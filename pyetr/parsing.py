@@ -28,12 +28,30 @@ class Quantified:
         return f"<Quantified atom={self.atom} quantifier={self.quantifier}>"
 
 
+class BoolNot:
+    def __init__(self, t) -> None:
+        assert len(t) == 1
+        assert len(t[0]) == 1
+        self.arg = t[0][0]
+
+    def __repr__(self) -> str:
+        return f"<BoolNot arg={self.arg}>"
+
+
 class BoolAnd:
     def __init__(self, t) -> None:
         self.operands = t[0]
 
     def __repr__(self) -> str:
         return f"<BoolAnd operands={self.operands}>"
+
+
+class BoolOr:
+    def __init__(self, t) -> None:
+        self.operands = t[0]
+
+    def __repr__(self) -> str:
+        return f"<BoolOr operands={self.operands}>"
 
 
 expr = pp.Forward()
@@ -44,8 +62,10 @@ quantifier = pp.oneOf(
 ).setResultsName("quantifier")
 quantified_expr = pp.Group(quantifier + atom).setParseAction(Quantified)
 
-bool_and = pp.Suppress(pp.Char("∧").setResultsName("bool_and", listAllMatches=True))
-# ∨
+bool_not = pp.Suppress(pp.Char("~"))
+bool_or = pp.Suppress(pp.Char("∨"))
+bool_and = pp.Suppress(pp.Char("∧"))
+
 predicate = (
     pp.Group(
         pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
@@ -59,7 +79,11 @@ predicate = (
 
 nested_and = pp.infixNotation(
     predicate,
-    [(bool_and, 2, pp_left, BoolAnd)],
+    [
+        (bool_not, 1, pp_right, BoolNot),
+        (bool_and, 2, pp_left, BoolAnd),
+        (bool_or, 2, pp_left, BoolOr),
+    ],
     lpar=pp.Suppress("("),
     rpar=pp.Suppress(")"),
 ).setResultsName("logical", listAllMatches=True)
@@ -72,13 +96,10 @@ def parse_formula(input_string):
 
 # input_string = '∃x ∃y ∀z ∀w [King(x) ∧ Queen(y) ∧ [King(z) → z = x] ∧ [Queen(w) → w = y]]'
 # input_string = "∃x ∃y ∀z ∀w [King(x) ∧ Queen(y) ∧ [King(x) ∧ Jack(y)]]"
-input_string = "∃x ∃y ∀z ∀w (King(x) ∧ Queen(y) ∧ (King(x) ∧ Jack(y)))"
+input_string = "∃x ∃y ∀z ∀w (King(x) ∨ ~Queen(y) ∧ (King(x) ∧ Jack(y)))"
 result = parse_formula(input_string)
 
 print(result.as_list())
 
 # bits to add
-# negation '~'
-# conjunction '&'
-# disjunction = pp.Group(expr + pp.Suppress('|') + expr)
 # implication = pp.Group(expr + pp.Suppress('→') + expr)
