@@ -1,5 +1,5 @@
 __all__ = [
-    "Atom",
+    "Variable",
     "Predicate",
     "Quantified",
     "BoolNot",
@@ -23,38 +23,40 @@ pp_left = pp.opAssoc.LEFT  # type:ignore
 pp_right = pp.opAssoc.RIGHT  # type:ignore
 
 
-class Atom:
-    var: str
+class Variable:
+    name: str
 
     def __init__(self, t) -> None:
-        self.var = t[0]
+        self.name = t[0]
 
     def __repr__(self) -> str:
-        return f"<Atom var={self.var}>"
+        return f"<Variable name={self.name}>"
 
 
 class Predicate:
-    atom: list[Atom]
+    variables: list[Variable]
     predicate: str
 
     def __init__(self, t) -> None:
         self.predicate = t[0].predicate
-        self.atom = t[0].atom.as_list()
+        self.variables = t[0].variables.as_list()
 
     def __repr__(self) -> str:
-        return f"<Predicate atom={self.atom} predicate={self.predicate}>"
+        return f"<Predicate variables={self.variables} predicate={self.predicate}>"
 
 
 class Quantified:
-    atom: Atom
+    variable: Variable
     quantifier: str
 
     def __init__(self, t) -> None:
-        self.atom = t[0].atom
+        variables = t[0].variables.as_list()
+        assert len(variables) == 1
+        self.variable = variables[0]
         self.quantifier = t[0].quantifier
 
     def __repr__(self) -> str:
-        return f"<Quantified atom={self.atom} quantifier={self.quantifier}>"
+        return f"<Quantified variable={self.variable} quantifier={self.quantifier}>"
 
 
 class BoolNot:
@@ -115,23 +117,23 @@ class Equals(TwoOperand):
 @cache
 def get_expr():
     expr = pp.Forward()
-    atom = (
+    variable = (
         pp.Word(pp.alphas, pp.alphanums)
-        .setResultsName("atom", listAllMatches=True)
-        .setParseAction(Atom)
+        .setResultsName("variables", listAllMatches=True)
+        .setParseAction(Variable)
     )
 
     quantifier = pp.oneOf(
         "∃ ∀",
     ).setResultsName("quantifier")
-    quantified_expr = pp.Group(quantifier + atom).setParseAction(Quantified)
+    quantified_expr = pp.Group(quantifier + variable).setParseAction(Quantified)
 
     bool_not = pp.Suppress(pp.oneOf("~"))
     bool_or = pp.Suppress(pp.oneOf("∨ |"))
     bool_and = pp.Suppress(pp.oneOf("∧ &"))
     implies = pp.Suppress(pp.Char("→"))
     equals = pp.Suppress(pp.oneOf("="))
-    variables = pp.delimitedList(atom)
+    variables = pp.delimitedList(variable)
     predicate = pp.Group(
         pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
         + pp.Suppress("(")
@@ -140,7 +142,7 @@ def get_expr():
     ).setParseAction(Predicate)
 
     nested_and = pp.infixNotation(
-        predicate | atom,
+        predicate | variable,
         [
             (bool_not, 1, pp_right, BoolNot),
             (bool_and, 2, pp_left, BoolAnd),
@@ -155,7 +157,7 @@ def get_expr():
     return expr
 
 
-Item = Atom | Predicate | Quantified | BoolNot | BoolAnd | BoolOr | Implies | Equals
+Item = Variable | Predicate | Quantified | BoolNot | BoolAnd | BoolOr | Implies | Equals
 
 
 def parse_string(input_string: str) -> list[Item]:

@@ -1,5 +1,5 @@
-from pyetr.parsing.parse_item import gather_atoms, parse_items
-from pyetr.parsing.parse_string import Atom, parse_string
+from pyetr.parsing.parse_item import gather_variables, parse_items
+from pyetr.parsing.parse_string import Variable, parse_string
 
 input_string = (
     "∃x ∃y ∀z ∀w (King(x,y) ∧ Queen(y) ∧ (King(z) → z = x) ∧ (Queen(w) → w = y))"

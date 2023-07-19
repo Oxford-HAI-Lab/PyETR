@@ -4,7 +4,6 @@ from pyetr.term import ArbitraryObject
 from pyetr.tools import ArbitraryObjectGenerator
 
 from .parse_string import (
-    Atom,
     BoolAnd,
     BoolNot,
     BoolOr,
@@ -13,26 +12,27 @@ from .parse_string import (
     Item,
     Predicate,
     Quantified,
+    Variable,
 )
 
 # from ..atom import Predicate as NewPredicate
 
 
-def gather_atoms(expr: list[Item]) -> list[Atom]:
-    out: list[Atom] = []
+def gather_variables(expr: list[Item]) -> list[Variable]:
+    out: list[Variable] = []
     for item in expr:
-        if isinstance(item, Atom):
+        if isinstance(item, Variable):
             out.append(item)
         elif isinstance(item, Predicate):
-            out += item.atom
+            out += item.variables
         elif isinstance(item, Quantified):
-            out.append(item.atom)
+            out.append(item.variable)
         elif isinstance(item, BoolAnd) or isinstance(item, BoolOr):
-            out += gather_atoms(item.operands)
+            out += gather_variables(item.operands)
         elif isinstance(item, BoolNot):
-            out += gather_atoms([item.arg])
+            out += gather_variables([item.arg])
         elif isinstance(item, Equals) or isinstance(item, Implies):
-            out += gather_atoms([item.left, item.right])
+            out += gather_variables([item.left, item.right])
         else:
             assert False
     return out
@@ -60,16 +60,16 @@ def gather_predicate_or_quantifier(
 
 
 def parse_items(expr: list[Item]):
-    atoms = gather_atoms(expr)
+    variables = gather_variables(expr)
     arb_object_generator = ArbitraryObjectGenerator(is_existential=True)
 
-    atom_map: dict[str, ArbitraryObject] = {}
-    for atom in atoms:
-        if atom.var not in atom_map:
+    variable_map: dict[str, ArbitraryObject] = {}
+    for variable in variables:
+        if variable.name not in variable_map:
             arb_obj = next(arb_object_generator)
-            atom_map[atom.var] = arb_obj
+            variable_map[variable.name] = arb_obj
 
     predicates = gather_predicate_or_quantifier(expr, Predicate)
     for predicate in predicates:
-        print(predicate.atom)
-    print(atom_map)
+        print(predicate.variables)
+    print(variable_map)
