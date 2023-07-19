@@ -33,18 +33,6 @@ class Variable:
         return f"<Variable name={self.name}>"
 
 
-class Predicate:
-    variables: list[Variable]
-    name: str
-
-    def __init__(self, t) -> None:
-        self.name = t[0][0]
-        self.args = t[0][1:]
-
-    def __repr__(self) -> str:
-        return f"<Predicate args={self.args} name={self.name}>"
-
-
 class Quantified:
     variable: Variable
     quantifier: str
@@ -106,6 +94,10 @@ class BoolOr(MultiOperand):
     name = "BoolOr"
 
 
+class Comma(MultiOperand):
+    name = "Comma"
+
+
 class Implies(TwoOperand):
     name = "Implies"
 
@@ -130,6 +122,25 @@ class Falsum:
         return f"<Falsum>"
 
 
+class Predicate:
+    variables: list["Item"]
+    name: str
+
+    def __init__(self, t) -> None:
+        self.name = t[0][0]
+        if len(t[0]) > 1:
+            other = t[0][1]
+            if isinstance(other, Comma):
+                self.args = t[0][1].operands
+            else:
+                self.args = [t[0][1]]
+        else:
+            self.args = []
+
+    def __repr__(self) -> str:
+        return f"<Predicate args={self.args} name={self.name}>"
+
+
 @cache
 def get_expr():
     expr = pp.Forward()
@@ -148,14 +159,15 @@ def get_expr():
     bool_and = pp.Suppress(pp.oneOf("∧ &"))
     implies = pp.Suppress(pp.Char("→"))
     equals = pp.Suppress(pp.Char("="))
-    variables = pp.delimitedList(variable)
 
     predicate_word = pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
+    predicate_0 = pp.Group(predicate_word + pp.Suppress("()")).setParseAction(Predicate)
+
     truth = pp.Char("⊤").setParseAction(Truth)
     falsum = pp.Char("⊥").setParseAction(Falsum)
-
+    comma = pp.Suppress(",")
     nested_and = pp.infixNotation(
-        variables | truth | falsum,
+        predicate_0 | variable | truth | falsum,
         [
             (predicate_word, 1, pp_right, Predicate),
             (bool_not, 1, pp_right, BoolNot),
@@ -163,6 +175,7 @@ def get_expr():
             (bool_or, 2, pp_left, BoolOr),
             (equals, 2, pp_left, Equals),
             (implies, 2, pp_left, Implies),
+            (comma, 2, pp_left, Comma),
         ],
         lpar=pp.Suppress("("),
         rpar=pp.Suppress(")"),
