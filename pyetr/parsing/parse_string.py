@@ -38,14 +38,11 @@ class Predicate:
     name: str
 
     def __init__(self, t) -> None:
-        self.name = t[0].predicate
-        if t[0].variables == "":
-            self.variables = []
-        else:
-            self.variables = t[0].variables.as_list()
+        self.name = t[0][0]
+        self.args = t[0][1:]
 
     def __repr__(self) -> str:
-        return f"<Predicate variables={self.variables} name={self.name}>"
+        return f"<Predicate args={self.args} name={self.name}>"
 
 
 class Quantified:
@@ -146,25 +143,21 @@ def get_expr():
         "∃ ∀",
     ).setResultsName("quantifier")
     quantified_expr = pp.Group(quantifier + variable).setParseAction(Quantified)
-
     bool_not = pp.Suppress(pp.Char("~"))
     bool_or = pp.Suppress(pp.oneOf("∨ |"))
     bool_and = pp.Suppress(pp.oneOf("∧ &"))
     implies = pp.Suppress(pp.Char("→"))
     equals = pp.Suppress(pp.Char("="))
-    variables = pp.Optional(pp.delimitedList(variable))
-    predicate = pp.Group(
-        pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
-        + pp.Suppress("(")
-        + variables
-        + pp.Suppress(")")
-    ).setParseAction(Predicate)
+    variables = pp.delimitedList(variable)
+
+    predicate_word = pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
     truth = pp.Char("⊤").setParseAction(Truth)
     falsum = pp.Char("⊥").setParseAction(Falsum)
 
     nested_and = pp.infixNotation(
-        predicate | variable | truth | falsum,
+        variables | truth | falsum,
         [
+            (predicate_word, 1, pp_right, Predicate),
             (bool_not, 1, pp_right, BoolNot),
             (bool_and, 2, pp_left, BoolAnd),
             (bool_or, 2, pp_left, BoolOr),
