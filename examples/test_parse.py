@@ -11,7 +11,7 @@ input_string = "∃x ∃y ∃z ∃w ((P(Mary, x) ∧ Ace(y)) ∧ ((P(z, King(y))
 # input1 = "∃x ∃y ∃z ∃w [Pro(Mary(), x) ∧ Ace(y)]"# ∧ ((P(z, King(y))) ∨ (P(John, x) ∧ (P(w, Queen(z)) ∧ P(w, Jack(y))))))"
 # input_string = "∃x ∃y ∀z ∀w y(x(a,b,c()), d)"
 result = parse_string(input_string)
-print(result)
+# print(result)
 out = parse_items(result)
 
 print(out)

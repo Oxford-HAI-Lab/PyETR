@@ -4,8 +4,7 @@ from pyetr.stateset import set_of_states, state
 from pyetr.term import ArbitraryObject
 from pyetr.tools import ArbitraryObjectGenerator
 
-from ..atom import Atom
-from ..atom import Predicate as NewPredicate
+from ..atom import Atom, Predicate
 from .parse_string import (
     BoolAnd,
     BoolNot,
@@ -14,7 +13,7 @@ from .parse_string import (
     Falsum,
     Implies,
     Item,
-    Predicate,
+    LogicPredicate,
     Quantified,
     Truth,
     Variable,
@@ -26,7 +25,7 @@ def gather_variables(expr: list[Item]) -> list[Variable]:
     for item in expr:
         if isinstance(item, Variable):
             out.append(item)
-        elif isinstance(item, Predicate):
+        elif isinstance(item, LogicPredicate):
             out += gather_variables(item.args)
         elif isinstance(item, Quantified):
             out.append(item.variable)
@@ -43,7 +42,7 @@ def gather_variables(expr: list[Item]) -> list[Variable]:
     return out
 
 
-Gatherable = TypeVar("Gatherable", bound=Predicate | Quantified)
+Gatherable = TypeVar("Gatherable", bound=LogicPredicate | Quantified)
 
 
 def gather_predicate_or_quantifier(
@@ -67,7 +66,7 @@ def gather_predicate_or_quantifier(
 def _parse_item(
     item: Item,
     variable_map: dict[str, ArbitraryObject],
-    predicate_map: dict[str, NewPredicate],
+    predicate_map: dict[str, Predicate],
 ) -> set_of_states:
     # Based on definition 4.16
     if isinstance(item, BoolOr):
@@ -102,7 +101,7 @@ def _parse_item(
         # based on (v)
         return set_of_states({})
 
-    elif isinstance(item, Predicate):
+    elif isinstance(item, LogicPredicate):
         # based on (vi)
         new_pred = predicate_map[item.name]
         [_parse_item(i, variable_map, predicate_map) for i in item.args]
@@ -134,7 +133,6 @@ def _parse_item(
 
 def parse_items(expr: list[Item]) -> set_of_states:
     variables = gather_variables(expr)
-    print(variables)
     arb_object_generator = ArbitraryObjectGenerator(is_existential=True)
 
     # Build maps
@@ -144,11 +142,11 @@ def parse_items(expr: list[Item]) -> set_of_states:
             arb_obj = next(arb_object_generator)
             variable_map[variable.name] = arb_obj
 
-    predicates = gather_predicate_or_quantifier(expr, Predicate)
-    predicate_map: dict[str, NewPredicate] = {}
+    predicates = gather_predicate_or_quantifier(expr, LogicPredicate)
+    predicate_map: dict[str, Predicate] = {}
     for predicate in predicates:
         if predicate.name not in predicate_map:
-            predicate_map[predicate.name] = NewPredicate(
+            predicate_map[predicate.name] = Predicate(
                 name=predicate.name, arity=len(predicate.args)
             )
         else:

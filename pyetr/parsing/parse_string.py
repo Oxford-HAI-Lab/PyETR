@@ -1,6 +1,6 @@
 __all__ = [
     "Variable",
-    "Predicate",
+    "LogicPredicate",
     "Quantified",
     "BoolNot",
     "BoolAnd",
@@ -122,8 +122,8 @@ class Falsum:
         return f"<Falsum>"
 
 
-class Predicate:
-    variables: list["Item"]
+class LogicPredicate:
+    args: list["Item"]
     name: str
 
     def __init__(self, t) -> None:
@@ -138,7 +138,7 @@ class Predicate:
             self.args = []
 
     def __repr__(self) -> str:
-        return f"<Predicate args={self.args} name={self.name}>"
+        return f"<LogicPredicate args={self.args} name={self.name}>"
 
 
 @cache
@@ -161,7 +161,9 @@ def get_expr():
     equals = pp.Suppress(pp.Char("="))
 
     predicate_word = pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
-    predicate_0 = pp.Group(predicate_word + pp.Suppress("()")).setParseAction(Predicate)
+    predicate_0 = pp.Group(predicate_word + pp.Suppress("()")).setParseAction(
+        LogicPredicate
+    )
 
     truth = pp.Char("⊤").setParseAction(Truth)
     falsum = pp.Char("⊥").setParseAction(Falsum)
@@ -169,7 +171,7 @@ def get_expr():
     nested_and = pp.infixNotation(
         predicate_0 | variable | truth | falsum,
         [
-            (predicate_word, 1, pp_right, Predicate),
+            (predicate_word, 1, pp_right, LogicPredicate),
             (bool_not, 1, pp_right, BoolNot),
             (bool_and, 2, pp_left, BoolAnd),
             (bool_or, 2, pp_left, BoolOr),
@@ -186,7 +188,7 @@ def get_expr():
 
 Item = (
     Variable
-    | Predicate
+    | LogicPredicate
     | Quantified
     | BoolNot
     | BoolAnd
