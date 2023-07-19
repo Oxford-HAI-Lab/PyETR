@@ -3,6 +3,7 @@ from typing import TypeVar
 from pyetr.term import ArbitraryObject
 from pyetr.tools import ArbitraryObjectGenerator
 
+from ..atom import Predicate as NewPredicate
 from .parse_string import (
     BoolAnd,
     BoolNot,
@@ -14,8 +15,6 @@ from .parse_string import (
     Quantified,
     Variable,
 )
-
-# from ..atom import Predicate as NewPredicate
 
 
 def gather_variables(expr: list[Item]) -> list[Variable]:
@@ -70,6 +69,18 @@ def parse_items(expr: list[Item]):
             variable_map[variable.name] = arb_obj
 
     predicates = gather_predicate_or_quantifier(expr, Predicate)
+    predicate_map: dict[str, NewPredicate] = {}
     for predicate in predicates:
-        print(predicate.variables)
+        if predicate.name not in predicate_map:
+            predicate_map[predicate.name] = NewPredicate(
+                name=predicate.name, arity=len(predicate.variables)
+            )
+        else:
+            existing_predicate = predicate_map[predicate.name]
+            if existing_predicate.arity != len(predicate.variables):
+                raise ValueError(
+                    f"Parsing predicate {predicate} has different arity than existing {existing_predicate}"
+                )
+
     print(variable_map)
+    print(predicate_map)

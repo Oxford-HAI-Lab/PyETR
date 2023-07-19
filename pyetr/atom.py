@@ -63,7 +63,7 @@ class Predicate:
         return Predicate(self.name, not self.verifier)
 
     def __repr__(self) -> str:
-        return f"<Predicate name={self.name}"
+        return f"<Predicate name={self.name} arity={self.arity}>"
 
     def __call__(self, terms: tuple[Term | ArbitraryObject | Emphasis, ...]) -> Atom:
         return Atom(self, terms)

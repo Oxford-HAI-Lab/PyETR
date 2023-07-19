@@ -35,14 +35,17 @@ class Variable:
 
 class Predicate:
     variables: list[Variable]
-    predicate: str
+    name: str
 
     def __init__(self, t) -> None:
-        self.predicate = t[0].predicate
-        self.variables = t[0].variables.as_list()
+        self.name = t[0].predicate
+        if t[0].variables == "":
+            self.variables = []
+        else:
+            self.variables = t[0].variables.as_list()
 
     def __repr__(self) -> str:
-        return f"<Predicate variables={self.variables} predicate={self.predicate}>"
+        return f"<Predicate variables={self.variables} name={self.name}>"
 
 
 class Quantified:
@@ -133,7 +136,7 @@ def get_expr():
     bool_and = pp.Suppress(pp.oneOf("∧ &"))
     implies = pp.Suppress(pp.Char("→"))
     equals = pp.Suppress(pp.oneOf("="))
-    variables = pp.delimitedList(variable)
+    variables = pp.Optional(pp.delimitedList(variable))
     predicate = pp.Group(
         pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
         + pp.Suppress("(")
