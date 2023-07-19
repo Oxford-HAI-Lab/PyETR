@@ -70,19 +70,15 @@ def _parse_item(
     predicate_map: dict[str, NewPredicate],
 ) -> set_of_states:
     # Based on definition 4.16
-    if isinstance(item, Variable):
-        variable_map[item.name]
-        raise NotImplementedError
-    elif isinstance(item, Predicate):
-        # based on (vi)
-        new_pred = predicate_map[item.name]
-        new_term = tuple([variable_map[v.name] for v in item.variables])
-        atom: Atom = new_pred(new_term)
-        return set_of_states({state({atom})})
-    elif isinstance(item, BoolNot):
-        # based on (iii)
-        new_arg = _parse_item(item.arg, variable_map, predicate_map)
-        return new_arg.negation()
+    if isinstance(item, BoolOr):
+        # based on (i)
+        new_set = set_of_states(set())
+        for operand in item.operands:
+            parsed_item: set_of_states = _parse_item(
+                operand, variable_map, predicate_map
+            )
+            new_set |= parsed_item
+        return new_set
 
     elif isinstance(item, BoolAnd):
         # based on (ii)
@@ -94,37 +90,47 @@ def _parse_item(
             new_set *= parsed_item
         return new_set
 
-    elif isinstance(item, BoolOr):
-        # based on (i)
-        new_set = set_of_states(set())
-        for operand in item.operands:
-            parsed_item: set_of_states = _parse_item(
-                operand, variable_map, predicate_map
-            )
-            new_set |= parsed_item
-        return new_set
+    elif isinstance(item, BoolNot):
+        # based on (iii)
+        new_arg = _parse_item(item.arg, variable_map, predicate_map)
+        return new_arg.negation()
+    elif isinstance(item, Truth):
+        # based on (iv)
+        return set_of_states({state({})})
+
+    elif isinstance(item, Falsum):
+        # based on (v)
+        return set_of_states({})
+
+    elif isinstance(item, Predicate):
+        # based on (vi)
+        new_pred = predicate_map[item.name]
+        new_term = tuple([variable_map[v.name] for v in item.variables])
+        atom: Atom = new_pred(new_term)
+        return set_of_states({state({atom})})
+
+    elif isinstance(item, Variable):
+        variable_map[item.name]
+        raise NotImplementedError
+
     elif isinstance(item, Equals):
         _parse_item(item.left, variable_map, predicate_map)
         _parse_item(item.right, variable_map, predicate_map)
         raise NotImplementedError
+
     elif isinstance(item, Implies):
         _parse_item(item.left, variable_map, predicate_map)
         _parse_item(item.right, variable_map, predicate_map)
         raise NotImplementedError
 
-    elif isinstance(item, Truth):
-        # based on (iv)
-        return set_of_states({state({})})
-    elif isinstance(item, Falsum):
-        # based on (v)
-        return set_of_states({})
     elif isinstance(item, Quantified):
         assert False  # Quantified should not be present here
+
     else:
         assert False
 
 
-def parse_items(expr: list[Item]):
+def parse_items(expr: list[Item]) -> set_of_states:
     variables = gather_variables(expr)
     arb_object_generator = ArbitraryObjectGenerator(is_existential=True)
 
