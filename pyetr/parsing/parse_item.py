@@ -1,5 +1,8 @@
 from typing import TypeVar
 
+from pyetr.term import ArbitraryObject
+from pyetr.tools import ArbitraryObjectGenerator
+
 from .parse_string import (
     Atom,
     BoolAnd,
@@ -12,6 +15,8 @@ from .parse_string import (
     Quantified,
 )
 
+# from ..atom import Predicate as NewPredicate
+
 
 def gather_atoms(expr: list[Item]) -> list[Atom]:
     out: list[Atom] = []
@@ -19,7 +24,7 @@ def gather_atoms(expr: list[Item]) -> list[Atom]:
         if isinstance(item, Atom):
             out.append(item)
         elif isinstance(item, Predicate):
-            out.append(item.atom)
+            out += item.atom
         elif isinstance(item, Quantified):
             out.append(item.atom)
         elif isinstance(item, BoolAnd) or isinstance(item, BoolOr):
@@ -50,5 +55,21 @@ def gather_predicate_or_quantifier(
         elif isinstance(item, Equals) or isinstance(item, Implies):
             out += gather_predicate_or_quantifier([item.left, item.right], object_type)
         else:
-            assert False
+            pass
     return out
+
+
+def parse_items(expr: list[Item]):
+    atoms = gather_atoms(expr)
+    arb_object_generator = ArbitraryObjectGenerator(is_existential=True)
+
+    atom_map: dict[str, ArbitraryObject] = {}
+    for atom in atoms:
+        if atom.var not in atom_map:
+            arb_obj = next(arb_object_generator)
+            atom_map[atom.var] = arb_obj
+
+    predicates = gather_predicate_or_quantifier(expr, Predicate)
+    for predicate in predicates:
+        print(predicate.atom)
+    print(atom_map)

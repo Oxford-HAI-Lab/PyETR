@@ -34,12 +34,12 @@ class Atom:
 
 
 class Predicate:
-    atom: Atom
+    atom: list[Atom]
     predicate: str
 
     def __init__(self, t) -> None:
         self.predicate = t[0].predicate
-        self.atom = t[0].atom
+        self.atom = t[0].atom.as_list()
 
     def __repr__(self) -> str:
         return f"<Predicate atom={self.atom} predicate={self.predicate}>"
@@ -115,7 +115,11 @@ class Equals(TwoOperand):
 @cache
 def get_expr():
     expr = pp.Forward()
-    atom = pp.Word(pp.alphas, pp.alphanums).setResultsName("atom").setParseAction(Atom)
+    atom = (
+        pp.Word(pp.alphas, pp.alphanums)
+        .setResultsName("atom", listAllMatches=True)
+        .setParseAction(Atom)
+    )
 
     quantifier = pp.oneOf(
         "∃ ∀",
@@ -127,11 +131,11 @@ def get_expr():
     bool_and = pp.Suppress(pp.oneOf("∧ &"))
     implies = pp.Suppress(pp.Char("→"))
     equals = pp.Suppress(pp.oneOf("="))
-
+    variables = pp.delimitedList(atom)
     predicate = pp.Group(
         pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
         + pp.Suppress("(")
-        + atom
+        + variables
         + pp.Suppress(")")
     ).setParseAction(Predicate)
 
