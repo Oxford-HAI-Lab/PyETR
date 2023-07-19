@@ -27,7 +27,7 @@ def gather_variables(expr: list[Item]) -> list[Variable]:
         if isinstance(item, Variable):
             out.append(item)
         elif isinstance(item, Predicate):
-            out += item.variables
+            out += gather_variables(item.args)
         elif isinstance(item, Quantified):
             out.append(item.variable)
         elif isinstance(item, BoolAnd) or isinstance(item, BoolOr):
@@ -105,7 +105,9 @@ def _parse_item(
     elif isinstance(item, Predicate):
         # based on (vi)
         new_pred = predicate_map[item.name]
-        new_term = tuple([variable_map[v.name] for v in item.variables])
+        [_parse_item(i, variable_map, predicate_map) for i in item.args]
+        raise NotImplementedError
+        new_term = tuple([variable_map[v.name] for v in item.args])
         atom: Atom = new_pred(new_term)
         return set_of_states({state({atom})})
 
@@ -132,6 +134,7 @@ def _parse_item(
 
 def parse_items(expr: list[Item]) -> set_of_states:
     variables = gather_variables(expr)
+    print(variables)
     arb_object_generator = ArbitraryObjectGenerator(is_existential=True)
 
     # Build maps
@@ -146,11 +149,11 @@ def parse_items(expr: list[Item]) -> set_of_states:
     for predicate in predicates:
         if predicate.name not in predicate_map:
             predicate_map[predicate.name] = NewPredicate(
-                name=predicate.name, arity=len(predicate.variables)
+                name=predicate.name, arity=len(predicate.args)
             )
         else:
             existing_predicate = predicate_map[predicate.name]
-            if existing_predicate.arity != len(predicate.variables):
+            if existing_predicate.arity != len(predicate.args):
                 raise ValueError(
                     f"Parsing predicate {predicate} has different arity than existing {existing_predicate}"
                 )
