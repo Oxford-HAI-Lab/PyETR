@@ -1,18 +1,22 @@
 from typing import TypeVar
 
+from pyetr.dependency import DependencyRelation
 from pyetr.stateset import set_of_states, state
-from pyetr.term import ArbitraryObject
+from pyetr.term import ArbitraryObject, Emphasis, Function, Term
 from pyetr.tools import ArbitraryObjectGenerator
+from pyetr.view import View
 
 from ..atom import Atom, Predicate
 from .parse_string import (
     BoolAnd,
     BoolNot,
     BoolOr,
+    Constant,
     Equals,
     Falsum,
     Implies,
     Item,
+    LogicFunction,
     LogicPredicate,
     Quantified,
     Truth,
@@ -27,6 +31,8 @@ def gather_variables(expr: list[Item]) -> list[Variable]:
             out.append(item)
         elif isinstance(item, LogicPredicate):
             out += gather_variables(item.args)
+        elif isinstance(item, LogicFunction):
+            out += gather_variables(item.args)
         elif isinstance(item, Quantified):
             out.append(item.variable)
         elif isinstance(item, BoolAnd) or isinstance(item, BoolOr):
@@ -35,7 +41,11 @@ def gather_variables(expr: list[Item]) -> list[Variable]:
             out += gather_variables([item.arg])
         elif isinstance(item, Equals) or isinstance(item, Implies):
             out += gather_variables([item.left, item.right])
-        elif isinstance(item, Truth) or isinstance(item, Falsum):
+        elif (
+            isinstance(item, Truth)
+            or isinstance(item, Falsum)
+            or isinstance(item, Constant)
+        ):
             pass
         else:
             assert False
@@ -61,6 +71,45 @@ def gather_predicate_or_quantifier(
         else:
             pass
     return out
+
+
+def _parse_function(
+    function: LogicFunction, variable_map: dict[str, ArbitraryObject]
+) -> Term:
+    new_function = Function(function.name, len(function.args))
+    terms: list[Term | ArbitraryObject | Emphasis] = []
+    for item in function.args:
+        if isinstance(item, Variable):
+            terms.append(variable_map[item.name])
+        elif isinstance(item, LogicFunction):
+            terms.append(_parse_function(item, variable_map))
+        # elif isinstance(item, LogicEmphasis):
+        #     raise NotImplementedError
+        elif isinstance(item, Constant):
+            terms.append(Term(Function(item.name, 0)))
+        else:
+            raise ValueError(f"Invalid item {item}")
+
+    return Term(new_function, tuple(terms))
+
+
+def _parse_predicate(
+    predicate: LogicPredicate, variable_map: dict[str, ArbitraryObject]
+) -> Atom:
+    new_pred = Predicate(name=predicate.name, arity=len(predicate.args))
+    new_items: list[Term | ArbitraryObject | Emphasis] = []
+    for item in predicate.args:
+        if isinstance(item, Variable):
+            new_items.append(variable_map[item.name])
+        elif isinstance(item, LogicFunction):
+            new_items.append(_parse_function(item, variable_map))
+        # elif isinstance(item, LogicEmphasis):
+        #     raise NotImplementedError
+        elif isinstance(item, Constant):
+            new_items.append(Term(Function(item.name, 0)))
+        else:
+            raise ValueError(f"Invalid item {item}")
+    return new_pred(tuple(new_items))
 
 
 def _parse_item(
@@ -103,35 +152,46 @@ def _parse_item(
 
     elif isinstance(item, LogicPredicate):
         # based on (vi)
-        new_pred = predicate_map[item.name]
-        [_parse_item(i, variable_map, predicate_map) for i in item.args]
-        raise NotImplementedError
-        new_term = tuple([variable_map[v.name] for v in item.args])
-        atom: Atom = new_pred(new_term)
-        return set_of_states({state({atom})})
+        return set_of_states({state({_parse_predicate(item, variable_map)})})
+
+    elif isinstance(item, LogicFunction):
+        raise ValueError(f"Logic function {item} found outside of logic predicate")
 
     elif isinstance(item, Variable):
-        variable_map[item.name]
-        raise NotImplementedError
+        raise ValueError(f"Variable {item} found outside of logic predicate")
 
     elif isinstance(item, Equals):
+        # use equals predicate
         _parse_item(item.left, variable_map, predicate_map)
         _parse_item(item.right, variable_map, predicate_map)
         raise NotImplementedError
 
     elif isinstance(item, Implies):
-        _parse_item(item.left, variable_map, predicate_map)
-        _parse_item(item.right, variable_map, predicate_map)
-        raise NotImplementedError
+        raise ValueError(f"Implies statement {item} found at lower level than top")
 
     elif isinstance(item, Quantified):
         assert False  # Quantified should not be present here
-
     else:
         assert False
 
 
-def parse_items(expr: list[Item]) -> set_of_states:
+def _parse_view(
+    expr: Item,
+    variable_map: dict[str, ArbitraryObject],
+    predicate_map: dict[str, Predicate],
+) -> View:
+    if isinstance(expr, Implies):
+        supposition = expr.left
+        stage = expr.right
+    else:
+        supposition = Truth([])
+        stage = expr
+    parsed_supposition = _parse_item(supposition, variable_map, predicate_map)
+    parsed_stage = _parse_item(stage, variable_map, predicate_map)
+    return View(parsed_supposition, parsed_stage, DependencyRelation(frozenset({})))
+
+
+def parse_items(expr: list[Item]) -> View:
     variables = gather_variables(expr)
     arb_object_generator = ArbitraryObjectGenerator(is_existential=True)
 
@@ -146,6 +206,7 @@ def parse_items(expr: list[Item]) -> set_of_states:
     predicate_map: dict[str, Predicate] = {}
     for predicate in predicates:
         if predicate.name not in predicate_map:
+            # predicate name is f_ use Function or arity is 0
             predicate_map[predicate.name] = Predicate(
                 name=predicate.name, arity=len(predicate.args)
             )
@@ -157,10 +218,10 @@ def parse_items(expr: list[Item]) -> set_of_states:
                 )
     # Parse items
     # Ignore quantified
-    new_item = None
+    view = None
     for item in expr:
         if not isinstance(item, Quantified):
-            assert new_item is None  # There must only be one valid term
-            new_item = _parse_item(item, variable_map, predicate_map)
-    assert new_item is not None
-    return new_item
+            assert view is None  # There must only be one valid view
+            view = _parse_view(item, variable_map, predicate_map)
+    assert view is not None
+    return view

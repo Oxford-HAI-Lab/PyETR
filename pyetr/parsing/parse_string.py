@@ -33,6 +33,16 @@ class Variable:
         return f"<Variable name={self.name}>"
 
 
+class Constant:
+    name: str
+
+    def __init__(self, t) -> None:
+        self.name = t[0][0]
+
+    def __repr__(self) -> str:
+        return f"<Constant name={self.name}>"
+
+
 class Quantified:
     variable: Variable
     quantifier: str
@@ -141,6 +151,25 @@ class LogicPredicate:
         return f"<LogicPredicate args={self.args} name={self.name}>"
 
 
+class LogicFunction:
+    args: list["Item"]
+    name: str
+
+    def __init__(self, t) -> None:
+        self.name = t[0][1]
+        if len(t[0]) > 2:
+            other = t[0][2]
+            if isinstance(other, Comma):
+                self.args = t[0][2].operands
+            else:
+                self.args = [t[0][2]]
+        else:
+            self.args = []
+
+    def __repr__(self) -> str:
+        return f"<LogicFunction args={self.args} name={self.name}>"
+
+
 @cache
 def get_expr():
     expr = pp.Forward()
@@ -161,9 +190,8 @@ def get_expr():
     equals = pp.Suppress(pp.Char("="))
 
     predicate_word = pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
-    predicate_0 = pp.Group(predicate_word + pp.Suppress("()")).setParseAction(
-        LogicPredicate
-    )
+    function_word = pp.Literal("f_") + predicate_word
+    predicate_0 = pp.Group(predicate_word + pp.Suppress("()")).setParseAction(Constant)
 
     truth = pp.Char("⊤").setParseAction(Truth)
     falsum = pp.Char("⊥").setParseAction(Falsum)
@@ -171,6 +199,7 @@ def get_expr():
     nested_and = pp.infixNotation(
         predicate_0 | variable | truth | falsum,
         [
+            (function_word, 1, pp_right, LogicFunction),
             (predicate_word, 1, pp_right, LogicPredicate),
             (bool_not, 1, pp_right, BoolNot),
             (bool_and, 2, pp_left, BoolAnd),
@@ -188,7 +217,9 @@ def get_expr():
 
 Item = (
     Variable
+    | LogicFunction
     | LogicPredicate
+    | Constant
     | Quantified
     | BoolNot
     | BoolAnd
