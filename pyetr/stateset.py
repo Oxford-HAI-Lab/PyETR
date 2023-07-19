@@ -138,4 +138,5 @@ class set_of_states(frozenset[state]):
                 output = new_state_set
             else:
                 output = output * new_state_set
+        assert output is not None
         return output

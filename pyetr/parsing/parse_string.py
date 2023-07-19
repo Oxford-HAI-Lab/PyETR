@@ -117,6 +117,22 @@ class Equals(TwoOperand):
     name = "Equals"
 
 
+class Truth:
+    def __init__(self, t) -> None:
+        pass
+
+    def __repr__(self) -> str:
+        return f"<Truth>"
+
+
+class Falsum:
+    def __init__(self, t) -> None:
+        pass
+
+    def __repr__(self) -> str:
+        return f"<Falsum>"
+
+
 @cache
 def get_expr():
     expr = pp.Forward()
@@ -131,11 +147,11 @@ def get_expr():
     ).setResultsName("quantifier")
     quantified_expr = pp.Group(quantifier + variable).setParseAction(Quantified)
 
-    bool_not = pp.Suppress(pp.oneOf("~"))
+    bool_not = pp.Suppress(pp.Char("~"))
     bool_or = pp.Suppress(pp.oneOf("∨ |"))
     bool_and = pp.Suppress(pp.oneOf("∧ &"))
     implies = pp.Suppress(pp.Char("→"))
-    equals = pp.Suppress(pp.oneOf("="))
+    equals = pp.Suppress(pp.Char("="))
     variables = pp.Optional(pp.delimitedList(variable))
     predicate = pp.Group(
         pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
@@ -143,9 +159,11 @@ def get_expr():
         + variables
         + pp.Suppress(")")
     ).setParseAction(Predicate)
+    truth = pp.Char("⊤").setParseAction(Truth)
+    falsum = pp.Char("⊥").setParseAction(Falsum)
 
     nested_and = pp.infixNotation(
-        predicate | variable,
+        predicate | variable | truth | falsum,
         [
             (bool_not, 1, pp_right, BoolNot),
             (bool_and, 2, pp_left, BoolAnd),
@@ -160,7 +178,18 @@ def get_expr():
     return expr
 
 
-Item = Variable | Predicate | Quantified | BoolNot | BoolAnd | BoolOr | Implies | Equals
+Item = (
+    Variable
+    | Predicate
+    | Quantified
+    | BoolNot
+    | BoolAnd
+    | BoolOr
+    | Implies
+    | Equals
+    | Truth
+    | Falsum
+)
 
 
 def parse_string(input_string: str) -> list[Item]:
