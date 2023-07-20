@@ -39,27 +39,3 @@ class Commitment:
     def __init__(self, view1: View, view2: View) -> None:
         self.view1 = view1
         self.view2 = view2
-
-
-# class Variable:
-#     name:str
-#     def __init__(self, name) -> None:
-#         self.name = name
-
-# class Operator(Enum):
-#     or_ = '∨'
-#     and_ = '∧'
-#     not_ = '¬'
-#     truth = 'T'
-#     falsum = '⊥'
-
-# expr = Variable('x')
-# #∃x ∃y ∀z ∀w (King(x) ∧ Queen(y) ∧ (King(z) → z = x) ∧ (Queen(w) → w = y))
-# Predicate()
-# def build_view(formula) -> View:
-
-# #∀x [S(x) → (D(x) ∨ Sm(x))]
-
-# translate sentence into the language of predicate calculus
-
-# example 47 to 58
