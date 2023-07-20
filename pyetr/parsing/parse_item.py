@@ -1,4 +1,5 @@
-from typing import TypeVar
+from dataclasses import dataclass
+from typing import overload
 
 from pyetr.dependency import Dependency, DependencyRelation
 from pyetr.stateset import set_of_states, state
@@ -24,14 +25,18 @@ from .parse_string import (
 )
 
 
-def _parse_predicate(
-    predicate: LogicPredicate,
-    variable_map: dict[str, ArbitraryObject],
-    predicate_map: dict[str, Predicate],
-) -> Atom:
+@dataclass
+class Maps:
+    variable_map: dict[str, ArbitraryObject]
+    predicate_map: dict[str, Predicate]
+    function_map: dict[str, Function]
+    constant_map: dict[str, Function]
+
+
+def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> Atom:
     def _parse_term(item: Item) -> Term | ArbitraryObject | Emphasis:
         if isinstance(item, Variable):
-            return variable_map[item.name]
+            return maps.variable_map[item.name]
         elif isinstance(item, LogicFunction):
             return _parse_function(item)
         elif isinstance(item, LogicEmphasis):
@@ -40,38 +45,42 @@ def _parse_predicate(
                 raise ValueError(f"Second emphasis found in {inner}")
             return Emphasis(inner)
         elif isinstance(item, Constant):
-            return Term(Function(item.name, 0))
+            return _parse_constant(item)
         else:
             raise ValueError(f"Invalid item {item}")
 
+    def _parse_constant(constant: Constant) -> Term:
+        if constant.name not in maps.constant_map:
+            raise ValueError(f"{constant} not found in constant map")
+        return Term(maps.constant_map[constant.name])
+
     def _parse_function(function: LogicFunction) -> Term:
-        new_function = Function(function.name, len(function.args))
+        if function.name not in maps.function_map:
+            raise ValueError(f"{function} not found in function map")
         terms: list[Term | ArbitraryObject | Emphasis] = [
             _parse_term(item) for item in function.args
         ]
-        return Term(new_function, tuple(terms))
+        if len(terms) == 0:
+            new_terms = None
+        else:
+            new_terms = tuple(terms)
+        return Term(maps.function_map[function.name], new_terms)
 
     terms: list[Term | ArbitraryObject | Emphasis] = [
         _parse_term(item) for item in predicate.args
     ]
-    if predicate.name not in predicate_map:
+    if predicate.name not in maps.predicate_map:
         raise ValueError(f"{predicate} not found in predicate map")
-    return predicate_map[predicate.name](tuple(terms))
+    return maps.predicate_map[predicate.name](tuple(terms))
 
 
-def _parse_item(
-    item: Item,
-    variable_map: dict[str, ArbitraryObject],
-    predicate_map: dict[str, Predicate],
-) -> set_of_states:
+def _parse_item(item: Item, maps: Maps) -> set_of_states:
     # Based on definition 4.16
     if isinstance(item, BoolOr):
         # based on (i)
         new_set = set_of_states(set())
         for operand in item.operands:
-            parsed_item: set_of_states = _parse_item(
-                operand, variable_map, predicate_map
-            )
+            parsed_item: set_of_states = _parse_item(operand, maps)
             new_set |= parsed_item
         return new_set
 
@@ -79,15 +88,13 @@ def _parse_item(
         # based on (ii)
         new_set = set_of_states(set())
         for operand in item.operands:
-            parsed_item: set_of_states = _parse_item(
-                operand, variable_map, predicate_map
-            )
+            parsed_item: set_of_states = _parse_item(operand, maps)
             new_set *= parsed_item
         return new_set
 
     elif isinstance(item, BoolNot):
         # based on (iii)
-        new_arg = _parse_item(item.arg, variable_map, predicate_map)
+        new_arg = _parse_item(item.arg, maps)
         return new_arg.negation()
     elif isinstance(item, Truth):
         # based on (iv)
@@ -99,9 +106,7 @@ def _parse_item(
 
     elif isinstance(item, LogicPredicate):
         # based on (vi)
-        return set_of_states(
-            {state({_parse_predicate(item, variable_map, predicate_map)})}
-        )
+        return set_of_states({state({_parse_predicate(item, maps)})})
 
     elif isinstance(item, LogicEmphasis):
         # TODO: Is this correct?
@@ -128,8 +133,7 @@ def _parse_item(
 def _parse_view(
     view_item: Item,
     dependency_relation: DependencyRelation,
-    variable_map: dict[str, ArbitraryObject],
-    predicate_map: dict[str, Predicate],
+    maps: Maps,
 ) -> View:
     if isinstance(view_item, Implies):
         supposition = view_item.left
@@ -137,8 +141,8 @@ def _parse_view(
     else:
         supposition = Truth()
         stage = view_item
-    parsed_supposition = _parse_item(supposition, variable_map, predicate_map)
-    parsed_stage = _parse_item(stage, variable_map, predicate_map)
+    parsed_supposition = _parse_item(supposition, maps)
+    parsed_stage = _parse_item(stage, maps)
     return View(parsed_supposition, parsed_stage, dependency_relation)
 
 
@@ -176,24 +180,84 @@ def get_variable_map_and_dependency_relation(
     return variable_map, DependencyRelation(frozenset(dependencies))
 
 
-Gatherable = TypeVar("Gatherable", bound=LogicPredicate | LogicFunction | Constant)
+@overload
+def gather_item(item: Item, object_type: type[LogicPredicate]) -> list[LogicPredicate]:
+    ...
 
 
-# Restructure to be of Item
-def gather_item(expr: list[Item], object_type: type[Gatherable]) -> list[Gatherable]:
-    out: list[Gatherable] = []
-    for item in expr:
-        if isinstance(item, object_type):
-            out.append(item)
-        elif isinstance(item, BoolAnd) or isinstance(item, BoolOr):
-            out += gather_item(item.operands, object_type)
-        elif isinstance(item, BoolNot) or isinstance(item, LogicEmphasis):
-            out += gather_item([item.arg], object_type)
-        elif isinstance(item, Implies):
-            out += gather_item([item.left, item.right], object_type)
-        else:
-            pass
+@overload
+def gather_item(item: Item, object_type: type[LogicFunction]) -> list[LogicFunction]:
+    ...
+
+
+@overload
+def gather_item(item: Item, object_type: type[Constant]) -> list[Constant]:
+    ...
+
+
+def gather_item(
+    item: Item, object_type: type[LogicPredicate] | type[LogicFunction] | type[Constant]
+) -> list[LogicPredicate] | list[LogicFunction] | list[Constant]:
+    out = []
+
+    if isinstance(item, object_type):
+        out.append(item)
+
+    if isinstance(item, LogicPredicate) or isinstance(item, LogicFunction):
+        for arg in item.args:
+            out += gather_item(arg, object_type)
+    elif isinstance(item, BoolAnd) or isinstance(item, BoolOr):
+        for operand in item.operands:
+            out += gather_item(operand, object_type)
+    elif isinstance(item, BoolNot) or isinstance(item, LogicEmphasis):
+        out += gather_item(item.arg, object_type)
+    elif isinstance(item, Implies):
+        out += gather_item(item.left, object_type) + gather_item(
+            item.right, object_type
+        )
+    else:
+        pass
     return out
+
+
+def build_maps(
+    item: Item,
+) -> tuple[dict[str, Predicate], dict[str, Function], dict[str, Function]]:
+    logic_predicates = gather_item(item, LogicPredicate)
+    logic_functions = gather_item(item, LogicFunction)
+    constants = gather_item(item, Constant)
+
+    predicate_map: dict[str, Predicate] = {}
+    for predicate in logic_predicates:
+        if predicate.name not in predicate_map:
+            predicate_map[predicate.name] = Predicate(
+                name=predicate.name, arity=len(predicate.args)
+            )
+        else:
+            exising_predicate = predicate_map[predicate.name]
+            if exising_predicate.arity != len(predicate.args):
+                raise ValueError(
+                    f"Parsing predicate {predicate} has different arity than existing {predicate_map[predicate.name]}"
+                )
+
+    function_map: dict[str, Function] = {}
+    for function in logic_functions:
+        if function.name not in function_map:
+            function_map[function.name] = Function(
+                name=function.name, arity=len(function.args)
+            )
+        else:
+            exising_function = function_map[function.name]
+            if exising_function.arity != len(function.args):
+                raise ValueError(
+                    f"Parsing function {function} has different arity than existing {function_map[function.name]}"
+                )
+
+    constant_map: dict[str, Function] = {}
+    for constant in constants:
+        if constant.name not in constant_map:
+            constant_map[constant.name] = Function(name=constant.name, arity=0)
+    return predicate_map, function_map, constant_map
 
 
 def parse_items(expr: list[Item]) -> View:
@@ -211,19 +275,6 @@ def parse_items(expr: list[Item]) -> View:
     variable_map, dependency_relation = get_variable_map_and_dependency_relation(
         quantifieds
     )
-
-    predicates = gather_item(expr, LogicPredicate)
-    predicate_map: dict[str, Predicate] = {}
-    for predicate in predicates:
-        if predicate.name not in predicate_map:
-            # predicate name is f_ use Function or arity is 0
-            predicate_map[predicate.name] = Predicate(
-                name=predicate.name, arity=len(predicate.args)
-            )
-        else:
-            existing_predicate = predicate_map[predicate.name]
-            if existing_predicate.arity != len(predicate.args):
-                raise ValueError(
-                    f"Parsing predicate {predicate} has different arity than existing {existing_predicate}"
-                )
-    return _parse_view(view_item, dependency_relation, variable_map, predicate_map)
+    predicate_map, function_map, constant_map = build_maps(view_item)
+    maps = Maps(variable_map, predicate_map, function_map, constant_map)
+    return _parse_view(view_item, dependency_relation, maps)

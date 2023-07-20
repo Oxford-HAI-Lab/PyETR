@@ -21,6 +21,11 @@ class Dependency:
         self.universal = universal
         self.existentials = existentials
 
+    def __repr__(self) -> str:
+        return (
+            f"<Dependency universal={self.universal} existentials={self.existentials}>"
+        )
+
 
 def _test_matroyshka(deps: frozenset[Dependency]):
     existentials: list[frozenset[ArbitraryObject]] = [d.existentials for d in deps]
@@ -70,3 +75,12 @@ class DependencyRelation:
                 raise ValueError(
                     f"{d.universal } not found in universal states {uni_arb_objects}"
                 )
+
+    def __repr__(self) -> str:
+        if len(self.dependencies) == 0:
+            full_string = ""
+        else:
+            full_string = " dependencies=" + "\n".join(
+                [dep.__repr__() for dep in self.dependencies]
+            )
+        return f"<DependencyRelation{full_string}>"
