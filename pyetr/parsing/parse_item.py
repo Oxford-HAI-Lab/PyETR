@@ -1,6 +1,6 @@
 from typing import TypeVar
 
-from pyetr.dependency import DependencyRelation
+from pyetr.dependency import Dependency, DependencyRelation
 from pyetr.stateset import set_of_states, state
 from pyetr.term import ArbitraryObject, Emphasis, Function, Term
 from pyetr.tools import ArbitraryObjectGenerator
@@ -24,59 +24,10 @@ from .parse_string import (
 )
 
 
-# Restructure to be of Item
-def gather_variables(expr: list[Item]) -> list[Variable]:
-    out: list[Variable] = []
-    for item in expr:
-        if isinstance(item, Variable):
-            out.append(item)
-        elif isinstance(item, LogicPredicate) or isinstance(item, LogicFunction):
-            out += gather_variables(item.args)
-        elif isinstance(item, LogicEmphasis):
-            out += gather_variables([item.arg])
-        elif isinstance(item, Quantified):
-            out.append(item.variable)
-        elif isinstance(item, BoolAnd) or isinstance(item, BoolOr):
-            out += gather_variables(item.operands)
-        elif isinstance(item, BoolNot):
-            out += gather_variables([item.arg])
-        elif isinstance(item, Implies):
-            out += gather_variables([item.left, item.right])
-        elif (
-            isinstance(item, Truth)
-            or isinstance(item, Falsum)
-            or isinstance(item, Constant)
-        ):
-            pass
-        else:
-            assert False
-    return out
-
-
-Gatherable = TypeVar("Gatherable", bound=LogicPredicate | Quantified)
-
-
-# Restructure to be of Item
-def gather_predicate_or_quantifier(
-    expr: list[Item], object_type: type[Gatherable]
-) -> list[Gatherable]:
-    out: list[Gatherable] = []
-    for item in expr:
-        if isinstance(item, object_type):
-            out.append(item)
-        elif isinstance(item, BoolAnd) or isinstance(item, BoolOr):
-            out += gather_predicate_or_quantifier(item.operands, object_type)
-        elif isinstance(item, BoolNot):
-            out += gather_predicate_or_quantifier([item.arg], object_type)
-        elif isinstance(item, Implies):
-            out += gather_predicate_or_quantifier([item.left, item.right], object_type)
-        else:
-            pass
-    return out
-
-
 def _parse_predicate(
-    predicate: LogicPredicate, variable_map: dict[str, ArbitraryObject]
+    predicate: LogicPredicate,
+    variable_map: dict[str, ArbitraryObject],
+    predicate_map: dict[str, Predicate],
 ) -> Atom:
     def _parse_term(item: Item) -> Term | ArbitraryObject | Emphasis:
         if isinstance(item, Variable):
@@ -100,11 +51,12 @@ def _parse_predicate(
         ]
         return Term(new_function, tuple(terms))
 
-    new_pred = Predicate(name=predicate.name, arity=len(predicate.args))
     terms: list[Term | ArbitraryObject | Emphasis] = [
         _parse_term(item) for item in predicate.args
     ]
-    return new_pred(tuple(terms))
+    if predicate.name not in predicate_map:
+        raise ValueError(f"{predicate} not found in predicate map")
+    return predicate_map[predicate.name](tuple(terms))
 
 
 def _parse_item(
@@ -147,7 +99,9 @@ def _parse_item(
 
     elif isinstance(item, LogicPredicate):
         # based on (vi)
-        return set_of_states({state({_parse_predicate(item, variable_map)})})
+        return set_of_states(
+            {state({_parse_predicate(item, variable_map, predicate_map)})}
+        )
 
     elif isinstance(item, LogicEmphasis):
         # TODO: Is this correct?
@@ -172,33 +126,93 @@ def _parse_item(
 
 
 def _parse_view(
-    expr: Item,
+    view_item: Item,
+    dependency_relation: DependencyRelation,
     variable_map: dict[str, ArbitraryObject],
     predicate_map: dict[str, Predicate],
 ) -> View:
-    if isinstance(expr, Implies):
-        supposition = expr.left
-        stage = expr.right
+    if isinstance(view_item, Implies):
+        supposition = view_item.left
+        stage = view_item.right
     else:
         supposition = Truth()
-        stage = expr
+        stage = view_item
     parsed_supposition = _parse_item(supposition, variable_map, predicate_map)
     parsed_stage = _parse_item(stage, variable_map, predicate_map)
-    return View(parsed_supposition, parsed_stage, DependencyRelation(frozenset({})))
+    return View(parsed_supposition, parsed_stage, dependency_relation)
+
+
+Universal = ArbitraryObject
+Existential = ArbitraryObject
+
+
+def get_variable_map_and_dependency_relation(
+    quantifieds: list[Quantified],
+) -> tuple[dict[str, ArbitraryObject], DependencyRelation]:
+    exi_generator = ArbitraryObjectGenerator(is_existential=True)
+    uni_generator = ArbitraryObjectGenerator(is_existential=False)
+    variable_map: dict[str, ArbitraryObject] = {}
+    encountered_universals: list[tuple[Universal, set[Existential]]] = []
+    for quantified in quantifieds:
+        if quantified.quantifier == "∃":
+            arb_obj = next(exi_generator)
+            for _, exi_set in encountered_universals:
+                exi_set.add(arb_obj)
+        else:
+            arb_obj = next(uni_generator)
+            encountered_universals.append((arb_obj, set()))
+
+        if quantified.variable.name not in variable_map:
+            variable_map[quantified.variable.name] = arb_obj
+        else:
+            raise ValueError(
+                f"Variable {quantified.variable.name} appears twice in quantifiers"
+            )
+    dependencies = [
+        Dependency(universal, frozenset(existentials))
+        for universal, existentials in encountered_universals
+        if len(existentials) > 0
+    ]
+    return variable_map, DependencyRelation(frozenset(dependencies))
+
+
+Gatherable = TypeVar("Gatherable", bound=LogicPredicate | LogicFunction | Constant)
+
+
+# Restructure to be of Item
+def gather_item(expr: list[Item], object_type: type[Gatherable]) -> list[Gatherable]:
+    out: list[Gatherable] = []
+    for item in expr:
+        if isinstance(item, object_type):
+            out.append(item)
+        elif isinstance(item, BoolAnd) or isinstance(item, BoolOr):
+            out += gather_item(item.operands, object_type)
+        elif isinstance(item, BoolNot) or isinstance(item, LogicEmphasis):
+            out += gather_item([item.arg], object_type)
+        elif isinstance(item, Implies):
+            out += gather_item([item.left, item.right], object_type)
+        else:
+            pass
+    return out
 
 
 def parse_items(expr: list[Item]) -> View:
-    variables = gather_variables(expr)
-    arb_object_generator = ArbitraryObjectGenerator(is_existential=True)
+    view_item = None
+    quantifieds: list[Quantified] = []
+    for item in expr:
+        if isinstance(item, Quantified):
+            quantifieds.append(item)
+        else:
+            assert view_item is None  # There must only be one valid view
+            view_item = item
+    if view_item is None:
+        raise ValueError(f"Main section not found")
 
-    # Build maps
-    variable_map: dict[str, ArbitraryObject] = {}
-    for variable in variables:
-        if variable.name not in variable_map:
-            arb_obj = next(arb_object_generator)
-            variable_map[variable.name] = arb_obj
+    variable_map, dependency_relation = get_variable_map_and_dependency_relation(
+        quantifieds
+    )
 
-    predicates = gather_predicate_or_quantifier(expr, LogicPredicate)
+    predicates = gather_item(expr, LogicPredicate)
     predicate_map: dict[str, Predicate] = {}
     for predicate in predicates:
         if predicate.name not in predicate_map:
@@ -212,12 +226,4 @@ def parse_items(expr: list[Item]) -> View:
                 raise ValueError(
                     f"Parsing predicate {predicate} has different arity than existing {existing_predicate}"
                 )
-    # Parse items
-    # Ignore quantified
-    view = None
-    for item in expr:
-        if not isinstance(item, Quantified):
-            assert view is None  # There must only be one valid view
-            view = _parse_view(item, variable_map, predicate_map)
-    assert view is not None
-    return view
+    return _parse_view(view_item, dependency_relation, variable_map, predicate_map)

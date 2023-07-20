@@ -11,6 +11,13 @@ class Dependency:
     def __init__(
         self, universal: ArbitraryObject, existentials: frozenset[ArbitraryObject]
     ) -> None:
+        """
+        Dependency specifying a universal and the existentials that depend on it.
+
+        Args:
+            universal (ArbitraryObject): The universal in question.
+            existentials (frozenset[ArbitraryObject]): The existentials depending on the universal.
+        """
         self.universal = universal
         self.existentials = existentials
 
