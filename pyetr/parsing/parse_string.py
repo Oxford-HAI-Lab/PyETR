@@ -1,18 +1,22 @@
 __all__ = [
     "Variable",
+    "LogicFunction",
     "LogicPredicate",
+    "LogicEmphasis",
+    "Constant",
     "Quantified",
     "BoolNot",
     "BoolAnd",
     "BoolOr",
     "Implies",
-    "Equals",
+    "Truth",
+    "Falsum",
     "Item",
     "parse_string",
 ]
 
 from functools import cache
-from typing import ClassVar
+from typing import Any, ClassVar, Optional
 
 import pyparsing as pp
 from pyparsing import ParserElement
@@ -57,7 +61,8 @@ class Quantified:
         return f"<Quantified variable={self.variable} quantifier={self.quantifier}>"
 
 
-class BoolNot:
+class SingleOperand:
+    name: ClassVar[str]
     arg: "Item"
 
     def __init__(self, t) -> None:
@@ -66,22 +71,15 @@ class BoolNot:
         self.arg = t[0][0]
 
     def __repr__(self) -> str:
-        return f"<BoolNot arg={self.arg}>"
+        return f"<{self.name} arg={self.arg}>"
 
 
-class TwoOperand:
-    name: ClassVar[str]
-    left: "Item"
-    right: "Item"
+class BoolNot(SingleOperand):
+    name = "BoolNot"
 
-    def __init__(self, t) -> None:
-        assert len(t) == 1
-        assert len(t[0]) == 2
-        self.left = t[0][0]
-        self.right = t[0][1]
 
-    def __repr__(self) -> str:
-        return f"<{self.name} left={self.left} right={self.right}>"
+class LogicEmphasis(SingleOperand):
+    name = "LogicEmphasis"
 
 
 class MultiOperand:
@@ -108,16 +106,27 @@ class Comma(MultiOperand):
     name = "Comma"
 
 
-class Implies(TwoOperand):
-    name = "Implies"
+class Implies:
+    left: "Item"
+    right: "Item"
+
+    def __init__(self, t) -> None:
+        assert len(t) == 1
+        assert len(t[0]) == 2
+        self.left = t[0][0]
+        self.right = t[0][1]
+
+    def __repr__(self) -> str:
+        return f"<Implies left={self.left} right={self.right}>"
 
 
-class Equals(TwoOperand):
-    name = "Equals"
+def equals(t):
+    assert len(t[0]) == 2
+    return LogicPredicate([["=", t[0]]])
 
 
 class Truth:
-    def __init__(self, t) -> None:
+    def __init__(self, t: Optional[Any] = None) -> None:
         pass
 
     def __repr__(self) -> str:
@@ -188,6 +197,7 @@ def get_expr():
     bool_and = pp.Suppress(pp.oneOf("∧ &"))
     implies = pp.Suppress(pp.Char("→"))
     equals = pp.Suppress(pp.Char("="))
+    emphasis = pp.Suppress(pp.Char("*"))
 
     predicate_word = pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
     function_word = pp.Literal("f_") + predicate_word
@@ -201,10 +211,11 @@ def get_expr():
         [
             (function_word, 1, pp_right, LogicFunction),
             (predicate_word, 1, pp_right, LogicPredicate),
+            (emphasis, 1, pp_right, LogicEmphasis),
             (bool_not, 1, pp_right, BoolNot),
             (bool_and, 2, pp_left, BoolAnd),
             (bool_or, 2, pp_left, BoolOr),
-            (equals, 2, pp_left, Equals),
+            (equals, 2, pp_left, equals),
             (implies, 2, pp_left, Implies),
             (comma, 2, pp_left, Comma),
         ],
@@ -219,13 +230,13 @@ Item = (
     Variable
     | LogicFunction
     | LogicPredicate
+    | LogicEmphasis
     | Constant
     | Quantified
     | BoolNot
     | BoolAnd
     | BoolOr
     | Implies
-    | Equals
     | Truth
     | Falsum
 )

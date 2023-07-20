@@ -12,10 +12,10 @@ from .parse_string import (
     BoolNot,
     BoolOr,
     Constant,
-    Equals,
     Falsum,
     Implies,
     Item,
+    LogicEmphasis,
     LogicFunction,
     LogicPredicate,
     Quantified,
@@ -24,22 +24,23 @@ from .parse_string import (
 )
 
 
+# Restructure to be of Item
 def gather_variables(expr: list[Item]) -> list[Variable]:
     out: list[Variable] = []
     for item in expr:
         if isinstance(item, Variable):
             out.append(item)
-        elif isinstance(item, LogicPredicate):
+        elif isinstance(item, LogicPredicate) or isinstance(item, LogicFunction):
             out += gather_variables(item.args)
-        elif isinstance(item, LogicFunction):
-            out += gather_variables(item.args)
+        elif isinstance(item, LogicEmphasis):
+            out += gather_variables([item.arg])
         elif isinstance(item, Quantified):
             out.append(item.variable)
         elif isinstance(item, BoolAnd) or isinstance(item, BoolOr):
             out += gather_variables(item.operands)
         elif isinstance(item, BoolNot):
             out += gather_variables([item.arg])
-        elif isinstance(item, Equals) or isinstance(item, Implies):
+        elif isinstance(item, Implies):
             out += gather_variables([item.left, item.right])
         elif (
             isinstance(item, Truth)
@@ -55,6 +56,7 @@ def gather_variables(expr: list[Item]) -> list[Variable]:
 Gatherable = TypeVar("Gatherable", bound=LogicPredicate | Quantified)
 
 
+# Restructure to be of Item
 def gather_predicate_or_quantifier(
     expr: list[Item], object_type: type[Gatherable]
 ) -> list[Gatherable]:
@@ -66,50 +68,43 @@ def gather_predicate_or_quantifier(
             out += gather_predicate_or_quantifier(item.operands, object_type)
         elif isinstance(item, BoolNot):
             out += gather_predicate_or_quantifier([item.arg], object_type)
-        elif isinstance(item, Equals) or isinstance(item, Implies):
+        elif isinstance(item, Implies):
             out += gather_predicate_or_quantifier([item.left, item.right], object_type)
         else:
             pass
     return out
 
 
-def _parse_function(
-    function: LogicFunction, variable_map: dict[str, ArbitraryObject]
-) -> Term:
-    new_function = Function(function.name, len(function.args))
-    terms: list[Term | ArbitraryObject | Emphasis] = []
-    for item in function.args:
-        if isinstance(item, Variable):
-            terms.append(variable_map[item.name])
-        elif isinstance(item, LogicFunction):
-            terms.append(_parse_function(item, variable_map))
-        # elif isinstance(item, LogicEmphasis):
-        #     raise NotImplementedError
-        elif isinstance(item, Constant):
-            terms.append(Term(Function(item.name, 0)))
-        else:
-            raise ValueError(f"Invalid item {item}")
-
-    return Term(new_function, tuple(terms))
-
-
 def _parse_predicate(
     predicate: LogicPredicate, variable_map: dict[str, ArbitraryObject]
 ) -> Atom:
-    new_pred = Predicate(name=predicate.name, arity=len(predicate.args))
-    new_items: list[Term | ArbitraryObject | Emphasis] = []
-    for item in predicate.args:
+    def _parse_term(item: Item) -> Term | ArbitraryObject | Emphasis:
         if isinstance(item, Variable):
-            new_items.append(variable_map[item.name])
+            return variable_map[item.name]
         elif isinstance(item, LogicFunction):
-            new_items.append(_parse_function(item, variable_map))
-        # elif isinstance(item, LogicEmphasis):
-        #     raise NotImplementedError
+            return _parse_function(item)
+        elif isinstance(item, LogicEmphasis):
+            inner = _parse_term(item.arg)
+            if isinstance(inner, Emphasis):
+                raise ValueError(f"Second emphasis found in {inner}")
+            return Emphasis(inner)
         elif isinstance(item, Constant):
-            new_items.append(Term(Function(item.name, 0)))
+            return Term(Function(item.name, 0))
         else:
             raise ValueError(f"Invalid item {item}")
-    return new_pred(tuple(new_items))
+
+    def _parse_function(function: LogicFunction) -> Term:
+        new_function = Function(function.name, len(function.args))
+        terms: list[Term | ArbitraryObject | Emphasis] = [
+            _parse_term(item) for item in function.args
+        ]
+        return Term(new_function, tuple(terms))
+
+    new_pred = Predicate(name=predicate.name, arity=len(predicate.args))
+    terms: list[Term | ArbitraryObject | Emphasis] = [
+        _parse_term(item) for item in predicate.args
+    ]
+    return new_pred(tuple(terms))
 
 
 def _parse_item(
@@ -154,23 +149,24 @@ def _parse_item(
         # based on (vi)
         return set_of_states({state({_parse_predicate(item, variable_map)})})
 
+    elif isinstance(item, LogicEmphasis):
+        # TODO: Is this correct?
+        raise ValueError(f"Logic emphasis {item} found outside of logic predicate")
+
     elif isinstance(item, LogicFunction):
         raise ValueError(f"Logic function {item} found outside of logic predicate")
 
     elif isinstance(item, Variable):
         raise ValueError(f"Variable {item} found outside of logic predicate")
 
-    elif isinstance(item, Equals):
-        # use equals predicate
-        _parse_item(item.left, variable_map, predicate_map)
-        _parse_item(item.right, variable_map, predicate_map)
-        raise NotImplementedError
+    elif isinstance(item, Constant):
+        raise ValueError(f"Constant {item} found outside of logic predicate")
 
     elif isinstance(item, Implies):
         raise ValueError(f"Implies statement {item} found at lower level than top")
 
     elif isinstance(item, Quantified):
-        assert False  # Quantified should not be present here
+        raise ValueError(f"Quantified {item} found at lower level than top")
     else:
         assert False
 
@@ -184,7 +180,7 @@ def _parse_view(
         supposition = expr.left
         stage = expr.right
     else:
-        supposition = Truth([])
+        supposition = Truth()
         stage = expr
     parsed_supposition = _parse_item(supposition, variable_map, predicate_map)
     parsed_stage = _parse_item(stage, variable_map, predicate_map)

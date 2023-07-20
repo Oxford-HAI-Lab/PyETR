@@ -4,7 +4,7 @@ from pyetr.parsing.parse_string import parse_string
 # input_string = (
 #     "∃x ∃y ∀z ∀w (King(x,y) ∧ Queen(y) ∧ (Jack() → z = x) ∧ (Queen(w) → w = y)) ∨ ⊥"
 # )
-input_string = "∃x ∃y ∃z ∃w ((P(Mary(), x) ∨ P(f_Ace(y), x)) ∨ ((P(z, f_King(y))) ∨ (P(John(), x) ∨ (P(w, f_Queen(z)) ∨ P(w, f_Jack(y))))))"
+input_string = "∃x ∃y ∃z ∃w ((P(Mary(), x) ∨ P(f_Ace(y), x)) ∨ ((P(z, *f_King(y))) ∨ (P(John(), x) ∨ (P(w, f_Queen(z)) ∨ P(w, f_Jack(y))))))"
 
 # input_string = "∃x ∃y ∀z ∀w [King(x) ∧ Queen(y) ∧ [King(x) ∧ Jack(y)]]"
 # input_string = "∃x ∃y ∀z ∀w (King(x(y)) ∨ ~Queen(y) ∧ (King(x) ∧ Jack(y)))"
