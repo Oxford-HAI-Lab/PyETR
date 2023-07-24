@@ -101,8 +101,18 @@ class DependencyRelation:
         Based on definition 4.24
         """
         arb_objects = set_of_states.arb_objects
-        for arb_object in arb_objects:
-            for dep in self.dependencies:
-                # remove arb_obj from dep
-                raise NotImplementedError
-        raise NotImplementedError
+
+        new_deps = []
+        for dep in self.dependencies:
+            if not [dep.universal.identical(a) for a in arb_objects]:
+                new_exis = set()
+                for exi in dep.existentials:
+                    for arb_object in arb_objects:
+                        if not exi.identical(arb_object):
+                            new_exis.add(exi)
+                if len(new_exis) == 0:
+                    pass
+                else:
+                    new_deps.append(Dependency(dep.universal, frozenset(new_exis)))
+
+        return DependencyRelation(frozenset(new_deps))

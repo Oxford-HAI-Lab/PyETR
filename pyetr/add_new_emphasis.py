@@ -20,9 +20,6 @@ class AtomCandidate:
         self.term_idx = term_idx
         self.atom_occurrences = 1
 
-    def __call__(self, s: set_of_states) -> set_of_states:
-        raise NotImplementedError
-
     def identical(self, other: "AtomCandidate") -> bool:
         return self.term == other.term
 

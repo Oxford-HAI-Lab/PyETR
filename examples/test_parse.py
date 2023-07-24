@@ -17,4 +17,5 @@ out = parse_items(result)
 
 # print(out)
 out = parse_string_to_view(input_string)
+out.answer(out)
 print(out)
