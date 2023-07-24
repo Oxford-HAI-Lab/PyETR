@@ -30,7 +30,8 @@ def stage_supposition_product(
 
 
 def arg_max_states(potentials: list[tuple[int, state]]) -> list[state]:
-    raise NotImplementedError
+    max_potential = max([potential for potential, _ in potentials])
+    return [state for potential, state in potentials if potential == max_potential]
 
 
 class View:
