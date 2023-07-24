@@ -140,3 +140,21 @@ class set_of_states(frozenset[state]):
                 output = output * new_state_set
         assert output is not None
         return output
+
+    @property
+    def is_verum(self):
+        if len(self) == 1:
+            first_elem = next(iter(self))
+            return len(first_elem) == 0
+        else:
+            return False
+
+    @property
+    def is_falsum(self):
+        return len(self) == 0
+
+    def answer_potential(self, other: "set_of_states") -> int:
+        """
+        Based on definition 4.29
+        """
+        return len(self.intersection(other))

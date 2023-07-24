@@ -84,3 +84,25 @@ class DependencyRelation:
                 [dep.__repr__() for dep in self.dependencies]
             )
         return f"<DependencyRelation{full_string}>"
+
+    # @property
+    # def arb_objects(self) -> set[ArbitraryObject]:
+    #     arb_objs = set()
+    #     for dep in self.dependencies:
+    #         if dep.universal not in arb_objs:
+    #             arb_objs.add(dep.universal)
+    #         for existential in dep.existentials:
+    #             if existential not in arb_objs:
+    #                 arb_objs.add(existential)
+    #     return arb_objs
+
+    def restriction(self, set_of_states: set_of_states) -> "DependencyRelation":
+        """
+        Based on definition 4.24
+        """
+        arb_objects = set_of_states.arb_objects
+        for arb_object in arb_objects:
+            for dep in self.dependencies:
+                # remove arb_obj from dep
+                raise NotImplementedError
+        raise NotImplementedError

@@ -11,9 +11,9 @@ class ArbitraryObjectGenerator:
     def __next__(self):
         self.i += 1
         if self.is_existential:
-            name_prefix = "x"
+            name_prefix = "a"
         else:
-            name_prefix = "y"
+            name_prefix = "x"
         return ArbitraryObject(
             name=f"{name_prefix}{self.i}", is_existential=self.is_existential
         )

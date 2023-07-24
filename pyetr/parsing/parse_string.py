@@ -211,7 +211,7 @@ def get_expr():
         [
             (function_word, 1, pp_right, LogicFunction),
             (predicate_word, 1, pp_right, LogicPredicate),
-            (emphasis, 1, pp_left, LogicEmphasis),
+            (emphasis, 1, pp_right, LogicEmphasis),
             (bool_not, 1, pp_right, BoolNot),
             (bool_and, 2, pp_left, BoolAnd),
             (bool_or, 2, pp_left, BoolOr),
