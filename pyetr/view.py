@@ -3,8 +3,9 @@ __all__ = ["View", "Commitment"]
 from pprint import pformat
 
 from .add_new_emphasis import add_new_emphasis
-from .dependency import DependencyRelation
+from .dependency import Dependency, DependencyRelation
 from .stateset import set_of_states, state
+from .term import ArbitraryObject
 
 
 def get_subset(
@@ -18,14 +19,20 @@ def get_subset(
     return set_of_states(out_set)
 
 
+Stage = set_of_states
+Supposition = set_of_states
+Existential = ArbitraryObject
+Universal = ArbitraryObject
+
+
 def stage_supposition_product(
-    stage_supposition_external: tuple[set_of_states, set_of_states],
-    stage_supposition_internal: tuple[set_of_states, set_of_states],
+    stage_supposition_external: tuple[Stage, Supposition],
+    stage_supposition_internal: tuple[Stage, Supposition],
 ) -> tuple[set_of_states, set_of_states]:
     stage_external, supposition_external = stage_supposition_external
     stage_internal, supposition_internal = stage_supposition_internal
     subset = get_subset(stage_external, supposition_internal)
-    result_stage = subset * stage_internal | stage_external.difference(subset)
+    result_stage = (subset * stage_internal) | stage_external.difference(subset)
     return result_stage, supposition_external
 
 
@@ -96,11 +103,62 @@ class View:
             )
             return View(stage, supposition, dependency_relation)
 
-    def __invert__(self) -> "View":
+    def negation(self) -> "View":
         """
         Based on definition 4.31
         """
-        raise NotImplementedError
+
+        def invert_stage_and_relation(
+            stage: Stage, dep_rel: DependencyRelation
+        ) -> DependencyRelation:
+            # Every new existential now depends on every new universal
+            # Except those that the ancestor existential depended on the ancestor universal
+            new_pairs: list[tuple[Existential, Universal]] = []
+            for arb_object in stage.arb_objects:
+                if arb_object.is_existential:
+                    # This will become universal
+                    current_existential = arb_object
+
+                    for arb_object in stage.arb_objects:
+                        if not arb_object.is_existential:
+                            # This will become existential
+                            current_universal = arb_object
+                            new_pairs.append((current_existential, current_universal))
+            # Now isolate only valid dependencies
+            final_pairs: list[tuple[Existential, Universal]] = []
+            for exi, uni in new_pairs:
+                for dep in dep_rel.dependencies:
+                    # If Dependency is not pre-existing add to the final pairs
+                    if not (dep.universal == uni and exi in dep.existentials):
+                        final_pairs.append((exi, uni))
+
+            # Invert all arb_objects. Due to being references this will update all
+            for arb_object in stage.arb_objects:
+                arb_object.is_existential = not arb_object.is_existential
+            final_pairs: list[tuple[Universal, Existential]] = final_pairs
+
+            # Form new deps
+            new_deps: list[tuple[Universal, set[Existential]]] = []
+            for uni, exi in final_pairs:
+                existing_deps = [(u, e) for u, e in new_deps if uni == u]
+                if len(existing_deps) == 0:
+                    new_deps.append((uni, {exi}))
+                elif len(existing_deps) == 1:
+                    _, existing_exis = existing_deps[0]
+                    existing_exis.add(exi)
+                else:
+                    assert False
+
+            final_deps = [Dependency(u, frozenset(e)) for u, e in new_deps]
+
+            return DependencyRelation(frozenset(final_deps))
+
+        verum = set_of_states({state({})})
+        stage, _ = stage_supposition_product(
+            (self.supposition, verum), (self.stage.negation(), verum)
+        )
+        dep_rel = invert_stage_and_relation(stage, self.dependency_relation)
+        return View(stage=stage, supposition=verum, dependency_relation=dep_rel)
 
 
 class Commitment:

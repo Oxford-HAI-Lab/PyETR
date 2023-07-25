@@ -104,6 +104,7 @@ class DependencyRelation:
 
         new_deps = []
         for dep in self.dependencies:
+            # If the state arb objects contain the dep universal
             if not [dep.universal.identical(a) for a in arb_objects]:
                 new_exis = set()
                 for exi in dep.existentials:

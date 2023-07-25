@@ -14,7 +14,7 @@ class Atom:
         terms: tuple[Term | ArbitraryObject | Emphasis, ...],
     ) -> None:
         if len(terms) != predicate.arity:
-            raise ValueError("Inconsistent")
+            raise ValueError(f"Inconsistent - number of terms does not equal arity")
         self.predicate = predicate
         emphasis_count = 0
         for term in terms:
