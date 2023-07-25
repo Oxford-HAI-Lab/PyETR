@@ -60,9 +60,25 @@ def unparse_set_of_states(s: set_of_states) -> Item:
     elif s.is_verum:
         return Truth([])
     else:
-        return BoolOr(
-            [[BoolAnd([[convert_atom(atom) for atom in or_arg]]) for or_arg in s]]
-        )
+        assert len(s) > 0
+        if len(s) == 1:
+            state = next(iter(s))
+            assert len(state) > 0
+            if len(state) == 1:
+                atom = next(iter(state))
+                return convert_atom(atom)
+            else:
+                return BoolAnd([[convert_atom(atom) for atom in state]])
+        else:
+            new_ands: list[LogicPredicate | BoolNot | BoolAnd] = []
+            for state in s:
+                assert len(state) > 0
+                if len(state) == 1:
+                    atom = next(iter(state))
+                    new_ands.append(convert_atom(atom))
+                else:
+                    new_ands.append(BoolAnd([[convert_atom(atom) for atom in state]]))
+            return BoolOr([new_ands])
 
 
 class QuantList:

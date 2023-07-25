@@ -153,17 +153,21 @@ Existential = ArbitraryObject
 def get_variable_map_and_dependency_relation(
     quantifieds: list[Quantified],
 ) -> tuple[dict[str, ArbitraryObject], DependencyRelation]:
-    exi_generator = ArbitraryObjectGenerator(is_existential=True)
-    uni_generator = ArbitraryObjectGenerator(is_existential=False)
+    # exi_generator = ArbitraryObjectGenerator(is_existential=True)
+    # uni_generator = ArbitraryObjectGenerator(is_existential=False)
     variable_map: dict[str, ArbitraryObject] = {}
     encountered_universals: list[tuple[Universal, set[Existential]]] = []
     for quantified in quantifieds:
         if quantified.quantifier == "∃":
-            arb_obj = next(exi_generator)
+            arb_obj = ArbitraryObject(
+                name=quantified.variable.name, is_existential=True
+            )
             for _, exi_set in encountered_universals:
                 exi_set.add(arb_obj)
         else:
-            arb_obj = next(uni_generator)
+            arb_obj = ArbitraryObject(
+                name=quantified.variable.name, is_existential=False
+            )
             encountered_universals.append((arb_obj, set()))
 
         if quantified.variable.name not in variable_map:
