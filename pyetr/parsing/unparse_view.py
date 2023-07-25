@@ -65,10 +65,35 @@ def unparse_set_of_states(s: set_of_states) -> Item:
         )
 
 
+class QuantList:
+    variables: list[Variable]
+    quantifier: str
+
+    def __init__(self, variables: list[Variable], quantifier: str) -> None:
+        self.variables = variables
+        self.quantifier = quantifier
+
+
+def order_quantifieds(
+    unordered_quantifieds: dict[str, Quantified], dep_rel: DependencyRelation
+) -> list[Quantified]:
+    raise NotImplementedError
+
+
 def get_quantifiers(
     arb_objects: set[ArbitraryObject], dep_rel: DependencyRelation
 ) -> list[Quantified]:
-    raise NotImplementedError
+    unordered_quantifieds: dict[str, Quantified] = {}
+    for arb_object in arb_objects:
+        if arb_object.name not in unordered_quantifieds:
+            if arb_object.is_existential:
+                quant = "∃"
+            else:
+                quant = "∀"
+            unordered_quantifieds[arb_object.name] = Quantified(
+                [QuantList([Variable([arb_object.name])], quantifier=quant)]
+            )
+    return order_quantifieds(unordered_quantifieds, dep_rel)
 
 
 def unparse_view(v: View) -> list[Item]:

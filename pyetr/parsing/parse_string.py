@@ -58,7 +58,7 @@ class Quantified:
     quantifier: str
 
     def __init__(self, t) -> None:
-        variables = t[0].variables.as_list()
+        variables = t[0].variables
         assert len(variables) == 1
         self.variable = variables[0]
         self.quantifier = t[0].quantifier
