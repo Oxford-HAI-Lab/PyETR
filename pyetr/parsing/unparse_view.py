@@ -1,5 +1,5 @@
 from pyetr.atom import Atom
-from pyetr.dependency import DependencyRelation
+from pyetr.dependency import Dependency, DependencyRelation
 from pyetr.parsing.parse_string import (
     BoolAnd,
     BoolNot,
@@ -77,7 +77,37 @@ class QuantList:
 def order_quantifieds(
     unordered_quantifieds: dict[str, Quantified], dep_rel: DependencyRelation
 ) -> list[Quantified]:
-    raise NotImplementedError
+    # All unspecified exis get put to the front
+    # The ordering is based on the right most having the least
+    # restrictions, then moving left with more and more deps
+    # Therefore, we must start with the smallest exi sets
+    exis_used: list[str] = []
+    univs_used: list[str] = []
+    sorted_universals: list[tuple[int, Dependency]] = sorted(
+        [(len(d.existentials), d) for d in dep_rel.dependencies]
+    )
+    final_out: list[Quantified] = []
+    for _, dep in sorted_universals:
+        # Fill list from the front
+        new_exis: list[Quantified] = []
+        for exi in dep.existentials:
+            if exi.name not in exis_used:
+                exis_used.append(exi.name)
+                new_exis.append(unordered_quantifieds[exi.name])
+        univs_used.append(dep.universal.name)
+        final_out = [unordered_quantifieds[dep.universal.name], *new_exis, *final_out]
+
+    for name, quantified in unordered_quantifieds.items():
+        if quantified.quantifier == "∃":
+            if name not in exis_used:
+                final_out.insert(0, quantified)
+        elif quantified.quantifier == "∀":
+            if name not in univs_used:
+                final_out.append(quantified)
+        else:
+            assert False
+
+    return final_out
 
 
 def get_quantifiers(
