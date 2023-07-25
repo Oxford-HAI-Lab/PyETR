@@ -132,7 +132,9 @@ def compare_candidate(candidate1: Candidate, candidate2: Candidate) -> Candidate
 
 
 def get_new_state(set_s: set_of_states, candidate: Candidate) -> set_of_states:
-    instance_num = random.randint(0, candidate.occurrences - 1)
+    instance_num = random.randint(
+        0, candidate.occurrences - 1
+    )  # TODO: occurances incorrect?
     atom_candidate = candidate.atom_candidates[instance_num]
     instances_encountered = 0
 
@@ -141,18 +143,19 @@ def get_new_state(set_s: set_of_states, candidate: Candidate) -> set_of_states:
         new_states = set()
         for atom in s:
             current_atom_candidate = get_atom_candidate(atom)
-            if (
-                current_atom_candidate.identical(atom_candidate)
-                and instance_num == instances_encountered
-            ):
-                new_terms: list[Term | ArbitraryObject | Emphasis] = []
-                for i, term in enumerate(atom.terms):
-                    if atom_candidate.term_idx == i:
-                        assert not isinstance(term, Emphasis)
-                        new_terms.append(Emphasis(term))
-                    else:
-                        new_terms.append(term)
-                new_atom = Atom(predicate=atom.predicate, terms=tuple(new_terms))
+            if current_atom_candidate.identical(atom_candidate):
+                instances_encountered += 1
+                if instance_num == instances_encountered - 1:
+                    new_terms: list[Term | ArbitraryObject | Emphasis] = []
+                    for i, term in enumerate(atom.terms):
+                        if atom_candidate.term_idx == i:
+                            assert not isinstance(term, Emphasis)
+                            new_terms.append(Emphasis(term))
+                        else:
+                            new_terms.append(term)
+                    new_atom = Atom(predicate=atom.predicate, terms=tuple(new_terms))
+                else:
+                    new_atom = atom
             else:
                 new_atom = atom
             new_states.add(new_atom)
@@ -170,6 +173,7 @@ def add_new_emphasis(
     elif not (stage.is_verum or stage.is_falsum):
         candidates = extract_candidates(stage)
         final_candidate = reduce(compare_candidate, candidates)
+        print(final_candidate.term)
         return get_new_state(stage, final_candidate), supposition
     else:
         return stage, supposition

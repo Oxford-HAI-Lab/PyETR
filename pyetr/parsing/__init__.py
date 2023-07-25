@@ -1,8 +1,11 @@
-__all__ = ["parse_string_to_view"]
+__all__ = ["parse_string_to_view", "parse_view_to_string"]
+
 
 from ..view import View
 from .parse_item import parse_items
 from .parse_string import parse_string
+from .unparse_item import unparse_items
+from .unparse_view import unparse_view
 
 
 def parse_string_to_view(s: str) -> View:
@@ -10,4 +13,4 @@ def parse_string_to_view(s: str) -> View:
 
 
 def parse_view_to_string(v: View) -> str:
-    raise NotImplementedError
+    return unparse_items(unparse_view(v))

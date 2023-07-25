@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import overload
 
+from pyetr.add_new_emphasis import add_new_emphasis
 from pyetr.dependency import Dependency, DependencyRelation
 from pyetr.stateset import set_of_states, state
 from pyetr.term import ArbitraryObject, Emphasis, Function, Term
@@ -143,6 +144,10 @@ def _parse_view(
         stage = view_item
     parsed_supposition = _parse_item(supposition, maps)
     parsed_stage = _parse_item(stage, maps)
+    if not parsed_supposition.has_emphasis and not parsed_stage.has_emphasis:
+        parsed_stage, parsed_supposition = add_new_emphasis(
+            parsed_stage, parsed_supposition
+        )
     return View(parsed_supposition, parsed_stage, dependency_relation)
 
 
