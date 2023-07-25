@@ -7,3 +7,7 @@ from .parse_string import parse_string
 
 def parse_string_to_view(s: str) -> View:
     return parse_items(parse_string(s))
+
+
+def parse_view_to_string(v: View) -> str:
+    raise NotImplementedError

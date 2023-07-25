@@ -36,6 +36,9 @@ class Variable:
     def __repr__(self) -> str:
         return f"<Variable name={self.name}>"
 
+    def to_string(self) -> str:
+        return self.name
+
 
 class Constant:
     name: str
@@ -45,6 +48,9 @@ class Constant:
 
     def __repr__(self) -> str:
         return f"<Constant name={self.name}>"
+
+    def to_string(self) -> str:
+        return self.name + "()"
 
 
 class Quantified:
@@ -59,6 +65,9 @@ class Quantified:
 
     def __repr__(self) -> str:
         return f"<Quantified variable={self.variable} quantifier={self.quantifier}>"
+
+    def to_string(self) -> str:
+        return self.quantifier + self.variable.to_string()
 
 
 class SingleOperand:
@@ -77,9 +86,15 @@ class SingleOperand:
 class BoolNot(SingleOperand):
     name = "BoolNot"
 
+    def to_string(self):
+        return "~" + self.arg.to_string()
+
 
 class LogicEmphasis(SingleOperand):
     name = "LogicEmphasis"
+
+    def to_string(self):
+        return "*" + self.arg.to_string()
 
 
 class MultiOperand:
@@ -93,17 +108,33 @@ class MultiOperand:
     def __repr__(self) -> str:
         return f"<{self.name} operands={self.operands}>"
 
+    def _operand_string(self, operand: str, with_brackets: bool) -> str:
+        inner = operand.join([o.to_string() for o in self.operands])
+        if with_brackets:
+            return "(" + inner + ")"
+        else:
+            return inner
+
 
 class BoolAnd(MultiOperand):
     name = "BoolAnd"
+
+    def to_string(self) -> str:
+        return self._operand_string(" ∧ ", with_brackets=True)
 
 
 class BoolOr(MultiOperand):
     name = "BoolOr"
 
+    def to_string(self) -> str:
+        return self._operand_string(" ∨ ", with_brackets=True)
+
 
 class Comma(MultiOperand):
     name = "Comma"
+
+    def to_string(self) -> str:
+        return self._operand_string(",", with_brackets=False)
 
 
 class Implies:
@@ -119,6 +150,9 @@ class Implies:
     def __repr__(self) -> str:
         return f"<Implies left={self.left} right={self.right}>"
 
+    def to_string(self) -> str:
+        return self.left.to_string() + "->" + self.right.to_string()
+
 
 def equals(t):
     assert len(t[0]) == 2
@@ -132,6 +166,9 @@ class Truth:
     def __repr__(self) -> str:
         return f"<Truth>"
 
+    def to_string(self) -> str:
+        return "⊤"
+
 
 class Falsum:
     def __init__(self, t) -> None:
@@ -139,6 +176,9 @@ class Falsum:
 
     def __repr__(self) -> str:
         return f"<Falsum>"
+
+    def to_string(self) -> str:
+        return "⊥"
 
 
 class LogicPredicate:
@@ -159,6 +199,9 @@ class LogicPredicate:
     def __repr__(self) -> str:
         return f"<LogicPredicate args={self.args} name={self.name}>"
 
+    def to_string(self) -> str:
+        return self.name + "(" + ", ".join([a.to_string() for a in self.args]) + ")"
+
 
 class LogicFunction:
     args: list["Item"]
@@ -177,6 +220,11 @@ class LogicFunction:
 
     def __repr__(self) -> str:
         return f"<LogicFunction args={self.args} name={self.name}>"
+
+    def to_string(self) -> str:
+        return (
+            "f_" + self.name + "(" + ",".join([a.to_string() for a in self.args]) + ")"
+        )
 
 
 @cache
