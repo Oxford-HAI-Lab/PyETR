@@ -37,7 +37,7 @@ def convert_term(term: Term | ArbitraryObject | Emphasis) -> Item:
             )
 
     elif isinstance(term, ArbitraryObject):
-        return Variable(term.name)
+        return Variable([term.name])
     elif isinstance(term, Emphasis):
         return LogicEmphasis([[convert_term(term.term)]])
     else:

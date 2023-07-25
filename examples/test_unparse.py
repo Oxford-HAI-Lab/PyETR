@@ -5,11 +5,13 @@ from pyetr.parsing.unparse_item import unparse_items
 from pyetr.parsing.unparse_view import unparse_view
 
 input_string = "∃x ∀y ∃z ∃w ((P(Mary(), x) ∨ P(*f_Ace(y), x)) ∨ ((P(z, f_King(y))) ∨ (P(John(), x) ∨ (P(w, f_Queen(z)) ∨ P(w, f_Jack(y))))))"
+# input_string = "(InHand(*Ace()) ∧ InHand(Queen())) ∨ (InHand(Jack()))"
 print(input_string)
 intermed = parse_string(input_string)
 # print(intermed)
 view = parse_items(intermed)
 # print(view)
 out = unparse_view(view)
+# print(out)
 output_string = unparse_items(out)
 print(output_string)

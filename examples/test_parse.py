@@ -21,15 +21,15 @@ input_string2 = "∃x P(*x, Mary())"
 # print(out)
 
 
-out1 = parse_string_to_view(input_string1)
-out2 = parse_string_to_view(input_string2)
-result = out1.answer(out2)
+# out1 = parse_string_to_view(input_string1)
+# out2 = parse_string_to_view(input_string2)
+# result = out1.answer(out2)
 
-print(result)
-
-
-# input_string1 = "(InHand(*Ace()) ∧ InHand(Queen())) ∨ (InHand(Jack()))"
-# input_string2 = "(InHand(*Ace))"
-# result = parse_string(input_string1)
 # print(result)
-# out = parse_items(result)
+
+
+input_string1 = "(InHand(Ace()) ∧ InHand(Queen())) ∨ (InHand(*Jack()))"
+# input_string2 = "(InHand(*Ace))"
+result = parse_string(input_string1)
+print(result)
+out = parse_items(result)

@@ -86,7 +86,7 @@ def _parse_item(item: Item, maps: Maps) -> set_of_states:
 
     elif isinstance(item, BoolAnd):
         # based on (ii)
-        new_set = set_of_states(set())
+        new_set = set_of_states({state(set())})
         for operand in item.operands:
             parsed_item: set_of_states = _parse_item(operand, maps)
             new_set *= parsed_item
