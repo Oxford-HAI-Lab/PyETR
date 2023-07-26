@@ -1,9 +1,15 @@
 __all__ = ["View", "Commitment"]
 
 from pprint import pformat
+from typing import Optional
 
 from .add_new_emphasis import add_new_emphasis
-from .dependency import Dependency, DependencyRelation
+from .dependency import (
+    Dependency,
+    DependencyRelation,
+    DependencyStructure,
+    _separate_arb_objects,
+)
 from .stateset import set_of_states, state
 from .term import ArbitraryObject
 
@@ -69,11 +75,44 @@ class View:
     def __repr__(self) -> str:
         return f"<View \n  stage={pformat(self.stage)} \n  supposition={pformat(self.supposition)} \n  dep_rel={self.dependency_relation}\n>"
 
-    def __mul__(self, other: "View") -> "View":
+    @property
+    def universals_and_existentials(self) -> tuple[set[Universal], set[Existential]]:
+        return _separate_arb_objects(
+            self.stage.arb_objects | self.supposition.arb_objects
+        )
+
+    def _product(
+        self, view: "View", inherited_dependencies: DependencyStructure
+    ) -> "View":
+        # Corresponds to line 4
+        stage, supposition = stage_supposition_product(
+            (self.stage, self.supposition), (view.stage, view.supposition)
+        )
+        self_uni, self_exi = self.universals_and_existentials
+        view_uni, view_exi = view.universals_and_existentials
+        expr1 = inherited_dependencies.fusion(
+            DependencyStructure(self_uni, self_exi, self.dependency_relation)
+        )
+        expr2 = inherited_dependencies.fusion(
+            DependencyStructure(view_uni, view_exi, view.dependency_relation)
+        )
+        dep_structure = expr1.fusion(expr2)
+        return View(stage, supposition, dep_structure.dependency_relation)
+
+    def product(
+        self, view: "View", inherited_dependencies: Optional[DependencyStructure] = None
+    ) -> "View":
         """
         Based on definition 4.27
         """
-        raise NotImplementedError
+        if inherited_dependencies is None:
+            # Corresponds to line 5
+            return self._product(
+                view, DependencyStructure(set(), set(), DependencyRelation(frozenset()))
+            )
+        else:
+            # Corresponds to line 4
+            return self._product(view, inherited_dependencies)
 
     def __add__(self, other: "View") -> "View":
         """

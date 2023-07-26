@@ -3,21 +3,25 @@ __all__ = ["Dependency", "DependencyRelation"]
 from .stateset import set_of_states
 from .term import ArbitraryObject
 
+Universal = ArbitraryObject
+Existential = ArbitraryObject
+
 
 class Dependency:
-    universal: ArbitraryObject
-    existentials: frozenset[ArbitraryObject]
+    universal: Universal
+    existentials: frozenset[Existential]
 
     def __init__(
-        self, universal: ArbitraryObject, existentials: frozenset[ArbitraryObject]
+        self, universal: Universal, existentials: frozenset[Existential]
     ) -> None:
         """
         Dependency specifying a universal and the existentials that depend on it.
 
         Args:
-            universal (ArbitraryObject): The universal in question.
-            existentials (frozenset[ArbitraryObject]): The existentials depending on the universal.
+            universal (Universal): The universal in question.
+            existentials (frozenset[Existential]): The existentials depending on the universal.
         """
+        # TODO: Overhaul dependency to be in pairwise structure
         self.universal = universal
         self.existentials = existentials
 
@@ -25,6 +29,12 @@ class Dependency:
         return (
             f"<Dependency universal={self.universal} existentials={self.existentials}>"
         )
+
+    def pairs(self) -> set[tuple[Universal, Existential]]:
+        new_set = set()
+        for existential in self.existentials:
+            new_set.add((self.universal, existential))
+        return new_set
 
 
 def _test_matroyshka(deps: frozenset[Dependency]):
@@ -39,13 +49,9 @@ def _test_matroyshka(deps: frozenset[Dependency]):
                 )
 
 
-UniArbObjects = set[ArbitraryObject]
-ExiArbObjects = set[ArbitraryObject]
-
-
 def _separate_arb_objects(
     arb_objects: set[ArbitraryObject],
-) -> tuple[UniArbObjects, ExiArbObjects]:
+) -> tuple[set[Universal], set[Existential]]:
     uni_objs = set()
     exi_objs = set()
     for obj in arb_objects:
@@ -85,6 +91,29 @@ class DependencyRelation:
             )
         return f"<DependencyRelation{full_string}>"
 
+    def pairs(self) -> set[tuple[Universal, Existential]]:
+        new_set: set[tuple[Universal, Existential]] = set()
+        for dep in self.dependencies:
+            new_set |= dep.pairs()
+        return new_set
+
+    @classmethod
+    def from_pairs(cls, pairs: set[tuple[Universal, Existential]]):
+        universal_deps: dict[str, tuple[Universal, set[Existential]]] = {}
+        for uni, exi in pairs:
+            if uni.name not in universal_deps:
+                universal_deps[uni.name] = (uni, {exi})
+            else:
+                universal_deps[uni.name][1].add(exi)
+        return cls(
+            frozenset(
+                [
+                    Dependency(uni, frozenset(exi_set))
+                    for uni, exi_set in universal_deps.values()
+                ]
+            )
+        )
+
     # @property
     # def arb_objects(self) -> set[ArbitraryObject]:
     #     arb_objs = set()
@@ -117,3 +146,25 @@ class DependencyRelation:
                     new_deps.append(Dependency(dep.universal, frozenset(new_exis)))
 
         return DependencyRelation(frozenset(new_deps))
+
+
+class DependencyStructure:
+    universals: set[Universal]
+    existentials: set[Existential]
+    dependency_pairs: frozenset[tuple[Universal, Existential]]
+    dependency_relation: DependencyRelation
+
+    def __init__(
+        self,
+        universals: set[Universal],
+        existentials: set[Existential],
+        dependency_relation: DependencyRelation,
+    ) -> None:
+        self.universals = universals
+        self.existentials = existentials
+        self.dependency_pairs = frozenset(dependency_relation.pairs())
+        self.dependency_relation = dependency_relation
+        # TODO: validation that the two sets are supersets of the dependency relation
+
+    def fusion(self, other: "DependencyStructure") -> "DependencyStructure":
+        raise NotImplementedError
