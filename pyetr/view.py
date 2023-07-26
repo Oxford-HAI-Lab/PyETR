@@ -146,48 +146,45 @@ class View:
         """
         Based on definition 4.31
         """
-
-        def invert_stage_and_relation(
-            stage: Stage, dep_rel: DependencyRelation
-        ) -> DependencyRelation:
-            # Every new existential now depends on every new universal
-            # Except those that the ancestor existential depended on the ancestor universal
-            new_pairs: list[tuple[Existential, Universal]] = []
-            for arb_object in stage.arb_objects:
-                if arb_object.is_existential:
-                    # This will become universal
-                    current_existential = arb_object
-
-                    for arb_object in stage.arb_objects:
-                        if not arb_object.is_existential:
-                            # This will become existential
-                            current_universal = arb_object
-                            new_pairs.append((current_existential, current_universal))
-            # Now isolate only valid dependencies
-            final_pairs: list[tuple[Existential, Universal]] = []
-            for exi, uni in new_pairs:
-                for dep in dep_rel.dependencies:
-                    # If Dependency is not pre-existing add to the final pairs
-                    if not (
-                        dep.universal.identical(uni) and dep.existential.identical(exi)
-                    ):
-                        final_pairs.append((exi, uni))
-
-            # Invert all arb_objects. Due to being references this will update all
-            for arb_object in stage.arb_objects:
-                arb_object.is_existential = not arb_object.is_existential
-            final_pairs: list[tuple[Universal, Existential]] = final_pairs
-
-            # Form new deps
-            final_deps: list[Dependency] = [Dependency(u, e) for u, e in final_pairs]
-            return DependencyRelation(frozenset(final_deps))
-
         verum = set_of_states({state({})})
         stage, _ = stage_supposition_product(
             (self.supposition, verum), (self.stage.negation(), verum)
         )
-        dep_rel = invert_stage_and_relation(stage, self.dependency_relation)
-        return View(stage=stage, supposition=verum, dependency_relation=dep_rel)
+        # Every new existential now depends on every new universal
+        # Except those that the ancestor existential depended on the ancestor universal
+        new_pairs: list[tuple[Existential, Universal]] = []
+        for arb_object in stage.arb_objects:
+            if arb_object.is_existential:
+                # This will become universal
+                current_existential = arb_object
+
+                for arb_object in stage.arb_objects:
+                    if not arb_object.is_existential:
+                        # This will become existential
+                        current_universal = arb_object
+                        new_pairs.append((current_existential, current_universal))
+        # Now isolate only valid dependencies
+        final_pairs: list[tuple[Existential, Universal]] = []
+        for exi, uni in new_pairs:
+            for dep in self.dependency_relation.dependencies:
+                # If Dependency is not pre-existing add to the final pairs
+                if not (
+                    dep.universal.identical(uni) and dep.existential.identical(exi)
+                ):
+                    final_pairs.append((exi, uni))
+
+        # Invert all arb_objects. Due to being references this will update all
+        for arb_object in stage.arb_objects:
+            arb_object.is_existential = not arb_object.is_existential
+        final_pairs: list[tuple[Universal, Existential]] = final_pairs
+
+        # Form new deps
+        final_deps: list[Dependency] = [Dependency(u, e) for u, e in final_pairs]
+        return View(
+            stage=stage,
+            supposition=verum,
+            dependency_relation=DependencyRelation(frozenset(final_deps)),
+        )
 
 
 class Commitment:
