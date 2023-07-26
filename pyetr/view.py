@@ -81,13 +81,9 @@ class View:
             self.stage.arb_objects | self.supposition.arb_objects
         )
 
-    def _product(
+    def _fuse_views(
         self, view: "View", inherited_dependencies: DependencyStructure
-    ) -> "View":
-        # Corresponds to line 4
-        stage, supposition = stage_supposition_product(
-            (self.stage, self.supposition), (view.stage, view.supposition)
-        )
+    ) -> DependencyStructure:
         self_uni, self_exi = self.universals_and_existentials
         view_uni, view_exi = view.universals_and_existentials
         expr1 = inherited_dependencies.fusion(
@@ -96,7 +92,19 @@ class View:
         expr2 = inherited_dependencies.fusion(
             DependencyStructure(view_uni, view_exi, view.dependency_relation)
         )
-        dep_structure = expr1.fusion(expr2)
+        return expr1.fusion(expr2)
+
+    def _product(
+        self, view: "View", inherited_dependencies: DependencyStructure
+    ) -> "View":
+        """
+        Based on definition 4.27
+        """
+        # Corresponds to line 4
+        stage, supposition = stage_supposition_product(
+            (self.stage, self.supposition), (view.stage, view.supposition)
+        )
+        dep_structure = self._fuse_views(view, inherited_dependencies)
         return View(stage, supposition, dep_structure.dependency_relation)
 
     def product(
@@ -114,11 +122,31 @@ class View:
             # Corresponds to line 4
             return self._product(view, inherited_dependencies)
 
-    def __add__(self, other: "View") -> "View":
+    def _sum(self, view: "View", inherited_dependencies: DependencyStructure):
         """
         Based on definition 4.28
         """
-        raise NotImplementedError
+        # TODO: Suppositions must be equal?
+        supposition = self.supposition
+        # Corresponds to line 1
+        stage = self.stage | view.stage
+        dep_structure = self._fuse_views(view, inherited_dependencies)
+        return View(stage, supposition, dep_structure.dependency_relation)
+
+    def sum(
+        self, view: "View", inherited_dependencies: Optional[DependencyStructure] = None
+    ) -> "View":
+        """
+        Based on definition 4.28
+        """
+        if inherited_dependencies is None:
+            # Corresponds to line 2
+            return self._product(
+                view, DependencyStructure(set(), set(), DependencyRelation(frozenset()))
+            )
+        else:
+            # Corresponds to line 1
+            return self._product(view, inherited_dependencies)
 
     def answer(self, other: "View") -> "View":
         """
@@ -186,6 +214,28 @@ class View:
             dependency_relation=DependencyRelation(frozenset(final_deps)),
         )
 
+    def merge(self, view: "View") -> "View":
+        """
+        Based on Definition 4.33
+        """
+        raise NotImplementedError
+
+    def universal_product(self, view: "View") -> "View":
+        """
+        Based on Definition 4.35
+        """
+        if not view.supposition.is_verum:
+            raise ValueError("External supposition is not verum")
+        raise NotImplementedError
+
+    def existential_sum(self, view: "View") -> "View":
+        """
+        Based on Definition 4.37
+        """
+        if not view.supposition.is_verum:
+            raise ValueError("External supposition is not verum")
+        raise NotImplementedError
+
 
 class Commitment:
     view1: View
@@ -194,3 +244,17 @@ class Commitment:
     def __init__(self, view1: View, view2: View) -> None:
         self.view1 = view1
         self.view2 = view2
+
+    def update(self, view: View) -> "Commitment":
+        """
+        Based on Definition 4.34
+        """
+        # TODO: Why is C relevant here? Why not just operate on views?
+
+        new_view = (
+            self.view2.universal_product(view)
+            .existential_sum(view)
+            .answer(view)
+            .merge(view)
+        )
+        return Commitment(self.view1, new_view)
