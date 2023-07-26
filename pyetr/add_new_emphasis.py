@@ -173,7 +173,6 @@ def add_new_emphasis(
     elif not (stage.is_verum or stage.is_falsum):
         candidates = extract_candidates(stage)
         final_candidate = reduce(compare_candidate, candidates)
-        print(final_candidate.term)
         return get_new_state(stage, final_candidate), supposition
     else:
         return stage, supposition
