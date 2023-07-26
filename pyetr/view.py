@@ -166,7 +166,7 @@ class View:
                 stage, supposition = add_new_emphasis(stage, supposition)
 
             dependency_relation = self.dependency_relation.restriction(
-                stage | supposition
+                (stage | supposition).arb_objects
             )
             return View(stage, supposition, dependency_relation)
 

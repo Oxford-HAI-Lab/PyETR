@@ -10,8 +10,8 @@ Existential = ArbitraryObject
 
 
 class Dependency:
-    universal: Universal
     existential: Existential
+    universal: Universal
 
     def __init__(self, universal: Universal, existential: Existential) -> None:
         """
@@ -19,16 +19,14 @@ class Dependency:
 
         Args:
             universal (Universal): The universal in question.
-            existentials (frozenset[Existential]): The existentials depending on the universal.
+            existential (Existential): The existential depending on the universal.
         """
-        # TODO: Overhaul dependency to be in pairwise structure
-        self.universal = universal
+        # TODO: Swap order in constructor
         self.existential = existential
+        self.universal = universal
 
     def __repr__(self) -> str:
-        return (
-            f"<Dependency universal={self.universal} existentials={self.existential}>"
-        )
+        return f"<Dependency existential={self.existential} universal={self.universal}>"
 
 
 def _separate_arb_objects(
@@ -113,12 +111,10 @@ class DependencyRelation:
     #                 arb_objs.add(existential)
     #     return arb_objs
 
-    def restriction(self, set_of_states: set_of_states) -> "DependencyRelation":
+    def restriction(self, arb_objects: set[ArbitraryObject]) -> "DependencyRelation":
         """
         Based on definition 4.24
         """
-        arb_objects = set_of_states.arb_objects
-
         new_deps = []
         for dep in self.dependencies:
             # If the state arb objects contain the dep universal
@@ -131,10 +127,34 @@ class DependencyRelation:
         return DependencyRelation(frozenset(new_deps))
 
 
+def transitive_closure(
+    D_initial: list[tuple[ArbitraryObject, ArbitraryObject]],
+    arb_objects: set[ArbitraryObject],
+) -> list[tuple[ArbitraryObject, ArbitraryObject]]:
+    def D_next(
+        D: list[tuple[ArbitraryObject, ArbitraryObject]]
+    ) -> list[tuple[ArbitraryObject, ArbitraryObject]]:
+        D_i_plus_1: list[tuple[ArbitraryObject, ArbitraryObject]] = []
+        for x, y in D:
+            for z in arb_objects:
+                if (y, z) in D_initial:
+                    D_i_plus_1.append((x, z))
+        return D_i_plus_1 + D
+
+    d_current: list[tuple[ArbitraryObject, ArbitraryObject]] = D_initial
+    while True:
+        D_next_set = D_next(d_current)
+        if set(D_next_set) == set(d_current):
+            # TODO: Is this condition correct?
+            break
+        d_current = D_next_set
+
+    return d_current
+
+
 class DependencyStructure:
     universals: set[Universal]
     existentials: set[Existential]
-    dependency_pairs: frozenset[tuple[Universal, Existential]]
     dependency_relation: DependencyRelation
 
     def __init__(
@@ -148,5 +168,130 @@ class DependencyStructure:
         self.dependency_relation = dependency_relation
         # TODO: validation that the two sets are supersets of the dependency relation
 
+    def chain(self, other: "DependencyStructure") -> "DependencyStructure":
+        universals = self.universals | other.universals
+        existentials = self.existentials | other.existentials
+
+        new_deps: set[Dependency] = set()
+        for existential in other.existentials:
+            for universal in self.universals:
+                new_deps.add(Dependency(universal=universal, existential=existential))
+
+        dep_rel: DependencyRelation = DependencyRelation(
+            self.dependency_relation.dependencies
+            | other.dependency_relation.dependencies
+            | new_deps
+        )
+        return DependencyStructure(universals, existentials, dep_rel)
+
+    def restriction(self, arb_objects: set[ArbitraryObject]) -> "DependencyStructure":
+        universals = self.universals & arb_objects
+        existentials = self.existentials & arb_objects
+        dep_rel = self.dependency_relation.restriction(arb_objects)
+        return DependencyStructure(
+            universals, existentials, dependency_relation=dep_rel
+        )
+
+    def triangle(
+        self, arb_object1: ArbitraryObject, arb_object2: ArbitraryObject
+    ) -> bool:
+        arb_obj1_found = False
+        arb_obj2_found = False
+        for arb_obj in self.universals | self.existentials:
+            if arb_obj.identical(arb_object1):
+                arb_obj1_found = True
+            if arb_obj.identical(arb_object2):
+                arb_obj2_found = True
+        if not arb_obj1_found or not arb_obj2_found:
+            return False
+
+        if arb_object1.is_existential and arb_object2.is_existential:
+            # Case 1
+            # There is X that E (arb_obj2) deps on and that e prime (arb_obj2) does not depend on
+            raise NotImplementedError
+        elif arb_object1.is_existential and not arb_object2.is_existential:
+            # Case 2
+            # There is a dependency of this structure
+            raise NotImplementedError
+        elif not arb_object1.is_existential and arb_object2.is_existential:
+            # Case 3
+            # Not Case 2
+            raise NotImplementedError
+        elif not arb_object1.is_existential and not arb_object2.is_existential:
+            # Case 4
+            # There is X that does depend on u prime (arb_obj2) and does not depend on u (arb_obj 1)
+            raise NotImplementedError
+        else:
+            assert False
+
+    def E0(self, other: "DependencyStructure") -> set[Existential]:
+        pairs: list[tuple[ArbitraryObject, ArbitraryObject]] = []
+
+        arb_objects = (
+            self.existentials | other.existentials | self.universals | other.universals
+        )
+        for x in arb_objects:
+            for y in arb_objects:
+                if self.triangle(x, y) or other.triangle(x, y):
+                    pairs.append((x, y))
+
+        output = transitive_closure(pairs, arb_objects)
+        new_out: list[ArbitraryObject] = []
+        for e in self.existentials | other.existentials:
+            pair_found = False
+            for u in self.universals | other.universals:
+                if (e, u) in output:
+                    pair_found = True
+                    break  # TODO: Will this break both?
+            if not pair_found:
+                new_out.append(e)
+        return set(new_out)
+
+    def U0(self, other: "DependencyStructure", e_0: set[Existential]) -> set[Universal]:
+        pairs: list[tuple[ArbitraryObject, ArbitraryObject]] = []
+
+        arb_objects = (
+            self.existentials | other.existentials | self.universals | other.universals
+        )
+        for x in arb_objects:
+            for y in arb_objects:
+                if self.triangle(x, y) or other.triangle(x, y):
+                    pairs.append((x, y))
+        output = transitive_closure(pairs, arb_objects)
+        # TODO: Compute once
+        new_out: list[ArbitraryObject] = []
+        for u in self.universals | other.universals:
+            for e in (self.existentials | other.existentials).difference(e_0):
+                pair_found = False
+                if (u, e) in output and (e, u) not in output:
+                    pair_found = True
+                    break  # TODO: Will this break both?
+                if not pair_found:
+                    new_out.append(u)
+        return set(new_out)
+
+    @property
+    def is_empty(self):
+        if len(self.universals) == 0 and len(self.existentials) == 0:
+            assert len(self.dependency_relation.dependencies) == 0
+            return True
+        else:
+            return False
+
     def fusion(self, other: "DependencyStructure") -> "DependencyStructure":
-        raise NotImplementedError
+        if self.is_empty and other.is_empty:
+            return self
+        else:
+            e_0 = self.E0(other)
+            u_0 = self.U0(other, e_0)
+
+            initial_structure = DependencyStructure(
+                u_0, e_0, DependencyRelation(frozenset())
+            )
+            a_r = self.universals | self.existentials
+            a_s = other.universals | other.existentials
+            return initial_structure.chain(
+                self.restriction(a_r.difference(e_0 | u_0)).fusion(
+                    other.restriction(a_s.difference(e_0 | u_0))
+                )
+            )
