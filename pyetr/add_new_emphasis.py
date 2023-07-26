@@ -11,6 +11,10 @@ from .stateset import set_of_states, state
 
 
 class AtomCandidate:
+    """
+    A candidate from an atom
+    """
+
     term: ArbitraryObject | Function | Term
     term_idx: int
     atom_occurrences: int
@@ -21,7 +25,7 @@ class AtomCandidate:
         self.atom_occurrences = 1
 
     def identical(self, other: "AtomCandidate") -> bool:
-        return self.term == other.term
+        return self.term.identical(other.term)
 
     @property
     def is_universal(self):
@@ -34,6 +38,9 @@ class AtomCandidate:
     @property
     def is_const(self):
         return isinstance(self.term, Function) and self.term.arity == 0
+
+    def __repr__(self) -> str:
+        return f"<AtomCand term={self.term} term_idx={self.term_idx} occur={self.atom_occurrences}>"
 
 
 def type_x_beats_y(x: AtomCandidate, y: AtomCandidate) -> bool:
@@ -80,18 +87,20 @@ def get_atom_candidate(atom: Atom) -> AtomCandidate:
 
 
 class Candidate:
-    atom_candidates: list[AtomCandidate]
+    atom_candidate: AtomCandidate
     occurrences: int
 
     def __init__(self, initial_cand: AtomCandidate) -> None:
-        self.atom_candidates = [initial_cand]
+        self.atom_candidate = initial_cand
         self.term = initial_cand.term
         self.occurrences = initial_cand.atom_occurrences
 
     def append_if_equal(self, new_cand: AtomCandidate) -> None:
-        if new_cand.identical(self.atom_candidates[0]):
-            self.atom_candidates.append(new_cand)
+        if new_cand.identical(self.atom_candidate):
             self.occurrences += new_cand.atom_occurrences
+
+    def __repr__(self) -> str:
+        return f"<Candidate occurrences={self.occurrences} atom_cand={self.atom_candidate}>"
 
 
 def extract_candidates(s: set_of_states) -> list[Candidate]:
@@ -100,20 +109,23 @@ def extract_candidates(s: set_of_states) -> list[Candidate]:
     for state in s:
         for atom in state:
             atom_cand = get_atom_candidate(atom)
-            if atom_cand in atomics_visited:
+            if [
+                atom_cand.identical(a)
+                for a in atomics_visited
+                if atom_cand.identical(a)
+            ]:
                 for cand in new_candidates:
                     cand.append_if_equal(atom_cand)
             else:
                 new_candidates.append(Candidate(atom_cand))
+                atomics_visited.append(atom_cand)
     return new_candidates
 
 
 def compare_candidate(candidate1: Candidate, candidate2: Candidate) -> Candidate:
-    atom_cand1 = candidate1.atom_candidates[0]
-    atom_cand2 = candidate2.atom_candidates[0]
-    type_result = compare_type(atom_cand1, atom_cand2)
+    type_result = compare_type(candidate1.atom_candidate, candidate2.atom_candidate)
     if type_result is not None:
-        if type_result.identical(atom_cand1):
+        if type_result.identical(candidate1.atom_candidate):
             return candidate1
         else:
             return candidate2
@@ -131,11 +143,17 @@ def compare_candidate(candidate1: Candidate, candidate2: Candidate) -> Candidate
             return candidate2
 
 
-def get_new_state(set_s: set_of_states, candidate: Candidate) -> set_of_states:
-    instance_num = random.randint(
-        0, candidate.occurrences - 1
-    )  # TODO: occurances incorrect?
-    atom_candidate = candidate.atom_candidates[instance_num]
+def count_candidates(set_s: set_of_states, atom_candidate: AtomCandidate) -> int:
+    instances_encountered = 0
+    for s in set_s:
+        for atom in s:
+            if get_atom_candidate(atom).identical(atom_candidate):
+                instances_encountered += 1
+    return instances_encountered
+
+
+def get_new_state(set_s: set_of_states, atom_candidate: AtomCandidate) -> set_of_states:
+    instance_num = random.randint(0, count_candidates(set_s, atom_candidate) - 1)
     instances_encountered = 0
 
     new_set_of_states = set()
@@ -169,10 +187,10 @@ def add_new_emphasis(
     if not (supposition.is_verum or supposition.is_falsum):
         candidates = extract_candidates(supposition)
         final_candidate = reduce(compare_candidate, candidates)
-        return stage, get_new_state(supposition, final_candidate)
+        return stage, get_new_state(supposition, final_candidate.atom_candidate)
     elif not (stage.is_verum or stage.is_falsum):
         candidates = extract_candidates(stage)
         final_candidate = reduce(compare_candidate, candidates)
-        return get_new_state(stage, final_candidate), supposition
+        return get_new_state(stage, final_candidate.atom_candidate), supposition
     else:
         return stage, supposition
