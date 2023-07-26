@@ -143,11 +143,18 @@ def compare_candidate(candidate1: Candidate, candidate2: Candidate) -> Candidate
             return candidate2
 
 
-def get_new_state(set_s: set_of_states, candidate: Candidate) -> set_of_states:
-    instance_num = random.randint(
-        0, candidate.occurrences - 1
-    )  # TODO: occurances incorrect?
-    atom_candidate = candidate.atom_candidate
+def count_candidates(set_s: set_of_states, atom_candidate: AtomCandidate) -> int:
+    instances_encountered = 0
+    for s in set_s:
+        for atom in s:
+            if get_atom_candidate(atom).identical(atom_candidate):
+                instances_encountered += 1
+    return instances_encountered
+
+
+def get_new_state(set_s: set_of_states, atom_candidate: AtomCandidate) -> set_of_states:
+    count_candidates(set_s, atom_candidate)
+    instance_num = random.randint(0, count_candidates(set_s, atom_candidate) - 1)
     instances_encountered = 0
 
     new_set_of_states = set()
@@ -181,10 +188,10 @@ def add_new_emphasis(
     if not (supposition.is_verum or supposition.is_falsum):
         candidates = extract_candidates(supposition)
         final_candidate = reduce(compare_candidate, candidates)
-        return stage, get_new_state(supposition, final_candidate)
+        return stage, get_new_state(supposition, final_candidate.atom_candidate)
     elif not (stage.is_verum or stage.is_falsum):
         candidates = extract_candidates(stage)
         final_candidate = reduce(compare_candidate, candidates)
-        return get_new_state(stage, final_candidate), supposition
+        return get_new_state(stage, final_candidate.atom_candidate), supposition
     else:
         return stage, supposition
