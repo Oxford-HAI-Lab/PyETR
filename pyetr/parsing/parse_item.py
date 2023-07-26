@@ -158,8 +158,6 @@ Existential = ArbitraryObject
 def get_variable_map_and_dependency_relation(
     quantifieds: list[Quantified],
 ) -> tuple[dict[str, ArbitraryObject], DependencyRelation]:
-    # exi_generator = ArbitraryObjectGenerator(is_existential=True)
-    # uni_generator = ArbitraryObjectGenerator(is_existential=False)
     variable_map: dict[str, ArbitraryObject] = {}
     encountered_universals: list[tuple[Universal, set[Existential]]] = []
     for quantified in quantifieds:
@@ -181,12 +179,8 @@ def get_variable_map_and_dependency_relation(
             raise ValueError(
                 f"Variable {quantified.variable.name} appears twice in quantifiers"
             )
-    dependencies = [
-        Dependency(universal, frozenset(existentials))
-        for universal, existentials in encountered_universals
-        if len(existentials) > 0
-    ]
-    return variable_map, DependencyRelation(frozenset(dependencies))
+
+    return variable_map, DependencyRelation.from_sets(encountered_universals)
 
 
 @overload

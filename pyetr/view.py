@@ -168,7 +168,9 @@ class View:
             for exi, uni in new_pairs:
                 for dep in dep_rel.dependencies:
                     # If Dependency is not pre-existing add to the final pairs
-                    if not (dep.universal == uni and exi in dep.existentials):
+                    if not (
+                        dep.universal.identical(uni) and dep.existential.identical(exi)
+                    ):
                         final_pairs.append((exi, uni))
 
             # Invert all arb_objects. Due to being references this will update all
@@ -177,19 +179,7 @@ class View:
             final_pairs: list[tuple[Universal, Existential]] = final_pairs
 
             # Form new deps
-            new_deps: list[tuple[Universal, set[Existential]]] = []
-            for uni, exi in final_pairs:
-                existing_deps = [(u, e) for u, e in new_deps if uni == u]
-                if len(existing_deps) == 0:
-                    new_deps.append((uni, {exi}))
-                elif len(existing_deps) == 1:
-                    _, existing_exis = existing_deps[0]
-                    existing_exis.add(exi)
-                else:
-                    assert False
-
-            final_deps = [Dependency(u, frozenset(e)) for u, e in new_deps]
-
+            final_deps: list[Dependency] = [Dependency(u, e) for u, e in final_pairs]
             return DependencyRelation(frozenset(final_deps))
 
         verum = set_of_states({state({})})
