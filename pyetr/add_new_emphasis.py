@@ -109,7 +109,11 @@ def extract_candidates(s: set_of_states) -> list[Candidate]:
     for state in s:
         for atom in state:
             atom_cand = get_atom_candidate(atom)
-            if [atom_cand.identical(a) for a in atomics_visited]:
+            if [
+                atom_cand.identical(a)
+                for a in atomics_visited
+                if atom_cand.identical(a)
+            ]:
                 for cand in new_candidates:
                     cand.append_if_equal(atom_cand)
             else:
@@ -119,11 +123,9 @@ def extract_candidates(s: set_of_states) -> list[Candidate]:
 
 
 def compare_candidate(candidate1: Candidate, candidate2: Candidate) -> Candidate:
-    atom_cand1 = candidate1.atom_candidate
-    atom_cand2 = candidate2.atom_candidate
-    type_result = compare_type(atom_cand1, atom_cand2)
+    type_result = compare_type(candidate1.atom_candidate, candidate2.atom_candidate)
     if type_result is not None:
-        if type_result.identical(atom_cand1):
+        if type_result.identical(candidate1.atom_candidate):
             return candidate1
         else:
             return candidate2
@@ -182,7 +184,6 @@ def add_new_emphasis(
         return stage, get_new_state(supposition, final_candidate)
     elif not (stage.is_verum or stage.is_falsum):
         candidates = extract_candidates(stage)
-        print(candidates)
         final_candidate = reduce(compare_candidate, candidates)
         return get_new_state(stage, final_candidate), supposition
     else:
