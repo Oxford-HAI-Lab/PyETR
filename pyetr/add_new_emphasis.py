@@ -153,7 +153,6 @@ def count_candidates(set_s: set_of_states, atom_candidate: AtomCandidate) -> int
 
 
 def get_new_state(set_s: set_of_states, atom_candidate: AtomCandidate) -> set_of_states:
-    count_candidates(set_s, atom_candidate)
     instance_num = random.randint(0, count_candidates(set_s, atom_candidate) - 1)
     instances_encountered = 0
 
