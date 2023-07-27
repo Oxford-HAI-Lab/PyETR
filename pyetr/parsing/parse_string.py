@@ -94,7 +94,7 @@ class LogicEmphasis(SingleOperand):
     name = "LogicEmphasis"
 
     def to_string(self):
-        return "*" + self.arg.to_string()
+        return self.arg.to_string() + "*"
 
 
 class MultiOperand:
@@ -259,7 +259,7 @@ def get_expr():
         [
             (function_word, 1, pp_right, LogicFunction),
             (predicate_word, 1, pp_right, LogicPredicate),
-            (emphasis, 1, pp_right, LogicEmphasis),
+            (emphasis, 1, pp_left, LogicEmphasis),
             (bool_not, 1, pp_right, BoolNot),
             (bool_and, 2, pp_left, BoolAnd),
             (bool_or, 2, pp_left, BoolOr),
