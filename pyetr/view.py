@@ -62,15 +62,6 @@ class View:
         self.supposition = supposition
         dependency_relation.validate(stage | supposition)
         self.dependency_relation = dependency_relation
-        total_emphasis = stage.has_emphasis + supposition.has_emphasis
-        if total_emphasis == 2:
-            raise ValueError("Both stage and supposition have an Emphasis")
-        elif total_emphasis == 0 and not (
-            (stage.is_falsum or stage.is_verum)
-            and (supposition.is_falsum or supposition.is_verum)
-        ):
-            raise ValueError("Neither stage nor supposition has an Emphasis")
-        # view has exactly one emphasis
 
     def __repr__(self) -> str:
         return f"<View \n  stage={pformat(self.stage)} \n  supposition={pformat(self.supposition)} \n  dep_rel={self.dependency_relation}\n>"
@@ -162,7 +153,7 @@ class View:
                 potentials.append((potential, s))
             stage = SetOfStates(arg_max_states(potentials))
 
-            if not (stage.has_emphasis and supposition.has_emphasis):
+            if stage.emphasis_count + supposition.emphasis_count == 0:
                 stage, supposition = add_new_emphasis(stage, supposition)
 
             dependency_relation = self.dependency_relation.restriction(

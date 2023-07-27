@@ -144,7 +144,7 @@ def _parse_view(
         stage = view_item
     parsed_supposition = _parse_item(supposition, maps)
     parsed_stage = _parse_item(stage, maps)
-    if not parsed_supposition.has_emphasis and not parsed_stage.has_emphasis:
+    if parsed_stage.emphasis_count + parsed_supposition.emphasis_count == 0:
         parsed_stage, parsed_supposition = add_new_emphasis(
             parsed_stage, parsed_supposition
         )

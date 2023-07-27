@@ -48,14 +48,11 @@ class State(frozenset[Atom]):
         return arb_objects
 
     @property
-    def has_emphasis(self) -> bool:
+    def emphasis_count(self) -> int:
         emphasis_count = 0
         for atom in self:
             emphasis_count += atom.has_emphasis
-        if emphasis_count > 1:
-            raise ValueError(f"Emphasis count in state at: {emphasis_count}")
-        else:
-            return emphasis_count == 1
+        return emphasis_count
 
 
 class SetOfStates(frozenset[State]):
@@ -100,14 +97,11 @@ class SetOfStates(frozenset[State]):
         return arb_objects
 
     @property
-    def has_emphasis(self) -> bool:
+    def emphasis_count(self) -> int:
         emphasis_count = 0
         for state in self:
-            emphasis_count += state.has_emphasis
-        if emphasis_count > 1:
-            raise ValueError(f"Emphasis count in state at: {emphasis_count}")
-        else:
-            return emphasis_count == 1
+            emphasis_count += state.emphasis_count
+        return emphasis_count
 
     def __mul__(self, other: "SetOfStates") -> "SetOfStates":
         """
