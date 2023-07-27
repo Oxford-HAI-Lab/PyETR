@@ -242,7 +242,7 @@ class DependencyStructure:
             for u in self.universals | other.universals:
                 if (e, u) in output:
                     pair_found = True
-                    break  # TODO: Will this break both?
+                    break
             if not pair_found:
                 new_out.append(e)
         return set(new_out)
@@ -261,13 +261,13 @@ class DependencyStructure:
         # TODO: Compute once
         new_out: list[ArbitraryObject] = []
         for u in self.universals | other.universals:
+            pair_found = False
             for e in (self.existentials | other.existentials).difference(e_0):
-                pair_found = False
                 if (u, e) in output and (e, u) not in output:
                     pair_found = True
-                    break  # TODO: Will this break both?
-                if not pair_found:
-                    new_out.append(u)
+                    break
+            if not pair_found:
+                new_out.append(u)
         return set(new_out)
 
     @property
