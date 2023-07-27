@@ -44,18 +44,13 @@ class ArbitraryObject:
             s = "Uni"
         return f"<ArbitraryObject ({s}) name={self.name}>"
 
-    def identical(self, other) -> bool:
+    def __eq__(self, other) -> bool:
         if not isinstance(other, ArbitraryObject):
             return False
         return self.name == other.name and self.is_existential == other.is_existential
 
-    # def __eq__(self, other) -> bool:
-    #     if not isinstance(other, ArbitraryObject):
-    #         return False
-    #     return self.name == other.name and self.is_existential == other.is_existential
-
-    # def __hash__(self) -> int:
-    #     return hash((self.name, self.is_existential))
+    def __hash__(self) -> int:
+        return hash((self.name, self.is_existential))
 
 
 class Emphasis:
@@ -85,6 +80,9 @@ class Emphasis:
             return False
         return self.term == other.term
 
+    def __hash__(self) -> int:
+        return hash(("Emphasis", self.term))
+
 
 class Term:
     f: Function
@@ -112,22 +110,6 @@ class Term:
                 )
             else:
                 self.has_emphasis = emphasis_count == 1
-
-    def identical(self, other: "Term | ArbitraryObject | Function") -> bool:
-        if not isinstance(other, Term):
-            return False
-        if self.t is None and other.t is None:
-            terms_equal = True
-        elif self.t is None or other.t is None:
-            terms_equal = False
-        else:
-            terms_equal = True
-            for i, term in enumerate(self.t):
-                other_term = other.t[i]
-                if term != other_term:
-                    terms_equal = False
-
-        return self.f == other.f and terms_equal
 
     @staticmethod
     def _count_emphasis(t: tuple["Term | ArbitraryObject | Emphasis", ...]) -> int:
