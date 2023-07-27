@@ -3,7 +3,7 @@ from typing import overload
 
 from pyetr.add_new_emphasis import add_new_emphasis
 from pyetr.dependency import Dependency, DependencyRelation
-from pyetr.stateset import set_of_states, state
+from pyetr.stateset import SetOfStates, State
 from pyetr.term import ArbitraryObject, Emphasis, Function, Term
 from pyetr.tools import ArbitraryObjectGenerator
 from pyetr.view import View
@@ -75,21 +75,21 @@ def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> Atom:
     return maps.predicate_map[predicate.name](tuple(terms))
 
 
-def _parse_item(item: Item, maps: Maps) -> set_of_states:
+def _parse_item(item: Item, maps: Maps) -> SetOfStates:
     # Based on definition 4.16
     if isinstance(item, BoolOr):
         # based on (i)
-        new_set = set_of_states(set())
+        new_set = SetOfStates(set())
         for operand in item.operands:
-            parsed_item: set_of_states = _parse_item(operand, maps)
+            parsed_item: SetOfStates = _parse_item(operand, maps)
             new_set |= parsed_item
         return new_set
 
     elif isinstance(item, BoolAnd):
         # based on (ii)
-        new_set = set_of_states({state(set())})
+        new_set = SetOfStates({State(set())})
         for operand in item.operands:
-            parsed_item: set_of_states = _parse_item(operand, maps)
+            parsed_item: SetOfStates = _parse_item(operand, maps)
             new_set *= parsed_item
         return new_set
 
@@ -99,15 +99,15 @@ def _parse_item(item: Item, maps: Maps) -> set_of_states:
         return new_arg.negation()
     elif isinstance(item, Truth):
         # based on (iv)
-        return set_of_states({state({})})
+        return SetOfStates({State({})})
 
     elif isinstance(item, Falsum):
         # based on (v)
-        return set_of_states({})
+        return SetOfStates({})
 
     elif isinstance(item, LogicPredicate):
         # based on (vi)
-        return set_of_states({state({_parse_predicate(item, maps)})})
+        return SetOfStates({State({_parse_predicate(item, maps)})})
 
     elif isinstance(item, LogicEmphasis):
         # TODO: Is this correct?

@@ -2,7 +2,7 @@ __all__ = ["Dependency", "DependencyRelation"]
 
 from typing import Iterable
 
-from .stateset import set_of_states
+from .stateset import SetOfStates
 from .term import ArbitraryObject
 
 Universal = ArbitraryObject
@@ -62,7 +62,7 @@ class DependencyRelation:
                         f"Existential sets do not meet Matroyshka condition. \nSet1: {set1}\nSet2: {set2}"
                     )
 
-    def validate(self, states: set_of_states):
+    def validate(self, states: SetOfStates):
         uni_arb_objects, exi_arb_objects = _separate_arb_objects(states.arb_objects)
         # universal to existentials that depend on them ( share a pair )
         s = self.to_sets()
@@ -118,10 +118,9 @@ class DependencyRelation:
         new_deps = []
         for dep in self.dependencies:
             # If the state arb objects contain the dep universal
-            rel_deps = [a for a in arb_objects if dep.universal.identical(a)]
-            if len(rel_deps) > 0:
+            if dep.universal in arb_objects:
                 for arb_object in arb_objects:
-                    if not dep.existential.identical(arb_object):
+                    if dep.existential != arb_object:
                         new_deps.append(Dependency(dep.universal, dep.existential))
 
         return DependencyRelation(frozenset(new_deps))
@@ -198,9 +197,9 @@ class DependencyStructure:
         arb_obj1_found = False
         arb_obj2_found = False
         for arb_obj in self.universals | self.existentials:
-            if arb_obj.identical(arb_object1):
+            if arb_obj == arb_object1:
                 arb_obj1_found = True
-            if arb_obj.identical(arb_object2):
+            if arb_obj == arb_object2:
                 arb_obj2_found = True
         if not arb_obj1_found or not arb_obj2_found:
             return False
@@ -224,46 +223,33 @@ class DependencyStructure:
         else:
             assert False
 
-    def E0(self, other: "DependencyStructure") -> set[Existential]:
-        pairs: list[tuple[ArbitraryObject, ArbitraryObject]] = []
-
-        arb_objects = (
-            self.existentials | other.existentials | self.universals | other.universals
-        )
-        for x in arb_objects:
-            for y in arb_objects:
-                if self.triangle(x, y) or other.triangle(x, y):
-                    pairs.append((x, y))
-
-        output = transitive_closure(pairs, arb_objects)
+    def E0(
+        self,
+        other: "DependencyStructure",
+        new_pairs: list[tuple[ArbitraryObject, ArbitraryObject]],
+    ) -> set[Existential]:
         new_out: list[ArbitraryObject] = []
         for e in self.existentials | other.existentials:
             pair_found = False
             for u in self.universals | other.universals:
-                if (e, u) in output:
+                if (e, u) in new_pairs:
                     pair_found = True
                     break
             if not pair_found:
                 new_out.append(e)
         return set(new_out)
 
-    def U0(self, other: "DependencyStructure", e_0: set[Existential]) -> set[Universal]:
-        pairs: list[tuple[ArbitraryObject, ArbitraryObject]] = []
-
-        arb_objects = (
-            self.existentials | other.existentials | self.universals | other.universals
-        )
-        for x in arb_objects:
-            for y in arb_objects:
-                if self.triangle(x, y) or other.triangle(x, y):
-                    pairs.append((x, y))
-        output = transitive_closure(pairs, arb_objects)
-        # TODO: Compute once
+    def U0(
+        self,
+        other: "DependencyStructure",
+        new_pairs: list[tuple[ArbitraryObject, ArbitraryObject]],
+        e_0: set[Existential],
+    ) -> set[Universal]:
         new_out: list[ArbitraryObject] = []
         for u in self.universals | other.universals:
             pair_found = False
             for e in (self.existentials | other.existentials).difference(e_0):
-                if (u, e) in output and (e, u) not in output:
+                if (u, e) in new_pairs and (e, u) not in new_pairs:
                     pair_found = True
                     break
             if not pair_found:
@@ -282,8 +268,21 @@ class DependencyStructure:
         if self.is_empty and other.is_empty:
             return self
         else:
-            e_0 = self.E0(other)
-            u_0 = self.U0(other, e_0)
+            pairs: list[tuple[ArbitraryObject, ArbitraryObject]] = []
+            arb_objects = (
+                self.existentials
+                | other.existentials
+                | self.universals
+                | other.universals
+            )
+            for x in arb_objects:
+                for y in arb_objects:
+                    if self.triangle(x, y) or other.triangle(x, y):
+                        pairs.append((x, y))
+            new_pairs = transitive_closure(pairs, arb_objects)
+
+            e_0 = self.E0(other, new_pairs)
+            u_0 = self.U0(other, new_pairs, e_0)
 
             initial_structure = DependencyStructure(
                 u_0, e_0, DependencyRelation(frozenset())

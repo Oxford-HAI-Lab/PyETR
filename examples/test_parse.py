@@ -2,7 +2,6 @@ from pyetr import parse_string_to_view
 from pyetr.atom import Atom, Predicate
 from pyetr.parsing.parse_item import parse_items
 from pyetr.parsing.parse_string import parse_string
-from pyetr.stateset import set_of_states, state
 from pyetr.term import ArbitraryObject
 
 # input_string = (
