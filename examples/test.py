@@ -6,11 +6,11 @@ from pyetr import (
     Emphasis,
     Function,
     Predicate,
+    SetOfStates,
+    State,
     Term,
     View,
-    state,
 )
-from pyetr.stateset import set_of_states
 from pyetr.view import Commitment
 
 smokes = Predicate("smokes", 1)
@@ -24,19 +24,20 @@ universal_arb = next(universal_arb_set)
 arbitrary_object1_smokes = Atom(smokes, (universal_arb,))
 arbitrary_object2_smokes = Atom(smokes, (Emphasis(existent_arb_obj),))
 
-stage = set_of_states(
-    {state({john_smokes, arbitrary_object1_smokes, arbitrary_object2_smokes})}
+stage = SetOfStates(
+    {State({john_smokes, arbitrary_object1_smokes, arbitrary_object2_smokes})}
 )
-supposition = set_of_states(
-    {state({john_smokes, arbitrary_object1_smokes, arbitrary_object1_smokes})}
+supposition = SetOfStates(
+    {State({john_smokes, arbitrary_object1_smokes, arbitrary_object1_smokes})}
 )
 dep_relation = DependencyRelation(
-    frozenset({Dependency(universal_arb, frozenset({existent_arb_obj}))})
+    frozenset({Dependency(universal_arb, existent_arb_obj)})
 )
+
 
 v1 = View(stage, supposition, dep_relation)
 v2 = View(stage, supposition, dep_relation)
 
-c = Commitment(v1, v2)
+c = Commitment({v1}, v2)
 
 print(v1)

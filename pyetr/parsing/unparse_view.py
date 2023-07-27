@@ -16,7 +16,7 @@ from pyetr.parsing.parse_string import (
     Truth,
     Variable,
 )
-from pyetr.stateset import set_of_states
+from pyetr.stateset import SetOfStates
 from pyetr.term import ArbitraryObject, Emphasis, Term
 from pyetr.view import View
 
@@ -54,7 +54,7 @@ def convert_atom(atom: Atom):
         return BoolNot([[inner]])
 
 
-def unparse_set_of_states(s: set_of_states) -> Item:
+def unparse_set_of_states(s: SetOfStates) -> Item:
     if s.is_falsum:
         return Falsum([])
     elif s.is_verum:

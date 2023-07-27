@@ -1,4 +1,4 @@
-__all__ = ["state"]
+__all__ = ["State", "SetOfStates"]
 
 from typing import AbstractSet, Iterable, Optional
 
@@ -6,39 +6,39 @@ from .atom import Atom
 from .term import ArbitraryObject
 
 
-class state(frozenset[Atom]):
-    def __new__(cls, __iterable: Optional[Iterable[Atom]] = None, /) -> "state":
+class State(frozenset[Atom]):
+    def __new__(cls, __iterable: Optional[Iterable[Atom]] = None, /) -> "State":
         if __iterable is None:
             return super().__new__(cls)
         else:
             return super().__new__(cls, __iterable)
 
-    def copy(self) -> "state":
-        return state(super().copy())
+    def copy(self) -> "State":
+        return State(super().copy())
 
-    def difference(self, *s: Iterable[object]) -> "state":
-        return state(super().difference(*s))
+    def difference(self, *s: Iterable[object]) -> "State":
+        return State(super().difference(*s))
 
-    def intersection(self, *s: Iterable[object]) -> "state":
-        return state(super().intersection(*s))
+    def intersection(self, *s: Iterable[object]) -> "State":
+        return State(super().intersection(*s))
 
-    def symmetric_difference(self, __s: Iterable[Atom]) -> "state":
-        return state(super().symmetric_difference(__s))
+    def symmetric_difference(self, __s: Iterable[Atom]) -> "State":
+        return State(super().symmetric_difference(__s))
 
-    def union(self, *s: Iterable[Atom]) -> "state":
-        return state(super().union(*s))
+    def union(self, *s: Iterable[Atom]) -> "State":
+        return State(super().union(*s))
 
-    def __and__(self, __value: AbstractSet[Atom]) -> "state":
-        return state(super().__and__(__value))
+    def __and__(self, __value: AbstractSet[Atom]) -> "State":
+        return State(super().__and__(__value))
 
-    def __or__(self, __value: AbstractSet[Atom]) -> "state":
-        return state(super().__or__(__value))
+    def __or__(self, __value: AbstractSet[Atom]) -> "State":
+        return State(super().__or__(__value))
 
-    def __sub__(self, __value: AbstractSet[Atom]) -> "state":
-        return state(super().__sub__(__value))
+    def __sub__(self, __value: AbstractSet[Atom]) -> "State":
+        return State(super().__sub__(__value))
 
-    def __xor__(self, __value: AbstractSet[Atom]) -> "state":
-        return state(super().__xor__(__value))
+    def __xor__(self, __value: AbstractSet[Atom]) -> "State":
+        return State(super().__xor__(__value))
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
@@ -58,41 +58,39 @@ class state(frozenset[Atom]):
             return emphasis_count == 1
 
 
-class set_of_states(frozenset[state]):
-    def __new__(
-        cls, __iterable: Optional[Iterable[state]] = None, /
-    ) -> "set_of_states":
+class SetOfStates(frozenset[State]):
+    def __new__(cls, __iterable: Optional[Iterable[State]] = None, /) -> "SetOfStates":
         if __iterable is None:
             return super().__new__(cls)
         else:
             return super().__new__(cls, __iterable)
 
-    def copy(self) -> "set_of_states":
-        return set_of_states(super().copy())
+    def copy(self) -> "SetOfStates":
+        return SetOfStates(super().copy())
 
-    def difference(self, *s: Iterable[object]) -> "set_of_states":
-        return set_of_states(super().difference(*s))
+    def difference(self, *s: Iterable[object]) -> "SetOfStates":
+        return SetOfStates(super().difference(*s))
 
-    def intersection(self, *s: Iterable[object]) -> "set_of_states":
-        return set_of_states(super().intersection(*s))
+    def intersection(self, *s: Iterable[object]) -> "SetOfStates":
+        return SetOfStates(super().intersection(*s))
 
-    def symmetric_difference(self, __s: Iterable[state]) -> "set_of_states":
-        return set_of_states(super().symmetric_difference(__s))
+    def symmetric_difference(self, __s: Iterable[State]) -> "SetOfStates":
+        return SetOfStates(super().symmetric_difference(__s))
 
-    def union(self, *s: Iterable[state]) -> "set_of_states":
-        return set_of_states(super().union(*s))
+    def union(self, *s: Iterable[State]) -> "SetOfStates":
+        return SetOfStates(super().union(*s))
 
-    def __and__(self, __value: AbstractSet[state]) -> "set_of_states":
-        return set_of_states(super().__and__(__value))
+    def __and__(self, __value: AbstractSet[State]) -> "SetOfStates":
+        return SetOfStates(super().__and__(__value))
 
-    def __or__(self, __value: AbstractSet[state]) -> "set_of_states":
-        return set_of_states(super().__or__(__value))
+    def __or__(self, __value: AbstractSet[State]) -> "SetOfStates":
+        return SetOfStates(super().__or__(__value))
 
-    def __sub__(self, __value: AbstractSet[state]) -> "set_of_states":
-        return set_of_states(super().__sub__(__value))
+    def __sub__(self, __value: AbstractSet[State]) -> "SetOfStates":
+        return SetOfStates(super().__sub__(__value))
 
-    def __xor__(self, __value: AbstractSet[state]) -> "set_of_states":
-        return set_of_states(super().__xor__(__value))
+    def __xor__(self, __value: AbstractSet[State]) -> "SetOfStates":
+        return SetOfStates(super().__xor__(__value))
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
@@ -111,17 +109,17 @@ class set_of_states(frozenset[state]):
         else:
             return emphasis_count == 1
 
-    def __mul__(self, other: "set_of_states") -> "set_of_states":
+    def __mul__(self, other: "SetOfStates") -> "SetOfStates":
         """
         Definition 4.14 Product of set of states
         """
 
-        output: set[state] = set()
+        output: set[State] = set()
         for state1 in self:
             for state2 in other:
                 output.add(state1 | state2)
 
-        return set_of_states(output)
+        return SetOfStates(output)
 
     def negation(self):
         """
@@ -129,11 +127,11 @@ class set_of_states(frozenset[state]):
         """
         output = None
         for s in self:
-            new_state_set_mut: set[state] = set()
+            new_state_set_mut: set[State] = set()
             for atom in s:
-                new_state = state({~atom})
+                new_state = State({~atom})
                 new_state_set_mut.add(new_state)
-            new_state_set = set_of_states(new_state_set_mut)
+            new_state_set = SetOfStates(new_state_set_mut)
             if output is None:
                 output = new_state_set
             else:
@@ -153,7 +151,7 @@ class set_of_states(frozenset[state]):
     def is_falsum(self):
         return len(self) == 0
 
-    def answer_potential(self, other: "set_of_states") -> int:
+    def answer_potential(self, other: "SetOfStates") -> int:
         """
         Based on definition 4.29
         """

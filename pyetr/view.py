@@ -10,23 +10,23 @@ from .dependency import (
     DependencyStructure,
     _separate_arb_objects,
 )
-from .stateset import set_of_states, state
-from .term import ArbitraryObject
+from .stateset import SetOfStates, State
+from .term import ArbitraryObject, Emphasis, Term
 
 
 def get_subset(
-    stage_external: set_of_states, supposition_internal: set_of_states
-) -> set_of_states:
+    stage_external: SetOfStates, supposition_internal: SetOfStates
+) -> SetOfStates:
     out_set = set()
     for state_stage_ext in stage_external:
         for supp_state in supposition_internal:
             if supp_state.issubset(state_stage_ext):
                 out_set.add(state_stage_ext)
-    return set_of_states(out_set)
+    return SetOfStates(out_set)
 
 
-Stage = set_of_states
-Supposition = set_of_states
+Stage = SetOfStates
+Supposition = SetOfStates
 Existential = ArbitraryObject
 Universal = ArbitraryObject
 
@@ -34,7 +34,7 @@ Universal = ArbitraryObject
 def stage_supposition_product(
     stage_supposition_external: tuple[Stage, Supposition],
     stage_supposition_internal: tuple[Stage, Supposition],
-) -> tuple[set_of_states, set_of_states]:
+) -> tuple[Stage, Supposition]:
     stage_external, supposition_external = stage_supposition_external
     stage_internal, supposition_internal = stage_supposition_internal
     subset = get_subset(stage_external, supposition_internal)
@@ -42,20 +42,20 @@ def stage_supposition_product(
     return result_stage, supposition_external
 
 
-def arg_max_states(potentials: list[tuple[int, state]]) -> list[state]:
+def arg_max_states(potentials: list[tuple[int, State]]) -> list[State]:
     max_potential = max([potential for potential, _ in potentials])
     return [state for potential, state in potentials if potential == max_potential]
 
 
 class View:
-    stage: set_of_states
-    supposition: set_of_states
+    stage: Stage
+    supposition: Supposition
     dependency_relation: DependencyRelation
 
     def __init__(
         self,
-        stage: set_of_states,
-        supposition: set_of_states,
+        stage: Stage,
+        supposition: Supposition,
         dependency_relation: DependencyRelation,
     ) -> None:
         self.stage = stage
@@ -156,11 +156,11 @@ class View:
             return self
         else:
             supposition = self.supposition
-            potentials: list[tuple[int, state]] = []
+            potentials: list[tuple[int, State]] = []
             for s in self.stage:
-                potential = set_of_states({s}).answer_potential(other.stage)
+                potential = SetOfStates({s}).answer_potential(other.stage)
                 potentials.append((potential, s))
-            stage = set_of_states(arg_max_states(potentials))
+            stage = SetOfStates(arg_max_states(potentials))
 
             if not (stage.has_emphasis and supposition.has_emphasis):
                 stage, supposition = add_new_emphasis(stage, supposition)
@@ -174,7 +174,7 @@ class View:
         """
         Based on definition 4.31
         """
-        verum = set_of_states({state({})})
+        verum = SetOfStates({State({})})
         stage, _ = stage_supposition_product(
             (self.supposition, verum), (self.stage.negation(), verum)
         )
@@ -196,9 +196,7 @@ class View:
         for exi, uni in new_pairs:
             for dep in self.dependency_relation.dependencies:
                 # If Dependency is not pre-existing add to the final pairs
-                if not (
-                    dep.universal.identical(uni) and dep.existential.identical(exi)
-                ):
+                if not (dep.universal == uni and dep.existential == exi):
                     final_pairs.append((exi, uni))
 
         # Invert all arb_objects. Due to being references this will update all
@@ -218,6 +216,18 @@ class View:
         """
         Based on Definition 4.33
         """
+
+        def _m_prime(
+            s: State,
+        ) -> set[
+            tuple[Term | ArbitraryObject | Emphasis, Term | ArbitraryObject | Emphasis]
+        ]:
+            raise NotImplementedError
+
+        self_arb = self.stage.arb_objects | self.supposition.arb_objects
+        other_arb = view.stage.arb_objects | view.supposition.arb_objects
+        if len(self_arb & other_arb) == 0 or False:  # TODO: What is this?
+            return self
         raise NotImplementedError
 
     def universal_product(self, view: "View") -> "View":
@@ -238,12 +248,12 @@ class View:
 
 
 class Commitment:
-    view1: View
-    view2: View
+    views: set[View]
+    current_view: View
 
-    def __init__(self, view1: View, view2: View) -> None:
-        self.view1 = view1
-        self.view2 = view2
+    def __init__(self, views: set[View], current_view: View) -> None:
+        self.views = views
+        self.current_view = current_view
 
     def update(self, view: View) -> "Commitment":
         """
@@ -251,10 +261,13 @@ class Commitment:
         """
         # TODO: Why is C relevant here? Why not just operate on views?
 
+        if view not in self.views:
+            raise ValueError("View not in views")
+
         new_view = (
-            self.view2.universal_product(view)
+            self.current_view.universal_product(view)
             .existential_sum(view)
             .answer(view)
             .merge(view)
         )
-        return Commitment(self.view1, new_view)
+        return Commitment(self.views, new_view)

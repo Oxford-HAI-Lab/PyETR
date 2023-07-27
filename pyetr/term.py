@@ -16,10 +16,17 @@ class Function:
     def __repr__(self) -> str:
         return f"Function({self.name}, {self.arity})"
 
-    def identical(self, other) -> bool:
+    def __eq__(self, other) -> bool:
         if not isinstance(other, Function):
             return False
+        if self.name == other.name and not (self.arity == other.arity):
+            raise ValueError(
+                f"Equality on two functions of same name {self.name}, {other.name}, different arity {self.arity}, {other.arity}"
+            )
         return self.name == other.name and self.arity == other.arity
+
+    def __hash__(self) -> int:
+        return hash(self.name) + hash(self.arity)
 
 
 class ArbitraryObject:
@@ -41,6 +48,14 @@ class ArbitraryObject:
         if not isinstance(other, ArbitraryObject):
             return False
         return self.name == other.name and self.is_existential == other.is_existential
+
+    # def __eq__(self, other) -> bool:
+    #     if not isinstance(other, ArbitraryObject):
+    #         return False
+    #     return self.name == other.name and self.is_existential == other.is_existential
+
+    # def __hash__(self) -> int:
+    #     return hash((self.name, self.is_existential))
 
 
 class Emphasis:
@@ -64,7 +79,8 @@ class Emphasis:
     def __repr__(self) -> str:
         return f"<Emphasis term={self.term}>"
 
-    def identical(self, other) -> bool:
+    def __eq__(self, other) -> bool:
+        # TODO: Is this right?
         if not isinstance(other, Emphasis):
             return False
         return self.term == other.term
@@ -141,6 +157,14 @@ class Term:
 
     def __repr__(self) -> str:
         return f"<Term f={self.f} t={self.t}>"
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Term):
+            return False
+        return self.f == other.f and self.t == other.t
+
+    def __hash__(self) -> int:
+        return hash((self.f, self.t))
 
 
 # Changed if clause in 4.2 to separate Arbitrary Objects from Term
