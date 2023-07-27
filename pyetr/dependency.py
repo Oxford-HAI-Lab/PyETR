@@ -93,12 +93,14 @@ class DependencyRelation:
                 new_deps.add(Dependency(uni, exi))
         return cls(dependencies=frozenset(new_deps))
 
-    def to_sets(self) -> set[tuple[Universal, set[Existential]]]:
+    def to_sets(self) -> list[tuple[Universal, set[Existential]]]:
         new_sets: dict[str, tuple[Universal, set[Existential]]] = {}
         for d in self.dependencies:
             if d.universal.name in new_sets:
                 new_sets[d.universal.name][1].add(d.existential)
-        return set(new_sets.values())
+            else:
+                new_sets[d.universal.name] = (d.universal, {d.existential})
+        return list(new_sets.values())
 
     # @property
     # def arb_objects(self) -> set[ArbitraryObject]:
