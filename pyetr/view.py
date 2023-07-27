@@ -60,7 +60,7 @@ class View:
     ) -> None:
         self.stage = stage
         self.supposition = supposition
-        dependency_relation.validate(stage.union(supposition))
+        dependency_relation.validate(stage | supposition)
         self.dependency_relation = dependency_relation
         total_emphasis = stage.has_emphasis + supposition.has_emphasis
         if total_emphasis == 2:
