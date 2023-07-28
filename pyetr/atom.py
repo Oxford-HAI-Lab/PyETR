@@ -48,6 +48,20 @@ class Atom:
     def __invert__(self):
         return Atom(~self.predicate, self.terms)
 
+    def is_same_excl_emphasis(self, other: "Atom") -> bool:
+        raise NotImplementedError
+
+    @property
+    def emphasis_term(self) -> Term | ArbitraryObject:
+        raise NotImplementedError
+
+    def replace(
+        self,
+        old_term: Term | ArbitraryObject | Emphasis,
+        new_term: Term | ArbitraryObject | Emphasis,
+    ) -> "Atom":
+        raise NotImplementedError
+
 
 class Predicate:
     name: str

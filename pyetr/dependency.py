@@ -191,6 +191,15 @@ class DependencyStructure:
         self.dependency_relation = dependency_relation
         self._validate()
 
+    @classmethod
+    def from_arb_objects(
+        cls,
+        arb_objects: set[ArbitraryObject],
+        dependency_relation: DependencyRelation,
+    ):
+        universals, existentials = _separate_arb_objects(arb_objects)
+        return cls(universals, existentials, dependency_relation)
+
     def _validate(self):
         unis, exis = _separate_arb_objects(self.dependency_relation.arb_objects)
         if not self.universals.issuperset(unis):

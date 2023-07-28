@@ -1,7 +1,10 @@
 __all__ = ["View", "Commitment"]
 
+from functools import reduce
 from pprint import pformat
 from typing import Optional
+
+from pyetr.atom import Atom
 
 from .add_new_emphasis import add_new_emphasis
 from .dependency import (
@@ -45,6 +48,16 @@ def stage_supposition_product(
 def arg_max_states(potentials: list[tuple[int, State]]) -> list[State]:
     max_potential = max([potential for potential, _ in potentials])
     return [state for potential, state in potentials if potential == max_potential]
+
+
+def substitution(
+    dep_structure: DependencyRelation,
+    arb_obj: ArbitraryObject,
+    term: Term | ArbitraryObject | Emphasis,
+    stage: Stage,
+    supposition: Supposition,
+) -> "View":
+    raise NotImplementedError
 
 
 class View:
@@ -96,7 +109,10 @@ class View:
             (self.stage, self.supposition), (view.stage, view.supposition)
         )
         dep_structure = self._fuse_views(view, inherited_dependencies)
-        return View(stage, supposition, dep_structure.dependency_relation)
+        dep_rel = dep_structure.dependency_relation.restriction(
+            (stage | supposition).arb_objects
+        )
+        return View(stage, supposition, dep_rel)
 
     def product(
         self, view: "View", inherited_dependencies: Optional[DependencyStructure] = None
@@ -117,12 +133,19 @@ class View:
         """
         Based on definition 4.28
         """
-        # TODO: Suppositions must be equal?
+        if self.supposition != view.supposition:
+            raise ValueError(
+                f"Invalid sum on {self.supposition} and {view.supposition}"
+            )
+
         supposition = self.supposition
         # Corresponds to line 1
         stage = self.stage | view.stage
         dep_structure = self._fuse_views(view, inherited_dependencies)
-        return View(stage, supposition, dep_structure.dependency_relation)
+        dep_rel = dep_structure.dependency_relation.restriction(
+            (stage | supposition).arb_objects
+        )
+        return View(stage, supposition, dep_rel)
 
     def sum(
         self, view: "View", inherited_dependencies: Optional[DependencyStructure] = None
@@ -203,23 +226,89 @@ class View:
             dependency_relation=DependencyRelation(frozenset(final_deps)),
         )
 
+    def issue_matches(
+        self, other: "View"
+    ) -> set[tuple[Term | ArbitraryObject, Term | ArbitraryObject]]:
+        self_atoms_with_emphasis: list[Atom] = []
+        other_atoms_with_emphasis: list[Atom] = []
+        for state in self.stage | self.supposition:
+            for atom in state:
+                if atom.has_emphasis:
+                    self_atoms_with_emphasis.append(atom)
+
+        for state in other.stage | other.supposition:
+            for atom in state:
+                if atom.has_emphasis:
+                    other_atoms_with_emphasis.append(atom)
+
+        pairs: list[tuple[Term | ArbitraryObject, Term | ArbitraryObject]] = []
+        for atom_self in self_atoms_with_emphasis:
+            for atom_other in other_atoms_with_emphasis:
+                if atom_self.is_same_excl_emphasis(atom_other):
+                    pairs.append((atom_self.emphasis_term, atom_other.emphasis_term))
+
+        return set(pairs)
+
     def merge(self, view: "View") -> "View":
         """
         Based on Definition 4.33
         """
 
         def _m_prime(
-            s: State,
-        ) -> set[
-            tuple[Term | ArbitraryObject | Emphasis, Term | ArbitraryObject | Emphasis]
-        ]:
-            raise NotImplementedError
+            gamma: State,
+        ) -> set[tuple[Term | ArbitraryObject | Emphasis, Universal]]:
+            out: set[tuple[Term | ArbitraryObject | Emphasis, Universal]] = set()
+            for t, u in self.issue_matches(view):
+                if isinstance(u, ArbitraryObject) and not u.is_existential:
+                    phi_exists = False
+                    for phi in view.supposition:
+                        new_phi = State(
+                            [atom.replace(old_term=t, new_term=u) for atom in phi]
+                        )
+                        if new_phi.issubset(gamma) and len(phi.difference(gamma)) != 0:
+                            phi_exists = True
+                            break
+                    if phi_exists:
+                        out.add((t, u))
+            return out
 
         self_arb = self.stage.arb_objects | self.supposition.arb_objects
         other_arb = view.stage.arb_objects | view.supposition.arb_objects
-        if len(self_arb & other_arb) == 0 or False:  # TODO: What is this?
+        self_struct = DependencyStructure.from_arb_objects(
+            self_arb, self.dependency_relation
+        )
+        other_struct = DependencyStructure.from_arb_objects(
+            other_arb, view.dependency_relation
+        )
+        if len(self_arb & other_arb) == 0 or (
+            other_struct == self_struct.restriction(other_arb)
+        ):
+            r_fuse_s = self_struct.fusion(other_struct)
+            views_for_sum: list[View] = []
+            for gamma in self.stage:
+                product_result: View = reduce(
+                    lambda v1, v2: v1.product(v2, r_fuse_s),
+                    [
+                        substitution(
+                            dep_structure=view.dependency_relation,
+                            arb_obj=u,
+                            term=t,
+                            stage=view.stage,
+                            supposition=SetOfStates({State({})}),
+                        )
+                        for t, u in _m_prime(gamma)
+                    ],
+                )
+                views_for_sum.append(
+                    View(
+                        SetOfStates({gamma}), self.supposition, self.dependency_relation
+                    )
+                    .product(view, inherited_dependencies=r_fuse_s)
+                    .product(product_result, inherited_dependencies=r_fuse_s)
+                )
+            return reduce(lambda v1, v2: v1.sum(v2, r_fuse_s), views_for_sum)
+        else:
             return self
-        raise NotImplementedError
 
     def universal_product(self, view: "View") -> "View":
         """
@@ -237,6 +326,14 @@ class View:
             raise ValueError("External supposition is not verum")
         raise NotImplementedError
 
+    def update(self, view: "View") -> "View":
+        """
+        Based on Definition 4.34
+        """
+        return (
+            self.universal_product(view).existential_sum(view).answer(view).merge(view)
+        )
+
 
 class Commitment:
     views: set[View]
@@ -245,20 +342,3 @@ class Commitment:
     def __init__(self, views: set[View], current_view: View) -> None:
         self.views = views
         self.current_view = current_view
-
-    def update(self, view: View) -> "Commitment":
-        """
-        Based on Definition 4.34
-        """
-        # TODO: Why is C relevant here? Why not just operate on views?
-
-        if view not in self.views:
-            raise ValueError("View not in views")
-
-        new_view = (
-            self.current_view.universal_product(view)
-            .existential_sum(view)
-            .answer(view)
-            .merge(view)
-        )
-        return Commitment(self.views, new_view)
