@@ -1,6 +1,7 @@
 __all__ = ["View", "Commitment"]
 
 from functools import reduce
+from operator import xor
 from pprint import pformat
 from typing import Optional
 
@@ -83,10 +84,12 @@ class View:
         return f"<View \n  stage={pformat(self.stage)} \n  supposition={pformat(self.supposition)} \n  dep_rel={self.dependency_relation}\n>"
 
     @property
+    def arb_objects(self) -> set[ArbitraryObject]:
+        return self.stage.arb_objects | self.supposition.arb_objects
+
+    @property
     def universals_and_existentials(self) -> tuple[set[Universal], set[Existential]]:
-        return _separate_arb_objects(
-            self.stage.arb_objects | self.supposition.arb_objects
-        )
+        return _separate_arb_objects(self.arb_objects)
 
     def _fuse_views(
         self, view: "View", inherited_dependencies: DependencyStructure
@@ -252,6 +255,12 @@ class View:
 
         return set(pairs)
 
+    @property
+    def dep_structure(self) -> "DependencyStructure":
+        return DependencyStructure.from_arb_objects(
+            self.arb_objects, self.dependency_relation
+        )
+
     def merge(self, view: "View") -> "View":
         """
         Based on Definition 4.33
@@ -275,18 +284,10 @@ class View:
                         out.add((t, u))
             return out
 
-        self_arb = self.stage.arb_objects | self.supposition.arb_objects
-        other_arb = view.stage.arb_objects | view.supposition.arb_objects
-        self_struct = DependencyStructure.from_arb_objects(
-            self_arb, self.dependency_relation
-        )
-        other_struct = DependencyStructure.from_arb_objects(
-            other_arb, view.dependency_relation
-        )
-        if len(self_arb & other_arb) == 0 or (
-            other_struct == self_struct.restriction(other_arb)
+        if len(self.arb_objects & view.arb_objects) == 0 or (
+            view.dep_structure == self.dep_structure.restriction(view.arb_objects)
         ):
-            r_fuse_s = self_struct.fusion(other_struct)
+            r_fuse_s = self.dep_structure.fusion(view.dep_structure)
             views_for_sum: list[View] = []
             for gamma in self.stage:
                 product_result: View = reduce(
@@ -313,43 +314,46 @@ class View:
         else:
             return self
 
+    def _uni_exi_condition(self, view: "View") -> bool:
+        """
+        Translated from:
+        A(Γ) ∩ A(Θ) = ∅ and either A(R) ∩ A(S) = ∅ or [R]Δ = S
+        """
+        expr1 = len(self.stage.arb_objects & self.supposition.arb_objects) == 0
+        expr2 = (
+            len(
+                self.dependency_relation.arb_objects
+                | view.dependency_relation.arb_objects
+            )
+            == 0
+        )
+        expr3 = (
+            self.dependency_relation.restriction(view.stage.arb_objects)
+            == view.dependency_relation
+        )
+
+        return expr1 and xor(expr2, expr3)
+
     def universal_product(self, view: "View") -> "View":
         """
         Based on Definition 4.35
         """
 
         def _m_prime() -> set[tuple[Universal, Term | ArbitraryObject]]:
-            self_stage_u, _ = _separate_arb_objects(self.stage.arb_objects)
+            self_u, _ = _separate_arb_objects(
+                self.stage.arb_objects | self.supposition.arb_objects
+            )
             output_set = set()
             for u, t in self.issue_matches(view):
-                if isinstance(u, ArbitraryObject) and u in self_stage_u:
-                    for t in self_stage_u:
-                        output_set.add((u, t))
+                if isinstance(u, ArbitraryObject) and u in (
+                    self_u - self.supposition.arb_objects
+                ):
+                    output_set.add((u, t))
             if output_set == set():
                 raise ValueError("No values were found m_prime output set")
             return output_set
 
-        if len(self.stage.arb_objects & self.supposition.arb_objects) == 0 and (
-            (
-                len(
-                    self.dependency_relation.arb_objects
-                    | view.dependency_relation.arb_objects
-                )
-                == 0
-            )
-            ^ (
-                self.dependency_relation.restriction(view.stage.arb_objects)
-                == view.dependency_relation
-            )
-        ):
-            self_arb = self.stage.arb_objects | self.supposition.arb_objects
-            other_arb = view.stage.arb_objects | view.supposition.arb_objects
-            self_struct = DependencyStructure.from_arb_objects(
-                self_arb, self.dependency_relation
-            )
-            other_struct = DependencyStructure.from_arb_objects(
-                other_arb, view.dependency_relation
-            )
+        if self._uni_exi_condition(view):
             if not view.supposition.is_verum:
                 return self
                 # raise ValueError("External supposition is not verum")
@@ -358,7 +362,8 @@ class View:
                 supposition=self.supposition,
                 dependency_relation=self.dependency_relation,
             )
-            r_fuse_s = self_struct.fusion(other_struct)
+            r_fuse_s = self.dep_structure.fusion(view.dep_structure)
+            m_prime = _m_prime()
             product_result: View = reduce(
                 lambda v1, v2: v1.product(v2, r_fuse_s),
                 [
@@ -369,20 +374,71 @@ class View:
                         stage=self.stage,
                         supposition=SetOfStates({State({})}),
                     )
-                    for u, t in _m_prime()
+                    for u, t in m_prime
                 ],
             )
             return initial_item.product(product_result, r_fuse_s)
         else:
             return self
 
+    @staticmethod
+    def _big_product() -> SetOfStates:
+        raise NotImplementedError
+
+    @staticmethod
+    def _big_union() -> SetOfStates:
+        def B(gamma, e):
+            raise NotImplementedError
+
+        # TODO: e is used twice as descriptor??
+        raise NotImplementedError
+
     def existential_sum(self, view: "View") -> "View":
         """
         Based on Definition 4.37
         """
+
+        def _m_prime() -> set[tuple[Universal, Term | ArbitraryObject]]:
+            _, self_e = self.universals_and_existentials
+            output_set = set()
+            for e, t in self.issue_matches(view):
+                if isinstance(e, ArbitraryObject) and e in (
+                    self_e - (self.supposition | view.stage).arb_objects
+                ):
+                    if not any(
+                        d.existential == e
+                        for d in self.dependency_relation.dependencies
+                    ):
+                        output_set.add((e, t))
+            return output_set
+
         if not view.supposition.is_verum:
             raise ValueError("External supposition is not verum")
-        raise NotImplementedError
+
+        if self._uni_exi_condition(view):
+            m_prime = _m_prime()
+            if m_prime == set():
+                return self
+            else:
+                r_fuse_s = self.dep_structure.fusion(view.dep_structure)
+                sum_items: list[View] = []
+                for e, t in m_prime:
+                    sum_items.append(
+                        substitution(
+                            dep_structure=r_fuse_s,
+                            arb_obj=e,
+                            term=t,
+                            stage=self._big_union(),
+                            supposition=self.supposition,
+                        )
+                    )
+                sum_result: View = reduce(
+                    lambda v1, v2: v1.sum(v2, r_fuse_s),
+                    sum_items,
+                )
+                return self.sum(sum_result, r_fuse_s)
+        else:
+            return self
 
     def update(self, view: "View") -> "View":
         """
