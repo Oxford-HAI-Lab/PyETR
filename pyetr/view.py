@@ -392,6 +392,18 @@ class View:
             self.universal_product(view).existential_sum(view).answer(view).merge(view)
         )
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, View):
+            return False
+        return (
+            self.stage == other.stage
+            and self.supposition == other.supposition
+            and self.dependency_relation == other.dependency_relation
+        )
+
+    def __hash__(self) -> int:
+        return hash((self.stage, self.supposition, self.dependency_relation))
+
 
 class Commitment:
     views: set[View]

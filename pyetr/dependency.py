@@ -35,6 +35,9 @@ class Dependency:
             self.existential == other.existential and self.universal == other.universal
         )
 
+    def __hash__(self) -> int:
+        return hash((self.existential, self.universal))
+
 
 def _separate_arb_objects(
     arb_objects: set[ArbitraryObject],
@@ -136,6 +139,9 @@ class DependencyRelation:
         if not isinstance(other, DependencyRelation):
             return False
         return self.dependencies == other.dependencies
+
+    def __hash__(self) -> int:
+        return hash((self.dependencies))
 
 
 def transitive_closure(
@@ -382,3 +388,6 @@ class DependencyStructure:
             and self.universals == other.universals
             and self.existentials == other.existentials
         )
+
+    def __hash__(self) -> int:
+        return hash((self.universals, self.existentials, self.dependency_relation))

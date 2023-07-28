@@ -67,6 +67,9 @@ class Atom:
             return False
         return self.predicate == other.predicate and self.terms == other.terms
 
+    def __hash__(self) -> int:
+        return hash((self.predicate, self.terms))
+
 
 class Predicate:
     name: str
@@ -86,6 +89,18 @@ class Predicate:
 
     def __call__(self, terms: tuple[Term | ArbitraryObject | Emphasis, ...]) -> Atom:
         return Atom(self, terms)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Predicate):
+            return False
+        return (
+            self.name == other.name
+            and self.arity == other.arity
+            and self.verifier == other.verifier
+        )
+
+    def __hash__(self) -> int:
+        return hash((self.name, self.arity, self.verifier))
 
 
 equals_predicate = Predicate("=", 2)
