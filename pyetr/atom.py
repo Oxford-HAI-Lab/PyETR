@@ -48,19 +48,57 @@ class Atom:
     def __invert__(self):
         return Atom(~self.predicate, self.terms)
 
-    def is_same_excl_emphasis(self, other: "Atom") -> bool:
-        raise NotImplementedError
-
     @property
     def emphasis_term(self) -> Term | ArbitraryObject:
-        raise NotImplementedError
+        if self.has_emphasis:
+            for term in self.terms:
+                if isinstance(term, Emphasis):
+                    return term.term
+                elif isinstance(term, Term) and term.has_emphasis:
+                    return term.emphasis_term
+            assert False
+        else:
+            raise ValueError(
+                f"Emphasis term requested for atom {self} - atom has no emphasis"
+            )
 
     def replace(
         self,
         old_term: Term | ArbitraryObject | Emphasis,
         new_term: Term | ArbitraryObject | Emphasis,
     ) -> "Atom":
-        raise NotImplementedError
+        new_terms = []
+        for term in self.terms:
+            if old_term == term:
+                replacement = new_term
+            else:
+                if isinstance(term, Term) and term.t is not None:
+                    replacement = term.replace(old_term, new_term)
+                elif isinstance(term, Emphasis):
+                    assert not isinstance(old_term, Emphasis)
+                    assert not isinstance(new_term, Emphasis)
+                    replacement = term.replace(old_term, new_term)
+                elif isinstance(term, ArbitraryObject):
+                    replacement = old_term
+                else:
+                    assert False
+            new_terms.append(replacement)
+        return Atom(predicate=self.predicate, terms=tuple(new_terms))
+
+    @property
+    def excluding_emphasis(self) -> "Atom":
+        if self.has_emphasis:
+            new_term = self.emphasis_term
+            old_term = Emphasis(new_term)
+            return self.replace(old_term, new_term)
+        else:
+            return self
+
+    def is_same_excl_emphasis(self, other: "Atom") -> bool:
+        if self.predicate != other.predicate:
+            return False
+        else:
+            return self.excluding_emphasis == other.excluding_emphasis
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Atom):

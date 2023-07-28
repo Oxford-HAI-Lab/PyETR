@@ -82,6 +82,20 @@ class Emphasis:
     def __hash__(self) -> int:
         return hash(("Emphasis", self.term))
 
+    def replace(
+        self, old_term: "Term | ArbitraryObject", new_term: "Term | ArbitraryObject"
+    ) -> "Emphasis":
+        if old_term == self.term:
+            replacement = new_term
+        else:
+            if isinstance(self.term, Term):
+                replacement = self.term.replace(old_term, new_term)
+            elif isinstance(self.term, ArbitraryObject):
+                replacement = old_term
+            else:
+                assert False
+        return Emphasis(t=replacement)
+
 
 class Term:
     f: Function
@@ -146,6 +160,46 @@ class Term:
 
     def __hash__(self) -> int:
         return hash((self.f, self.t))
+
+    def replace(
+        self,
+        old_term: "Term | ArbitraryObject | Emphasis",
+        new_term: "Term | ArbitraryObject | Emphasis",
+    ) -> "Term":
+        new_terms = []
+        if self.t is None:
+            return self
+        for term in self.t:
+            if old_term == term:
+                replacement = new_term
+            else:
+                if isinstance(term, Term) and term.t is not None:
+                    replacement = term.replace(old_term, new_term)
+                elif isinstance(term, Emphasis):
+                    assert not isinstance(old_term, Emphasis)
+                    assert not isinstance(new_term, Emphasis)
+                    replacement = term.replace(old_term, new_term)
+                elif isinstance(term, ArbitraryObject):
+                    replacement = old_term
+                else:
+                    assert False
+            new_terms.append(replacement)
+        return Term(f=self.f, t=tuple(new_terms))
+
+    @property
+    def emphasis_term(self) -> "Term | ArbitraryObject":
+        if self.has_emphasis and self.t is not None:
+            for term in self.t:
+                if isinstance(term, Emphasis):
+                    return term.term
+                elif isinstance(term, Term):
+                    if term.has_emphasis:
+                        return term.emphasis_term
+            assert False
+        else:
+            raise ValueError(
+                f"Emphasis term requested for term {self} - term has no emphasis"
+            )
 
 
 # Changed if clause in 4.2 to separate Arbitrary Objects from Term
