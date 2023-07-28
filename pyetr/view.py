@@ -51,12 +51,15 @@ def arg_max_states(potentials: list[tuple[int, State]]) -> list[State]:
 
 
 def substitution(
-    dep_structure: DependencyRelation,
+    dep_structure: DependencyStructure,
     arb_obj: ArbitraryObject,
     term: Term | ArbitraryObject | Emphasis,
     stage: Stage,
     supposition: Supposition,
 ) -> "View":
+    """
+    Based on definition 4.32
+    """
     raise NotImplementedError
 
 
@@ -290,7 +293,7 @@ class View:
                     lambda v1, v2: v1.product(v2, r_fuse_s),
                     [
                         substitution(
-                            dep_structure=view.dependency_relation,
+                            dep_structure=r_fuse_s,
                             arb_obj=u,
                             term=t,
                             stage=view.stage,
@@ -314,9 +317,64 @@ class View:
         """
         Based on Definition 4.35
         """
-        if not view.supposition.is_verum:
-            raise ValueError("External supposition is not verum")
-        raise NotImplementedError
+
+        def _m_prime() -> set[tuple[Universal, Term | ArbitraryObject]]:
+            self_stage_u, _ = _separate_arb_objects(self.stage.arb_objects)
+            output_set = set()
+            for u, t in self.issue_matches(view):
+                if isinstance(u, ArbitraryObject) and u in self_stage_u:
+                    for t in self_stage_u:
+                        output_set.add((u, t))
+            if output_set == set():
+                raise ValueError("No values were found m_prime output set")
+            return output_set
+
+        if len(self.stage.arb_objects & self.supposition.arb_objects) == 0 and (
+            (
+                len(
+                    self.dependency_relation.arb_objects
+                    | view.dependency_relation.arb_objects
+                )
+                == 0
+            )
+            ^ (
+                self.dependency_relation.restriction(view.stage.arb_objects)
+                == view.dependency_relation
+            )
+        ):
+            self_arb = self.stage.arb_objects | self.supposition.arb_objects
+            other_arb = view.stage.arb_objects | view.supposition.arb_objects
+            self_struct = DependencyStructure.from_arb_objects(
+                self_arb, self.dependency_relation
+            )
+            other_struct = DependencyStructure.from_arb_objects(
+                other_arb, view.dependency_relation
+            )
+            if not view.supposition.is_verum:
+                return self
+                # raise ValueError("External supposition is not verum")
+            initial_item = View(
+                stage=view.supposition,
+                supposition=self.supposition,
+                dependency_relation=self.dependency_relation,
+            )
+            r_fuse_s = self_struct.fusion(other_struct)
+            product_result: View = reduce(
+                lambda v1, v2: v1.product(v2, r_fuse_s),
+                [
+                    substitution(
+                        dep_structure=r_fuse_s,
+                        arb_obj=u,
+                        term=t,
+                        stage=self.stage,
+                        supposition=SetOfStates({State({})}),
+                    )
+                    for u, t in _m_prime()
+                ],
+            )
+            return initial_item.product(product_result, r_fuse_s)
+        else:
+            return self
 
     def existential_sum(self, view: "View") -> "View":
         """

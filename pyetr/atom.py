@@ -62,6 +62,11 @@ class Atom:
     ) -> "Atom":
         raise NotImplementedError
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Atom):
+            return False
+        return self.predicate == other.predicate and self.terms == other.terms
+
 
 class Predicate:
     name: str

@@ -28,6 +28,13 @@ class Dependency:
     def __repr__(self) -> str:
         return f"<Dependency existential={self.existential} universal={self.universal}>"
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Dependency):
+            return False
+        return (
+            self.existential == other.existential and self.universal == other.universal
+        )
+
 
 def _separate_arb_objects(
     arb_objects: set[ArbitraryObject],
@@ -124,6 +131,11 @@ class DependencyRelation:
                         new_deps.append(Dependency(dep.universal, dep.existential))
 
         return DependencyRelation(frozenset(new_deps))
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, DependencyRelation):
+            return False
+        return self.dependencies == other.dependencies
 
 
 def transitive_closure(
@@ -361,3 +373,12 @@ class DependencyStructure:
 
     def __repr__(self) -> str:
         return f"<DependencyStructure dep_rel={self.dependency_relation} unis={self.universals} exis={self.existentials}>"
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, DependencyStructure):
+            return False
+        return (
+            self.dependency_relation == other.dependency_relation
+            and self.universals == other.universals
+            and self.existentials == other.existentials
+        )

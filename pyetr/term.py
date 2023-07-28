@@ -75,7 +75,6 @@ class Emphasis:
         return f"<Emphasis term={self.term}>"
 
     def __eq__(self, other) -> bool:
-        # TODO: Is this right?
         if not isinstance(other, Emphasis):
             return False
         return self.term == other.term
