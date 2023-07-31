@@ -363,7 +363,6 @@ class View:
                 dependency_relation=self.dependency_relation,
             )
             r_fuse_s = self.dep_structure.fusion(view.dep_structure)
-            m_prime = _m_prime()
             product_result: View = reduce(
                 lambda v1, v2: v1.product(v2, r_fuse_s),
                 [
@@ -374,24 +373,34 @@ class View:
                         stage=self.stage,
                         supposition=SetOfStates({State({})}),
                     )
-                    for u, t in m_prime
+                    for u, t in _m_prime()
                 ],
             )
             return initial_item.product(product_result, r_fuse_s)
         else:
             return self
 
-    @staticmethod
-    def _big_product() -> SetOfStates:
-        raise NotImplementedError
+    def _big_union(self, e: Existential) -> SetOfStates:
+        def _big_product(gamma: State) -> SetOfStates:
+            def B(gamma: State, e: Existential) -> State:
+                raise NotImplementedError
 
-    @staticmethod
-    def _big_union() -> SetOfStates:
-        def B(gamma, e):
-            raise NotImplementedError
+            return reduce(
+                lambda s1, s2: s1 * s2,
+                [SetOfStates({State({x}), State({~x})}) for x in B(gamma, e)],
+            )
 
-        # TODO: e is used twice as descriptor??
-        raise NotImplementedError
+        final_sets: list[SetOfStates] = []
+        for gamma in self.stage:
+            if e in gamma.arb_objects:
+                x_set = State([x for x in gamma if e not in x.arb_objects])
+                for delta in _big_product(gamma):
+                    if not delta.issubset(gamma):
+                        x_set.union(delta)
+
+                final_sets.append(SetOfStates({gamma}) | SetOfStates({x_set}))
+
+        return reduce(lambda s1, s2: s1 | s2, final_sets)
 
     def existential_sum(self, view: "View") -> "View":
         """
@@ -421,20 +430,18 @@ class View:
                 return self
             else:
                 r_fuse_s = self.dep_structure.fusion(view.dep_structure)
-                sum_items: list[View] = []
-                for e, t in m_prime:
-                    sum_items.append(
+                sum_result: View = reduce(
+                    lambda v1, v2: v1.sum(v2, r_fuse_s),
+                    [
                         substitution(
                             dep_structure=r_fuse_s,
                             arb_obj=e,
                             term=t,
-                            stage=self._big_union(),
+                            stage=self._big_union(e),
                             supposition=self.supposition,
                         )
-                    )
-                sum_result: View = reduce(
-                    lambda v1, v2: v1.sum(v2, r_fuse_s),
-                    sum_items,
+                        for e, t in m_prime
+                    ],
                 )
                 return self.sum(sum_result, r_fuse_s)
         else:
