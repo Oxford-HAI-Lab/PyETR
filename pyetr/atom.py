@@ -108,6 +108,15 @@ class Atom:
     def __hash__(self) -> int:
         return hash((self.predicate, self.terms))
 
+    @property
+    def readable(self) -> "str":
+        terms = ",".join([i.readable for i in self.terms])
+        if self.predicate.verifier:
+            tilda = ""
+        else:
+            tilda = "~"
+        return f"{tilda}{self.predicate.name}({terms})"
+
 
 class Predicate:
     name: str

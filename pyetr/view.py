@@ -1,7 +1,6 @@
 __all__ = ["View", "Commitment"]
 
 from functools import reduce
-from operator import xor
 from pprint import pformat
 from typing import Optional
 
@@ -61,6 +60,13 @@ def substitution(
     """
     Based on definition 4.32
     """
+    # if arb_obj.is_existential:
+    #     new_stage = stage.replace(old_term = arb_obj, new_term = term)
+    # else:
+    #     pass
+    # return View(
+    #     stage =
+    # )
     raise NotImplementedError
 
 
@@ -275,7 +281,7 @@ class View:
                     phi_exists = False
                     for phi in view.supposition:
                         new_phi = State(
-                            [atom.replace(old_term=t, new_term=u) for atom in phi]
+                            [atom.replace(old_term=u, new_term=t) for atom in phi]
                         )
                         if new_phi.issubset(gamma) and len(phi.difference(gamma)) != 0:
                             phi_exists = True
@@ -317,22 +323,14 @@ class View:
     def _uni_exi_condition(self, view: "View") -> bool:
         """
         Translated from:
-        A(Γ) ∩ A(Θ) = ∅ and either A(R) ∩ A(S) = ∅ or [R]Δ = S
+        A(Γ) ∩ A(Θ) = ∅ and (A(R) ∩ A(S) = ∅ or [R]Δ = S)
         """
         expr1 = len(self.stage.arb_objects & self.supposition.arb_objects) == 0
-        expr2 = (
-            len(
-                self.dependency_relation.arb_objects
-                | view.dependency_relation.arb_objects
-            )
-            == 0
-        )
+        expr2 = len(self.arb_objects | view.arb_objects) == 0
         expr3 = (
-            self.dependency_relation.restriction(view.stage.arb_objects)
-            == view.dependency_relation
+            self.dep_structure.restriction(view.stage.arb_objects) == view.dep_structure
         )
-
-        return expr1 and xor(expr2, expr3)
+        return expr1 and (expr2 or expr3)
 
     def universal_product(self, view: "View") -> "View":
         """
@@ -356,7 +354,6 @@ class View:
         if self._uni_exi_condition(view):
             if not view.supposition.is_verum:
                 return self
-                # raise ValueError("External supposition is not verum")
             initial_item = View(
                 stage=view.supposition,
                 supposition=self.supposition,
@@ -380,32 +377,33 @@ class View:
         else:
             return self
 
-    def _big_union(self, e: Existential) -> SetOfStates:
-        def _big_product(gamma: State) -> SetOfStates:
-            def B(gamma: State, e: Existential) -> State:
-                raise NotImplementedError
-
-            return reduce(
-                lambda s1, s2: s1 * s2,
-                [SetOfStates({State({x}), State({~x})}) for x in B(gamma, e)],
-            )
-
-        final_sets: list[SetOfStates] = []
-        for gamma in self.stage:
-            if e in gamma.arb_objects:
-                x_set = State([x for x in gamma if e not in x.arb_objects])
-                for delta in _big_product(gamma):
-                    if not delta.issubset(gamma):
-                        x_set.union(delta)
-
-                final_sets.append(SetOfStates({gamma}) | SetOfStates({x_set}))
-
-        return reduce(lambda s1, s2: s1 | s2, final_sets)
-
     def existential_sum(self, view: "View") -> "View":
         """
         Based on Definition 4.37
         """
+
+        def _big_union(e: Existential) -> SetOfStates:
+            def _big_product(gamma: State) -> SetOfStates:
+                def B(gamma: State, e: Existential) -> State:
+                    return State([x for x in gamma if x.emphasis_term == e])
+
+                return reduce(
+                    lambda s1, s2: s1 * s2,
+                    [SetOfStates({State({x}), State({~x})}) for x in B(gamma, e)],
+                )
+
+            assert e in self.arb_objects
+            final_sets: list[SetOfStates] = []
+            for gamma in self.stage:
+                if e in gamma.arb_objects:
+                    x_set = State([x for x in gamma if e not in x.arb_objects])
+                    for delta in _big_product(gamma):
+                        if not delta.issubset(gamma):
+                            x_set.union(delta)
+
+                    final_sets.append(SetOfStates({gamma}) | SetOfStates({x_set}))
+
+            return reduce(lambda s1, s2: s1 | s2, final_sets)
 
         def _m_prime() -> set[tuple[Universal, Term | ArbitraryObject]]:
             _, self_e = self.universals_and_existentials
@@ -422,7 +420,7 @@ class View:
             return output_set
 
         if not view.supposition.is_verum:
-            raise ValueError("External supposition is not verum")
+            return self
 
         if self._uni_exi_condition(view):
             m_prime = _m_prime()
@@ -437,7 +435,7 @@ class View:
                             dep_structure=r_fuse_s,
                             arb_obj=e,
                             term=t,
-                            stage=self._big_union(e),
+                            stage=_big_union(e),
                             supposition=self.supposition,
                         )
                         for e, t in m_prime
@@ -466,6 +464,10 @@ class View:
 
     def __hash__(self) -> int:
         return hash((self.stage, self.supposition, self.dependency_relation))
+
+    @property
+    def readable(self) -> str:
+        return f"{self.stage.readable}^{self.supposition.readable} deps={self.dependency_relation.readable}"
 
 
 class Commitment:

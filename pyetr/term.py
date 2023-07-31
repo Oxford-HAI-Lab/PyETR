@@ -52,6 +52,14 @@ class ArbitraryObject:
     def __hash__(self) -> int:
         return hash((self.name, self.is_existential))
 
+    @property
+    def readable(self) -> str:
+        if self.is_existential:
+            suffix = "e"
+        else:
+            suffix = "u"
+        return f"{self.name}_{suffix}"
+
 
 class Emphasis:
     term: "Term | ArbitraryObject"
@@ -95,6 +103,10 @@ class Emphasis:
             else:
                 assert False
         return Emphasis(t=replacement)
+
+    @property
+    def readable(self) -> str:
+        return f"{self.term.readable}*"
 
 
 class Term:
@@ -200,6 +212,15 @@ class Term:
             raise ValueError(
                 f"Emphasis term requested for term {self} - term has no emphasis"
             )
+
+    @property
+    def readable(self) -> str:
+        if self.f.arity == 0:
+            return f"{self.f.name}"
+        else:
+            assert self.t is not None
+            terms = ",".join([i.readable for i in self.t])
+            return f"f_{self.f.name}({terms})"
 
 
 # Changed if clause in 4.2 to separate Arbitrary Objects from Term

@@ -143,6 +143,16 @@ class DependencyRelation:
     def __hash__(self) -> int:
         return hash((self.dependencies))
 
+    @property
+    def readable(self) -> "str":
+        if len(self.dependencies) == 0:
+            return "None"
+        else:
+            return "".join(
+                f"{u.readable}" + "{" + ",".join(e.readable for e in exis) + "}"
+                for u, exis in self.to_sets()
+            )
+
 
 def transitive_closure(
     D_initial: list[tuple[ArbitraryObject, ArbitraryObject]],

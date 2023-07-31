@@ -54,6 +54,12 @@ class State(frozenset[Atom]):
             emphasis_count += atom.has_emphasis
         return emphasis_count
 
+    @property
+    def readable(self) -> str:
+        if len(self) == 0:
+            return "0"
+        return "".join([i.readable for i in self])
+
 
 class SetOfStates(frozenset[State]):
     def __new__(cls, __iterable: Optional[Iterable[State]] = None, /) -> "SetOfStates":
@@ -150,3 +156,8 @@ class SetOfStates(frozenset[State]):
         Based on definition 4.29
         """
         return len(self.intersection(other))
+
+    @property
+    def readable(self) -> str:
+        terms = ",".join([i.readable for i in self])
+        return "{" + terms + "}"
