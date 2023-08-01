@@ -2,10 +2,9 @@ from dataclasses import dataclass
 from typing import overload
 
 from pyetr.add_new_emphasis import add_new_emphasis
-from pyetr.dependency import Dependency, DependencyRelation
+from pyetr.dependency import DependencyRelation
 from pyetr.stateset import SetOfStates, State
 from pyetr.term import ArbitraryObject, Emphasis, Function, Term
-from pyetr.tools import ArbitraryObjectGenerator
 from pyetr.view import View
 
 from ..atom import Atom, Predicate
@@ -110,7 +109,6 @@ def _parse_item(item: Item, maps: Maps) -> SetOfStates:
         return SetOfStates({State({_parse_predicate(item, maps)})})
 
     elif isinstance(item, LogicEmphasis):
-        # TODO: Is this correct?
         raise ValueError(f"Logic emphasis {item} found outside of logic predicate")
 
     elif isinstance(item, LogicFunction):
@@ -148,7 +146,11 @@ def _parse_view(
         parsed_stage, parsed_supposition = add_new_emphasis(
             parsed_stage, parsed_supposition
         )
-    return View(parsed_supposition, parsed_stage, dependency_relation)
+    return View(
+        stage=parsed_stage,
+        supposition=parsed_supposition,
+        dependency_relation=dependency_relation,
+    )
 
 
 Universal = ArbitraryObject

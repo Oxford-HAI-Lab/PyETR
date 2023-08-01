@@ -608,6 +608,15 @@ class View:
         )
         return self
 
+    def depose(self) -> "View":
+        verum = SetOfStates({State({})})
+        new_stage = self.stage | self.supposition.negation()
+        return View(
+            stage=new_stage,
+            supposition=verum,
+            dependency_relation=self.dependency_relation,
+        )
+
 
 class Commitment:
     views: set[View]
