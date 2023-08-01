@@ -60,14 +60,49 @@ def substitution(
     """
     Based on definition 4.32
     """
-    # if arb_obj.is_existential:
-    #     new_stage = stage.replace(old_term = arb_obj, new_term = term)
-    # else:
-    #     pass
-    # return View(
-    #     stage =
-    # )
-    raise NotImplementedError
+
+    def _determine_substitutions() -> list[tuple[ArbitraryObject, ArbitraryObject]]:
+        [(arb_obj, term)]
+        raise NotImplementedError
+
+    def get_novelized_arbs() -> set[ArbitraryObject]:
+        raise NotImplementedError
+
+    old_T = dep_structure
+
+    new_dep_structure = dep_structure
+    new_stage = stage
+    for old_item, new_item in _determine_substitutions():
+        new_dep_structure = new_dep_structure.replace(old_item, new_item)
+        new_stage = new_stage.replace(old_item, new_item)
+    new_dep_structure = new_dep_structure.restriction(get_novelized_arbs())
+    T_prime = old_T.chain(new_dep_structure)
+    return View(
+        stage=new_stage,
+        supposition=supposition,
+        dependency_relation=T_prime.dependency_relation,
+    )
+
+
+def state_division(
+    state: State,
+    other_stage: Stage,
+    other_supposition: Supposition,
+) -> State:
+    """
+    Based on definition 4.38
+    """
+    delta_that_meet_cond: list[State] = []
+    for delta in other_stage:
+        if delta.issubset(state) and any(
+            psi.issubset(state) for psi in other_supposition
+        ):
+            delta_that_meet_cond.append(delta)
+
+    if len(delta_that_meet_cond) == 1:
+        return state - delta_that_meet_cond[0]
+    else:
+        return state
 
 
 class View:
@@ -467,7 +502,111 @@ class View:
 
     @property
     def readable(self) -> str:
-        return f"{self.stage.readable}^{self.supposition.readable} deps={self.dependency_relation.readable}"
+        if self.is_falsum:
+            return "F"
+        elif self.is_verum:
+            return "T"
+        elif len(self.dependency_relation.dependencies) == 0:
+            return f"{self.stage.readable}^{self.supposition.readable}"
+        else:
+            return f"{self.stage.readable}^{self.supposition.readable} deps={self.dependency_relation.readable}"
+
+    def division(self, other: "View") -> "View":
+        """
+        Based on definition 4.38
+        """
+
+        def cond(delta: State):
+            for psi in other.supposition:
+                for gamma in self.stage:
+                    if delta.issubset(gamma) and psi.issubset(gamma):
+                        return True
+            return False
+
+        if all(cond(delta) for delta in other.stage):
+            new_stage = SetOfStates(
+                [
+                    state_division(
+                        state=gamma,
+                        other_stage=other.stage,
+                        other_supposition=other.supposition,
+                    )
+                    for gamma in self.stage
+                ]
+            )
+            new_dep_rel = self.dependency_relation.restriction(
+                new_stage.arb_objects | self.supposition.arb_objects
+            )
+            return View(
+                stage=new_stage,
+                supposition=self.supposition,
+                dependency_relation=new_dep_rel,
+            )
+        else:
+            return self
+
+    @property
+    def is_verum(self) -> bool:
+        return self.stage.is_verum and self.supposition.is_verum
+
+    @property
+    def is_falsum(self) -> bool:
+        return self.stage.is_falsum and self.supposition.is_verum
+
+    def factor(self, other: "View") -> "View":
+        """
+        Based on definition 4.39
+        """
+
+        def big_intersection(state: State) -> State:
+            out: list[State] = []
+            for t, a in self.issue_matches(other):
+                if isinstance(a, ArbitraryObject) and not a.is_existential:
+                    replaced_stage = other.stage.replace(old_term=a, new_term=t)
+                    replaced_supposition = other.supposition.replace(
+                        old_term=a, new_term=t
+                    )
+                    out.append(
+                        state_division(
+                            state=state,
+                            other_stage=replaced_stage,
+                            other_supposition=replaced_supposition,
+                        )
+                    )
+            return reduce(lambda s1, s2: s1 & s2, out)
+
+        def state_factor(state: State) -> State:
+            """
+            Based on definition 4.39
+            """
+            gamma_prime = state_division(
+                state=state,
+                other_stage=other.stage,
+                other_supposition=other.supposition,
+            )
+            expr = big_intersection(state)
+            if len(expr) == 0:
+                return gamma_prime
+            else:
+                return gamma_prime & expr
+
+        if not other.is_falsum:
+            new_stage = SetOfStates([state_factor(state=gamma) for gamma in self.stage])
+
+        else:
+            new_stage = SetOfStates(
+                gamma for gamma in self.stage if not gamma.is_primitive_absurd
+            )
+
+        new_dep_rel = self.dependency_relation.restriction(
+            new_stage.arb_objects | self.supposition.arb_objects
+        )
+        return View(
+            stage=new_stage,
+            supposition=self.supposition,
+            dependency_relation=new_dep_rel,
+        )
+        return self
 
 
 class Commitment:

@@ -85,6 +85,20 @@ class Atom:
             new_terms.append(replacement)
         return Atom(predicate=self.predicate, terms=tuple(new_terms))
 
+    def replace_low_level(
+        self,
+        old_term: Term | ArbitraryObject | Emphasis,
+        new_term: Term | ArbitraryObject | Emphasis,
+    ) -> "Atom":
+        new_terms = []
+        for term in self.terms:
+            if old_term == term:
+                new_terms.append(new_term)
+            elif isinstance(term, ArbitraryObject):
+                new_terms.append(old_term)
+
+        return Atom(predicate=self.predicate, terms=tuple(new_terms))
+
     @property
     def excluding_emphasis(self) -> "Atom":
         if self.has_emphasis:

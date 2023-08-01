@@ -153,6 +153,11 @@ class DependencyRelation:
                 for u, exis in self.to_sets()
             )
 
+    def replace(
+        self, old_item: ArbitraryObject, new_item: ArbitraryObject
+    ) -> "DependencyRelation":
+        raise NotImplementedError
+
 
 def transitive_closure(
     D_initial: list[tuple[ArbitraryObject, ArbitraryObject]],
@@ -401,3 +406,8 @@ class DependencyStructure:
 
     def __hash__(self) -> int:
         return hash((self.universals, self.existentials, self.dependency_relation))
+
+    def replace(
+        self, old_item: ArbitraryObject, new_item: ArbitraryObject
+    ) -> "DependencyStructure":
+        raise NotImplementedError

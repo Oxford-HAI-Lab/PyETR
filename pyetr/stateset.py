@@ -2,8 +2,8 @@ __all__ = ["State", "SetOfStates"]
 
 from typing import AbstractSet, Iterable, Optional
 
-from .atom import Atom
-from .term import ArbitraryObject
+from .atom import Atom, equals_predicate
+from .term import ArbitraryObject, Emphasis, Term
 
 
 class State(frozenset[Atom]):
@@ -59,6 +59,39 @@ class State(frozenset[Atom]):
         if len(self) == 0:
             return "0"
         return "".join([i.readable for i in self])
+
+    def replace(
+        self,
+        old_term: Term | ArbitraryObject | Emphasis,
+        new_term: Term | ArbitraryObject | Emphasis,
+    ) -> "SetOfStates":
+        raise NotImplementedError
+
+    @property
+    def is_primitive_absurd(self) -> bool:
+        state = State([a.excluding_emphasis for a in self])
+        # LNC
+        for atom in state:
+            if ~atom in state:
+                return True
+
+        # Aristotle
+        for atom in state:
+            if (atom.predicate == equals_predicate) and (not atom.predicate.verifier):
+                if atom.terms[0] == atom.terms[1]:
+                    return True
+
+        # Leibniz
+        for atom in state:
+            if (atom.predicate == equals_predicate) and atom.predicate.verifier:
+                t = atom.terms[0]
+                t_prime = atom.terms[1]
+                for x in state:
+                    if t in x.terms:
+                        new_x = ~x.replace_low_level(old_term=t, new_term=t_prime)
+                        if new_x in state:
+                            return True
+        return False
 
 
 class SetOfStates(frozenset[State]):
@@ -161,3 +194,10 @@ class SetOfStates(frozenset[State]):
     def readable(self) -> str:
         terms = ",".join([i.readable for i in self])
         return "{" + terms + "}"
+
+    def replace(
+        self,
+        old_term: Term | ArbitraryObject | Emphasis,
+        new_term: Term | ArbitraryObject | Emphasis,
+    ) -> "SetOfStates":
+        raise NotImplementedError
