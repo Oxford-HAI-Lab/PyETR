@@ -100,7 +100,7 @@ class Emphasis:
             if isinstance(self.term, Term):
                 replacement = self.term.replace(old_term, new_term)
             elif isinstance(self.term, ArbitraryObject):
-                replacement = old_term
+                replacement = self.term
             else:
                 assert False
         return Emphasis(t=replacement)

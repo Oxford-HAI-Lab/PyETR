@@ -42,6 +42,20 @@ class Dependency:
     def __hash__(self) -> int:
         return hash((self.existential, self.universal))
 
+    def replace(
+        self, old_item: ArbitraryObject, new_item: ArbitraryObject
+    ) -> "Dependency":
+        if old_item.is_existential and self.existential == old_item:
+            new_exi = new_item
+        else:
+            new_exi = self.existential
+
+        if not old_item.is_existential and self.universal == old_item:
+            new_uni = new_item
+        else:
+            new_uni = self.universal
+        return Dependency(universal=new_uni, existential=new_exi)
+
 
 def _separate_arb_objects(
     arb_objects: set[ArbitraryObject],
@@ -160,7 +174,10 @@ class DependencyRelation:
     def replace(
         self, old_item: ArbitraryObject, new_item: ArbitraryObject
     ) -> "DependencyRelation":
-        raise NotImplementedError
+        new_deps = set()
+        for dep in self.dependencies:
+            new_deps.add(dep.replace(old_item=old_item, new_item=new_item))
+        return DependencyRelation(frozenset(new_deps))
 
 
 def transitive_closure(

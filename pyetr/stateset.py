@@ -67,8 +67,8 @@ class State(frozenset[Atom]):
         self,
         old_term: Term | ArbitraryObject | Emphasis,
         new_term: Term | ArbitraryObject | Emphasis,
-    ) -> "SetOfStates":
-        raise NotImplementedError
+    ) -> "State":
+        return State([s.replace(old_term=old_term, new_term=new_term) for s in self])
 
     @property
     def is_primitive_absurd(self) -> bool:
@@ -206,4 +206,6 @@ class SetOfStates(frozenset[State]):
         old_term: Term | ArbitraryObject | Emphasis,
         new_term: Term | ArbitraryObject | Emphasis,
     ) -> "SetOfStates":
-        raise NotImplementedError
+        return SetOfStates(
+            [s.replace(old_term=old_term, new_term=new_term) for s in self]
+        )

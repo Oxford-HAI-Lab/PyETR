@@ -14,7 +14,9 @@ class Atom:
         terms: tuple[Term | ArbitraryObject | Emphasis, ...],
     ) -> None:
         if len(terms) != predicate.arity:
-            raise ValueError(f"Inconsistent - number of terms does not equal arity")
+            raise ValueError(
+                f"Inconsistent - number of terms does not equal arity in {terms} for predicate {predicate}"
+            )
         self.predicate = predicate
         emphasis_count = 0
         for term in terms:
@@ -83,12 +85,14 @@ class Atom:
             else:
                 if isinstance(term, Term) and term.t is not None:
                     replacement = term.replace(old_term, new_term)
+                elif isinstance(term, Term) and term.t is None:
+                    replacement = term
                 elif isinstance(term, Emphasis):
                     assert not isinstance(old_term, Emphasis)
                     assert not isinstance(new_term, Emphasis)
                     replacement = term.replace(old_term, new_term)
                 elif isinstance(term, ArbitraryObject):
-                    replacement = old_term
+                    replacement = term
                 else:
                     assert False
             new_terms.append(replacement)
@@ -143,7 +147,7 @@ class Predicate:
         self.arity = arity
 
     def __invert__(self):
-        return Predicate(self.name, not self.verifier)
+        return Predicate(name=self.name, arity=self.arity, _verifier=not self.verifier)
 
     def __repr__(self) -> str:
         return f"<Predicate name={self.name} arity={self.arity}>"

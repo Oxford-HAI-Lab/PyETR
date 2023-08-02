@@ -4,9 +4,8 @@ from functools import reduce
 from itertools import permutations
 from typing import Optional
 
-from pyetr.atom import Atom
-
 from .add_new_emphasis import add_new_emphasis
+from .atom import Atom
 from .dependency import (
     Dependency,
     DependencyRelation,
@@ -335,12 +334,20 @@ class View:
                         out.add((t, u))
             return out
 
+        # if self.is_verum or view.is_falsum:
+        #     # TODO: is this correct?
+        #     return view
+        # if self.is_falsum or view.is_verum:
+        #     # TODO: is this correct?
+        #     return self
+
         if len(self.arb_objects & view.arb_objects) == 0 or (
             view.dep_structure == self.dep_structure.restriction(view.arb_objects)
         ):
             r_fuse_s = self.dep_structure.fusion(view.dep_structure)
             views_for_sum: list[View] = []
             for gamma in self.stage:
+                # TODO: What to do if m_prime(gamma) is empty?
                 product_result: View = reduce(
                     lambda v1, v2: v1.product(v2, r_fuse_s),
                     [
@@ -392,10 +399,16 @@ class View:
                     self_u - self.supposition.arb_objects
                 ):
                     output_set.add((u, t))
-            if output_set == set():
-                raise ValueError("No values were found m_prime output set")
+            # if output_set == set():
+            #     raise ValueError("No values were found m_prime output set")
             return output_set
 
+        # if self.is_verum:
+        #     # TODO: is this correct?
+        #     return view
+        # if self.is_falsum:
+        #     # TODO: is this correct?
+        #     return view
         if self._uni_exi_condition(view):
             if not view.supposition.is_verum:
                 return self
@@ -631,19 +644,30 @@ class View:
         else:
             new_dep_rel = self.dependency_relation
         return View(
-            new_stage,
-            new_supposition,
-            new_dep_rel.restriction(
+            stage=new_stage,
+            supposition=new_supposition,
+            dependency_relation=new_dep_rel.restriction(
                 new_stage.arb_objects | new_supposition.arb_objects
             ),
         )
 
     def is_equivalent_under_arb_sub(self, other: "View") -> bool:
+        """
+        Complexity is O((n!)^2*n) where n is average num of exi and unis
+
+        For exis and unis above 9 or 10 (of each) this becomes an issue, below is fine
+        """
         self_uni, self_exi = _separate_arb_objects(self.arb_objects)
         other_uni, other_exi = _separate_arb_objects(other.arb_objects)
         if len(self_uni) != len(other_uni) or len(self_exi) != len(other_exi):
             return False
-
+        if (
+            len(self_uni) > 9
+            or len(self_exi) > 9
+            or len(other_uni) > 9
+            or len(other_exi) > 9
+        ):
+            raise ValueError("Too many unis or exis to feasibly compute")
         for exi_perm in permutations(other_exi):
             for uni_perm in permutations(other_uni):
                 new_view = self
