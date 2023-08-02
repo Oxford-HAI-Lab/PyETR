@@ -2,7 +2,7 @@ __all__ = ["View", "Commitment"]
 
 from functools import reduce
 from itertools import permutations
-from typing import Optional
+from typing import Optional, cast
 
 from pyetr.tools import ArbitraryObjectGenerator
 
@@ -15,7 +15,7 @@ from .dependency import (
     _separate_arb_objects,
 )
 from .stateset import SetOfStates, State
-from .term import ArbitraryObject, Emphasis, Term
+from .term import ArbitraryObject, Term
 
 
 def get_subset(
@@ -55,19 +55,34 @@ def substitution(
     arb_gen: ArbitraryObjectGenerator,
     dep_structure: DependencyStructure,
     arb_obj: ArbitraryObject,
-    term: Term | ArbitraryObject | Emphasis,
+    term: Term | ArbitraryObject,
     stage: Stage,
     supposition: Supposition,
 ) -> "View":
     """
     Based on definition 4.32
     """
+
     def Z() -> set[ArbitraryObject]:
-        unis = set([uni for uni in dep_structure.universals if dep_structure.triangle(uni, arb_obj)])
-        exis = set([exi for exi in dep_structure.existentials if dep_structure.less_sim(exi, arb_obj)])
+        unis = set(
+            [
+                uni
+                for uni in dep_structure.universals
+                if dep_structure.triangle(uni, arb_obj)
+            ]
+        )
+        exis = set(
+            [
+                exi
+                for exi in dep_structure.existentials
+                if dep_structure.less_sim(exi, arb_obj)
+            ]
+        )
         return (unis | exis) - {arb_obj}
 
-    def _determine_substitutions(arb_objects: set[ArbitraryObject]) -> dict[ArbitraryObject, ArbitraryObject]:
+    def _determine_substitutions(
+        arb_objects: set[ArbitraryObject],
+    ) -> dict[ArbitraryObject, ArbitraryObject]:
         return arb_gen.redraw(arb_objects)
 
     assert len(stage.arb_objects & supposition.arb_objects) == 0
@@ -78,11 +93,12 @@ def substitution(
     new_stage = stage
 
     subs = _determine_substitutions(Z())
-    for old_item, new_item in subs.items():
-        new_dep_structure = new_dep_structure.replace(old_item, new_item)
-        new_stage = new_stage.replace(old_item, new_item)
-    
-    new_stage = new_stage.replace(arb_obj, term)
+    new_dep_structure = new_dep_structure.replace(subs)
+    new_stage = new_stage.replace(
+        cast(dict[ArbitraryObject, Term | ArbitraryObject], subs)
+    )
+
+    new_stage = new_stage.replace({arb_obj: term})
 
     new_dep_structure = new_dep_structure.restriction(set(subs.values()))
     T_prime = old_T.chain(new_dep_structure)
@@ -283,7 +299,7 @@ class View:
 
         # Invert all arb_objects. Due to being references this will update all
         for arb_object in stage.arb_objects:
-            arb_object.is_existential = not arb_object.is_existential
+            arb_object._is_existential = not arb_object.is_existential
         final_pairs: list[tuple[Universal, Existential]] = final_pairs
 
         # Form new deps
@@ -330,15 +346,14 @@ class View:
 
         def _m_prime(
             gamma: State,
-        ) -> set[tuple[Term | ArbitraryObject | Emphasis, Universal]]:
-            out: set[tuple[Term | ArbitraryObject | Emphasis, Universal]] = set()
+        ) -> set[tuple[Term | ArbitraryObject, Universal]]:
+            out: set[tuple[Term | ArbitraryObject, Universal]] = set()
             for t, u in self.issue_matches(view):
                 if isinstance(u, ArbitraryObject) and not u.is_existential:
                     phi_exists = False
                     for phi in view.supposition:
-                        new_phi = State(
-                            [atom.replace(old_term=u, new_term=t) for atom in phi]
-                        )
+                        # TODO: Do these replacements need to simultaneous?
+                        new_phi = State([atom.replace({u: t}) for atom in phi])
                         if new_phi.issubset(gamma) and len(phi.difference(gamma)) != 0:
                             phi_exists = True
                             break
@@ -357,19 +372,25 @@ class View:
             view.dep_structure == self.dep_structure.restriction(view.arb_objects)
         ):
             r_fuse_s = self.dep_structure.fusion(view.dep_structure)
+            arb_gen = ArbitraryObjectGenerator(self.arb_objects | view.arb_objects)
             views_for_sum: list[View] = []
             for gamma in self.stage:
                 # TODO: What to do if m_prime(gamma) is empty?
                 m_prime = _m_prime(gamma)
                 if len(m_prime) == 0:
-                    views_for_sum.append(View(
-                        SetOfStates({gamma}), self.supposition, self.dependency_relation
-                    ).product(view, inherited_dependencies=r_fuse_s))
+                    views_for_sum.append(
+                        View(
+                            SetOfStates({gamma}),
+                            self.supposition,
+                            self.dependency_relation,
+                        ).product(view, inherited_dependencies=r_fuse_s)
+                    )
                 else:
                     product_result: View = reduce(
                         lambda v1, v2: v1.product(v2, r_fuse_s),
                         [
                             substitution(
+                                arb_gen=arb_gen,
                                 dep_structure=r_fuse_s,
                                 arb_obj=u,
                                 term=t,
@@ -377,12 +398,13 @@ class View:
                                 supposition=SetOfStates({State({})}),
                             )
                             for t, u in m_prime
-                        ]
+                        ],
                     )
-                    pass
                     views_for_sum.append(
                         View(
-                            SetOfStates({gamma}), self.supposition, self.dependency_relation
+                            SetOfStates({gamma}),
+                            self.supposition,
+                            self.dependency_relation,
                         )
                         .product(view, inherited_dependencies=r_fuse_s)
                         .product(product_result, inherited_dependencies=r_fuse_s)
@@ -451,7 +473,7 @@ class View:
                         supposition=SetOfStates({State({})}),
                     )
                     for u, t in m_prime
-                ]
+                ],
             )
             return initial_item.product(product_result, r_fuse_s)
         else:
@@ -504,7 +526,7 @@ class View:
 
         if self._uni_exi_condition(view):
             m_prime = _m_prime()
-            if len(m_prime) ==0:
+            if len(m_prime) == 0:
                 return self
             else:
                 arb_gen = ArbitraryObjectGenerator(self.arb_objects | view.arb_objects)
@@ -526,8 +548,6 @@ class View:
                 return self.sum(sum_result, r_fuse_s)
         else:
             return self
-
-
 
     def update(self, view: "View") -> "View":
         """
@@ -603,10 +623,8 @@ class View:
             out: list[State] = []
             for t, a in self.issue_matches(other):
                 if isinstance(a, ArbitraryObject) and not a.is_existential:
-                    replaced_stage = other.stage.replace(old_term=a, new_term=t)
-                    replaced_supposition = other.supposition.replace(
-                        old_term=a, new_term=t
-                    )
+                    replaced_stage = other.stage.replace({a: t})
+                    replaced_supposition = other.supposition.replace({a: t})
                     out.append(
                         state_division(
                             state=state,
@@ -658,20 +676,15 @@ class View:
         )
 
     def replace(
-        self,
-        old_term: Term | ArbitraryObject | Emphasis,
-        new_term: Term | ArbitraryObject | Emphasis,
-    ):
-        new_stage = self.stage.replace(old_term=old_term, new_term=new_term)
-        new_supposition = self.supposition.replace(old_term=old_term, new_term=new_term)
-        if isinstance(old_term, ArbitraryObject) and isinstance(
-            new_term, ArbitraryObject
-        ):
-            new_dep_rel = self.dependency_relation.replace(
-                old_item=old_term, new_item=new_term
-            )
-        else:
-            new_dep_rel = self.dependency_relation
+        self, replacements: dict[ArbitraryObject, Term | ArbitraryObject]
+    ) -> "View":
+        new_stage = self.stage.replace(replacements)
+        new_supposition = self.supposition.replace(replacements)
+        filtered_replacements = {
+            e: n for e, n in replacements.items() if isinstance(n, ArbitraryObject)
+        }
+        new_dep_rel = self.dependency_relation.replace(filtered_replacements)
+
         return View(
             stage=new_stage,
             supposition=new_supposition,
@@ -697,18 +710,23 @@ class View:
             or len(other_exi) > 9
         ):
             raise ValueError("Too many unis or exis to feasibly compute")
-        
-        #TODO: What about repeated names? E.g. P(a,x) vs P(x,y)?
+
+        # TODO: What about repeated names? E.g. P(a,x) vs P(x,y)?
         # This will cause a bug as a -> x , then x -> y leading to P(y,y)
         # Requires intermediate set of unused arb objects
 
         for exi_perm in permutations(other_exi):
             for uni_perm in permutations(other_uni):
                 new_view = self
-                for new_exi, old_exi in zip(exi_perm, self_exi):
-                    new_view = new_view.replace(old_term=old_exi, new_term=new_exi)
-                for new_uni, old_uni in zip(uni_perm, self_uni):
-                    new_view = new_view.replace(old_term=old_uni, new_term=new_uni)
+                replacements = {
+                    **dict(zip(exi_perm, self_exi)),
+                    **dict(zip(uni_perm, self_uni)),
+                }
+
+                new_view = new_view.replace(
+                    cast(dict[ArbitraryObject, Term | ArbitraryObject], replacements)
+                )
+
                 if new_view == other:
                     return True
         return False
