@@ -75,9 +75,9 @@ class Atom:
 
     def replace(
         self,
-        old_term: Term | ArbitraryObject | Emphasis,
-        new_term: Term | ArbitraryObject | Emphasis,
+        replacements: dict[ArbitraryObject, Term | ArbitraryObject | Emphasis]
     ) -> "Atom":
+        raise NotImplementedError
         new_terms = []
         for term in self.terms:
             if old_term == term:

@@ -1,22 +1,27 @@
 __all__ = ["ArbitraryObjectGenerator"]
 
+from enum import Enum
+
+from pyetr.view import View
 from .term import ArbitraryObject
 
+class NameScheme(Enum):
+    alphabet = "alphabet"
 
 class ArbitraryObjectGenerator:
-    def __init__(self, is_existential: bool) -> None:
+    def __init__(self, existing_arb_objs: set[ArbitraryObject],*, scheme = NameScheme.alphabet) -> None:
         self.i = 0
-        self.is_existential = is_existential
 
-    def __next__(self):
-        self.i += 1
-        if self.is_existential:
-            name_prefix = "a"
-        else:
-            name_prefix = "x"
-        return ArbitraryObject(
-            name=f"{name_prefix}{self.i}", is_existential=self.is_existential
-        )
+        # Generate a letter excluding those provided
+    
+    def get_existential(self) -> ArbitraryObject:
+        raise NotImplementedError
 
-    def __iter__(self):
-        return self
+    def get_universal(self) -> ArbitraryObject:
+        raise NotImplementedError
+
+    def redraw(self, arb_objects: set[ArbitraryObject]) -> dict[ArbitraryObject, ArbitraryObject]:
+        raise NotImplementedError
+
+    def novelise(self, arb_objects: set[ArbitraryObject], view: View) -> View:
+        raise NotImplementedError

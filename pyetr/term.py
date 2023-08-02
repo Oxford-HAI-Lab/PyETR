@@ -190,22 +190,21 @@ class Term:
 
     def replace(
         self,
-        old_term: "Term | ArbitraryObject | Emphasis",
-        new_term: "Term | ArbitraryObject | Emphasis",
+        replacements: dict[ArbitraryObject, "Term | ArbitraryObject"],
     ) -> "Term":
         new_terms = []
         if self.t is None:
             return self
         for term in self.t:
-            if old_term == term:
-                replacement = new_term
+            if term in replacements:
+                replacement = replacements[term]
             else:
                 if isinstance(term, Term) and term.t is not None:
-                    replacement = term.replace(old_term, new_term)
+                    replacement = term.replace(replacements)
                 elif isinstance(term, Emphasis):
                     assert not isinstance(old_term, Emphasis)
                     assert not isinstance(new_term, Emphasis)
-                    replacement = term.replace(old_term, new_term)
+                    replacement = term.replace(replacements)
                 elif isinstance(term, ArbitraryObject):
                     replacement = term
                 else:

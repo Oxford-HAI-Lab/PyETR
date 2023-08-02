@@ -4,6 +4,8 @@ from functools import reduce
 from itertools import permutations
 from typing import Optional
 
+from pyetr.tools import ArbitraryObjectGenerator
+
 from .add_new_emphasis import add_new_emphasis
 from .atom import Atom
 from .dependency import (
@@ -50,6 +52,7 @@ def arg_max_states(potentials: list[tuple[int, State]]) -> list[State]:
 
 
 def substitution(
+    arb_gen: ArbitraryObjectGenerator,
     dep_structure: DependencyStructure,
     arb_obj: ArbitraryObject,
     term: Term | ArbitraryObject | Emphasis,
@@ -59,22 +62,31 @@ def substitution(
     """
     Based on definition 4.32
     """
+    def Z() -> set[ArbitraryObject]:
+        unis = set([uni for uni in dep_structure.universals if dep_structure.triangle(uni, arb_obj)])
+        exis = set([exi for exi in dep_structure.existentials if dep_structure.less_sim(exi, arb_obj)])
+        return (unis | exis) - {arb_obj}
 
-    def _determine_substitutions() -> list[tuple[ArbitraryObject, ArbitraryObject]]:
-        raise NotImplementedError
+    def _determine_substitutions(arb_objects: set[ArbitraryObject]) -> dict[ArbitraryObject, ArbitraryObject]:
+        return arb_gen.redraw(arb_objects)
 
-    def get_novelized_arbs() -> set[ArbitraryObject]:
-        raise NotImplementedError
+    assert len(stage.arb_objects & supposition.arb_objects) == 0
 
     old_T = dep_structure
 
     new_dep_structure = dep_structure
     new_stage = stage
-    for old_item, new_item in _determine_substitutions():
+
+    subs = _determine_substitutions(Z())
+    for old_item, new_item in subs.items():
         new_dep_structure = new_dep_structure.replace(old_item, new_item)
         new_stage = new_stage.replace(old_item, new_item)
-    new_dep_structure = new_dep_structure.restriction(get_novelized_arbs())
+    
+    new_stage = new_stage.replace(arb_obj, term)
+
+    new_dep_structure = new_dep_structure.restriction(set(subs.values()))
     T_prime = old_T.chain(new_dep_structure)
+    T_prime = T_prime.restriction(new_stage.arb_objects | supposition.arb_objects)
     return View(
         stage=new_stage,
         supposition=supposition,
@@ -348,26 +360,33 @@ class View:
             views_for_sum: list[View] = []
             for gamma in self.stage:
                 # TODO: What to do if m_prime(gamma) is empty?
-                product_result: View = reduce(
-                    lambda v1, v2: v1.product(v2, r_fuse_s),
-                    [
-                        substitution(
-                            dep_structure=r_fuse_s,
-                            arb_obj=u,
-                            term=t,
-                            stage=view.stage,
-                            supposition=SetOfStates({State({})}),
-                        )
-                        for t, u in _m_prime(gamma)
-                    ],
-                )
-                views_for_sum.append(
-                    View(
+                m_prime = _m_prime(gamma)
+                if len(m_prime) == 0:
+                    views_for_sum.append(View(
                         SetOfStates({gamma}), self.supposition, self.dependency_relation
+                    ).product(view, inherited_dependencies=r_fuse_s))
+                else:
+                    product_result: View = reduce(
+                        lambda v1, v2: v1.product(v2, r_fuse_s),
+                        [
+                            substitution(
+                                dep_structure=r_fuse_s,
+                                arb_obj=u,
+                                term=t,
+                                stage=view.stage,
+                                supposition=SetOfStates({State({})}),
+                            )
+                            for t, u in m_prime
+                        ]
                     )
-                    .product(view, inherited_dependencies=r_fuse_s)
-                    .product(product_result, inherited_dependencies=r_fuse_s)
-                )
+                    pass
+                    views_for_sum.append(
+                        View(
+                            SetOfStates({gamma}), self.supposition, self.dependency_relation
+                        )
+                        .product(view, inherited_dependencies=r_fuse_s)
+                        .product(product_result, inherited_dependencies=r_fuse_s)
+                    )
             return reduce(lambda v1, v2: v1.sum(v2, r_fuse_s), views_for_sum)
         else:
             return self
@@ -399,16 +418,18 @@ class View:
                     self_u - self.supposition.arb_objects
                 ):
                     output_set.add((u, t))
-            # if output_set == set():
-            #     raise ValueError("No values were found m_prime output set")
             return output_set
 
+        arb_gen = ArbitraryObjectGenerator(self.arb_objects | view.arb_objects)
         # if self.is_verum:
         #     # TODO: is this correct?
         #     return view
         # if self.is_falsum:
         #     # TODO: is this correct?
         #     return view
+        m_prime = _m_prime()
+        if len(m_prime) == 0:
+            return self
         if self._uni_exi_condition(view):
             if not view.supposition.is_verum:
                 return self
@@ -422,14 +443,15 @@ class View:
                 lambda v1, v2: v1.product(v2, r_fuse_s),
                 [
                     substitution(
+                        arb_gen=arb_gen,
                         dep_structure=r_fuse_s,
                         arb_obj=u,
                         term=t,
                         stage=self.stage,
                         supposition=SetOfStates({State({})}),
                     )
-                    for u, t in _m_prime()
-                ],
+                    for u, t in m_prime
+                ]
             )
             return initial_item.product(product_result, r_fuse_s)
         else:
@@ -463,7 +485,7 @@ class View:
 
             return reduce(lambda s1, s2: s1 | s2, final_sets)
 
-        def _m_prime() -> set[tuple[Universal, Term | ArbitraryObject]]:
+        def _m_prime() -> set[tuple[Existential, Term | ArbitraryObject]]:
             _, self_e = self.universals_and_existentials
             output_set = set()
             for e, t in self.issue_matches(view):
@@ -482,14 +504,16 @@ class View:
 
         if self._uni_exi_condition(view):
             m_prime = _m_prime()
-            if m_prime == set():
+            if len(m_prime) ==0:
                 return self
             else:
+                arb_gen = ArbitraryObjectGenerator(self.arb_objects | view.arb_objects)
                 r_fuse_s = self.dep_structure.fusion(view.dep_structure)
                 sum_result: View = reduce(
                     lambda v1, v2: v1.sum(v2, r_fuse_s),
                     [
                         substitution(
+                            arb_gen=arb_gen,
                             dep_structure=r_fuse_s,
                             arb_obj=e,
                             term=t,
@@ -503,10 +527,15 @@ class View:
         else:
             return self
 
+
+
     def update(self, view: "View") -> "View":
         """
         Based on Definition 4.34
         """
+        arb_gen = ArbitraryObjectGenerator(self.arb_objects | view.arb_objects)
+        shared_objs = self.arb_objects & view.arb_objects
+        view = arb_gen.novelise(shared_objs, view)
         return (
             self.universal_product(view).existential_sum(view).answer(view).merge(view)
         )
@@ -668,6 +697,11 @@ class View:
             or len(other_exi) > 9
         ):
             raise ValueError("Too many unis or exis to feasibly compute")
+        
+        #TODO: What about repeated names? E.g. P(a,x) vs P(x,y)?
+        # This will cause a bug as a -> x , then x -> y leading to P(y,y)
+        # Requires intermediate set of unused arb objects
+
         for exi_perm in permutations(other_exi):
             for uni_perm in permutations(other_uni):
                 new_view = self
