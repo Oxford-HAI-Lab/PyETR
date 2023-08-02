@@ -361,13 +361,6 @@ class View:
                         out.add((t, u))
             return out
 
-        # if self.is_verum or view.is_falsum:
-        #     # TODO: is this correct?
-        #     return view
-        # if self.is_falsum or view.is_verum:
-        #     # TODO: is this correct?
-        #     return self
-
         if len(self.arb_objects & view.arb_objects) == 0 or (
             view.dep_structure == self.dep_structure.restriction(view.arb_objects)
         ):
@@ -443,12 +436,7 @@ class View:
             return output_set
 
         arb_gen = ArbitraryObjectGenerator(self.arb_objects | view.arb_objects)
-        # if self.is_verum:
-        #     # TODO: is this correct?
-        #     return view
-        # if self.is_falsum:
-        #     # TODO: is this correct?
-        #     return view
+
         m_prime = _m_prime()
         if len(m_prime) == 0:
             return self
@@ -632,6 +620,9 @@ class View:
                             other_supposition=replaced_supposition,
                         )
                     )
+            # TODO: Is this correct?
+            if len(out) == 0:
+                return State({})
             return reduce(lambda s1, s2: s1 & s2, out)
 
         def state_factor(state: State) -> State:
@@ -710,10 +701,6 @@ class View:
             or len(other_exi) > 9
         ):
             raise ValueError("Too many unis or exis to feasibly compute")
-
-        # TODO: What about repeated names? E.g. P(a,x) vs P(x,y)?
-        # This will cause a bug as a -> x , then x -> y leading to P(y,y)
-        # Requires intermediate set of unused arb objects
 
         for exi_perm in permutations(other_exi):
             for uni_perm in permutations(other_uni):
