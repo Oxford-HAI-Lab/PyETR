@@ -47,4 +47,6 @@ class e1(BaseExample):
     @classmethod
     def test(cls):
         result = default_inference_procedure(cls.v)
+        print(result)
+        print(cls.c)
         assert result.is_equivalent_under_arb_sub(cls.c)

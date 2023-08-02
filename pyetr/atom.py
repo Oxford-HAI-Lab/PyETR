@@ -101,7 +101,6 @@ class Atom:
         for term in self.terms:
             if term in replacements:
                 assert not isinstance(term, Term)
-                print(term)
                 replacement = replacements[term]
             else:
                 if isinstance(term, Term) and term.t is not None:
