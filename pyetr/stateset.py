@@ -64,11 +64,9 @@ class State(frozenset[Atom]):
         return "{" + ",".join(i.detailed for i in self) + "}"
 
     def replace(
-        self,
-        old_term: Term | ArbitraryObject | Emphasis,
-        new_term: Term | ArbitraryObject | Emphasis,
+        self, replacements: dict[ArbitraryObject, Term | ArbitraryObject]
     ) -> "State":
-        return State([s.replace(old_term=old_term, new_term=new_term) for s in self])
+        return State([s.replace(replacements) for s in self])
 
     @property
     def is_primitive_absurd(self) -> bool:
@@ -202,10 +200,6 @@ class SetOfStates(frozenset[State]):
         return "{" + ",".join(i.detailed for i in self) + "}"
 
     def replace(
-        self,
-        old_term: Term | ArbitraryObject | Emphasis,
-        new_term: Term | ArbitraryObject | Emphasis,
+        self, replacements: dict[ArbitraryObject, Term | ArbitraryObject]
     ) -> "SetOfStates":
-        return SetOfStates(
-            [s.replace(old_term=old_term, new_term=new_term) for s in self]
-        )
+        return SetOfStates([s.replace(replacements) for s in self])

@@ -43,15 +43,14 @@ class Dependency:
         return hash((self.existential, self.universal))
 
     def replace(
-        self, old_item: ArbitraryObject, new_item: ArbitraryObject
+        self, replacements: dict[ArbitraryObject, ArbitraryObject]
     ) -> "Dependency":
-        if old_item.is_existential and self.existential == old_item:
-            new_exi = new_item
+        if self.existential in replacements:
+            new_exi = replacements[self.existential]
         else:
             new_exi = self.existential
-
-        if not old_item.is_existential and self.universal == old_item:
-            new_uni = new_item
+        if self.universal in replacements:
+            new_uni = replacements[self.universal]
         else:
             new_uni = self.universal
         return Dependency(universal=new_uni, existential=new_exi)
@@ -172,11 +171,11 @@ class DependencyRelation:
         return hash((self.dependencies))
 
     def replace(
-        self, old_item: ArbitraryObject, new_item: ArbitraryObject
+        self, replacements: dict[ArbitraryObject, ArbitraryObject]
     ) -> "DependencyRelation":
         new_deps = set()
         for dep in self.dependencies:
-            new_deps.add(dep.replace(old_item=old_item, new_item=new_item))
+            new_deps.add(dep.replace(replacements))
         return DependencyRelation(frozenset(new_deps))
 
 
@@ -363,8 +362,7 @@ class DependencyStructure:
             unis_e_prime_depends_on = get_all_dep_partners_for_arb_obj(
                 arb_object2, self.dependency_relation.dependencies
             )
-            return len(unis_e_prime_depends_on.difference(unis_e_depends_on) ) ==0
-            
+            return len(unis_e_prime_depends_on.difference(unis_e_depends_on)) == 0
 
         elif arb_object1.is_existential and not arb_object2.is_existential:
             # Case 2
@@ -485,6 +483,6 @@ class DependencyStructure:
         return hash((self.universals, self.existentials, self.dependency_relation))
 
     def replace(
-        self, old_item: ArbitraryObject, new_item: ArbitraryObject
+        self, replacements: dict[ArbitraryObject, ArbitraryObject]
     ) -> "DependencyStructure":
         raise NotImplementedError

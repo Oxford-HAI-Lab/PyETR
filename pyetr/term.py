@@ -35,11 +35,15 @@ class Function:
 
 class ArbitraryObject:
     name: str
-    is_existential: bool
+    _is_existential: bool
 
     def __init__(self, name: str, *, is_existential: bool):
         self.name = name
-        self.is_existential = is_existential
+        self._is_existential = is_existential
+
+    @property
+    def is_existential(self):
+        return self._is_existential
 
     @property
     def detailed(self) -> str:
@@ -92,13 +96,14 @@ class Emphasis:
         return hash(("Emphasis", self.term))
 
     def replace(
-        self, old_term: "Term | ArbitraryObject", new_term: "Term | ArbitraryObject"
+        self,
+        replacements: dict[ArbitraryObject, "Term | ArbitraryObject"],
     ) -> "Emphasis":
-        if old_term == self.term:
-            replacement = new_term
+        if self.term in replacements:
+            replacement = replacements[self.term]
         else:
             if isinstance(self.term, Term):
-                replacement = self.term.replace(old_term, new_term)
+                replacement = self.term.replace(replacements)
             elif isinstance(self.term, ArbitraryObject):
                 replacement = self.term
             else:
@@ -188,6 +193,27 @@ class Term:
     def __hash__(self) -> int:
         return hash((self.f, self.t))
 
+    def replace_emphasis(
+        self, existing: Emphasis, new: "Term | ArbitraryObject | Emphasis"
+    ) -> "Term":
+        new_terms = []
+        if self.t is None:
+            return self
+        for term in self.t:
+            if term == existing:
+                replacement = new
+            else:
+                if isinstance(term, Term) and term.t is not None:
+                    replacement = term.replace_emphasis(existing, new)
+                elif isinstance(term, Emphasis):
+                    assert False
+                elif isinstance(term, ArbitraryObject):
+                    replacement = term
+                else:
+                    assert False
+            new_terms.append(replacement)
+        return Term(f=self.f, t=tuple(new_terms))
+
     def replace(
         self,
         replacements: dict[ArbitraryObject, "Term | ArbitraryObject"],
@@ -202,8 +228,6 @@ class Term:
                 if isinstance(term, Term) and term.t is not None:
                     replacement = term.replace(replacements)
                 elif isinstance(term, Emphasis):
-                    assert not isinstance(old_term, Emphasis)
-                    assert not isinstance(new_term, Emphasis)
                     replacement = term.replace(replacements)
                 elif isinstance(term, ArbitraryObject):
                     replacement = term

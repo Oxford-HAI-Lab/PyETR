@@ -73,24 +73,43 @@ class Atom:
                 f"Emphasis term requested for atom {self} - atom has no emphasis"
             )
 
-    def replace(
-        self,
-        replacements: dict[ArbitraryObject, Term | ArbitraryObject | Emphasis]
+    def replace_emphasis(
+        self, existing: Emphasis, new: Term | ArbitraryObject | Emphasis
     ) -> "Atom":
-        raise NotImplementedError
         new_terms = []
         for term in self.terms:
-            if old_term == term:
-                replacement = new_term
+            if term == existing:
+                replacement = new
             else:
                 if isinstance(term, Term) and term.t is not None:
-                    replacement = term.replace(old_term, new_term)
+                    replacement = term.replace_emphasis(existing=existing, new=new)
                 elif isinstance(term, Term) and term.t is None:
                     replacement = term
                 elif isinstance(term, Emphasis):
-                    assert not isinstance(old_term, Emphasis)
-                    assert not isinstance(new_term, Emphasis)
-                    replacement = term.replace(old_term, new_term)
+                    assert False
+                elif isinstance(term, ArbitraryObject):
+                    replacement = term
+                else:
+                    assert False
+            new_terms.append(replacement)
+        return Atom(predicate=self.predicate, terms=tuple(new_terms))
+
+    def replace(
+        self, replacements: dict[ArbitraryObject, Term | ArbitraryObject]
+    ) -> "Atom":
+        new_terms = []
+        for term in self.terms:
+            if term in replacements:
+                assert not isinstance(term, Term)
+                print(term)
+                replacement = replacements[term]
+            else:
+                if isinstance(term, Term) and term.t is not None:
+                    replacement = term.replace(replacements)
+                elif isinstance(term, Term) and term.t is None:
+                    replacement = term
+                elif isinstance(term, Emphasis):
+                    replacement = term.replace(replacements)
                 elif isinstance(term, ArbitraryObject):
                     replacement = term
                 else:
@@ -116,8 +135,7 @@ class Atom:
     def excluding_emphasis(self) -> "Atom":
         if self.has_emphasis:
             new_term = self.emphasis_term
-            old_term = Emphasis(new_term)
-            return self.replace(old_term, new_term)
+            return self.replace_emphasis(existing=Emphasis(new_term), new=new_term)
         else:
             return self
 
