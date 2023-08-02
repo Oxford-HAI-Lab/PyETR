@@ -207,7 +207,7 @@ class Term:
                     assert not isinstance(new_term, Emphasis)
                     replacement = term.replace(old_term, new_term)
                 elif isinstance(term, ArbitraryObject):
-                    replacement = old_term
+                    replacement = term
                 else:
                     assert False
             new_terms.append(replacement)
