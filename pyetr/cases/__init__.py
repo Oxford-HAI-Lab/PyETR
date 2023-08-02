@@ -1,17 +1,28 @@
+__all__ = ["e1"]
 from abc import ABCMeta, abstractmethod
-from typing import ClassVar
+from typing import cast
 
+from pyetr.inference import default_inference_procedure
 from pyetr.parsing import parse_string_to_view as ps
 from pyetr.view import View
 
 
 class BaseExample(metaclass=ABCMeta):
-    c: ClassVar[View]
+    v: tuple[View, ...]
+    c: View
 
-    def __init__(self, views: list[str | View] | list[str] | list[View]) -> None:
-        for v in views:
-            if isinstance(v, View):
-                pass
+    def __init_subclass__(cls) -> None:
+        if not hasattr(cls, "v"):
+            raise TypeError("Example must have attribute v")
+        if not hasattr(cls, "c"):
+            raise TypeError("Example must have attribute c")
+        v = getattr(cls, "v")
+        assert isinstance(v, tuple)
+        for i in v:
+            assert isinstance(i, View)
+        v = cast(tuple[View, ...], v)
+        c = getattr(cls, "c")
+        assert isinstance(c, View)
 
     @classmethod
     @abstractmethod
@@ -21,16 +32,19 @@ class BaseExample(metaclass=ABCMeta):
 
 class e1(BaseExample):
     """
-    P1: Every archaeon has a nucleus; ∀x (P(x) → Q(x))
-    P2: Halobacterium is an archeon; P(H)
+    P1: Every archaeon has a nucleus; ∀x (IsArcheon(x) → HasNucleus(x))
+    P2: Halobacterium is an archeon; IsArcheon(Halobacterium())
 
-    C: Halobacterium is an archaeon and has a nucleus; P(H) ∧ Q(H)
-
+    C: Halobacterium is an archaeon and has a nucleus; IsArcheon(Halobacterium()) ∧ HasNucleus(Halobacterium())
     """
 
-    v = (ps("∀x (P(x) → Q(x))"), ps("P(H)"))
-    c = ps("P(H) ∧ Q(H)")
+    v: tuple[View, View] = (
+        ps("∀x (IsArcheon(x) → HasNucleus(x))"),
+        ps("IsArcheon(Halobacterium())"),
+    )
+    c: View = ps("IsArcheon(Halobacterium()) ∧ HasNucleus(Halobacterium())")
 
     @classmethod
     def test(cls):
-        print("here")
+        result = default_inference_procedure(cls.v)
+        assert result.is_equivalent_under_arb_sub(cls.c)

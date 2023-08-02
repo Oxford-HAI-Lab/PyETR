@@ -54,11 +54,14 @@ class State(frozenset[Atom]):
             emphasis_count += atom.has_emphasis
         return emphasis_count
 
-    @property
-    def readable(self) -> str:
+    def __repr__(self) -> str:
         if len(self) == 0:
             return "0"
-        return "".join([i.readable for i in self])
+        return "".join([repr(i) for i in self])
+
+    @property
+    def detailed(self) -> str:
+        return "{" + ",".join(i.detailed for i in self) + "}"
 
     def replace(
         self,
@@ -190,10 +193,13 @@ class SetOfStates(frozenset[State]):
         """
         return len(self.intersection(other))
 
-    @property
-    def readable(self) -> str:
-        terms = ",".join([i.readable for i in self])
+    def __repr__(self) -> str:
+        terms = ",".join([repr(i) for i in self])
         return "{" + terms + "}"
+
+    @property
+    def detailed(self) -> str:
+        return "{" + ",".join(i.detailed for i in self) + "}"
 
     def replace(
         self,

@@ -16,6 +16,10 @@ class Function:
     def __repr__(self) -> str:
         return f"Function({self.name}, {self.arity})"
 
+    @property
+    def detailed(self) -> str:
+        return repr(self)
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, Function):
             return False
@@ -37,12 +41,20 @@ class ArbitraryObject:
         self.name = name
         self.is_existential = is_existential
 
-    def __repr__(self) -> str:
+    @property
+    def detailed(self) -> str:
         if self.is_existential:
             s = "Exi"
         else:
             s = "Uni"
         return f"<ArbitraryObject ({s}) name={self.name}>"
+
+    def __repr__(self) -> str:
+        if self.is_existential:
+            suffix = "e"
+        else:
+            suffix = "u"
+        return f"{self.name}_{suffix}"
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, ArbitraryObject):
@@ -51,14 +63,6 @@ class ArbitraryObject:
 
     def __hash__(self) -> int:
         return hash((self.name, self.is_existential))
-
-    @property
-    def readable(self) -> str:
-        if self.is_existential:
-            suffix = "e"
-        else:
-            suffix = "u"
-        return f"{self.name}_{suffix}"
 
 
 class Emphasis:
@@ -78,9 +82,6 @@ class Emphasis:
         else:
             assert False
         return output_set
-
-    def __repr__(self) -> str:
-        return f"<Emphasis term={self.term}>"
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Emphasis):
@@ -105,8 +106,11 @@ class Emphasis:
         return Emphasis(t=replacement)
 
     @property
-    def readable(self) -> str:
-        return f"{self.term.readable}*"
+    def detailed(self) -> str:
+        return f"<Emphasis term={self.term.detailed}>"
+
+    def __repr__(self) -> str:
+        return f"{self.term}*"
 
 
 class Term:
@@ -162,8 +166,19 @@ class Term:
                     assert False
             return output_set
 
+    @property
+    def detailed(self) -> str:
+        if self.t is None:
+            return f"<Term f={self.f.detailed} t=()>"
+        return f"<Term f={self.f.detailed} t={','.join(t.detailed for t in self.t)}>"
+
     def __repr__(self) -> str:
-        return f"<Term f={self.f} t={self.t}>"
+        if self.f.arity == 0:
+            return f"{self.f.name}"
+        else:
+            assert self.t is not None
+            terms = ",".join([repr(i) for i in self.t])
+            return f"f_{self.f.name}({terms})"
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Term):
@@ -212,15 +227,6 @@ class Term:
             raise ValueError(
                 f"Emphasis term requested for term {self} - term has no emphasis"
             )
-
-    @property
-    def readable(self) -> str:
-        if self.f.arity == 0:
-            return f"{self.f.name}"
-        else:
-            assert self.t is not None
-            terms = ",".join([i.readable for i in self.t])
-            return f"f_{self.f.name}({terms})"
 
 
 # Changed if clause in 4.2 to separate Arbitrary Objects from Term

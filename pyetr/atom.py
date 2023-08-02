@@ -42,8 +42,17 @@ class Atom:
                 assert False
         return output_objs
 
+    @property
+    def detailed(self) -> str:
+        return f"<Atom predicate={self.predicate.detailed} terms=({','.join(t.detailed for t in self.terms)})>"
+
     def __repr__(self) -> str:
-        return f"<Atom predicate={self.predicate} terms={self.terms}>"
+        terms = ",".join([repr(i) for i in self.terms])
+        if self.predicate.verifier:
+            tilda = ""
+        else:
+            tilda = "~"
+        return f"{tilda}{self.predicate.name}({terms})"
 
     def __invert__(self):
         return Atom(~self.predicate, self.terms)
@@ -122,15 +131,6 @@ class Atom:
     def __hash__(self) -> int:
         return hash((self.predicate, self.terms))
 
-    @property
-    def readable(self) -> "str":
-        terms = ",".join([i.readable for i in self.terms])
-        if self.predicate.verifier:
-            tilda = ""
-        else:
-            tilda = "~"
-        return f"{tilda}{self.predicate.name}({terms})"
-
 
 class Predicate:
     name: str
@@ -147,6 +147,10 @@ class Predicate:
 
     def __repr__(self) -> str:
         return f"<Predicate name={self.name} arity={self.arity}>"
+
+    @property
+    def detailed(self) -> str:
+        return repr(self)
 
     def __call__(self, terms: tuple[Term | ArbitraryObject | Emphasis, ...]) -> Atom:
         return Atom(self, terms)

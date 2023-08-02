@@ -1,7 +1,7 @@
 __all__ = ["View", "Commitment"]
 
 from functools import reduce
-from pprint import pformat
+from itertools import permutations
 from typing import Optional
 
 from pyetr.atom import Atom
@@ -62,7 +62,6 @@ def substitution(
     """
 
     def _determine_substitutions() -> list[tuple[ArbitraryObject, ArbitraryObject]]:
-        [(arb_obj, term)]
         raise NotImplementedError
 
     def get_novelized_arbs() -> set[ArbitraryObject]:
@@ -121,8 +120,19 @@ class View:
         dependency_relation.validate(stage | supposition)
         self.dependency_relation = dependency_relation
 
+    @property
+    def detailed(self) -> str:
+        return f"<View \n  stage={self.stage.detailed} \n  supposition={self.supposition.detailed} \n  dep_rel={self.dependency_relation.detailed}\n>"
+
     def __repr__(self) -> str:
-        return f"<View \n  stage={pformat(self.stage)} \n  supposition={pformat(self.supposition)} \n  dep_rel={self.dependency_relation}\n>"
+        if self.is_falsum:
+            return "F"
+        elif self.is_verum:
+            return "T"
+        elif len(self.dependency_relation.dependencies) == 0:
+            return f"{self.stage}^{self.supposition}"
+        else:
+            return f"{self.stage}^{self.supposition} deps={self.dependency_relation}"
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
@@ -500,17 +510,6 @@ class View:
     def __hash__(self) -> int:
         return hash((self.stage, self.supposition, self.dependency_relation))
 
-    @property
-    def readable(self) -> str:
-        if self.is_falsum:
-            return "F"
-        elif self.is_verum:
-            return "T"
-        elif len(self.dependency_relation.dependencies) == 0:
-            return f"{self.stage.readable}^{self.supposition.readable}"
-        else:
-            return f"{self.stage.readable}^{self.supposition.readable} deps={self.dependency_relation.readable}"
-
     def division(self, other: "View") -> "View":
         """
         Based on definition 4.38
@@ -606,7 +605,6 @@ class View:
             supposition=self.supposition,
             dependency_relation=new_dep_rel,
         )
-        return self
 
     def depose(self) -> "View":
         verum = SetOfStates({State({})})
@@ -616,6 +614,46 @@ class View:
             supposition=verum,
             dependency_relation=self.dependency_relation,
         )
+
+    def replace(
+        self,
+        old_term: Term | ArbitraryObject | Emphasis,
+        new_term: Term | ArbitraryObject | Emphasis,
+    ):
+        new_stage = self.stage.replace(old_term=old_term, new_term=new_term)
+        new_supposition = self.supposition.replace(old_term=old_term, new_term=new_term)
+        if isinstance(old_term, ArbitraryObject) and isinstance(
+            new_term, ArbitraryObject
+        ):
+            new_dep_rel = self.dependency_relation.replace(
+                old_item=old_term, new_item=new_term
+            )
+        else:
+            new_dep_rel = self.dependency_relation
+        return View(
+            new_stage,
+            new_supposition,
+            new_dep_rel.restriction(
+                new_stage.arb_objects | new_supposition.arb_objects
+            ),
+        )
+
+    def is_equivalent_under_arb_sub(self, other: "View") -> bool:
+        self_uni, self_exi = _separate_arb_objects(self.arb_objects)
+        other_uni, other_exi = _separate_arb_objects(other.arb_objects)
+        if len(self_uni) != len(other_uni) or len(self_exi) != len(other_exi):
+            return False
+
+        for exi_perm in permutations(other_exi):
+            for uni_perm in permutations(other_uni):
+                new_view = self
+                for new_exi, old_exi in zip(exi_perm, self_exi):
+                    new_view = new_view.replace(old_term=old_exi, new_term=new_exi)
+                for new_uni, old_uni in zip(uni_perm, self_uni):
+                    new_view = new_view.replace(old_term=old_uni, new_term=new_uni)
+                if new_view == other:
+                    return True
+        return False
 
 
 class Commitment:

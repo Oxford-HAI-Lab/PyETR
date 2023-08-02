@@ -28,6 +28,10 @@ class Dependency:
     def __repr__(self) -> str:
         return f"<Dependency existential={self.existential} universal={self.universal}>"
 
+    @property
+    def detailed(self) -> "str":
+        return repr(self)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Dependency):
             return False
@@ -85,14 +89,24 @@ class DependencyRelation:
                     f"{dep.universal } not found in universal states {uni_arb_objects}"
                 )
 
-    def __repr__(self) -> str:
+    @property
+    def detailed(self) -> "str":
         if len(self.dependencies) == 0:
             full_string = ""
         else:
             full_string = " dependencies=" + "\n".join(
-                [dep.__repr__() for dep in self.dependencies]
+                [dep.detailed for dep in self.dependencies]
             )
         return f"<DependencyRelation{full_string}>"
+
+    def __repr__(self) -> "str":
+        if len(self.dependencies) == 0:
+            return "None"
+        else:
+            return "".join(
+                f"{u}" + "{" + ",".join(repr(e) for e in exis) + "}"
+                for u, exis in self.to_sets()
+            )
 
     @classmethod
     def from_sets(cls, sets: Iterable[tuple[Universal, Iterable[Existential]]]):
@@ -142,16 +156,6 @@ class DependencyRelation:
 
     def __hash__(self) -> int:
         return hash((self.dependencies))
-
-    @property
-    def readable(self) -> "str":
-        if len(self.dependencies) == 0:
-            return "None"
-        else:
-            return "".join(
-                f"{u.readable}" + "{" + ",".join(e.readable for e in exis) + "}"
-                for u, exis in self.to_sets()
-            )
 
     def replace(
         self, old_item: ArbitraryObject, new_item: ArbitraryObject

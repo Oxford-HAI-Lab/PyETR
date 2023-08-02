@@ -14,7 +14,6 @@ __all__ = [
     "View",
     "Commitment",
     "parse_string_to_view",
-    "show",
 ]
 
 from .atom import Atom, Predicate, equals_predicate
@@ -24,7 +23,3 @@ from .stateset import SetOfStates, State
 from .term import ArbitraryObject, Emphasis, Function, Term
 from .tools import ArbitraryObjectGenerator
 from .view import Commitment, View
-
-
-def show(view: View):
-    print(view.readable)
