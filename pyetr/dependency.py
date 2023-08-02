@@ -341,6 +341,62 @@ class DependencyStructure:
         else:
             assert False
 
+    def less_sim(
+        self, arb_object1: ArbitraryObject, arb_object2: ArbitraryObject
+    ) -> bool:
+        arb_obj1_found = False
+        arb_obj2_found = False
+        for arb_obj in self.universals | self.existentials:
+            if arb_obj == arb_object1:
+                arb_obj1_found = True
+            if arb_obj == arb_object2:
+                arb_obj2_found = True
+        if not arb_obj1_found or not arb_obj2_found:
+            return False
+
+        if arb_object1.is_existential and arb_object2.is_existential:
+            # Case 1
+            # not(There is an X that E prime (arb_obj2) deps on and that e (arb_obj1)does not depend upon)
+            unis_e_depends_on = get_all_dep_partners_for_arb_obj(
+                arb_object1, self.dependency_relation.dependencies
+            )
+            unis_e_prime_depends_on = get_all_dep_partners_for_arb_obj(
+                arb_object2, self.dependency_relation.dependencies
+            )
+            return len(unis_e_prime_depends_on.difference(unis_e_depends_on) ) ==0
+            
+
+        elif arb_object1.is_existential and not arb_object2.is_existential:
+            # Case 2
+            # There is a dependency of this structure
+            return dependency_exists(
+                universal=arb_object2,
+                existential=arb_object1,
+                dependencies=self.dependency_relation.dependencies,
+            )
+
+        elif not arb_object1.is_existential and arb_object2.is_existential:
+            # Case 3
+            # There is not a dependency of this structure
+            return not dependency_exists(
+                universal=arb_object1,
+                existential=arb_object2,
+                dependencies=self.dependency_relation.dependencies,
+            )
+
+        elif not arb_object1.is_existential and not arb_object2.is_existential:
+            # Case 4
+            # not(There is an X that depends on u (arb_obj 1) but does not depend on u_prime (arb_obj2))
+            exis_depending_on_u = get_all_dep_partners_for_arb_obj(
+                arb_object1, self.dependency_relation.dependencies
+            )
+            exis_depending_on_u_prime = get_all_dep_partners_for_arb_obj(
+                arb_object2, self.dependency_relation.dependencies
+            )
+            return len(exis_depending_on_u.difference(exis_depending_on_u_prime)) == 0
+        else:
+            assert False
+
     def E0(
         self,
         other: "DependencyStructure",
