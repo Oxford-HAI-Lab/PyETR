@@ -84,7 +84,7 @@ class DependencyRelation:
         while stack:
             set1 = stack.pop(0)
             for set2 in stack:
-                if not set1.issubset(set2) or set2.issubset(set1):
+                if not (set1.issubset(set2) or set2.issubset(set1)):
                     raise ValueError(
                         f"Existential sets do not meet Matroyshka condition. \nSet1: {set1}\nSet2: {set2}"
                     )
