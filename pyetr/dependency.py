@@ -95,11 +95,11 @@ class DependencyRelation:
         for dep in self.dependencies:
             if dep.existential not in exi_arb_objects:
                 raise ValueError(
-                    f"{dep.existential} not found in existential states {exi_arb_objects}"
+                    f"{dep.existential} not found among existential objects {exi_arb_objects} in states."
                 )
             if dep.universal not in uni_arb_objects:
                 raise ValueError(
-                    f"{dep.universal } not found in universal states {uni_arb_objects}"
+                    f"{dep.universal } not found among universal objects {uni_arb_objects} in states."
                 )
 
     @property
@@ -152,13 +152,11 @@ class DependencyRelation:
         """
         Based on definition 4.24
         """
-        new_deps = []
-        for dep in self.dependencies:
-            # If the state arb objects contain the dep universal
-            if dep.universal in arb_objects:
-                for arb_object in arb_objects:
-                    if dep.existential != arb_object:
-                        new_deps.append(Dependency(dep.universal, dep.existential))
+        new_deps = [
+            dep
+            for dep in self.dependencies
+            if dep.universal in arb_objects and dep.existential in arb_objects
+        ]
 
         return DependencyRelation(frozenset(new_deps))
 
