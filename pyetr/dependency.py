@@ -236,11 +236,13 @@ class DependencyStructure:
         universals: set[Universal],
         existentials: set[Existential],
         dependency_relation: DependencyRelation,
+        validate=True,
     ) -> None:
         self.universals = universals
         self.existentials = existentials
         self.dependency_relation = dependency_relation
-        self._validate()
+        if validate:
+            self._validate()
 
     @classmethod
     def from_arb_objects(
@@ -483,4 +485,19 @@ class DependencyStructure:
     def replace(
         self, replacements: dict[ArbitraryObject, ArbitraryObject]
     ) -> "DependencyStructure":
-        raise NotImplementedError
+        def replaceAobject(x: ArbitraryObject) -> ArbitraryObject:
+            if x in replacements:
+                return replacements[x]
+            else:
+                return x
+
+        new_unis = {replaceAobject(x) for x in self.universals}
+        new_exis = {replaceAobject(x) for x in self.existentials}
+        new_deps = {
+            Dependency(
+                universal=replaceAobject(d.universal),
+                existential=replaceAobject(d.existential),
+            )
+            for d in self.dependency_relation.dependencies
+        }
+        return DependencyStructure(new_unis, new_exis, DependencyRelation(new_deps))
