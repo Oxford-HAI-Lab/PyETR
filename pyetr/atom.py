@@ -144,6 +144,18 @@ class Atom:
         else:
             return self.excluding_emphasis == other.excluding_emphasis
 
+    def is_same_emphasis_context(self, other: "Atom") -> bool:
+        if (
+            self.predicate != other.predicate
+            and self.predicate != other.predicate.__invert__
+        ):
+            return False
+        else:
+            for x, y in zip(self.terms, other.terms):
+                if not x.is_same_emphasis_context(y):
+                    return False
+            return True
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Atom):
             return False

@@ -68,6 +68,11 @@ class ArbitraryObject:
     def __hash__(self) -> int:
         return hash((self.name, self.is_existential))
 
+    def is_same_emphasis_context(
+        self, other: "Term | ArbitraryObject | Emphasis"
+    ) -> bool:
+        return self == other
+
 
 class Emphasis:
     term: "Term | ArbitraryObject"
@@ -116,6 +121,11 @@ class Emphasis:
 
     def __repr__(self) -> str:
         return f"{self.term}*"
+
+    def is_same_emphasis_context(
+        self, other: "Term | ArbitraryObject | Emphasis"
+    ) -> bool:
+        return isinstance(other, Emphasis)
 
 
 class Term:
@@ -213,6 +223,20 @@ class Term:
                     assert False
             new_terms.append(replacement)
         return Term(f=self.f, t=tuple(new_terms))
+
+    def is_same_emphasis_context(
+        self, other: "Term | ArbitraryObject | Emphasis"
+    ) -> bool:
+        if (
+            isinstance(other, Emphasis)
+            or isinstance(other, ArbitraryObject)
+            or self.f != other.f
+        ):
+            return False
+        for x, y in zip(self.t, other.t):
+            if not x.is_same_emphasis_context(y):
+                return False
+        return True
 
     def replace(
         self,

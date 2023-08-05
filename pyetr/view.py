@@ -102,11 +102,13 @@ def substitution(
 
     new_dep_structure = new_dep_structure.restriction(set(subs.values()))
     T_prime = old_T.chain(new_dep_structure)
-    T_prime = T_prime.restriction(new_stage.arb_objects | supposition.arb_objects)
+    # The following restriction is in the book but should not have been
+    # T_prime = T_prime.restriction(new_stage.arb_objects | supposition.arb_objects)
     return View(
         stage=new_stage,
         supposition=supposition,
         dependency_relation=T_prime.dependency_relation,
+        validate=False,
     )
 
 
@@ -141,10 +143,12 @@ class View:
         stage: Stage,
         supposition: Supposition,
         dependency_relation: DependencyRelation,
+        validate=True,
     ) -> None:
         self.stage = stage
         self.supposition = supposition
-        dependency_relation.validate(stage | supposition)
+        if validate:
+            dependency_relation.validate(stage | supposition)
         self.dependency_relation = dependency_relation
 
     @property
@@ -172,13 +176,22 @@ class View:
     def _fuse_views(
         self, view: "View", inherited_dependencies: DependencyStructure
     ) -> DependencyStructure:
-        self_uni, self_exi = self.universals_and_existentials
-        view_uni, view_exi = view.universals_and_existentials
+        # A little hack - perhaps we should move back to each View (or pre-View) has a full DepRel
+        self_uni, self_exi = _separate_arb_objects(
+            self.arb_objects | self.dependency_relation.arb_objects
+        )
+        view_uni, view_exi = _separate_arb_objects(
+            view.arb_objects | view.dependency_relation.arb_objects
+        )
         expr1 = inherited_dependencies.fusion(
-            DependencyStructure(self_uni, self_exi, self.dependency_relation)
+            DependencyStructure(
+                self_uni, self_exi, self.dependency_relation, validate=False
+            )
         )
         expr2 = inherited_dependencies.fusion(
-            DependencyStructure(view_uni, view_exi, view.dependency_relation)
+            DependencyStructure(
+                view_uni, view_exi, view.dependency_relation, validate=False
+            )
         )
         return expr1.fusion(expr2)
 
@@ -328,7 +341,7 @@ class View:
         pairs: list[tuple[Term | ArbitraryObject, Term | ArbitraryObject]] = []
         for atom_self in self_atoms_with_emphasis:
             for atom_other in other_atoms_with_emphasis:
-                if atom_self.is_same_excl_emphasis(atom_other):
+                if atom_self.is_same_emphasis_context(atom_other):
                     pairs.append((atom_self.emphasis_term, atom_other.emphasis_term))
 
         return set(pairs)
@@ -379,28 +392,27 @@ class View:
                         ).product(view, inherited_dependencies=r_fuse_s)
                     )
                 else:
-                    product_result: View = reduce(
-                        lambda v1, v2: v1.product(v2, r_fuse_s),
-                        [
-                            substitution(
-                                arb_gen=arb_gen,
-                                dep_structure=r_fuse_s,
-                                arb_obj=u,
-                                term=t,
-                                stage=view.stage,
-                                supposition=SetOfStates({State({})}),
-                            )
-                            for t, u in m_prime
-                        ],
-                    )
-                    views_for_sum.append(
-                        View(
-                            SetOfStates({gamma}),
-                            self.supposition,
-                            self.dependency_relation,
+                    product_factors: list = [
+                        substitution(
+                            arb_gen=arb_gen,
+                            dep_structure=r_fuse_s,
+                            arb_obj=u,
+                            term=t,
+                            stage=view.stage,
+                            supposition=SetOfStates({State({})}),
                         )
-                        .product(view, inherited_dependencies=r_fuse_s)
-                        .product(product_result, inherited_dependencies=r_fuse_s)
+                        for t, u in m_prime
+                    ]
+                    views_for_sum.append(
+                        reduce(
+                            lambda v1, v2: v1.product(v2, r_fuse_s),
+                            product_factors,
+                            View(
+                                SetOfStates({gamma}),
+                                self.supposition,
+                                self.dependency_relation,
+                            ).product(view, inherited_dependencies=r_fuse_s),
+                        )
                     )
             return reduce(lambda v1, v2: v1.sum(v2, r_fuse_s), views_for_sum)
         else:
@@ -704,17 +716,15 @@ class View:
 
         for exi_perm in permutations(other_exi):
             for uni_perm in permutations(other_uni):
-                new_view = self
                 replacements = {
                     **dict(zip(exi_perm, self_exi)),
                     **dict(zip(uni_perm, self_uni)),
                 }
 
-                new_view = new_view.replace(
+                new_view = other.replace(
                     cast(dict[ArbitraryObject, Term | ArbitraryObject], replacements)
                 )
-
-                if new_view == other:
+                if new_view == self:
                     return True
         return False
 
