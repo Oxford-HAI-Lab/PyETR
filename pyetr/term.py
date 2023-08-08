@@ -233,9 +233,14 @@ class Term:
             or self.f != other.f
         ):
             return False
-        for x, y in zip(self.t, other.t):
-            if not x.is_same_emphasis_context(y):
-                return False
+        if self.t is None and other.t is None:
+            return True
+        elif self.t is None or other.t is None:
+            return False
+        else:
+            for x, y in zip(self.t, other.t):
+                if not x.is_same_emphasis_context(y):
+                    return False
         return True
 
     def replace(

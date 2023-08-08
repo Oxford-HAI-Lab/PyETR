@@ -485,19 +485,21 @@ class DependencyStructure:
     def replace(
         self, replacements: dict[ArbitraryObject, ArbitraryObject]
     ) -> "DependencyStructure":
-        def replaceAobject(x: ArbitraryObject) -> ArbitraryObject:
+        def replace_arb_object(x: ArbitraryObject) -> ArbitraryObject:
             if x in replacements:
                 return replacements[x]
             else:
                 return x
 
-        new_unis = {replaceAobject(x) for x in self.universals}
-        new_exis = {replaceAobject(x) for x in self.existentials}
+        new_unis = {replace_arb_object(x) for x in self.universals}
+        new_exis = {replace_arb_object(x) for x in self.existentials}
         new_deps = {
             Dependency(
-                universal=replaceAobject(d.universal),
-                existential=replaceAobject(d.existential),
+                universal=replace_arb_object(d.universal),
+                existential=replace_arb_object(d.existential),
             )
             for d in self.dependency_relation.dependencies
         }
-        return DependencyStructure(new_unis, new_exis, DependencyRelation(new_deps))
+        return DependencyStructure(
+            new_unis, new_exis, DependencyRelation(frozenset(new_deps))
+        )
