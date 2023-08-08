@@ -392,7 +392,7 @@ class View:
                         ).product(view, inherited_dependencies=r_fuse_s)
                     )
                 else:
-                    product_factors: list = [
+                    product_factors: list[View] = [
                         substitution(
                             arb_gen=arb_gen,
                             dep_structure=r_fuse_s,
@@ -403,17 +403,19 @@ class View:
                         )
                         for t, u in m_prime
                     ]
-                    views_for_sum.append(
-                        reduce(
-                            lambda v1, v2: v1.product(v2, r_fuse_s),
-                            product_factors,
-                            View(
-                                SetOfStates({gamma}),
-                                self.supposition,
-                                self.dependency_relation,
-                            ).product(view, inherited_dependencies=r_fuse_s),
-                        )
+                    product_factors.insert(
+                        0,
+                        View(
+                            SetOfStates({gamma}),
+                            self.supposition,
+                            self.dependency_relation,
+                        ),
                     )
+                    views_for_sum.append(
+                        reduce(lambda v1, v2: v1.product(v2, r_fuse_s), product_factors)
+                    )
+
+            # N.B. it's possible we should have a default value for this big sum in case views_for_sum is empty.
             return reduce(lambda v1, v2: v1.sum(v2, r_fuse_s), views_for_sum)
         else:
             return self
