@@ -236,13 +236,10 @@ class DependencyStructure:
         universals: set[Universal],
         existentials: set[Existential],
         dependency_relation: DependencyRelation,
-        validate=True,
     ) -> None:
         self.universals = universals
         self.existentials = existentials
         self.dependency_relation = dependency_relation
-        if validate:
-            self._validate()
 
     @classmethod
     def from_arb_objects(
@@ -253,7 +250,8 @@ class DependencyStructure:
         universals, existentials = _separate_arb_objects(arb_objects)
         return cls(universals, existentials, dependency_relation)
 
-    def _validate(self):
+    def validate(self, states: SetOfStates):
+        self.dependency_relation.validate(states)
         unis, exis = _separate_arb_objects(self.dependency_relation.arb_objects)
         if not self.universals.issuperset(unis):
             raise ValueError(f"Universals {self.universals} is not superset of {unis}")

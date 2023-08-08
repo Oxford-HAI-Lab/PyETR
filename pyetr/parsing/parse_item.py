@@ -146,7 +146,7 @@ def _parse_view(
         parsed_stage, parsed_supposition = add_new_emphasis(
             parsed_stage, parsed_supposition
         )
-    return View(
+    return View.make_valid(
         stage=parsed_stage,
         supposition=parsed_supposition,
         dependency_relation=dependency_relation,
