@@ -389,6 +389,7 @@ class View:
                             SetOfStates({gamma}),
                             self.supposition,
                             self.dependency_relation,
+                            validate=False,
                         ).product(view, inherited_dependencies=r_fuse_s)
                     )
                 else:
