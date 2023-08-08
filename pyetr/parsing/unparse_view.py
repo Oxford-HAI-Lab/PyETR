@@ -1,5 +1,5 @@
 from pyetr.atom import Atom
-from pyetr.dependency import Dependency, DependencyRelation
+from pyetr.dependency import Dependency, dependencies_to_sets
 from pyetr.parsing.parse_string import (
     BoolAnd,
     BoolNot,
@@ -91,7 +91,7 @@ class QuantList:
 
 
 def order_quantifieds(
-    unordered_quantifieds: dict[str, Quantified], dep_rel: DependencyRelation
+    unordered_quantifieds: dict[str, Quantified], dependencies: frozenset[Dependency]
 ) -> list[Quantified]:
     # All unspecified exis get put to the front
     # The ordering is based on the right most having the least
@@ -99,7 +99,7 @@ def order_quantifieds(
     # Therefore, we must start with the smallest exi sets
     exis_used: list[str] = []
     univs_used: list[str] = []
-    dep_sets = dep_rel.to_sets()
+    dep_sets = dependencies_to_sets(dependencies)
     sorted_universals: list[tuple[int, ArbitraryObject, set[ArbitraryObject]]] = sorted(
         [(len(exi_set), uni, exi_set) for uni, exi_set in dep_sets]
     )
@@ -128,7 +128,7 @@ def order_quantifieds(
 
 
 def get_quantifiers(
-    arb_objects: set[ArbitraryObject], dep_rel: DependencyRelation
+    arb_objects: set[ArbitraryObject], dependencies: frozenset[Dependency]
 ) -> list[Quantified]:
     unordered_quantifieds: dict[str, Quantified] = {}
     for arb_object in arb_objects:
@@ -140,7 +140,7 @@ def get_quantifiers(
             unordered_quantifieds[arb_object.name] = Quantified(
                 [QuantList([Variable([arb_object.name])], quantifier=quant)]
             )
-    return order_quantifieds(unordered_quantifieds, dep_rel)
+    return order_quantifieds(unordered_quantifieds, dependencies)
 
 
 def unparse_view(v: View) -> list[Item]:
@@ -153,6 +153,6 @@ def unparse_view(v: View) -> list[Item]:
         main_item = Implies([[supposition, stage]])
     all_arb = v.stage.arb_objects | v.supposition.arb_objects
     output: list[Quantified] = get_quantifiers(
-        all_arb, v.dependency_structure.dependency_relation
+        all_arb, v.dependency_structure.dependencies
     )
     return [*output, main_item]

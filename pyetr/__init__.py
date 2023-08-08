@@ -3,7 +3,7 @@ __all__ = [
     "Atom",
     "equals_predicate",
     "Dependency",
-    "DependencyRelation",
+    "DependencyStructure",
     "SetOfStates",
     "State",
     "Term",
@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 from .atom import Atom, Predicate, equals_predicate
-from .dependency import Dependency, DependencyRelation
+from .dependency import Dependency, DependencyStructure
 from .parsing import parse_string_to_view
 from .stateset import SetOfStates, State
 from .term import ArbitraryObject, Emphasis, Function, Term

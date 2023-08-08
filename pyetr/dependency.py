@@ -1,4 +1,4 @@
-__all__ = ["Dependency", "DependencyRelation"]
+__all__ = ["Dependency", "DependencyStructure"]
 
 from typing import Iterable
 
@@ -69,114 +69,6 @@ def _separate_arb_objects(
     return uni_objs, exi_objs
 
 
-class DependencyRelation:
-    dependencies: frozenset[Dependency]
-
-    def __init__(self, dependencies: frozenset[Dependency]) -> None:
-        self.dependencies = dependencies
-        self._test_matroyshka()
-
-    def _test_matroyshka(self):
-        existentials: list[frozenset[ArbitraryObject]] = [
-            frozenset(e) for _, e in self.to_sets()
-        ]
-        stack = existentials.copy()
-        while stack:
-            set1 = stack.pop(0)
-            for set2 in stack:
-                if not (set1.issubset(set2) or set2.issubset(set1)):
-                    raise ValueError(
-                        f"Existential sets do not meet Matroyshka condition. \nSet1: {set1}\nSet2: {set2}"
-                    )
-
-    def validate(self, states: SetOfStates):
-        uni_arb_objects, exi_arb_objects = _separate_arb_objects(states.arb_objects)
-        # universal to existentials that depend on them ( share a pair )
-        for dep in self.dependencies:
-            if dep.existential not in exi_arb_objects:
-                raise ValueError(
-                    f"{dep.existential} not found among existential objects {exi_arb_objects} in states."
-                )
-            if dep.universal not in uni_arb_objects:
-                raise ValueError(
-                    f"{dep.universal } not found among universal objects {uni_arb_objects} in states."
-                )
-
-    @property
-    def detailed(self) -> "str":
-        if len(self.dependencies) == 0:
-            full_string = ""
-        else:
-            full_string = " dependencies=" + "\n".join(
-                [dep.detailed for dep in self.dependencies]
-            )
-        return f"<DependencyRelation{full_string}>"
-
-    def __repr__(self) -> "str":
-        if len(self.dependencies) == 0:
-            return "None"
-        else:
-            return "".join(
-                f"{u}" + "{" + ",".join(repr(e) for e in exis) + "}"
-                for u, exis in self.to_sets()
-            )
-
-    @classmethod
-    def from_sets(cls, sets: Iterable[tuple[Universal, Iterable[Existential]]]):
-        new_deps = set()
-        for uni, exi_set in sets:
-            for exi in exi_set:
-                new_deps.add(Dependency(uni, exi))
-        return cls(dependencies=frozenset(new_deps))
-
-    def to_sets(self) -> list[tuple[Universal, set[Existential]]]:
-        new_sets: dict[str, tuple[Universal, set[Existential]]] = {}
-        for d in self.dependencies:
-            if d.universal.name in new_sets:
-                new_sets[d.universal.name][1].add(d.existential)
-            else:
-                new_sets[d.universal.name] = (d.universal, {d.existential})
-        return list(new_sets.values())
-
-    @property
-    def arb_objects(self) -> set[ArbitraryObject]:
-        arb_objs = set()
-        for dep in self.dependencies:
-            if dep.universal not in arb_objs:
-                arb_objs.add(dep.universal)
-            if dep.existential not in arb_objs:
-                arb_objs.add(dep.existential)
-        return arb_objs
-
-    def restriction(self, arb_objects: set[ArbitraryObject]) -> "DependencyRelation":
-        """
-        Based on definition 4.24
-        """
-        new_deps = [
-            dep
-            for dep in self.dependencies
-            if dep.universal in arb_objects and dep.existential in arb_objects
-        ]
-
-        return DependencyRelation(frozenset(new_deps))
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, DependencyRelation):
-            return False
-        return self.dependencies == other.dependencies
-
-    def __hash__(self) -> int:
-        return hash((self.dependencies))
-
-    def replace(
-        self, replacements: dict[ArbitraryObject, ArbitraryObject]
-    ) -> "DependencyRelation":
-        new_deps = set()
-        for dep in self.dependencies:
-            new_deps.add(dep.replace(replacements))
-        return DependencyRelation(frozenset(new_deps))
-
-
 def transitive_closure(
     D_initial: list[tuple[ArbitraryObject, ArbitraryObject]],
     arb_objects: set[ArbitraryObject],
@@ -226,33 +118,93 @@ def dependency_exists(
     return False
 
 
+def dependencies_from_sets(
+    sets: Iterable[tuple[Universal, Iterable[Existential]]]
+) -> frozenset[Dependency]:
+    new_deps = set()
+    for uni, exi_set in sets:
+        for exi in exi_set:
+            new_deps.add(Dependency(uni, exi))
+    return frozenset(new_deps)
+
+
+def dependencies_to_sets(
+    dependencies: frozenset[Dependency],
+) -> list[tuple[Universal, set[Existential]]]:
+    new_sets: dict[str, tuple[Universal, set[Existential]]] = {}
+    for d in dependencies:
+        if d.universal.name in new_sets:
+            new_sets[d.universal.name][1].add(d.existential)
+        else:
+            new_sets[d.universal.name] = (d.universal, {d.existential})
+    return list(new_sets.values())
+
+
 class DependencyStructure:
     universals: set[Universal]
     existentials: set[Existential]
-    dependency_relation: DependencyRelation
+    dependencies: frozenset[Dependency]
 
     def __init__(
         self,
         universals: set[Universal],
         existentials: set[Existential],
-        dependency_relation: DependencyRelation,
+        dependencies: frozenset[Dependency],
     ) -> None:
         self.universals = universals
         self.existentials = existentials
-        self.dependency_relation = dependency_relation
+        self.dependencies = dependencies
+        self._test_matroyshka()
+
+    def _test_matroyshka(self):
+        existentials: list[frozenset[ArbitraryObject]] = [
+            frozenset(e) for _, e in dependencies_to_sets(self.dependencies)
+        ]
+        stack = existentials.copy()
+        while stack:
+            set1 = stack.pop(0)
+            for set2 in stack:
+                if not (set1.issubset(set2) or set2.issubset(set1)):
+                    raise ValueError(
+                        f"Existential sets do not meet Matroyshka condition. \nSet1: {set1}\nSet2: {set2}"
+                    )
 
     @classmethod
     def from_arb_objects(
         cls,
         arb_objects: set[ArbitraryObject],
-        dependency_relation: DependencyRelation,
+        dependencies: frozenset[Dependency],
     ):
         universals, existentials = _separate_arb_objects(arb_objects)
-        return cls(universals, existentials, dependency_relation)
+        return cls(universals, existentials, dependencies)
+
+    def validate_dependencies(self, states: SetOfStates):
+        uni_arb_objects, exi_arb_objects = _separate_arb_objects(states.arb_objects)
+        # universal to existentials that depend on them ( share a pair )
+        for dep in self.dependencies:
+            if dep.existential not in exi_arb_objects:
+                raise ValueError(
+                    f"{dep.existential} not found among existential objects {exi_arb_objects} in states."
+                )
+            if dep.universal not in uni_arb_objects:
+                raise ValueError(
+                    f"{dep.universal } not found among universal objects {uni_arb_objects} in states."
+                )
+
+    @property
+    def dependency_arb_objects(self) -> set[ArbitraryObject]:
+        arb_objs = set()
+        for dep in self.dependencies:
+            if dep.universal not in arb_objs:
+                arb_objs.add(dep.universal)
+            if dep.existential not in arb_objs:
+                arb_objs.add(dep.existential)
+        return arb_objs
 
     def validate(self, states: SetOfStates):
-        self.dependency_relation.validate(states)
-        unis, exis = _separate_arb_objects(self.dependency_relation.arb_objects)
+        self.validate_dependencies(states)
+
+        unis, exis = _separate_arb_objects(self.dependency_arb_objects)
         if not self.universals.issuperset(unis):
             raise ValueError(f"Universals {self.universals} is not superset of {unis}")
         if not self.existentials.issuperset(exis):
@@ -269,19 +221,23 @@ class DependencyStructure:
             for universal in self.universals:
                 new_deps.add(Dependency(universal=universal, existential=existential))
 
-        dep_rel: DependencyRelation = DependencyRelation(
-            self.dependency_relation.dependencies
-            | other.dependency_relation.dependencies
-            | new_deps
+        return DependencyStructure(
+            universals, existentials, self.dependencies | other.dependencies | new_deps
         )
-        return DependencyStructure(universals, existentials, dep_rel)
 
     def restriction(self, arb_objects: set[ArbitraryObject]) -> "DependencyStructure":
+        """
+        Based on definition 4.24
+        """
         universals = self.universals & arb_objects
         existentials = self.existentials & arb_objects
-        dep_rel = self.dependency_relation.restriction(arb_objects)
+        new_deps = [
+            dep
+            for dep in self.dependencies
+            if dep.universal in arb_objects and dep.existential in arb_objects
+        ]
         return DependencyStructure(
-            universals, existentials, dependency_relation=dep_rel
+            universals, existentials, dependencies=frozenset(new_deps)
         )
 
     def triangle(
@@ -301,10 +257,10 @@ class DependencyStructure:
             # Case 1
             # There is X that E (arb_obj1) depends on and that e prime (arb_obj2) does not depend on
             unis_e_depends_on = get_all_dep_partners_for_arb_obj(
-                arb_object1, self.dependency_relation.dependencies
+                arb_object1, self.dependencies
             )
             unis_e_prime_depends_on = get_all_dep_partners_for_arb_obj(
-                arb_object2, self.dependency_relation.dependencies
+                arb_object2, self.dependencies
             )
             return len(unis_e_depends_on.difference(unis_e_prime_depends_on)) != 0
         elif arb_object1.is_existential and not arb_object2.is_existential:
@@ -313,7 +269,7 @@ class DependencyStructure:
             return dependency_exists(
                 universal=arb_object2,
                 existential=arb_object1,
-                dependencies=self.dependency_relation.dependencies,
+                dependencies=self.dependencies,
             )
 
         elif not arb_object1.is_existential and arb_object2.is_existential:
@@ -322,17 +278,17 @@ class DependencyStructure:
             return not dependency_exists(
                 universal=arb_object1,
                 existential=arb_object2,
-                dependencies=self.dependency_relation.dependencies,
+                dependencies=self.dependencies,
             )
 
         elif not arb_object1.is_existential and not arb_object2.is_existential:
             # Case 4
             # There is X that does depend on u prime (arb_obj2) and does not depend on u (arb_obj 1)
             exis_depending_on_u = get_all_dep_partners_for_arb_obj(
-                arb_object1, self.dependency_relation.dependencies
+                arb_object1, self.dependencies
             )
             exis_depending_on_u_prime = get_all_dep_partners_for_arb_obj(
-                arb_object2, self.dependency_relation.dependencies
+                arb_object2, self.dependencies
             )
             return len(exis_depending_on_u_prime.difference(exis_depending_on_u)) != 0
         else:
@@ -355,10 +311,10 @@ class DependencyStructure:
             # Case 1
             # not(There is an X that E prime (arb_obj2) deps on and that e (arb_obj1)does not depend upon)
             unis_e_depends_on = get_all_dep_partners_for_arb_obj(
-                arb_object1, self.dependency_relation.dependencies
+                arb_object1, self.dependencies
             )
             unis_e_prime_depends_on = get_all_dep_partners_for_arb_obj(
-                arb_object2, self.dependency_relation.dependencies
+                arb_object2, self.dependencies
             )
             return len(unis_e_prime_depends_on.difference(unis_e_depends_on)) == 0
 
@@ -368,7 +324,7 @@ class DependencyStructure:
             return dependency_exists(
                 universal=arb_object2,
                 existential=arb_object1,
-                dependencies=self.dependency_relation.dependencies,
+                dependencies=self.dependencies,
             )
 
         elif not arb_object1.is_existential and arb_object2.is_existential:
@@ -377,17 +333,17 @@ class DependencyStructure:
             return not dependency_exists(
                 universal=arb_object1,
                 existential=arb_object2,
-                dependencies=self.dependency_relation.dependencies,
+                dependencies=self.dependencies,
             )
 
         elif not arb_object1.is_existential and not arb_object2.is_existential:
             # Case 4
             # not(There is an X that depends on u (arb_obj 1) but does not depend on u_prime (arb_obj2))
             exis_depending_on_u = get_all_dep_partners_for_arb_obj(
-                arb_object1, self.dependency_relation.dependencies
+                arb_object1, self.dependencies
             )
             exis_depending_on_u_prime = get_all_dep_partners_for_arb_obj(
-                arb_object2, self.dependency_relation.dependencies
+                arb_object2, self.dependencies
             )
             return len(exis_depending_on_u.difference(exis_depending_on_u_prime)) == 0
         else:
@@ -429,7 +385,7 @@ class DependencyStructure:
     @property
     def is_empty(self):
         if len(self.universals) == 0 and len(self.existentials) == 0:
-            assert len(self.dependency_relation.dependencies) == 0
+            assert len(self.dependencies) == 0
             return True
         else:
             return False
@@ -454,9 +410,7 @@ class DependencyStructure:
             e_0 = self.E0(other, new_pairs)
             u_0 = self.U0(other, new_pairs, e_0)
 
-            initial_structure = DependencyStructure(
-                u_0, e_0, DependencyRelation(frozenset())
-            )
+            initial_structure = DependencyStructure(u_0, e_0, frozenset())
             a_r = self.universals | self.existentials
             a_s = other.universals | other.existentials
             return initial_structure.chain(
@@ -466,19 +420,29 @@ class DependencyStructure:
             )
 
     def __repr__(self) -> str:
-        return f"<DependencyStructure dep_rel={self.dependency_relation} unis={self.universals} exis={self.existentials}>"
+        if len(self.dependencies) == 0:
+            return "None"
+        else:
+            return "".join(
+                f"{u}" + "{" + ",".join(repr(e) for e in exis) + "}"
+                for u, exis in dependencies_to_sets(self.dependencies)
+            )
+
+    @property
+    def detailed(self):
+        return f"<DependencyStructure deps={[i.detailed for i in self.dependencies]} unis={self.universals} exis={self.existentials}>"
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, DependencyStructure):
             return False
         return (
-            self.dependency_relation == other.dependency_relation
+            self.dependencies == other.dependencies
             and self.universals == other.universals
             and self.existentials == other.existentials
         )
 
     def __hash__(self) -> int:
-        return hash((self.universals, self.existentials, self.dependency_relation))
+        return hash((self.universals, self.existentials, self.dependencies))
 
     def replace(
         self, replacements: dict[ArbitraryObject, ArbitraryObject]
@@ -491,13 +455,5 @@ class DependencyStructure:
 
         new_unis = {replace_arb_object(x) for x in self.universals}
         new_exis = {replace_arb_object(x) for x in self.existentials}
-        new_deps = {
-            Dependency(
-                universal=replace_arb_object(d.universal),
-                existential=replace_arb_object(d.existential),
-            )
-            for d in self.dependency_relation.dependencies
-        }
-        return DependencyStructure(
-            new_unis, new_exis, DependencyRelation(frozenset(new_deps))
-        )
+        new_deps = {d.replace(replacements) for d in self.dependencies}
+        return DependencyStructure(new_unis, new_exis, frozenset(new_deps))
