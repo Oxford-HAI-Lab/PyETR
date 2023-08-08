@@ -458,27 +458,28 @@ class View:
         if self._uni_exi_condition(view):
             if not view.supposition.is_verum:
                 return self
-            initial_item = View(
-                stage=view.supposition,
-                supposition=self.supposition,
-                dependency_relation=self.dependency_relation,
-            )
             r_fuse_s = self.dep_structure.fusion(view.dep_structure)
-            product_result: View = reduce(
-                lambda v1, v2: v1.product(v2, r_fuse_s),
-                [
-                    substitution(
-                        arb_gen=arb_gen,
-                        dep_structure=r_fuse_s,
-                        arb_obj=u,
-                        term=t,
-                        stage=self.stage,
-                        supposition=SetOfStates({State({})}),
-                    )
-                    for u, t in m_prime
-                ],
+            product_factors: list[View] = [
+                substitution(
+                    arb_gen=arb_gen,
+                    dep_structure=r_fuse_s,
+                    arb_obj=u,
+                    term=t,
+                    stage=self.stage,
+                    supposition=SetOfStates({State({})}),
+                )
+                for u, t in m_prime
+            ]
+            product_factors.insert(
+                0,
+                View(
+                    stage=SetOfStates({State({})}),
+                    supposition=self.supposition,
+                    dependency_relation=self.dependency_relation,
+                    validate=False,
+                ),
             )
-            return initial_item.product(product_result, r_fuse_s)
+            return reduce(lambda v1, v2: v1.product(v2, r_fuse_s), product_factors)
         else:
             return self
 
