@@ -1,4 +1,4 @@
-__all__ = ["Dependency", "DependencyStructure"]
+__all__ = ["Dependency", "DependencyRelation"]
 
 from typing import Iterable
 
@@ -140,7 +140,7 @@ def dependencies_to_sets(
     return list(new_sets.values())
 
 
-class DependencyStructure:
+class DependencyRelation:
     universals: set[Universal]
     existentials: set[Existential]
     dependencies: frozenset[Dependency]
@@ -212,7 +212,7 @@ class DependencyStructure:
                 f"Existentials {self.existentials} is not superset of {exis}"
             )
 
-    def chain(self, other: "DependencyStructure") -> "DependencyStructure":
+    def chain(self, other: "DependencyRelation") -> "DependencyRelation":
         universals = self.universals | other.universals
         existentials = self.existentials | other.existentials
 
@@ -221,11 +221,11 @@ class DependencyStructure:
             for universal in self.universals:
                 new_deps.add(Dependency(universal=universal, existential=existential))
 
-        return DependencyStructure(
+        return DependencyRelation(
             universals, existentials, self.dependencies | other.dependencies | new_deps
         )
 
-    def restriction(self, arb_objects: set[ArbitraryObject]) -> "DependencyStructure":
+    def restriction(self, arb_objects: set[ArbitraryObject]) -> "DependencyRelation":
         """
         Based on definition 4.24
         """
@@ -236,7 +236,7 @@ class DependencyStructure:
             for dep in self.dependencies
             if dep.universal in arb_objects and dep.existential in arb_objects
         ]
-        return DependencyStructure(
+        return DependencyRelation(
             universals, existentials, dependencies=frozenset(new_deps)
         )
 
@@ -351,7 +351,7 @@ class DependencyStructure:
 
     def E0(
         self,
-        other: "DependencyStructure",
+        other: "DependencyRelation",
         new_pairs: list[tuple[ArbitraryObject, ArbitraryObject]],
     ) -> set[Existential]:
         new_out: list[ArbitraryObject] = []
@@ -367,7 +367,7 @@ class DependencyStructure:
 
     def U0(
         self,
-        other: "DependencyStructure",
+        other: "DependencyRelation",
         new_pairs: list[tuple[ArbitraryObject, ArbitraryObject]],
         e_0: set[Existential],
     ) -> set[Universal]:
@@ -390,7 +390,7 @@ class DependencyStructure:
         else:
             return False
 
-    def fusion(self, other: "DependencyStructure") -> "DependencyStructure":
+    def fusion(self, other: "DependencyRelation") -> "DependencyRelation":
         if self.is_empty and other.is_empty:
             return self
         else:
@@ -410,10 +410,10 @@ class DependencyStructure:
             e_0 = self.E0(other, new_pairs)
             u_0 = self.U0(other, new_pairs, e_0)
 
-            initial_structure = DependencyStructure(u_0, e_0, frozenset())
+            initial_relation = DependencyRelation(u_0, e_0, frozenset())
             a_r = self.universals | self.existentials
             a_s = other.universals | other.existentials
-            return initial_structure.chain(
+            return initial_relation.chain(
                 self.restriction(a_r.difference(e_0 | u_0)).fusion(
                     other.restriction(a_s.difference(e_0 | u_0))
                 )
@@ -430,10 +430,10 @@ class DependencyStructure:
 
     @property
     def detailed(self):
-        return f"<DependencyStructure deps={[i.detailed for i in self.dependencies]} unis={self.universals} exis={self.existentials}>"
+        return f"<DependencyRelation deps={[i.detailed for i in self.dependencies]} unis={self.universals} exis={self.existentials}>"
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, DependencyStructure):
+        if not isinstance(other, DependencyRelation):
             return False
         return (
             self.dependencies == other.dependencies
@@ -446,7 +446,7 @@ class DependencyStructure:
 
     def replace(
         self, replacements: dict[ArbitraryObject, ArbitraryObject]
-    ) -> "DependencyStructure":
+    ) -> "DependencyRelation":
         def replace_arb_object(x: ArbitraryObject) -> ArbitraryObject:
             if x in replacements:
                 return replacements[x]
@@ -456,4 +456,4 @@ class DependencyStructure:
         new_unis = {replace_arb_object(x) for x in self.universals}
         new_exis = {replace_arb_object(x) for x in self.existentials}
         new_deps = {d.replace(replacements) for d in self.dependencies}
-        return DependencyStructure(new_unis, new_exis, frozenset(new_deps))
+        return DependencyRelation(new_unis, new_exis, frozenset(new_deps))

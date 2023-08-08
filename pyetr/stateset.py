@@ -3,7 +3,7 @@ __all__ = ["State", "SetOfStates"]
 from typing import AbstractSet, Iterable, Optional
 
 from .atom import Atom, equals_predicate
-from .term import ArbitraryObject, Emphasis, Term
+from .term import ArbitraryObject, Term
 
 
 class State(frozenset[Atom]):
