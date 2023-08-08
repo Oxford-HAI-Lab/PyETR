@@ -176,7 +176,7 @@ class View:
     def _fuse_views(
         self, view: "View", inherited_dependencies: DependencyStructure
     ) -> DependencyStructure:
-        # A little hack - perhaps we should move back to each View (or pre-View) has a full DepRel
+        # TODO: A little hack - perhaps we should move back to each View (or pre-View) has a full DepRel
         self_uni, self_exi = _separate_arb_objects(
             self.arb_objects | self.dependency_relation.arb_objects
         )
@@ -416,7 +416,7 @@ class View:
                         reduce(lambda v1, v2: v1.product(v2, r_fuse_s), product_factors)
                     )
 
-            # N.B. it's possible we should have a default value for this big sum in case views_for_sum is empty.
+            # TODO: it's possible we should have a default value for this big sum in case views_for_sum is empty.
             return reduce(lambda v1, v2: v1.sum(v2, r_fuse_s), views_for_sum)
         else:
             return self
