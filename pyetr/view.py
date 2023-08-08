@@ -8,12 +8,7 @@ from pyetr.tools import ArbitraryObjectGenerator
 
 from .add_new_emphasis import add_new_emphasis
 from .atom import Atom
-from .dependency import (
-    Dependency,
-    DependencyRelation,
-    DependencyStructure,
-    _separate_arb_objects,
-)
+from .dependency import Dependency, DependencyStructure, _separate_arb_objects
 from .stateset import SetOfStates, State
 from .term import ArbitraryObject, Term
 
@@ -149,9 +144,7 @@ class View:
         self.stage = stage
         self.supposition = supposition
         if validate:
-            dependency_structure.dependency_relation.validate(
-                self.stage | self.supposition
-            )
+            dependency_structure.validate(self.stage | self.supposition)
         self.dependency_structure = dependency_structure
 
     def is_valid(self):
@@ -166,7 +159,7 @@ class View:
         cls,
         stage: Stage,
         supposition: Supposition,
-        dependency_relation: DependencyRelation,
+        dependencies: frozenset[Dependency],
     ):
         unis, exis = _separate_arb_objects((stage | supposition).arb_objects)
         return cls(
@@ -175,23 +168,23 @@ class View:
             dependency_structure=DependencyStructure(
                 universals=unis,
                 existentials=exis,
-                dependency_relation=dependency_relation,
+                dependencies=dependencies,
             ),
         )
 
     @property
     def detailed(self) -> str:
-        return f"<View \n  stage={self.stage.detailed} \n  supposition={self.supposition.detailed} \n  dep_rel={self.dependency_structure.dependency_relation.detailed}\n>"
+        return f"<View \n  stage={self.stage.detailed} \n  supposition={self.supposition.detailed} \n  dep_struct={self.dependency_structure.detailed}\n>"
 
     def __repr__(self) -> str:
         if self.is_falsum:
             return "F"
         elif self.is_verum:
             return "T"
-        elif len(self.dependency_structure.dependency_relation.dependencies) == 0:
+        elif len(self.dependency_structure.dependencies) == 0:
             return f"{self.stage}^{self.supposition}"
         else:
-            return f"{self.stage}^{self.supposition} deps={self.dependency_structure.dependency_relation}"
+            return f"{self.stage}^{self.supposition} deps={self.dependency_structure}"
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
@@ -206,19 +199,19 @@ class View:
     ) -> DependencyStructure:
         # TODO: A little hack - perhaps we should move back to each View (or pre-View) has a full DepRel
         self_uni, self_exi = _separate_arb_objects(
-            self.arb_objects | self.dependency_structure.dependency_relation.arb_objects
+            self.arb_objects | self.dependency_structure.dependency_arb_objects
         )
         view_uni, view_exi = _separate_arb_objects(
-            view.arb_objects | view.dependency_structure.dependency_relation.arb_objects
+            view.arb_objects | view.dependency_structure.dependency_arb_objects
         )
         expr1 = inherited_dependencies.fusion(
             DependencyStructure(
-                self_uni, self_exi, self.dependency_structure.dependency_relation
+                self_uni, self_exi, self.dependency_structure.dependencies
             )
         )
         expr2 = inherited_dependencies.fusion(
             DependencyStructure(
-                view_uni, view_exi, view.dependency_structure.dependency_relation
+                view_uni, view_exi, view.dependency_structure.dependencies
             )
         )
         return expr1.fusion(expr2)
@@ -234,10 +227,8 @@ class View:
             (self.stage, self.supposition), (view.stage, view.supposition)
         )
         dep_structure = self._fuse_views(view, inherited_dependencies)
-        dep_rel = dep_structure.dependency_relation.restriction(
-            (stage | supposition).arb_objects
-        )
-        return View.make_valid(stage, supposition, dep_rel)
+        dep_structure2 = dep_structure.restriction((stage | supposition).arb_objects)
+        return View.make_valid(stage, supposition, dep_structure2.dependencies)
 
     def product(
         self, view: "View", inherited_dependencies: Optional[DependencyStructure] = None
@@ -247,9 +238,7 @@ class View:
         """
         if inherited_dependencies is None:
             # Corresponds to line 5
-            return self._product(
-                view, DependencyStructure(set(), set(), DependencyRelation(frozenset()))
-            )
+            return self._product(view, DependencyStructure(set(), set(), frozenset()))
         else:
             # Corresponds to line 4
             return self._product(view, inherited_dependencies)
@@ -267,10 +256,8 @@ class View:
         # Corresponds to line 1
         stage = self.stage | view.stage
         dep_structure = self._fuse_views(view, inherited_dependencies)
-        dep_rel = dep_structure.dependency_relation.restriction(
-            (stage | supposition).arb_objects
-        )
-        return View.make_valid(stage, supposition, dep_rel)
+        dep_rel = dep_structure.restriction((stage | supposition).arb_objects)
+        return View.make_valid(stage, supposition, dep_rel.dependencies)
 
     def sum(
         self, view: "View", inherited_dependencies: Optional[DependencyStructure] = None
@@ -280,9 +267,7 @@ class View:
         """
         if inherited_dependencies is None:
             # Corresponds to line 2
-            return self._product(
-                view, DependencyStructure(set(), set(), DependencyRelation(frozenset()))
-            )
+            return self._product(view, DependencyStructure(set(), set(), frozenset()))
         else:
             # Corresponds to line 1
             return self._product(view, inherited_dependencies)
@@ -304,12 +289,10 @@ class View:
             if stage.emphasis_count + supposition.emphasis_count == 0:
                 stage, supposition = add_new_emphasis(stage, supposition)
 
-            dependency_relation = (
-                self.dependency_structure.dependency_relation.restriction(
-                    (stage | supposition).arb_objects
-                )
+            dependency_relation = self.dependency_structure.restriction(
+                (stage | supposition).arb_objects
             )
-            return View.make_valid(stage, supposition, dependency_relation)
+            return View.make_valid(stage, supposition, dependency_relation.dependencies)
 
     def negation(self) -> "View":
         """
@@ -335,7 +318,7 @@ class View:
         # Now isolate only valid dependencies
         final_pairs: list[tuple[Existential, Universal]] = []
         for exi, uni in new_pairs:
-            for dep in self.dependency_structure.dependency_relation.dependencies:
+            for dep in self.dependency_structure.dependencies:
                 # If Dependency is not pre-existing add to the final pairs
                 if not (dep.universal == uni and dep.existential == exi):
                     final_pairs.append((exi, uni))
@@ -350,7 +333,7 @@ class View:
         return View.make_valid(
             stage=stage,
             supposition=verum,
-            dependency_relation=DependencyRelation(frozenset(final_deps)),
+            dependencies=frozenset(final_deps),
         )
 
     def issue_matches(
@@ -437,7 +420,7 @@ class View:
                         View.make_valid(
                             SetOfStates({gamma}),
                             self.supposition,
-                            self.dependency_structure.dependency_relation,
+                            self.dependency_structure.dependencies,
                         ),
                     )
                     views_for_sum.append(
@@ -548,7 +531,7 @@ class View:
                 ):
                     if not any(
                         d.existential == e
-                        for d in self.dependency_structure.dependency_relation.dependencies
+                        for d in self.dependency_structure.dependencies
                     ):
                         output_set.add((e, t))
             return output_set
@@ -627,13 +610,13 @@ class View:
                     for gamma in self.stage
                 ]
             )
-            new_dep_rel = self.dependency_structure.dependency_relation.restriction(
+            new_dep_rel = self.dependency_structure.restriction(
                 new_stage.arb_objects | self.supposition.arb_objects
             )
             return View.make_valid(
                 stage=new_stage,
                 supposition=self.supposition,
-                dependency_relation=new_dep_rel,
+                dependencies=new_dep_rel.dependencies,
             )
         else:
             return self
@@ -692,13 +675,13 @@ class View:
                 gamma for gamma in self.stage if not gamma.is_primitive_absurd
             )
 
-        new_dep_rel = self.dependency_structure.dependency_relation.restriction(
+        new_dep_rel = self.dependency_structure.restriction(
             new_stage.arb_objects | self.supposition.arb_objects
         )
         return View.make_valid(
             stage=new_stage,
             supposition=self.supposition,
-            dependency_relation=new_dep_rel,
+            dependencies=new_dep_rel.dependencies,
         )
 
     def depose(self) -> "View":
@@ -707,7 +690,7 @@ class View:
         return View.make_valid(
             stage=new_stage,
             supposition=verum,
-            dependency_relation=self.dependency_structure.dependency_relation,
+            dependencies=self.dependency_structure.dependencies,
         )
 
     def replace(
@@ -718,16 +701,14 @@ class View:
         filtered_replacements = {
             e: n for e, n in replacements.items() if isinstance(n, ArbitraryObject)
         }
-        new_dep_rel = self.dependency_structure.dependency_relation.replace(
-            filtered_replacements
-        )
+        new_dep_structure = self.dependency_structure.replace(filtered_replacements)
 
         return View.make_valid(
             stage=new_stage,
             supposition=new_supposition,
-            dependency_relation=new_dep_rel.restriction(
+            dependencies=new_dep_structure.restriction(
                 new_stage.arb_objects | new_supposition.arb_objects
-            ),
+            ).dependencies,
         )
 
     def is_equivalent_under_arb_sub(self, other: "View") -> bool:

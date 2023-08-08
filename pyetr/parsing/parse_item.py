@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import overload
 
 from pyetr.add_new_emphasis import add_new_emphasis
-from pyetr.dependency import DependencyRelation
+from pyetr.dependency import Dependency, dependencies_from_sets
 from pyetr.stateset import SetOfStates, State
 from pyetr.term import ArbitraryObject, Emphasis, Function, Term
 from pyetr.view import View
@@ -131,7 +131,7 @@ def _parse_item(item: Item, maps: Maps) -> SetOfStates:
 
 def _parse_view(
     view_item: Item,
-    dependency_relation: DependencyRelation,
+    dependencies: frozenset[Dependency],
     maps: Maps,
 ) -> View:
     if isinstance(view_item, Implies):
@@ -149,7 +149,7 @@ def _parse_view(
     return View.make_valid(
         stage=parsed_stage,
         supposition=parsed_supposition,
-        dependency_relation=dependency_relation,
+        dependencies=dependencies,
     )
 
 
@@ -159,7 +159,7 @@ Existential = ArbitraryObject
 
 def get_variable_map_and_dependency_relation(
     quantifieds: list[Quantified],
-) -> tuple[dict[str, ArbitraryObject], DependencyRelation]:
+) -> tuple[dict[str, ArbitraryObject], frozenset[Dependency]]:
     variable_map: dict[str, ArbitraryObject] = {}
     encountered_universals: list[tuple[Universal, set[Existential]]] = []
     for quantified in quantifieds:
@@ -182,7 +182,7 @@ def get_variable_map_and_dependency_relation(
                 f"Variable {quantified.variable.name} appears twice in quantifiers"
             )
 
-    return variable_map, DependencyRelation.from_sets(encountered_universals)
+    return variable_map, dependencies_from_sets(encountered_universals)
 
 
 @overload
