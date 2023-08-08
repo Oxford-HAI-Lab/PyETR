@@ -256,8 +256,12 @@ class View:
         # Corresponds to line 1
         stage = self.stage | view.stage
         dep_structure = self._fuse_views(view, inherited_dependencies)
-        dep_rel = dep_structure.restriction((stage | supposition).arb_objects)
-        return View.make_valid(stage, supposition, dep_rel.dependencies)
+        new_dependency_structure = dep_structure.restriction(
+            (stage | supposition).arb_objects
+        )
+        return View.make_valid(
+            stage, supposition, new_dependency_structure.dependencies
+        )
 
     def sum(
         self, view: "View", inherited_dependencies: Optional[DependencyStructure] = None
@@ -289,10 +293,12 @@ class View:
             if stage.emphasis_count + supposition.emphasis_count == 0:
                 stage, supposition = add_new_emphasis(stage, supposition)
 
-            dependency_relation = self.dependency_structure.restriction(
+            dependency_structure = self.dependency_structure.restriction(
                 (stage | supposition).arb_objects
             )
-            return View.make_valid(stage, supposition, dependency_relation.dependencies)
+            return View.make_valid(
+                stage, supposition, dependency_structure.dependencies
+            )
 
     def negation(self) -> "View":
         """
@@ -610,13 +616,13 @@ class View:
                     for gamma in self.stage
                 ]
             )
-            new_dep_rel = self.dependency_structure.restriction(
+            new_dependency_structure = self.dependency_structure.restriction(
                 new_stage.arb_objects | self.supposition.arb_objects
             )
             return View.make_valid(
                 stage=new_stage,
                 supposition=self.supposition,
-                dependencies=new_dep_rel.dependencies,
+                dependencies=new_dependency_structure.dependencies,
             )
         else:
             return self
@@ -675,13 +681,13 @@ class View:
                 gamma for gamma in self.stage if not gamma.is_primitive_absurd
             )
 
-        new_dep_rel = self.dependency_structure.restriction(
+        new_dependency_structure = self.dependency_structure.restriction(
             new_stage.arb_objects | self.supposition.arb_objects
         )
         return View.make_valid(
             stage=new_stage,
             supposition=self.supposition,
-            dependencies=new_dep_rel.dependencies,
+            dependencies=new_dependency_structure.dependencies,
         )
 
     def depose(self) -> "View":

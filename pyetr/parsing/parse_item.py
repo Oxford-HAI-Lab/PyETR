@@ -157,7 +157,7 @@ Universal = ArbitraryObject
 Existential = ArbitraryObject
 
 
-def get_variable_map_and_dependency_relation(
+def get_variable_map_and_dependencies(
     quantifieds: list[Quantified],
 ) -> tuple[dict[str, ArbitraryObject], frozenset[Dependency]]:
     variable_map: dict[str, ArbitraryObject] = {}
@@ -277,9 +277,7 @@ def parse_items(expr: list[Item]) -> View:
     if view_item is None:
         raise ValueError(f"Main section not found")
 
-    variable_map, dependency_relation = get_variable_map_and_dependency_relation(
-        quantifieds
-    )
+    variable_map, dependencies = get_variable_map_and_dependencies(quantifieds)
     predicate_map, function_map, constant_map = build_maps(view_item)
     maps = Maps(variable_map, predicate_map, function_map, constant_map)
-    return _parse_view(view_item, dependency_relation, maps)
+    return _parse_view(view_item, dependencies, maps)
