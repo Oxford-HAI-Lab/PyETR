@@ -94,6 +94,13 @@ class State(frozenset[Atom]):
                             return True
         return False
 
+    @property
+    def atoms(self) -> set[Atom]:
+        a = set()
+        for atom in self:
+            a.add(atom)
+        return a
+
 
 class SetOfStates(frozenset[State]):
     def __new__(cls, __iterable: Optional[Iterable[State]] = None, /) -> "SetOfStates":
@@ -213,3 +220,13 @@ class SetOfStates(frozenset[State]):
         self, replacements: dict[ArbitraryObject, Term | ArbitraryObject]
     ) -> "SetOfStates":
         return SetOfStates([s.replace(replacements) for s in self])
+
+    @property
+    def atoms(self) -> set[Atom]:
+        a = set()
+        for state in self:
+            a |= state.atoms
+        return a
+
+    def flip(self):
+        raise NotImplementedError

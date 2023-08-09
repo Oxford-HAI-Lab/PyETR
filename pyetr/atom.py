@@ -161,6 +161,9 @@ class Atom:
     def __hash__(self) -> int:
         return hash((self.predicate, self.terms))
 
+    def get_issue_atoms(self) -> set["Atom"]:
+        raise NotImplementedError
+
 
 class Predicate:
     name: str

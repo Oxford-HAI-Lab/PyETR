@@ -45,6 +45,9 @@ class ArbitraryObject:
     def is_existential(self):
         return self._is_existential
 
+    def flip(self) -> "ArbitraryObject":
+        return ArbitraryObject(name=self.name, is_existential=not self.is_existential)
+
     @property
     def detailed(self) -> str:
         if self.is_existential:

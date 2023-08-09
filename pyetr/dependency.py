@@ -153,6 +153,7 @@ class DependencyRelation:
         self.universals = universals
         self.existentials = existentials
         self.dependencies = dependencies
+        self.validate()
         self._test_matroyshka()
 
     def _test_matroyshka(self):
@@ -177,17 +178,25 @@ class DependencyRelation:
         universals, existentials = _separate_arb_objects(arb_objects)
         return cls(universals, existentials, dependencies)
 
-    def validate_dependencies(self, states: SetOfStates):
+    def validate_against_states(self, states: SetOfStates, pre_view: bool = False):
         uni_arb_objects, exi_arb_objects = _separate_arb_objects(states.arb_objects)
-        # universal to existentials that depend on them ( share a pair )
-        for dep in self.dependencies:
-            if dep.existential not in exi_arb_objects:
+        if pre_view:
+            if not self.universals.issuperset(uni_arb_objects):
                 raise ValueError(
-                    f"{dep.existential} not found among existential objects {exi_arb_objects} in states."
+                    f"Universals: {self.universals} not superset of states {uni_arb_objects}"
                 )
-            if dep.universal not in uni_arb_objects:
+            if not self.existentials.issuperset(exi_arb_objects):
                 raise ValueError(
-                    f"{dep.universal } not found among universal objects {uni_arb_objects} in states."
+                    f"Existentials: {self.existentials} not superset of states {exi_arb_objects}"
+                )
+        else:
+            if uni_arb_objects != self.universals:
+                raise ValueError(
+                    f"Universals: {self.universals} not same as states {uni_arb_objects}"
+                )
+            if exi_arb_objects != self.existentials:
+                raise ValueError(
+                    f"Existentials: {self.existentials} not same as states {exi_arb_objects}"
                 )
 
     @property
@@ -200,9 +209,7 @@ class DependencyRelation:
                 arb_objs.add(dep.existential)
         return arb_objs
 
-    def validate(self, states: SetOfStates):
-        self.validate_dependencies(states)
-
+    def validate(self):
         unis, exis = _separate_arb_objects(self.dependency_arb_objects)
         if not self.universals.issuperset(unis):
             raise ValueError(f"Universals {self.universals} is not superset of {unis}")
@@ -210,6 +217,12 @@ class DependencyRelation:
             raise ValueError(
                 f"Existentials {self.existentials} is not superset of {exis}"
             )
+        for uni in self.universals:
+            if uni.is_existential:
+                raise ValueError(f"Universals contain exi: {uni}")
+        for exi in self.existentials:
+            if not exi.is_existential:
+                raise ValueError(f"Universals contain uni: {exi}")
 
     def chain(self, other: "DependencyRelation") -> "DependencyRelation":
         universals = self.universals | other.universals
@@ -456,3 +469,19 @@ class DependencyRelation:
         new_exis = {replace_arb_object(x) for x in self.existentials}
         new_deps = {d.replace(replacements) for d in self.dependencies}
         return DependencyRelation(new_unis, new_exis, frozenset(new_deps))
+
+    def flip(self) -> "DependencyRelation":
+        # Every new existential now depends on every new universal
+        # Except those that the ancestor existential depended on the ancestor universal
+        new_unis = {exi.flip() for exi in self.existentials}
+        new_exis = {uni.flip() for uni in self.universals}
+        new_deps: list[Dependency] = []
+        for exi in self.existentials:
+            for uni in self.universals:
+                ancestor_dep = Dependency(existential=exi, universal=uni)
+                if ancestor_dep not in self.dependencies:
+                    new_dep = Dependency(existential=uni.flip(), universal=exi.flip())
+                    new_deps.append(new_dep)
+        return DependencyRelation(
+            universals=new_unis, existentials=new_exis, dependencies=frozenset(new_deps)
+        )
