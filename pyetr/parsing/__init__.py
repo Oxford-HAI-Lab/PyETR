@@ -8,8 +8,8 @@ from .unparse_item import unparse_items
 from .unparse_view import unparse_view
 
 
-def parse_string_to_view(s: str) -> View:
-    return parse_items(parse_string(s))
+def parse_string_to_view(s: str, add_emphasis: bool = False) -> View:
+    return parse_items(parse_string(s), add_emphasis=add_emphasis)
 
 
 def parse_view_to_string(v: View) -> str:

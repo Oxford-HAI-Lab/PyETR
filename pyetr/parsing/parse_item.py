@@ -130,9 +130,7 @@ def _parse_item(item: Item, maps: Maps) -> SetOfStates:
 
 
 def _parse_view(
-    view_item: Item,
-    dependencies: frozenset[Dependency],
-    maps: Maps,
+    view_item: Item, dependencies: frozenset[Dependency], maps: Maps, add_emphasis: bool
 ) -> View:
     if isinstance(view_item, Implies):
         supposition = view_item.left
@@ -142,7 +140,10 @@ def _parse_view(
         stage = view_item
     parsed_supposition = _parse_item(supposition, maps)
     parsed_stage = _parse_item(stage, maps)
-    if parsed_stage.emphasis_count + parsed_supposition.emphasis_count == 0:
+    if (
+        parsed_stage.emphasis_count + parsed_supposition.emphasis_count == 0
+        and add_emphasis
+    ):
         parsed_stage, parsed_supposition = add_new_emphasis(
             parsed_stage, parsed_supposition
         )
@@ -265,7 +266,7 @@ def build_maps(
     return predicate_map, function_map, constant_map
 
 
-def parse_items(expr: list[Item]) -> View:
+def parse_items(expr: list[Item], add_emphasis: bool) -> View:
     view_item = None
     quantifieds: list[Quantified] = []
     for item in expr:
@@ -280,4 +281,4 @@ def parse_items(expr: list[Item]) -> View:
     variable_map, dependencies = get_variable_map_and_dependencies(quantifieds)
     predicate_map, function_map, constant_map = build_maps(view_item)
     maps = Maps(variable_map, predicate_map, function_map, constant_map)
-    return _parse_view(view_item, dependencies, maps)
+    return _parse_view(view_item, dependencies, maps, add_emphasis)

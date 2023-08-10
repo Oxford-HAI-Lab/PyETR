@@ -396,11 +396,15 @@ class View:
             # Corresponds to line 1
             return self._sum(view, inherited_dependencies)
 
-    def answer(self, other: "View") -> "View":
+    def answer(self, other: "View", verbose: bool = False) -> "View":
         """
         Based on definition 4.30
         """
+        if verbose:
+            print(f"AnswerInput: External: {self} Internal {other}")
         if not other.supposition.is_verum:
+            if verbose:
+                print(f"AnswerOutput: {self}")
             return self
         else:
             supposition = self.supposition
@@ -410,12 +414,15 @@ class View:
                 potentials.append((potential, s))
             stage = SetOfStates(arg_max_states(potentials))
 
-            return View.with_restriction(
+            out = View.with_restriction(
                 stage=stage,
                 supposition=supposition,
                 dependency_relation=self.dependency_relation,
                 issue_structure=self.issue_structure,
             )
+            if verbose:
+                print(f"AnswerOutput: {out}")
+            return out
 
     # def negation(self) -> "View":
     #     """
@@ -433,7 +440,7 @@ class View:
     #         issue_structure=self.issue_structure.flip(),
     #     )
 
-    def merge(self, view: "View") -> "View":
+    def merge(self, view: "View", verbose: bool = False) -> "View":
         """
         Based on Definition 4.33
         """
@@ -454,6 +461,8 @@ class View:
                         out.add((t, u))
             return out
 
+        if verbose:
+            print(f"MergeInput: External: {self} Internal {view}")
         if self.stage.is_falsum:
             return self
 
@@ -502,23 +511,37 @@ class View:
                     views_for_sum.append(
                         reduce(lambda v1, v2: v1.product(v2, r_fuse_s), product_factors)
                     )
-
-            return reduce(lambda v1, v2: v1.sum(v2, r_fuse_s), views_for_sum)
+            out = reduce(lambda v1, v2: v1.sum(v2, r_fuse_s), views_for_sum)
+            if verbose:
+                print(f"MergeOutput: {out}")
+            return out
         else:
+            if verbose:
+                print(f"MergeOutput: {self}")
             return self
 
-    def update(self, view: "View") -> "View":
+    def update(self, view: "View", verbose: bool = False) -> "View":
         """
         Based on Definition 4.34
         """
+        if verbose:
+            print()
+            print(f"UpdateInput: External: {self} Internal {view}")
         arb_gen = ArbitraryObjectGenerator(
             self.stage_supp_arb_objects | view.stage_supp_arb_objects
         )
         shared_objs = self.stage_supp_arb_objects & view.stage_supp_arb_objects
         view = arb_gen.novelise(shared_objs, view)
-        return (
-            self.universal_product(view).existential_sum(view).answer(view).merge(view)
+        out = (
+            self.universal_product(view, verbose=verbose)
+            .existential_sum(view, verbose=verbose)
+            .answer(view, verbose=verbose)
+            .merge(view, verbose=verbose)
         )
+        if verbose:
+            print(f"UpdateOutput: {out}")
+            print()
+        return out
 
     def _uni_exi_condition(self, view: "View") -> bool:
         """
@@ -533,7 +556,7 @@ class View:
         )
         return expr1 and (expr2 or expr3)
 
-    def universal_product(self, view: "View") -> "View":
+    def universal_product(self, view: "View", verbose: bool = False) -> "View":
         """
         Based on Definition 4.35
         """
@@ -550,15 +573,21 @@ class View:
                     output_set.add((u, t))
             return output_set
 
+        if verbose:
+            print(f"UniProdInput: External: {self} Internal {view}")
         arb_gen = ArbitraryObjectGenerator(
             self.stage_supp_arb_objects | view.stage_supp_arb_objects
         )
 
         m_prime = _m_prime()
         if len(m_prime) == 0:
+            if verbose:
+                print(f"UniProdOutput: {self}")
             return self
         if self._uni_exi_condition(view):
             if not view.supposition.is_verum:
+                if verbose:
+                    print(f"UniProdOutput: {self}")
                 return self
             r_fuse_s = self.dependency_relation.fusion(view.dependency_relation)
             product_factors: list[View] = [
@@ -581,11 +610,16 @@ class View:
                 )
                 for u, t in m_prime
             ]
-            return reduce(lambda v1, v2: v1.product(v2, r_fuse_s), product_factors)
+            out = reduce(lambda v1, v2: v1.product(v2, r_fuse_s), product_factors)
+            if verbose:
+                print(f"UniProdOutput: {out}")
+            return out
         else:
+            if verbose:
+                print(f"UniProdOutput: {self}")
             return self
 
-    def existential_sum(self, view: "View") -> "View":
+    def existential_sum(self, view: "View", verbose: bool = False) -> "View":
         """
         Based on Definition 4.37
         """
@@ -632,12 +666,18 @@ class View:
                         output_set.add((e, t))
             return output_set
 
+        if verbose:
+            print(f"ExiSumInput: External: {self} Internal {view}")
         if not view.supposition.is_verum:
+            if verbose:
+                print(f"ExiSumOutput: {self}")
             return self
 
         if self._uni_exi_condition(view):
             m_prime = _m_prime()
             if len(m_prime) == 0:
+                if verbose:
+                    print(f"ExiSumOutput: {self}")
                 return self
             else:
                 arb_gen = ArbitraryObjectGenerator(
@@ -659,8 +699,13 @@ class View:
                         for e, t in m_prime
                     ],
                 )
-                return self.sum(sum_result, r_fuse_s)
+                out = self.sum(sum_result, r_fuse_s)
+                if verbose:
+                    print(f"ExiSumOutput: {out}")
+                return out
         else:
+            if verbose:
+                print(f"ExiSumOutput: {self}")
             return self
 
     def division(self, other: "View") -> "View":
@@ -695,10 +740,12 @@ class View:
         else:
             return self
 
-    def factor(self, other: "View") -> "View":
+    def factor(self, other: "View", verbose: bool = False) -> "View":
         """
         Based on definition 4.39
         """
+        if verbose:
+            print(f"FactorInput: External: {self} Internal {other}")
 
         def big_intersection(state: State) -> Optional[State]:
             out: list[State] = []
@@ -741,22 +788,30 @@ class View:
                 gamma for gamma in self.stage if not gamma.is_primitive_absurd
             )
 
-        return View.with_restriction(
+        out = View.with_restriction(
             stage=new_stage,
             supposition=self.supposition,
             dependency_relation=self.dependency_relation,
             issue_structure=self.issue_structure,
         )
+        if verbose:
+            print(f"FactorOutput: {out}")
+        return out
 
-    def depose(self) -> "View":
+    def depose(self, verbose: bool = False) -> "View":
         """
         Based on definition 4.45
         """
+        if verbose:
+            print(f"DeposeInput: {self}")
         verum = SetOfStates({State({})})
         new_stage = self.stage | self.supposition.negation()
-        return View.with_restriction(
+        out = View.with_restriction(
             stage=new_stage,
             supposition=verum,
             dependency_relation=self.dependency_relation,
             issue_structure=self.issue_structure.negation(),
         )
+        if verbose:
+            print(f"DeposeOutput: {out}")
+        return out

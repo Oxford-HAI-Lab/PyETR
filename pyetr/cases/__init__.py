@@ -2,7 +2,7 @@ __all__ = ["BaseExample"]
 from abc import ABCMeta, abstractmethod
 from typing import cast
 
-from pyetr.inference import default_inference_procedure
+from pyetr.inference import basic_step, default_inference_procedure
 from pyetr.parsing import parse_string_to_view as ps
 from pyetr.view import View
 
@@ -42,7 +42,85 @@ class e1(BaseExample):
         ps("∀x (IsArcheon(x*) → IsArcheon(x) ∧ HasNucleus(x))"),
         ps("IsArcheon(Halobacterium()*)"),
     )
-    c: View = ps("IsArcheon(Halobacterium()) ∧ HasNucleus(Halobacterium())")
+    c: View = ps("IsArcheon(Halobacterium()*) ∧ HasNucleus(Halobacterium())")
+
+    @classmethod
+    def test(cls):
+        result = basic_step(cls.v)
+        print("result", result)
+
+        assert result.is_equivalent_under_arb_sub(cls.c)
+
+
+class e47(BaseExample):
+    """
+    P1: Some thermotogum stains gram-negative
+    P2: Maritima is a thermotogum
+
+    C: Maritima stains gram negative
+    """
+
+    v: tuple[View, View] = (
+        ps("∃x Thermotogum(x*) ∧ StainsGramNegative(x)"),
+        ps("Thermotogum(Maritima()*)"),
+    )
+    c: View = ps("StainsGramNegative(Maritima())")
+
+    @classmethod
+    def test(cls):
+        result = default_inference_procedure(cls.v)
+        assert result.is_equivalent_under_arb_sub(cls.c)
+
+
+class e56_basic_step(BaseExample):
+    """
+    P1: Every professor teaches some student
+    P2: Every student reads some book
+
+    C: Every professor teaches some student who reads some book
+    """
+
+    v: tuple[View, View] = (
+        ps("∀x ∃y Professor(x) → Professor(x) ∧ Student(y*) ∧ Teaches(x, y)"),
+        ps("∀z ∃w Student(z*) → Student(z) ∧ Book(w) ∧ Reads(z, w)"),
+    )
+    c: View = ps(
+        "∀a ∃b ∃c Professor(a) → Professor(a) ∧ Student(b*) ∧ Teaches(a, b) ∧ Reads(b, c) ∧ Book(c)"
+    ).depose()
+
+    @classmethod
+    def test(cls):
+        result = basic_step(cls.v)
+        assert result.is_equivalent_under_arb_sub(cls.c)
+
+
+class e56_default_inference(e56_basic_step):
+    c: View = ps("∃y ∃b ⊤ ∨ Reads(y,b) ∧ Book(b)")
+
+    @classmethod
+    def test(cls):
+        result = default_inference_procedure(cls.v)
+        assert result.is_equivalent_under_arb_sub(cls.c)
+
+
+class e15(BaseExample):
+    """
+    P1: There is an ace and a jack and a queen, or else there is an eight
+    and a ten and a four or else there is an ace.
+    P2: There is an ace and a jack, and there is an ace and a ten.
+    P3: There is not a queen.
+
+    C: There is a four
+    """
+
+    v: tuple[View, View, View] = (
+        ps(
+            "∃x1 ∃x2 ∃x3 ∃x4 ∃x5 ∃x6 ∃x7 (Ace() ∧ Jack(x2) ∧ Queen(x3)) ∨ (Eight(x4) ∧ Ten(x5) ∧ Four(x6)) ∨ Ace(x7)"
+        ),
+        ps("∃y1 ∃y2 ∃y3 ∃y4 (Ace() ∧ Jack(y2)) ∨ (Ace(y3) ∧ Ten(y4))"),
+        ps("∀z ~Queen(z)"),
+    )
+    c: View = ps("∃w Four(w)")
 
     @classmethod
     def test(cls):
