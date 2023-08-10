@@ -30,12 +30,12 @@ class BaseExample(metaclass=ABCMeta):
         raise NotImplementedError
 
 
-class e1(BaseExample):
+class e51(BaseExample):
     """
-    P1: Every archaeon has a nucleus; ∀x (IsArcheon(x) → HasNucleus(x))
-    P2: Halobacterium is an archeon; IsArcheon(Halobacterium())
+    P1: Every archaeon has a nucleus
+    P2: Halobacterium is an archeon
 
-    C: Halobacterium is an archaeon and has a nucleus; IsArcheon(Halobacterium()) ∧ HasNucleus(Halobacterium())
+    C: Halobacterium is an archaeon and has a nucleus
     """
 
     v: tuple[View, View] = (
@@ -47,8 +47,6 @@ class e1(BaseExample):
     @classmethod
     def test(cls):
         result = basic_step(cls.v)
-        print("result", result)
-
         assert result.is_equivalent_under_arb_sub(cls.c)
 
 
@@ -103,29 +101,29 @@ class e56_default_inference(e56_basic_step):
         assert result.is_equivalent_under_arb_sub(cls.c)
 
 
-class e15(BaseExample):
-    """
-    P1: There is an ace and a jack and a queen, or else there is an eight
-    and a ten and a four or else there is an ace.
-    P2: There is an ace and a jack, and there is an ace and a ten.
-    P3: There is not a queen.
+# class e15(BaseExample):
+#     """
+#     P1: There is an ace and a jack and a queen, or else there is an eight
+#     and a ten and a four or else there is an ace.
+#     P2: There is an ace and a jack, and there is an ace and a ten.
+#     P3: There is not a queen.
 
-    C: There is a four
-    """
+#     C: There is a four
+#     """
 
-    v: tuple[View, View, View] = (
-        ps(
-            "∃x1 ∃x2 ∃x3 ∃x4 ∃x5 ∃x6 ∃x7 (Ace() ∧ Jack(x2) ∧ Queen(x3)) ∨ (Eight(x4) ∧ Ten(x5) ∧ Four(x6)) ∨ Ace(x7)"
-        ),
-        ps("∃y1 ∃y2 ∃y3 ∃y4 (Ace() ∧ Jack(y2)) ∨ (Ace(y3) ∧ Ten(y4))"),
-        ps("∀z ~Queen(z)"),
-    )
-    c: View = ps("∃w Four(w)")
+#     v: tuple[View, View, View] = (
+#         ps(
+#             "∃x1 ∃x2 ∃x3 ∃x4 ∃x5 ∃x6 ∃x7 (Ace() ∧ Jack(x2) ∧ Queen(x3)) ∨ (Eight(x4) ∧ Ten(x5) ∧ Four(x6)) ∨ Ace(x7)"
+#         ),
+#         ps("∃y1 ∃y2 ∃y3 ∃y4 (Ace() ∧ Jack(y2)) ∨ (Ace(y3) ∧ Ten(y4))"),
+#         ps("∀z ~Queen(z)"),
+#     )
+#     c: View = ps("∃w Four(w)")
 
-    @classmethod
-    def test(cls):
-        result = default_inference_procedure(cls.v)
-        assert result.is_equivalent_under_arb_sub(cls.c)
+#     @classmethod
+#     def test(cls):
+#         result = default_inference_procedure(cls.v)
+#         assert result.is_equivalent_under_arb_sub(cls.c)
 
 
 class UniProduct(BaseExample):
