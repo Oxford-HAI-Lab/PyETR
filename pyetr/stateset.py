@@ -51,7 +51,7 @@ class State(frozenset[Atom]):
     def emphasis_count(self) -> int:
         emphasis_count = 0
         for atom in self:
-            emphasis_count += atom.has_emphasis
+            emphasis_count += atom.emphasis_count
         return emphasis_count
 
     def __repr__(self) -> str:
@@ -100,6 +100,10 @@ class State(frozenset[Atom]):
         for atom in self:
             a.add(atom)
         return a
+
+    @property
+    def excluding_emphasis(self) -> "State":
+        return State(atom.excluding_emphasis for atom in self)
 
 
 class SetOfStates(frozenset[State]):
@@ -228,5 +232,6 @@ class SetOfStates(frozenset[State]):
             a |= state.atoms
         return a
 
-    def flip(self):
-        raise NotImplementedError
+    @property
+    def excluding_emphasis(self) -> "SetOfStates":
+        return SetOfStates(state.excluding_emphasis for state in self)

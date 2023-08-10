@@ -7,7 +7,6 @@ from typing import Optional, cast
 from pyetr.issues import IssueStructure
 from pyetr.tools import ArbitraryObjectGenerator
 
-from .add_new_emphasis import add_new_emphasis
 from .atom import Atom
 from .dependency import Dependency, DependencyRelation, _separate_arb_objects
 from .stateset import SetOfStates, State
@@ -54,6 +53,7 @@ def substitution(
     term: Term | ArbitraryObject,
     stage: Stage,
     supposition: Supposition,
+    issue_structure: IssueStructure,
 ) -> "View":
     """
     Based on definition 4.32
@@ -93,16 +93,19 @@ def substitution(
     new_dep_relation = new_dep_relation.restriction(set(subs.values()))
     T_prime = old_T.chain(new_dep_relation)
 
+    new_issue_structure = issue_structure.replace(
+        cast(dict[ArbitraryObject, Term | ArbitraryObject], subs)
+    )
+    new_issue_structure = new_issue_structure.replace({arb_obj: term})
+
     # The following restriction is in the book but should not have been
     # T_prime = T_prime.restriction(new_stage.arb_objects | supposition.arb_objects)
-    def get_issue_structure():
-        raise NotImplementedError
 
     return View(
         stage=new_stage,
         supposition=supposition,
         dependency_relation=T_prime,
-        issue_structure=get_issue_structure(),
+        issue_structure=new_issue_structure,
         is_pre_view=True,
     )
 
@@ -145,9 +148,9 @@ class View:
     ) -> None:
         self.stage = stage
         self.supposition = supposition
-        self.validate(pre_view=is_pre_view)
         self.dependency_relation = dependency_relation
         self.issue_structure = issue_structure
+        self.validate(pre_view=is_pre_view)
 
     def validate(self, *, pre_view: bool = False):
         self.dependency_relation.validate_against_states(
@@ -155,6 +158,11 @@ class View:
         )
         if not pre_view:
             self.issue_structure.validate_against_states(self.stage | self.supposition)
+
+        if self.stage.emphasis_count > 0:
+            raise ValueError(f"Stage {self.stage} contains emphasis")
+        if self.supposition.emphasis_count > 0:
+            raise ValueError(f"Supposition {self.supposition} contains emphasis")
 
     @classmethod
     def with_restriction(
@@ -181,12 +189,11 @@ class View:
         atoms = stage.atoms | supposition.atoms
         emphasised_atoms: set[Atom] = set()
         for a in atoms:
-            if a.has_emphasis:
-                emphasised_atoms |= a.get_issue_atoms()
+            emphasised_atoms |= a.get_issue_atoms()
 
         return cls(
-            stage=stage,
-            supposition=supposition,
+            stage=stage.excluding_emphasis,
+            supposition=supposition.excluding_emphasis,
             dependency_relation=dependency_relation,
             issue_structure=IssueStructure(emphasised_atoms),
         )
@@ -403,8 +410,6 @@ class View:
                 potentials.append((potential, s))
             stage = SetOfStates(arg_max_states(potentials))
 
-            if stage.emphasis_count + supposition.emphasis_count == 0:
-                stage, supposition = add_new_emphasis(stage, supposition)
             return View.with_restriction(
                 stage=stage,
                 supposition=supposition,
@@ -412,20 +417,21 @@ class View:
                 issue_structure=self.issue_structure,
             )
 
-    def negation(self) -> "View":
-        """
-        Based on definition 4.31
-        """
-        verum = SetOfStates({State({})})
-        stage, _ = stage_supposition_product(
-            (self.supposition, verum), (self.stage.negation(), verum)
-        )
-        return View(
-            stage=stage.flip(),
-            supposition=verum,
-            dependency_relation=self.dependency_relation.flip(),
-            issue_structure=self.issue_structure.flip(),
-        )
+    # def negation(self) -> "View":
+    #     """
+    #     Based on definition 4.31
+    #     """
+    #     verum = SetOfStates({State({})})
+    #     stage, _ = stage_supposition_product(
+    #         (self.supposition, verum), (self.stage.negation(), verum)
+    #     )
+    #     raise NotImplementedError
+    #     return View(
+    #         stage=stage.flip(),
+    #         supposition=verum,
+    #         dependency_relation=self.dependency_relation.flip(),
+    #         issue_structure=self.issue_structure.flip(),
+    #     )
 
     def merge(self, view: "View") -> "View":
         """
@@ -438,16 +444,18 @@ class View:
             out: set[tuple[Term | ArbitraryObject, Universal]] = set()
             for t, u in self.issue_matches(view):
                 if isinstance(u, ArbitraryObject) and not u.is_existential:
-                    phi_exists = False
-                    for phi in view.supposition:
-                        # TODO: Do these replacements need to simultaneous?
-                        new_phi = State([atom.replace({u: t}) for atom in phi])
-                        if new_phi.issubset(gamma) and len(phi.difference(gamma)) != 0:
-                            phi_exists = True
+                    psi_exists = False
+                    for psi in view.supposition:
+                        new_psi = psi.replace({u: t})
+                        if new_psi.issubset(gamma) and len(psi.difference(gamma)) != 0:
+                            psi_exists = True
                             break
-                    if phi_exists:
+                    if psi_exists:
                         out.add((t, u))
             return out
+
+        if self.stage.is_falsum:
+            return self
 
         if len(self.stage_supp_arb_objects & view.stage_supp_arb_objects) == 0 or (
             view.dependency_relation
@@ -486,6 +494,7 @@ class View:
                             term=t,
                             stage=view.stage,
                             supposition=SetOfStates({State({})}),
+                            issue_structure=view.issue_structure,
                         )
                         for t, u in m_prime
                     ]
@@ -494,7 +503,6 @@ class View:
                         reduce(lambda v1, v2: v1.product(v2, r_fuse_s), product_factors)
                     )
 
-            # TODO: it's possible we should have a default value for this big sum in case views_for_sum is empty.
             return reduce(lambda v1, v2: v1.sum(v2, r_fuse_s), views_for_sum)
         else:
             return self
@@ -569,6 +577,7 @@ class View:
                     term=t,
                     stage=self.stage,
                     supposition=SetOfStates({State({})}),
+                    issue_structure=self.issue_structure,
                 )
                 for u, t in m_prime
             ]
@@ -584,7 +593,12 @@ class View:
         def _big_union(e: Existential) -> SetOfStates:
             def _big_product(gamma: State) -> SetOfStates:
                 def B(gamma: State, e: Existential) -> State:
-                    return State([x for x in gamma if x.emphasis_term == e])
+                    atoms = set()
+                    for atom in self.issue_structure:
+                        atom_excl = atom.excluding_emphasis
+                        if atom_excl in gamma:
+                            atoms.add(atom_excl)
+                    return State(atoms)
 
                 return reduce(
                     lambda s1, s2: s1 * s2,
@@ -640,6 +654,7 @@ class View:
                             term=t,
                             stage=_big_union(e),
                             supposition=self.supposition,
+                            issue_structure=self.issue_structure,
                         )
                         for e, t in m_prime
                     ],
@@ -685,7 +700,7 @@ class View:
         Based on definition 4.39
         """
 
-        def big_intersection(state: State) -> State:
+        def big_intersection(state: State) -> Optional[State]:
             out: list[State] = []
             for t, a in self.issue_matches(other):
                 if isinstance(a, ArbitraryObject) and not a.is_existential:
@@ -698,10 +713,10 @@ class View:
                             other_supposition=replaced_supposition,
                         )
                     )
-            # TODO: Is this correct?
             if len(out) == 0:
-                return State({})
-            return reduce(lambda s1, s2: s1 & s2, out)
+                return None
+            else:
+                return reduce(lambda s1, s2: s1 & s2, out)
 
         def state_factor(state: State) -> State:
             """
@@ -713,7 +728,7 @@ class View:
                 other_supposition=other.supposition,
             )
             expr = big_intersection(state)
-            if len(expr) == 0:
+            if expr is None:
                 return gamma_prime
             else:
                 return gamma_prime & expr
@@ -739,9 +754,9 @@ class View:
         """
         verum = SetOfStates({State({})})
         new_stage = self.stage | self.supposition.negation()
-        return View(
+        return View.with_restriction(
             stage=new_stage,
             supposition=verum,
             dependency_relation=self.dependency_relation,
-            issue_structure=self.issue_structure.negation() | self.issue_structure,
+            issue_structure=self.issue_structure.negation(),
         )

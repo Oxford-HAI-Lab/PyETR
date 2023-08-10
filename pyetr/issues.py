@@ -14,7 +14,16 @@ class IssueStructure(frozenset[Atom]):
         if __iterable is None:
             return super().__new__(cls)
         else:
+            cls.validate(__iterable)
             return super().__new__(cls, __iterable)
+
+    @classmethod
+    def validate(cls, atoms: Iterable[Atom]):
+        for atom in atoms:
+            if atom.emphasis_count != 1:
+                raise TypeError(
+                    f"Incorrect atom type: {atom} provided to issue structure"
+                )
 
     def copy(self) -> "IssueStructure":
         return IssueStructure(super().copy())
@@ -62,12 +71,10 @@ class IssueStructure(frozenset[Atom]):
 
     def flip(self):
         # Flip all arb objects
-
         raise NotImplementedError
         # return (self | {~a for a in self}).restriction()
 
     def negation(self) -> "IssueStructure":
-        # TODO: Is this correct?
         return self | IssueStructure(~a for a in self)
 
     @property

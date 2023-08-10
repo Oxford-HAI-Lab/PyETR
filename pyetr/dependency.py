@@ -86,7 +86,6 @@ def transitive_closure(
     while True:
         D_next_set = D_next(d_current)
         if set(D_next_set) == set(d_current):
-            # TODO: Is this condition correct?
             break
         d_current = D_next_set
 

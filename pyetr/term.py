@@ -76,6 +76,10 @@ class ArbitraryObject:
     ) -> bool:
         return self == other
 
+    @property
+    def excluding_emphasis(self) -> "ArbitraryObject":
+        return self
+
 
 class Emphasis:
     term: "Term | ArbitraryObject"
@@ -129,6 +133,10 @@ class Emphasis:
         self, other: "Term | ArbitraryObject | Emphasis"
     ) -> bool:
         return isinstance(other, Emphasis)
+
+    @property
+    def excluding_emphasis(self) -> "Term | ArbitraryObject":
+        return self.term.excluding_emphasis
 
 
 class Term:
@@ -205,6 +213,16 @@ class Term:
 
     def __hash__(self) -> int:
         return hash((self.f, self.t))
+
+    @property
+    def excluding_emphasis(self) -> "Term":
+        if self.t is None:
+            return self
+        else:
+            new_subterms: list["Term | ArbitraryObject | Emphasis"] = [
+                subterm.excluding_emphasis for subterm in self.t
+            ]
+            return Term(f=self.f, t=tuple(new_subterms))
 
     def replace_emphasis(
         self, existing: Emphasis, new: "Term | ArbitraryObject | Emphasis"

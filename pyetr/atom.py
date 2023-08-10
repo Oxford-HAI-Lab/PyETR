@@ -1,12 +1,15 @@
 __all__ = ["Predicate", "Atom", "equals_predicate"]
 
+
+from typing import cast
+
 from .term import ArbitraryObject, Emphasis, Term
 
 
 class Atom:
     predicate: "Predicate"
     terms: tuple[Term | ArbitraryObject | Emphasis, ...]
-    has_emphasis: bool
+    emphasis_count: int
 
     def __init__(
         self,
@@ -24,10 +27,7 @@ class Atom:
                 emphasis_count += term.has_emphasis
             elif isinstance(term, Emphasis):
                 emphasis_count += 1
-        if emphasis_count > 1:
-            raise ValueError(f"Emphasis count in atom at: {emphasis_count}")
-        else:
-            self.has_emphasis = emphasis_count == 1
+        self.emphasis_count = emphasis_count
         self.terms = terms
 
         # Invarient: atom has one or 0 emphasis
@@ -61,7 +61,7 @@ class Atom:
 
     @property
     def emphasis_term(self) -> Term | ArbitraryObject:
-        if self.has_emphasis:
+        if self.emphasis_count == 1:
             for term in self.terms:
                 if isinstance(term, Emphasis):
                     return term.term
@@ -70,7 +70,7 @@ class Atom:
             assert False
         else:
             raise ValueError(
-                f"Emphasis term requested for atom {self} - atom has no emphasis"
+                f"Emphasis term requested for atom {self} - atom does not have exactly one emphasis"
             )
 
     def replace_emphasis(
@@ -132,11 +132,8 @@ class Atom:
 
     @property
     def excluding_emphasis(self) -> "Atom":
-        if self.has_emphasis:
-            new_term = self.emphasis_term
-            return self.replace_emphasis(existing=Emphasis(new_term), new=new_term)
-        else:
-            return self
+        new_terms = [term.excluding_emphasis for term in self.terms]
+        return Atom(predicate=self.predicate, terms=tuple(new_terms))
 
     def is_same_excl_emphasis(self, other: "Atom") -> bool:
         if self.predicate != other.predicate:
@@ -162,7 +159,41 @@ class Atom:
         return hash((self.predicate, self.terms))
 
     def get_issue_atoms(self) -> set["Atom"]:
-        raise NotImplementedError
+        # Each atom is represented by a list of terms
+        def _get_issue_terms(
+            term: "Term | ArbitraryObject | Emphasis",
+        ) -> list[Term] | list[Emphasis]:
+            if isinstance(term, Term):
+                if term.t is not None:
+                    term_sets: list[Term] = []
+                    for i, subterm in enumerate(term.t):
+                        subterm_issues = _get_issue_terms(subterm)
+                        for subterm_issue in subterm_issues:
+                            new_terms = list(term.t)
+                            new_terms[i] = subterm_issue
+                            term_sets.append(Term(f=term.f, t=tuple(new_terms)))
+                    return term_sets
+                else:
+                    return []
+            elif isinstance(term, ArbitraryObject):
+                return []
+            elif isinstance(term, Emphasis):
+                active_issue = Emphasis(term.term.excluding_emphasis)
+                return [active_issue] + [
+                    Emphasis(cast(Term, issue)) for issue in _get_issue_terms(term.term)
+                ]
+            else:
+                assert False
+
+        final_atoms: set[Atom] = set()
+        for i, term in enumerate(self.terms):
+            issue_terms = _get_issue_terms(term)
+            for issue_term in issue_terms:
+                new_terms = list(self.terms)
+                new_terms[i] = issue_term
+
+                final_atoms.add(Atom(predicate=self.predicate, terms=tuple(new_terms)))
+        return final_atoms
 
 
 class Predicate:
