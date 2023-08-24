@@ -547,20 +547,20 @@ class e57(BasicStep, BaseExample):
     c: View = ps("∃y A(y) ∧ B(y*) ∧ C(y)")
 
 
-class e58(BasicStep, BaseExample):
+class e58_reversed(BasicStep, BaseExample):
     """
-    Example 58
+    Example 58 reversed
 
-    P1 Some B are A.
-    P2 All C are B.
+    P1 All C are B.
+    P2 Some B are A.
     C Some C are A.
     """
 
     v: tuple[View, View] = (
-        ps("∃x B(x*) ∧ A(x)"),
         ps("∀y (C(y)) → C(y) ∧ B(y*)"),
+        ps("∃x B(x*) ∧ A(x)"),
     )
-    c: View = ps("∃y C(y) ∧ A(y)")
+    c: View = ps("∃y C(y) ∧ A(y) ∧ B(y*)")
 
 
 class UniProduct(BaseExample):
