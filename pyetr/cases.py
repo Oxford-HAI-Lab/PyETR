@@ -26,31 +26,218 @@ class BaseExample(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def test(cls):
+    def test(cls, verbose: bool = False):
         raise NotImplementedError
 
 
-class e51(BaseExample):
-    """
-    P1: Every archaeon has a nucleus
-    P2: Halobacterium is an archeon
+class BaseTest:
+    v: tuple[View, ...]
+    c: View
 
-    C: Halobacterium is an archaeon and has a nucleus
+
+class DefaultInference(BaseTest):
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = default_inference_procedure(cls.v, verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class BasicStep(BaseTest):
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = basic_step(cls.v, verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class Factor(BaseTest):
+    v: tuple[View, View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].factor(cls.v[1], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class e1(DefaultInference, BaseExample):
+    """
+    Example 1 (p. 61):
+
+    P1 Either Jane is kneeling by the fire and she is looking at the TV or else
+    Mark is standing at the window and he is peering into the garden.
+    P2 Jane is kneeling by the fire.
+    C Jane is looking at the TV.
     """
 
     v: tuple[View, View] = (
-        ps("∀x (IsArcheon(x*) → IsArcheon(x) ∧ HasNucleus(x))"),
-        ps("IsArcheon(Halobacterium()*)"),
+        ps(
+            "(KneelingByTheFire(Jane()) ∧ LookingAtTV(Jane())) ∨ (StandingAtTheWindow(Mark()) ∧ PeeringIntoTheGarden(Mark()))"
+        ),
+        ps("KneelingByTheFire(Jane())"),
     )
-    c: View = ps("IsArcheon(Halobacterium()*) ∧ HasNucleus(Halobacterium())")
-
-    @classmethod
-    def test(cls):
-        result = basic_step(cls.v)
-        assert result.is_equivalent_under_arb_sub(cls.c)
+    c: View = ps("LookingAtTV(Jane())")
 
 
-class e47(BaseExample):
+class e2(DefaultInference, BaseExample):
+    """
+    Example 2 (p. 62):
+
+    P1 There is at least an ace and a queen, or else at least a king and a ten.
+    P2 There is a king.
+    C There is a ten.
+    """
+
+    v: tuple[View, View] = (
+        ps("(A(x()) ∧ Q(y())) ∨ (K(z()) ∧ T(w()))"),
+        ps("K(x())"),
+    )
+    c: View = ps("T(x())")
+
+
+class e3(DefaultInference, BaseExample):
+    """
+    Example 3 (p.63):
+
+    P1 There is at least an ace and a king or else there is at least a queen and
+    a jack.
+    P2 There isn't an ace.
+    C There is a queen and a jack.
+    """
+
+    v: tuple[View, View] = (
+        ps("(Ace(a()) ∧ King(k())) ∨ (Queen(q()) ∧ Jack(j()))"),
+        ps("~Ace(a())"),
+    )
+    c: View = ps("Queen(q()) ∧ Jack(j())")
+
+
+class e10(DefaultInference, BaseExample):
+    """
+    Example 10 (p.76)
+
+    P1 There is a king.
+    P2 There is at least an ace and a queen, or else at least a king and a ten.
+    C There is a ten.
+    """
+
+    v: tuple[View, View] = (
+        ps("K(x())"),
+        ps("(A(x()) ∧ Q(y())) ∨ (K(z()) ∧ T(w()))"),
+    )
+    c: View = ps("⊤")
+
+
+class e11(DefaultInference, BaseExample):
+    """
+    Example 11 (p. 77)
+
+    P1 Either John smokes or Mary smokes.
+    P2 Supposing John smokes, John drinks.
+    P3 Supposing Mary smokes, Mary eats.
+    C Either John smokes and drinks or Mary smokes and drinks.
+    """
+
+    v: tuple[View, View, View] = (
+        ps("Smokes(j()) ∨ Smokes(m())"),
+        ps("Smokes(j()) → Drinks(j())"),
+        ps("Smokes(m()) → Eats(m())"),
+    )
+    c: View = ps("(Smokes(j()) ∧ Drinks(j())) ∨ (Smokes(m()) ∧ Drinks(m()))")
+
+
+# class e12i(NegationTest, BaseExample):
+#     """
+#     Example 12i (p. 78)
+
+#     ItisnotthecasethatPorQorR
+#     """
+#     v: tuple[View] = (
+#         ps("P(p()) ∨ Q(q()) ∨ R(r())"),
+#     )
+#     c: View = ps("~P(p()) ∧ ~Q(q()) ∧ ~R(r())")
+
+# class e12ii(NegationTest, BaseExample):
+#     """
+#     Example 12ii (p. 78)
+
+#     ItisnotthecasethatPandQandR
+#     """
+#     v: tuple[View] = (
+#         ps("P(p()) ∧ Q(q()) ∧ R(r())"),
+#     )
+#     c: View = ps("~P(p()) ∧ ~Q(q()) ∧ ~R(r())")
+
+# class e12iii(NegationTest, BaseExample):
+#     """
+#     Example 12iii (p. 79)
+
+#     It is not the case that, supposing S, ((P and Q) or R)
+#     """
+#     v: tuple[View] = (
+#         ps("S(s()) → ((P(p()) ∧ Q(q())) ∨ R(r()))"),
+#     )
+#     c: View = ps("(S(s()) ∧ ~P(p()) ∧ ~R(r())) ∨ (S(s()) ∧ ~Q(q()) ∧ ~R(r()))")
+
+
+class e13(DefaultInference, BaseExample):
+    """
+    Example 13 (p. 80)
+
+    P1 There is an ace and a king or a queen and a jack.
+    P2 There isn't an ace.
+    C There is a queen and a jack.
+    """
+
+    v: tuple[View, View] = (
+        ps("(IsAce(a()) ∧ IsKing(k())) ∨ (IsQueen(q()) ∧ IsJack(j()))"),
+        ps("~IsAce(a())"),
+    )
+    c: View = ps("IsQueen(q()) ∧ IsJack(j())")
+
+
+class e14_1(Factor, BaseExample):
+    """
+    Example 14-1(p. 81) Factor examples
+    """
+
+    v: tuple[View, View] = (
+        ps("(P(p()) ∧ Q(q())) ∨ (P(p()) ∧ R(r()))"),
+        ps("P(p())"),
+    )
+    c: View = ps("Q(q()) ∨ R(r())")
+
+
+class e14_2(Factor, BaseExample):
+    """
+    Example 14-2(p. 81) Factor examples
+    """
+
+    v: tuple[View, View] = (
+        ps(
+            "(P(p()) ∧ Q(q()) ∧ S(s())) ∨ (P(p()) ∧ R(r()) ∧ S(s())) ∨ (P(p()) ∧ R(r()))"
+        ),
+        ps("(S(s())) → (P(p()))"),
+    )
+    c: View = ps("(Q(q()) ∧ S(s())) ∨ (R(r()) ∧ S(s())) ∨ (P(p()) ∧ R(r()))")
+
+
+class e14_3(Factor, BaseExample):
+    """
+    Example 14-2(p. 81) Factor examples
+    """
+
+    v: tuple[View, View] = (
+        ps(
+            "(P(p()) ∧ Q(q()) ∧ S(s())) ∨ (P(p()) ∧ R(r()) ∧ S(s())) ∨ (P(p()) ∧ R(r()))"
+        ),
+        ps("(S(s())) → (P(p()))"),
+    )
+    c: View = ps("(Q(q()) ∧ S(s())) ∨ (R(r()) ∧ S(s())) ∨ (P(p()) ∧ R(r()))")
+
+
+class e47(DefaultInference, BaseExample):
     """
     P1: Some thermotogum stains gram-negative
     P2: Maritima is a thermotogum
@@ -64,13 +251,37 @@ class e47(BaseExample):
     )
     c: View = ps("StainsGramNegative(Maritima())")
 
-    @classmethod
-    def test(cls):
-        result = default_inference_procedure(cls.v)
-        assert result.is_equivalent_under_arb_sub(cls.c)
+
+class e48(DefaultInference, BaseExample):
+    """
+    P1 Some dictyoglomus is thermophobic.
+    P2 Turgidum is not a dictyoglomus.
+    C Turgidum is not a dictyoglomus.
+    """
+
+    v: tuple[View, View] = (
+        ps("∃x D(x*) ∧ T(x)"),
+        ps("~D(Turgidum()*)"),
+    )
+    c: View = ps("~D(Turgidum())")
 
 
-class e56_basic_step(BaseExample):
+class e51(BasicStep, BaseExample):
+    """
+    P1: Every archaeon has a nucleus
+    P2: Halobacterium is an archeon
+
+    C: Halobacterium is an archaeon and has a nucleus
+    """
+
+    v: tuple[View, View] = (
+        ps("∀x (IsArcheon(x*) → IsArcheon(x) ∧ HasNucleus(x))"),
+        ps("IsArcheon(Halobacterium()*)"),
+    )
+    c: View = ps("IsArcheon(Halobacterium()*) ∧ HasNucleus(Halobacterium())")
+
+
+class e56_default_inference(DefaultInference, BaseExample):
     """
     P1: Every professor teaches some student
     P2: Every student reads some book
@@ -82,23 +293,14 @@ class e56_basic_step(BaseExample):
         ps("∀x ∃y Professor(x) → Professor(x) ∧ Student(y*) ∧ Teaches(x, y)"),
         ps("∀z ∃w Student(z*) → Student(z) ∧ Book(w) ∧ Reads(z, w)"),
     )
+
+    c: View = ps("∃y ∃b ⊤ ∨ Reads(y,b) ∧ Book(b)")
+
+
+class e56_basic_step(BasicStep, e56_default_inference):
     c: View = ps(
         "∀a ∃b ∃c Professor(a) → Professor(a) ∧ Student(b*) ∧ Teaches(a, b) ∧ Reads(b, c) ∧ Book(c)"
     ).depose()
-
-    @classmethod
-    def test(cls):
-        result = basic_step(cls.v)
-        assert result.is_equivalent_under_arb_sub(cls.c)
-
-
-class e56_default_inference(e56_basic_step):
-    c: View = ps("∃y ∃b ⊤ ∨ Reads(y,b) ∧ Book(b)")
-
-    @classmethod
-    def test(cls):
-        result = default_inference_procedure(cls.v)
-        assert result.is_equivalent_under_arb_sub(cls.c)
 
 
 # class e15(BaseExample):
