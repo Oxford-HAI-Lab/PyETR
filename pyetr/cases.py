@@ -416,6 +416,24 @@ class e41(DefaultInference, BaseExample):
     c: View = ps("~P(p())")
 
 
+class e44_1(DefaultInference, BaseExample):
+    """
+    Example 44-1
+
+    P1 The chair is saleable if and only if it is inelegant.
+    P2 The chair is elegant if and only if it is stable.
+    P3 The chair is saleable or it is stable, or both.
+    C The chair is saleable elegant and stable.
+    """
+
+    v: tuple[View, View, View] = (
+        ps("(Saleable(c()) ∧ Elegant(c())) ∨ (~Saleable(c()) ∧ ~Elegant(c())) "),
+        ps("(Elegant(c()) ∧ Stable(c())) ∨ (~Elegant(c()) ∧ ~Stable(c()))"),
+        ps("Saleable(c()) ∨ Stable(c()) ∨ (Saleable(c()) ∧ Elegant(c()))"),
+    )
+    c: View = ps("Saleable(c()) ∧ Elegant(c()) ∧ Stable(c())")
+
+
 class e47(DefaultInference, BaseExample):
     """
     P1: Some thermotogum stains gram-negative
@@ -460,6 +478,38 @@ class e51(BasicStep, BaseExample):
     c: View = ps("IsArcheon(Halobacterium()*) ∧ HasNucleus(Halobacterium())")
 
 
+class e52(BasicStep, BaseExample):
+    """
+    Example 52
+
+    P1 All Fs G.
+    P2 John Gs.
+    C John Fs.
+    """
+
+    v: tuple[View, View] = (
+        ps("∀x (F(x)) → (F(x) ∧ G(x*))"),
+        ps("G(John()*)"),
+    )
+    c: View = ps("F(John())")
+
+
+class e54(BasicStep, BaseExample):
+    """
+    Example 54
+
+    P1 Sharks attack bathers.
+    P2 Whitey is a shark.
+    C Whitey attacks bathers.
+    """
+
+    v: tuple[View, View] = (
+        ps("∀x (Shark(x*)) → ((Shark(x) ∧ Attack(x)) ∨ ⊤)"),
+        ps("Shark(Whitey()*)"),
+    )
+    c: View = ps("Attack(Whitey())")
+
+
 class e56_default_inference(DefaultInference, BaseExample):
     """
     P1: Every professor teaches some student
@@ -472,7 +522,6 @@ class e56_default_inference(DefaultInference, BaseExample):
         ps("∀x ∃y Professor(x) → Professor(x) ∧ Student(y*) ∧ Teaches(x, y)"),
         ps("∀z ∃w Student(z*) → Student(z) ∧ Book(w) ∧ Reads(z, w)"),
     )
-
     c: View = ps("∃y ∃b ⊤ ∨ Reads(y,b) ∧ Book(b)")
 
 
@@ -482,29 +531,36 @@ class e56_basic_step(BasicStep, e56_default_inference):
     ).depose()
 
 
-# class e15(BaseExample):
-#     """
-#     P1: There is an ace and a jack and a queen, or else there is an eight
-#     and a ten and a four or else there is an ace.
-#     P2: There is an ace and a jack, and there is an ace and a ten.
-#     P3: There is not a queen.
+class e57(BasicStep, BaseExample):
+    """
+    Example 57
 
-#     C: There is a four
-#     """
+    P1 All B are A.
+    P2 Some C are B.
+    C Some C are A.
+    """
 
-#     v: tuple[View, View, View] = (
-#         ps(
-#             "∃x1 ∃x2 ∃x3 ∃x4 ∃x5 ∃x6 ∃x7 (Ace() ∧ Jack(x2) ∧ Queen(x3)) ∨ (Eight(x4) ∧ Ten(x5) ∧ Four(x6)) ∨ Ace(x7)"
-#         ),
-#         ps("∃y1 ∃y2 ∃y3 ∃y4 (Ace() ∧ Jack(y2)) ∨ (Ace(y3) ∧ Ten(y4))"),
-#         ps("∀z ~Queen(z)"),
-#     )
-#     c: View = ps("∃w Four(w)")
+    v: tuple[View, View] = (
+        ps("∀x (B(x*)) → (B(x) ∧ A(x))"),
+        ps("∃x C(x) ∧ B(x*)"),
+    )
+    c: View = ps("∃y C(y) ∧ A(y)")
 
-#     @classmethod
-#     def test(cls):
-#         result = default_inference_procedure(cls.v)
-#         assert result.is_equivalent_under_arb_sub(cls.c)
+
+class e58(BasicStep, BaseExample):
+    """
+    Example 58
+
+    P1 Some B are A.
+    P2 All C are B.
+    C Some C are A.
+    """
+
+    v: tuple[View, View] = (
+        ps("∃x B(x*) ∧ A(x)"),
+        ps("∀x (C(x)) → C(x) ∧ B(x*)"),
+    )
+    c: View = ps("∃y C(y) ∧ A(y)")
 
 
 class UniProduct(BaseExample):
