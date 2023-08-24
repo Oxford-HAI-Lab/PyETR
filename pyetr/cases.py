@@ -237,6 +237,185 @@ class e14_3(Factor, BaseExample):
     c: View = ps("(Q(q()) ∧ S(s())) ∨ (R(r()) ∧ S(s())) ∨ (P(p()) ∧ R(r()))")
 
 
+class e14_6(Factor, BaseExample):
+    """
+    Example 14-6(p. 81) Factor examples
+    """
+
+    v: tuple[View, View] = (
+        ps("(P(p()) ∧ R(r())) ∨ (Q(q()) ∧ S(s()))"),
+        ps("P(p()) ∨ Q(q()) ∨ T(t())"),
+    )
+    c: View = ps("(P(p()) ∧ R(r())) ∨ (Q(q()) ∧ S(s()))")
+
+
+class e14_7(Factor, BaseExample):
+    """
+    Example 14-7(p. 81) Factor examples
+    """
+
+    v: tuple[View, View] = (
+        ps("(P(p()) ∧ R(r())) ∨ (Q(q()) ∧ S(s())) ∨ P(p())"),
+        ps("P(p()) ∨ Q(q())"),
+    )
+    c: View = ps("R(r()) ∨ S(s()) ∨ ⊤")
+
+
+class e15(DefaultInference, BaseExample):
+    """
+    Example 15
+
+    P1 There is an ace and a jack and a queen, or else there is an eight and a ten and a four, or else there is an ace.
+    P2 There is an ace and a jack, and there is an eight and a ten.
+    P3 There is not a queen.
+    C There is a four
+    """
+
+    v: tuple[View, View, View] = (
+        ps(
+            "(Ace(a()) ∧ Jack(j()) ∧ Queen(q())) ∨ (Eight(e()) ∧ Ten(t()) ∧ Four(f())) ∨ (Ace(a()))"
+        ),
+        ps("Ace(a()) ∧ Jack(j()) ∧ Eight(e()) ∧ Ten(t())"),
+        ps("~Queen(q())"),
+    )
+    c: View = ps("Four(f())")
+
+
+class e16(DefaultInference, BaseExample):
+    """
+    Example 16
+
+    P1 There is a ten and an eight and a four, or else there is a jack and a king and a queen, or else there is an ace.
+    P2 There isn't a four.
+    P3 There isn't an ace.
+    """
+
+    v: tuple[View, View, View] = (
+        ps(
+            "(Ten(t()) ∧ Eight(e()) ∧ Four(f())) ∨ (Jack(j()) ∧ King(k()) ∧ Queen(q())) ∨ (Ace(a()))"
+        ),
+        ps("~Four(f())"),
+        ps("~Ace(a())"),
+    )
+    c: View = ps("Jack(j()) ∧ King(k()) ∧ Queen(q())")
+
+
+class e17(DefaultInference, BaseExample):
+    """
+    Example 17
+
+    P1 There is a king in the hand and there is not an ace in the hand, or else there is an ace in the hand and there is not a king in the hand.
+    P2 There is a king in the hand.
+    C There isn't an ace in the hand.
+    """
+
+    v: tuple[View, View] = (
+        ps("(King(k()) ∧ ~Ace(a())) ∨ (Ace(a()) ∧ ~King(k()))"),
+        ps("King(k())"),
+    )
+    c: View = ps("~Ace(a())")
+
+
+class e20(DefaultInference, BaseExample):
+    """
+    Example 20
+
+    P1 Either there is a king in the hand or a queen in the hand.
+    P2 On the supposition that there is a king, Mary wins.
+    P3 On the supposition that there is a queen, Bill wins.
+    C Either Mary wins or Bill wins.
+    """
+
+    v: tuple[View, View, View] = (
+        ps("King(k()) ∨ Queen(q())"),
+        ps("(King(k())) → (Win(mary()))"),
+        ps("(Queen(q())) → (Win(bill()))"),
+    )
+    c: View = ps("Win(mary()) ∨ Win(bill())")
+
+
+class e28(DefaultInference, BaseExample):
+    """
+    Example 28
+
+    P1 Is there a tiger?
+    P2 Supposing there is a tiger, there is orange fur.
+    P3 There is orange fur.
+    C There is a tiger.
+    """
+
+    v: tuple[View, View, View] = (
+        ps("Tiger(t()) ∨ ~Tiger(t())"),
+        ps("(Tiger(t())) → (Tiger(t()) ∧ Orange(o()))"),
+        ps("Orange(o())"),
+    )
+    c: View = ps("Tiger(t())")
+
+
+class e32_1(DefaultInference, BaseExample):
+    """
+    Example 32-1
+
+    P1 If P then Q.
+    P2 P
+    C Q
+    """
+
+    v: tuple[View, View] = (
+        ps("(P(p())) → (P(p()) ∧ Q(q()))"),
+        ps("P(p())"),
+    )
+    c: View = ps("Q(q())")
+
+
+class e32_2(DefaultInference, BaseExample):
+    """
+    Example 32-2
+
+    P1 P
+    P2 If P then Q.
+    C Q
+    """
+
+    v: tuple[View, View] = (
+        ps("P(p())"),
+        ps("(P(p())) → (P(p()) ∧ Q(q()))"),
+    )
+    c: View = ps("Q(q())")
+
+
+class e33(DefaultInference, BaseExample):
+    """
+    Example 33
+
+    P1 If the card is red then the number is even.
+    P2 The number is even.
+    C The card is red
+    """
+
+    v: tuple[View, View] = (
+        ps("(R(r())) → (R(r()) ∧ E(e()))"),
+        ps("E(e())"),
+    )
+    c: View = ps("R(r())")
+
+
+class e41(DefaultInference, BaseExample):
+    """
+    Example 41
+
+    P1 P only if Q.
+    P2 Not Q.
+    C Not P.
+    """
+
+    v: tuple[View, View] = (
+        ps("(~Q(q())) → (~Q(q()) ∧ ~P(p()))"),
+        ps("~Q(q())"),
+    )
+    c: View = ps("~P(p())")
+
+
 class e47(DefaultInference, BaseExample):
     """
     P1: Some thermotogum stains gram-negative
