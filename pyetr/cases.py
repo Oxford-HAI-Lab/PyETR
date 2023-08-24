@@ -225,16 +225,16 @@ class e14_2(Factor, BaseExample):
 
 class e14_3(Factor, BaseExample):
     """
-    Example 14-2(p. 81) Factor examples
+    Example 14-3(p. 81) Factor examples
     """
 
     v: tuple[View, View] = (
         ps(
-            "(P(p()) ∧ Q(q()) ∧ S(s())) ∨ (P(p()) ∧ R(r()) ∧ S(s())) ∨ (P(p()) ∧ R(r()))"
+            "(P(p()) ∧ R(r())) ∨ (Q(q()) ∧ S(s())) ∨ (P(p()) ∧ S(s())) ∨ (Q(q()) ∧ R(r()))"
         ),
-        ps("(S(s())) → (P(p()))"),
+        ps("P(p()) ∨ Q(q())"),
     )
-    c: View = ps("(Q(q()) ∧ S(s())) ∨ (R(r()) ∧ S(s())) ∨ (P(p()) ∧ R(r()))")
+    c: View = ps("R(r()) ∨ S(s())")
 
 
 class e14_6(Factor, BaseExample):
