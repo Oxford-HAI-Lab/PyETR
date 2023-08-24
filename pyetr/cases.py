@@ -91,9 +91,9 @@ class e2(DefaultInference, BaseExample):
 
     v: tuple[View, View] = (
         ps("(A(x()) ∧ Q(y())) ∨ (K(z()) ∧ T(w()))"),
-        ps("K(x())"),
+        ps("K(z())"),
     )
-    c: View = ps("T(x())")
+    c: View = ps("T(w())")
 
 
 class e3(DefaultInference, BaseExample):
@@ -129,7 +129,7 @@ class e10(DefaultInference, BaseExample):
     c: View = ps("⊤")
 
 
-class e11(DefaultInference, BaseExample):
+class e11(BasicStep, BaseExample):
     """
     Example 11 (p. 77)
 
@@ -144,7 +144,7 @@ class e11(DefaultInference, BaseExample):
         ps("Smokes(j()) → Drinks(j())"),
         ps("Smokes(m()) → Eats(m())"),
     )
-    c: View = ps("(Smokes(j()) ∧ Drinks(j())) ∨ (Smokes(m()) ∧ Drinks(m()))")
+    c: View = ps("(Smokes(j()) ∧ Drinks(j())) ∨ (Smokes(m()) ∧ Eats(m()))")
 
 
 # class e12i(NegationTest, BaseExample):
@@ -453,14 +453,14 @@ class e48(DefaultInference, BaseExample):
     """
     P1 Some dictyoglomus is thermophobic.
     P2 Turgidum is not a dictyoglomus.
-    C Turgidum is not a dictyoglomus.
+    C Truth
     """
 
     v: tuple[View, View] = (
         ps("∃x D(x*) ∧ T(x)"),
         ps("~D(Turgidum()*)"),
     )
-    c: View = ps("~D(Turgidum())")
+    c: View = ps("⊤")
 
 
 class e51(BasicStep, BaseExample):
@@ -484,14 +484,14 @@ class e52(BasicStep, BaseExample):
 
     P1 All Fs G.
     P2 John Gs.
-    C John Fs.
+    C John Fs and Gs.
     """
 
     v: tuple[View, View] = (
         ps("∀x (F(x)) → (F(x) ∧ G(x*))"),
         ps("G(John()*)"),
     )
-    c: View = ps("F(John())")
+    c: View = ps("F(John()) ∧ G(John()*)")
 
 
 class e54(BasicStep, BaseExample):
@@ -507,7 +507,7 @@ class e54(BasicStep, BaseExample):
         ps("∀x (Shark(x*)) → ((Shark(x) ∧ Attack(x)) ∨ ⊤)"),
         ps("Shark(Whitey()*)"),
     )
-    c: View = ps("Attack(Whitey())")
+    c: View = ps("Attack(Whitey()) ∧ Shark(Whitey()*)")
 
 
 class e56_default_inference(DefaultInference, BaseExample):
@@ -544,7 +544,7 @@ class e57(BasicStep, BaseExample):
         ps("∀x (B(x*)) → (B(x) ∧ A(x))"),
         ps("∃x C(x) ∧ B(x*)"),
     )
-    c: View = ps("∃y C(y) ∧ A(y)")
+    c: View = ps("∃y A(y) ∧ B(y*) ∧ C(y)")
 
 
 class e58(BasicStep, BaseExample):
@@ -558,7 +558,7 @@ class e58(BasicStep, BaseExample):
 
     v: tuple[View, View] = (
         ps("∃x B(x*) ∧ A(x)"),
-        ps("∀x (C(x)) → C(x) ∧ B(x*)"),
+        ps("∀y (C(y)) → C(y) ∧ B(y*)"),
     )
     c: View = ps("∃y C(y) ∧ A(y)")
 

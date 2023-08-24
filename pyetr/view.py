@@ -577,7 +577,7 @@ class View:
         A(Γ) ∩ A(Θ) = ∅ and (A(R) ∩ A(S) = ∅ or [R]Δ = S)
         """
         expr1 = len(self.stage.arb_objects & self.supposition.arb_objects) == 0
-        expr2 = len(self.stage_supp_arb_objects | view.stage_supp_arb_objects) == 0
+        expr2 = len(self.stage_supp_arb_objects & view.stage_supp_arb_objects) == 0
         expr3 = (
             self.dependency_relation.restriction(view.stage.arb_objects)
             == view.dependency_relation
