@@ -110,23 +110,46 @@ def substitution(
     )
 
 
+def division_cond(delta: State, supposition: Supposition, stage: Stage):
+    for psi in supposition:
+        for gamma in stage:
+            if delta.issubset(gamma) and psi.issubset(gamma):
+                return True
+    return False
+
+
+def division_presupposition(self_stage, other_stage, other_supposition):
+    return all(
+        division_cond(delta, supposition=other_supposition, stage=self_stage)
+        for delta in other_stage
+    )
+
+
 def state_division(
     state: State,
+    self_stage: Stage,
     other_stage: Stage,
     other_supposition: Supposition,
 ) -> State:
     """
     Based on definition 4.38
     """
-    delta_that_meet_cond: list[State] = []
-    for delta in other_stage:
-        if delta.issubset(state) and any(
-            psi.issubset(state) for psi in other_supposition
-        ):
-            delta_that_meet_cond.append(delta)
+    if division_presupposition(
+        self_stage=self_stage,
+        other_stage=other_stage,
+        other_supposition=other_supposition,
+    ):
+        delta_that_meet_cond: list[State] = []
+        for delta in other_stage:
+            if delta.issubset(state) and any(
+                psi.issubset(state) for psi in other_supposition
+            ):
+                delta_that_meet_cond.append(delta)
 
-    if len(delta_that_meet_cond) == 1:
-        return state - delta_that_meet_cond[0]
+        if len(delta_that_meet_cond) == 1:
+            return state - delta_that_meet_cond[0]
+        else:
+            return state
     else:
         return state
 
@@ -717,19 +740,16 @@ class View:
         """
         Based on definition 4.38
         """
-
-        def cond(delta: State):
-            for psi in other.supposition:
-                for gamma in self.stage:
-                    if delta.issubset(gamma) and psi.issubset(gamma):
-                        return True
-            return False
-
-        if all(cond(delta) for delta in other.stage):
+        if division_presupposition(
+            self_stage=self.stage,
+            other_stage=other.stage,
+            other_supposition=other.supposition,
+        ):
             new_stage = SetOfStates(
                 [
                     state_division(
                         state=gamma,
+                        self_stage=self.stage,
                         other_stage=other.stage,
                         other_supposition=other.supposition,
                     )
@@ -761,6 +781,7 @@ class View:
                     out.append(
                         state_division(
                             state=state,
+                            self_stage=self.stage,
                             other_stage=replaced_stage,
                             other_supposition=replaced_supposition,
                         )
@@ -776,6 +797,7 @@ class View:
             """
             gamma_prime = state_division(
                 state=state,
+                self_stage=self.stage,
                 other_stage=other.stage,
                 other_supposition=other.supposition,
             )
