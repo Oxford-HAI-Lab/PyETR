@@ -225,10 +225,15 @@ class View:
             return "F"
         elif self.is_verum:
             return "T"
-        elif len(self.dependency_relation.dependencies) == 0:
-            return f"{self.stage}^{self.supposition} issues={self.issue_structure}"
+        if len(self.dependency_relation.dependencies) == 0:
+            dep_string = ""
         else:
-            return f"{self.stage}^{self.supposition} issues={self.issue_structure} deps={self.dependency_relation}"
+            dep_string = f" deps={self.dependency_relation}"
+        if len(self.issue_structure) == 0:
+            issue_string = ""
+        else:
+            issue_string = f" issues={self.issue_structure}"
+        return f"{self.stage}^{self.supposition}{issue_string}{dep_string}"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, View):
