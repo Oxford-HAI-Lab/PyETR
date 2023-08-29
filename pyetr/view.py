@@ -468,7 +468,7 @@ class View:
         out = View.with_restriction(
             stage=stage,
             supposition=verum,
-            dependency_relation=self.dependency_relation,
+            dependency_relation=self.dependency_relation.negation(),
             issue_structure=self.issue_structure.negation(),
         )
         if verbose:
