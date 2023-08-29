@@ -1,5 +1,5 @@
 from pyetr.atom import Atom
-from pyetr.dependency import Dependency, dependencies_to_sets
+from pyetr.dependency import Dependency, DependencyRelation, dependencies_to_sets
 from pyetr.parsing.parse_string import (
     BoolAnd,
     BoolNot,
@@ -128,19 +128,19 @@ def order_quantifieds(
 
 
 def get_quantifiers(
-    arb_objects: set[ArbitraryObject], dependencies: frozenset[Dependency]
+    arb_objects: set[ArbitraryObject], dependency_relation: DependencyRelation
 ) -> list[Quantified]:
     unordered_quantifieds: dict[str, Quantified] = {}
     for arb_object in arb_objects:
         if arb_object.name not in unordered_quantifieds:
-            if arb_object.is_existential:
+            if dependency_relation.is_existential(arb_object):
                 quant = "∃"
             else:
                 quant = "∀"
             unordered_quantifieds[arb_object.name] = Quantified(
                 [QuantList([Variable([arb_object.name])], quantifier=quant)]
             )
-    return order_quantifieds(unordered_quantifieds, dependencies)
+    return order_quantifieds(unordered_quantifieds, dependency_relation.dependencies)
 
 
 def unparse_view(v: View) -> list[Item]:
@@ -152,7 +152,5 @@ def unparse_view(v: View) -> list[Item]:
         supposition = unparse_set_of_states(v.supposition)
         main_item = Implies([[supposition, stage]])
     all_arb = v.stage.arb_objects | v.supposition.arb_objects
-    output: list[Quantified] = get_quantifiers(
-        all_arb, v.dependency_relation.dependencies
-    )
+    output: list[Quantified] = get_quantifiers(all_arb, v.dependency_relation)
     return [*output, main_item]

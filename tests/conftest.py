@@ -57,15 +57,10 @@ def func():
 
 
 @pytest.fixture
-def exi_arb_obj():
-    return ArbitraryObject("x1", is_existential=True)
+def arb_obj():
+    return ArbitraryObject("x1")
 
 
 @pytest.fixture
-def uni_arb_obj():
-    return ArbitraryObject("x1", is_existential=False)
-
-
-@pytest.fixture
-def term(func, exi_arb_obj):
-    return Term(func, (exi_arb_obj,))
+def term(func, arb_obj):
+    return Term(func, (arb_obj,))

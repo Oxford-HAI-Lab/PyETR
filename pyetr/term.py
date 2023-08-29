@@ -35,41 +35,24 @@ class Function:
 
 class ArbitraryObject:
     name: str
-    _is_existential: bool
 
-    def __init__(self, name: str, *, is_existential: bool):
+    def __init__(self, name: str):
         self.name = name
-        self._is_existential = is_existential
-
-    @property
-    def is_existential(self):
-        return self._is_existential
-
-    def flip(self) -> "ArbitraryObject":
-        return ArbitraryObject(name=self.name, is_existential=not self.is_existential)
 
     @property
     def detailed(self) -> str:
-        if self.is_existential:
-            s = "Exi"
-        else:
-            s = "Uni"
-        return f"<ArbitraryObject ({s}) name={self.name}>"
+        return f"<ArbitraryObject name={self.name}>"
 
     def __repr__(self) -> str:
-        if self.is_existential:
-            suffix = "e"
-        else:
-            suffix = "u"
-        return f"{self.name}_{suffix}"
+        return f"{self.name}"
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, ArbitraryObject):
             return False
-        return self.name == other.name and self.is_existential == other.is_existential
+        return self.name == other.name
 
     def __hash__(self) -> int:
-        return hash((self.name, self.is_existential))
+        return hash(self.name)
 
     def is_same_emphasis_context(
         self, other: "Term | ArbitraryObject | Emphasis"

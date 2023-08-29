@@ -24,7 +24,7 @@ class TestFunction:
 
     def test_eq_diff_obj(self):
         func1 = Function(name="gentoo", arity=0)
-        arb = ArbitraryObject(name="thing", is_existential=True)
+        arb = ArbitraryObject(name="thing")
         assert not func1 == arb
 
     def test_repr(self):
@@ -34,22 +34,22 @@ class TestFunction:
 
 class TestArbitraryObject:
     def test_valid_exi(self):
-        test = ArbitraryObject("x1", is_existential=True)
-        assert test.detailed == "<ArbitraryObject (Exi) name=x1>"
+        test = ArbitraryObject("x1")
+        assert test.detailed == "<ArbitraryObject name=x1>"
 
     def test_valid_uni(self):
-        test = ArbitraryObject("x1", is_existential=False)
-        assert test.detailed == "<ArbitraryObject (Uni) name=x1>"
+        test = ArbitraryObject(
+            "x1",
+        )
+        assert test.detailed == "<ArbitraryObject name=x1>"
 
     def test_repr(self):
-        func = ArbitraryObject(name="gentoo", is_existential=True)
-        assert repr(func) == "gentoo_e"
-        func = ArbitraryObject(name="gentoo", is_existential=False)
-        assert repr(func) == "gentoo_u"
+        func = ArbitraryObject(name="gentoo")
+        assert repr(func) == "gentoo"
 
     def test_eq_diff_obj(self):
         func1 = Function(name="gentoo", arity=0)
-        arb = ArbitraryObject(name="thing", is_existential=True)
+        arb = ArbitraryObject(name="thing")
         assert not arb == func1
 
 
@@ -58,22 +58,19 @@ class TestEmphasis:
         test = Emphasis(term)
         assert (
             test.detailed
-            == "<Emphasis term=<Term f=Function(func, 1) t=(<ArbitraryObject (Exi) name=x1>,)>>"
+            == "<Emphasis term=<Term f=Function(func, 1) t=(<ArbitraryObject name=x1>,)>>"
         )
 
-    def test_valid_arb_obj(self, exi_arb_obj):
-        test = Emphasis(exi_arb_obj)
-        assert test.detailed == "<Emphasis term=<ArbitraryObject (Exi) name=x1>>"
+    def test_valid_arb_obj(self, arb_obj):
+        test = Emphasis(arb_obj)
+        assert test.detailed == "<Emphasis term=<ArbitraryObject name=x1>>"
 
-    def test_extract_arb_obj(self, exi_arb_obj):
-        test = Emphasis(exi_arb_obj)
-        assert exi_arb_obj in test.arb_objects
+    def test_extract_arb_obj(self, arb_obj):
+        test = Emphasis(arb_obj)
+        assert arb_obj in test.arb_objects
 
 
 class TestTerm:
-    def test_valid(self, func, exi_arb_obj):
-        t = Term(func, (exi_arb_obj,))
-        assert (
-            t.detailed
-            == "<Term f=Function(func, 1) t=(<ArbitraryObject (Exi) name=x1>,)>"
-        )
+    def test_valid(self, func, arb_obj):
+        t = Term(func, (arb_obj,))
+        assert t.detailed == "<Term f=Function(func, 1) t=(<ArbitraryObject name=x1>,)>"

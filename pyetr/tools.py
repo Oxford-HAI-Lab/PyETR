@@ -71,21 +71,15 @@ class ArbitraryObjectGenerator:
         else:
             assert False
 
-    def get_existential(self) -> ArbitraryObject:
-        return ArbitraryObject(name=next(self.gen), is_existential=True)
-
-    def get_universal(self) -> ArbitraryObject:
-        return ArbitraryObject(name=next(self.gen), is_existential=False)
+    def get_arb_obj(self) -> ArbitraryObject:
+        return ArbitraryObject(name=next(self.gen))
 
     def redraw(
         self, arb_objects: set[ArbitraryObject]
     ) -> dict[ArbitraryObject, ArbitraryObject]:
         draws: dict[ArbitraryObject, ArbitraryObject] = {}
         for arb_obj in arb_objects:
-            if arb_obj.is_existential:
-                draws[arb_obj] = self.get_existential()
-            else:
-                draws[arb_obj] = self.get_universal()
+            draws[arb_obj] = self.get_arb_obj()
         return draws
 
     def novelise(self, arb_objects: set[ArbitraryObject], view: "View") -> "View":

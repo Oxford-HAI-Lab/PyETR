@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import overload
 
 from pyetr.add_new_emphasis import add_new_emphasis
-from pyetr.dependency import Dependency, dependencies_from_sets
+from pyetr.dependency import Dependency, DependencyRelation, dependencies_from_sets
 from pyetr.stateset import SetOfStates, State
 from pyetr.term import ArbitraryObject, Emphasis, Function, Term
 from pyetr.view import View
@@ -130,7 +130,10 @@ def _parse_item(item: Item, maps: Maps) -> SetOfStates:
 
 
 def _parse_view(
-    view_item: Item, dependencies: frozenset[Dependency], maps: Maps, add_emphasis: bool
+    view_item: Item,
+    dependency_relation: DependencyRelation,
+    maps: Maps,
+    add_emphasis: bool,
 ) -> View:
     if isinstance(view_item, Implies):
         supposition = view_item.left
@@ -145,12 +148,12 @@ def _parse_view(
         and add_emphasis
     ):
         parsed_stage, parsed_supposition = add_new_emphasis(
-            parsed_stage, parsed_supposition
+            parsed_stage, parsed_supposition, dependency_relation
         )
-    return View.from_deps(
+    return View.from_integrated_emp(
         stage=parsed_stage,
         supposition=parsed_supposition,
-        dependencies=dependencies,
+        dependency_relation=dependency_relation,
     )
 
 
@@ -160,20 +163,20 @@ Existential = ArbitraryObject
 
 def get_variable_map_and_dependencies(
     quantifieds: list[Quantified],
-) -> tuple[dict[str, ArbitraryObject], frozenset[Dependency]]:
+) -> tuple[dict[str, ArbitraryObject], DependencyRelation]:
     variable_map: dict[str, ArbitraryObject] = {}
     encountered_universals: list[tuple[Universal, set[Existential]]] = []
+    existentials: set[Existential] = set()
+    universals: set[Universal] = set()
     for quantified in quantifieds:
         if quantified.quantifier == "∃":
-            arb_obj = ArbitraryObject(
-                name=quantified.variable.name, is_existential=True
-            )
+            arb_obj = ArbitraryObject(name=quantified.variable.name)
+            existentials.add(arb_obj)
             for _, exi_set in encountered_universals:
                 exi_set.add(arb_obj)
         else:
-            arb_obj = ArbitraryObject(
-                name=quantified.variable.name, is_existential=False
-            )
+            arb_obj = ArbitraryObject(name=quantified.variable.name)
+            universals.add(arb_obj)
             encountered_universals.append((arb_obj, set()))
 
         if quantified.variable.name not in variable_map:
@@ -183,7 +186,11 @@ def get_variable_map_and_dependencies(
                 f"Variable {quantified.variable.name} appears twice in quantifiers"
             )
 
-    return variable_map, dependencies_from_sets(encountered_universals)
+    return variable_map, DependencyRelation(
+        universals=universals,
+        existentials=existentials,
+        dependencies=dependencies_from_sets(encountered_universals),
+    )
 
 
 @overload
@@ -278,7 +285,7 @@ def parse_items(expr: list[Item], add_emphasis: bool) -> View:
     if view_item is None:
         raise ValueError(f"Main section not found")
 
-    variable_map, dependencies = get_variable_map_and_dependencies(quantifieds)
+    variable_map, dep_relation = get_variable_map_and_dependencies(quantifieds)
     predicate_map, function_map, constant_map = build_maps(view_item)
     maps = Maps(variable_map, predicate_map, function_map, constant_map)
-    return _parse_view(view_item, dependencies, maps, add_emphasis)
+    return _parse_view(view_item, dep_relation, maps, add_emphasis)

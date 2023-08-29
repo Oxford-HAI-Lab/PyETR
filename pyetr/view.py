@@ -8,7 +8,7 @@ from pyetr.issues import IssueStructure
 from pyetr.tools import ArbitraryObjectGenerator
 
 from .atom import Atom
-from .dependency import Dependency, DependencyRelation, _separate_arb_objects
+from .dependency import Dependency, DependencyRelation
 from .stateset import SetOfStates, State
 from .term import ArbitraryObject, Term
 
@@ -188,6 +188,27 @@ class View:
             raise ValueError(f"Supposition {self.supposition} contains emphasis")
 
     @classmethod
+    def get_verum(cls):
+        verum = SetOfStates({State({})})
+        return View(
+            stage=verum,
+            supposition=verum,
+            dependency_relation=DependencyRelation(set(), set(), frozenset()),
+            issue_structure=IssueStructure(),
+        )
+
+    @classmethod
+    def get_falsum(cls):
+        verum = SetOfStates({State({})})
+        falsum = SetOfStates()
+        return View(
+            stage=falsum,
+            supposition=verum,
+            dependency_relation=DependencyRelation(set(), set(), frozenset()),
+            issue_structure=IssueStructure(),
+        )
+
+    @classmethod
     def with_restriction(
         cls,
         stage: Stage,
@@ -219,24 +240,6 @@ class View:
             supposition=supposition.excluding_emphasis,
             dependency_relation=dependency_relation,
             issue_structure=IssueStructure(emphasised_atoms),
-        )
-
-    @classmethod
-    def from_deps(
-        cls,
-        stage: Stage,
-        supposition: Supposition,
-        dependencies: frozenset[Dependency],
-    ):
-        unis, exis = _separate_arb_objects((stage | supposition).arb_objects)
-        return cls.from_integrated_emp(
-            stage=stage,
-            supposition=supposition,
-            dependency_relation=DependencyRelation(
-                universals=unis,
-                existentials=exis,
-                dependencies=dependencies,
-            ),
         )
 
     @property
@@ -461,10 +464,10 @@ class View:
             (self.supposition, verum), (self.stage.negation(), verum)
         )
         return View.with_restriction(
-            stage=stage.flip(),
+            stage=stage,
             supposition=verum,
-            dependency_relation=self.dependency_relation.flip(),
-            issue_structure=self.issue_structure.negation().flip(),
+            dependency_relation=self.dependency_relation,
+            issue_structure=self.issue_structure.negation(),
         )
 
     def merge(self, view: "View", verbose: bool = False) -> "View":
@@ -477,7 +480,9 @@ class View:
         ) -> set[tuple[Term | ArbitraryObject, Universal]]:
             out: set[tuple[Term | ArbitraryObject, Universal]] = set()
             for t, u in self.issue_matches(view):
-                if isinstance(u, ArbitraryObject) and not u.is_existential:
+                if isinstance(
+                    u, ArbitraryObject
+                ) and not view.dependency_relation.is_existential(u):
                     psi_exists = False
                     for psi in view.supposition:
                         new_psi = psi.replace({u: t})
@@ -589,13 +594,10 @@ class View:
         """
 
         def _m_prime() -> set[tuple[Universal, Term | ArbitraryObject]]:
-            self_u, _ = _separate_arb_objects(
-                self.stage.arb_objects | self.supposition.arb_objects
-            )
             output_set = set()
             for u, t in self.issue_matches(view):
                 if isinstance(u, ArbitraryObject) and u in (
-                    self_u - self.supposition.arb_objects
+                    self.dependency_relation.universals - self.supposition.arb_objects
                 ):
                     output_set.add((u, t))
             return output_set
@@ -680,11 +682,11 @@ class View:
             return reduce(lambda s1, s2: s1 | s2, final_sets)
 
         def _m_prime() -> set[tuple[Existential, Term | ArbitraryObject]]:
-            _, self_e = _separate_arb_objects(self.stage_supp_arb_objects)
             output_set = set()
             for e, t in self.issue_matches(view):
                 if isinstance(e, ArbitraryObject) and e in (
-                    self_e - (self.supposition | view.stage).arb_objects
+                    self.dependency_relation.existentials
+                    - (self.supposition | view.stage).arb_objects
                 ):
                     if not any(
                         d.existential == e
@@ -774,7 +776,9 @@ class View:
         def big_intersection(state: State) -> Optional[State]:
             out: list[State] = []
             for t, a in self.issue_matches(other):
-                if isinstance(a, ArbitraryObject) and not a.is_existential:
+                if isinstance(
+                    a, ArbitraryObject
+                ) and not other.dependency_relation.is_existential(a):
                     replaced_stage = other.stage.replace({a: t})
                     replaced_supposition = other.supposition.replace({a: t})
                     out.append(
@@ -850,14 +854,14 @@ class View:
             return self
         elif other.stage_supp_arb_objects.issubset(self.stage_supp_arb_objects):
             # I case
-            view1 = View(
-                stage=other.stage,
-                supposition=other.supposition,
-                dependency_relation=DependencyRelation.from_arb_objects(
-                    other.stage_supp_arb_objects, dependencies=frozenset()
-                ),
-                issue_structure=other.issue_structure,
-            )
+            # view1 = View(
+            #     stage=other.stage,
+            #     supposition=other.supposition,
+            #     dependency_relation=DependencyRelation.from_arb_objects(
+            #         other.stage_supp_arb_objects, dependencies=frozenset()
+            #     ),
+            #     issue_structure=other.issue_structure,
+            # )
             # view2 = View(
             #     stage=other.stage,
             #     supposition=SetOfStates({State({})}),

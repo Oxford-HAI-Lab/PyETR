@@ -3,16 +3,13 @@ from .view import View
 
 
 def basic_step(v: tuple[View, ...], verbose: bool = False) -> View:
-    verum = SetOfStates({State({})})
-    falsum = SetOfStates({})
-    empty_dep = frozenset({})
-    out = View.from_deps(verum, verum, empty_dep)
+    out = View.get_verum()
     for i, view in enumerate(v):
         if i == 0:
             out = out.update(view.depose(verbose=verbose), verbose=verbose)
         else:
             out = out.update(view, verbose=verbose)
-    return out.factor(View.from_deps(falsum, verum, empty_dep), verbose=verbose)
+    return out.factor(View.get_falsum(), verbose=verbose)
 
 
 def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> View:

@@ -5,6 +5,7 @@ from functools import reduce
 from typing import Optional
 
 from pyetr.atom import Atom
+from pyetr.dependency import DependencyRelation
 from pyetr.term import ArbitraryObject, Emphasis, Function, Term
 
 from .stateset import SetOfStates, State
@@ -18,22 +19,33 @@ class AtomCandidate:
     term: ArbitraryObject | Function | Term
     term_idx: int
     atom_occurrences: int
+    _dependency_relation: DependencyRelation
 
-    def __init__(self, term: ArbitraryObject | Function | Term, term_idx: int) -> None:
+    def __init__(
+        self,
+        term: ArbitraryObject | Function | Term,
+        dependency_relation: DependencyRelation,
+        term_idx: int,
+    ) -> None:
         self.term = term
         self.term_idx = term_idx
         self.atom_occurrences = 1
+        self._dependency_relation = dependency_relation
 
     def __eq__(self, other: "AtomCandidate") -> bool:
         return self.term == other.term
 
     @property
     def is_universal(self):
-        return isinstance(self.term, ArbitraryObject) and not self.term.is_existential
+        return isinstance(
+            self.term, ArbitraryObject
+        ) and not self._dependency_relation.is_existential(self.term)
 
     @property
     def is_existential(self):
-        return isinstance(self.term, ArbitraryObject) and self.term.is_existential
+        return isinstance(
+            self.term, ArbitraryObject
+        ) and self._dependency_relation.is_existential(self.term)
 
     @property
     def is_const(self):
@@ -68,11 +80,15 @@ def compare_type(
         return None
 
 
-def get_atom_candidate(atom: Atom) -> AtomCandidate:
+def get_atom_candidate(
+    atom: Atom, dependency_relation: DependencyRelation
+) -> AtomCandidate:
     current_candidate: Optional[AtomCandidate] = None
     for i, term in enumerate(atom.terms):
         assert not isinstance(term, Emphasis)
-        new_candidate = AtomCandidate(term=term, term_idx=i)
+        new_candidate = AtomCandidate(
+            term=term, dependency_relation=dependency_relation, term_idx=i
+        )
         if current_candidate is None:
             current_candidate = new_candidate
         elif current_candidate == new_candidate:
@@ -103,12 +119,14 @@ class Candidate:
         return f"<Candidate occurrences={self.occurrences} atom_cand={self.atom_candidate}>"
 
 
-def extract_candidates(s: SetOfStates) -> list[Candidate]:
+def extract_candidates(
+    s: SetOfStates, dependency_relation: DependencyRelation
+) -> list[Candidate]:
     new_candidates: list[Candidate] = []
     atomics_visited: list[AtomCandidate] = []
     for state in s:
         for atom in state:
-            atom_cand = get_atom_candidate(atom)
+            atom_cand = get_atom_candidate(atom, dependency_relation)
             if atom_cand in atomics_visited:
                 for cand in new_candidates:
                     cand.append_if_equal(atom_cand)
@@ -139,24 +157,39 @@ def compare_candidate(candidate1: Candidate, candidate2: Candidate) -> Candidate
             return candidate2
 
 
-def count_candidates(set_s: SetOfStates, atom_candidate: AtomCandidate) -> int:
+def count_candidates(
+    set_s: SetOfStates,
+    atom_candidate: AtomCandidate,
+    dependency_relation: DependencyRelation,
+) -> int:
     instances_encountered = 0
     for s in set_s:
         for atom in s:
-            if get_atom_candidate(atom) == atom_candidate:
+            if (
+                get_atom_candidate(atom, dependency_relation=dependency_relation)
+                == atom_candidate
+            ):
                 instances_encountered += 1
     return instances_encountered
 
 
-def get_new_state(set_s: SetOfStates, atom_candidate: AtomCandidate) -> SetOfStates:
-    instance_num = random.randint(0, count_candidates(set_s, atom_candidate) - 1)
+def get_new_state(
+    set_s: SetOfStates,
+    atom_candidate: AtomCandidate,
+    dependency_relation: DependencyRelation,
+) -> SetOfStates:
+    instance_num = random.randint(
+        0, count_candidates(set_s, atom_candidate, dependency_relation) - 1
+    )
     instances_encountered = 0
 
     new_set_of_states = set()
     for s in set_s:
         new_states = set()
         for atom in s:
-            current_atom_candidate = get_atom_candidate(atom)
+            current_atom_candidate = get_atom_candidate(
+                atom, dependency_relation=dependency_relation
+            )
             if current_atom_candidate == atom_candidate:
                 instances_encountered += 1
                 if instance_num == instances_encountered - 1:
@@ -178,15 +211,22 @@ def get_new_state(set_s: SetOfStates, atom_candidate: AtomCandidate) -> SetOfSta
 
 
 def add_new_emphasis(
-    stage: SetOfStates, supposition: SetOfStates
+    stage: SetOfStates,
+    supposition: SetOfStates,
+    dependency_relation: DependencyRelation,
 ) -> tuple[SetOfStates, SetOfStates]:
     if not (supposition.is_verum or supposition.is_falsum):
-        candidates = extract_candidates(supposition)
+        candidates = extract_candidates(supposition, dependency_relation)
         final_candidate = reduce(compare_candidate, candidates)
-        return stage, get_new_state(supposition, final_candidate.atom_candidate)
+        return stage, get_new_state(
+            supposition, final_candidate.atom_candidate, dependency_relation
+        )
     elif not (stage.is_verum or stage.is_falsum):
-        candidates = extract_candidates(stage)
+        candidates = extract_candidates(stage, dependency_relation)
         final_candidate = reduce(compare_candidate, candidates)
-        return get_new_state(stage, final_candidate.atom_candidate), supposition
+        return (
+            get_new_state(stage, final_candidate.atom_candidate, dependency_relation),
+            supposition,
+        )
     else:
         return stage, supposition
