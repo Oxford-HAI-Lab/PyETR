@@ -455,20 +455,25 @@ class View:
                 print(f"AnswerOutput: {out}")
             return out
 
-    def negation(self) -> "View":
+    def negation(self, verbose: bool = False) -> "View":
         """
         Based on definition 4.31
         """
+        if verbose:
+            print(f"NegationInput: {self}")
         verum = SetOfStates({State({})})
         stage, _ = stage_supposition_product(
             (self.supposition, verum), (self.stage.negation(), verum)
         )
-        return View.with_restriction(
+        out = View.with_restriction(
             stage=stage,
             supposition=verum,
             dependency_relation=self.dependency_relation,
             issue_structure=self.issue_structure.negation(),
         )
+        if verbose:
+            print(f"NegationOutput: {out}")
+        return out
 
     def merge(self, view: "View", verbose: bool = False) -> "View":
         """

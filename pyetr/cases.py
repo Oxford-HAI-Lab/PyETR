@@ -61,6 +61,16 @@ class Factor(BaseTest):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
+class Negation(BaseTest):
+    v: tuple[View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].negation(verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
 class e1(DefaultInference, BaseExample):
     """
     Example 1 (p. 61):
@@ -147,38 +157,37 @@ class e11(BasicStep, BaseExample):
     c: View = ps("(Smokes(j()) ∧ Drinks(j())) ∨ (Smokes(m()) ∧ Eats(m()))")
 
 
-# class e12i(NegationTest, BaseExample):
-#     """
-#     Example 12i (p. 78)
+class e12i(Negation, BaseExample):
+    """
+    Example 12i (p. 78)
 
-#     ItisnotthecasethatPorQorR
-#     """
-#     v: tuple[View] = (
-#         ps("P(p()) ∨ Q(q()) ∨ R(r())"),
-#     )
-#     c: View = ps("~P(p()) ∧ ~Q(q()) ∧ ~R(r())")
+    ItisnotthecasethatPorQorR
+    """
 
-# class e12ii(NegationTest, BaseExample):
-#     """
-#     Example 12ii (p. 78)
+    v: tuple[View] = (ps("P(p()) ∨ Q(q()) ∨ R(r())"),)
+    c: View = ps("~P(p()) ∧ ~Q(q()) ∧ ~R(r())")
 
-#     ItisnotthecasethatPandQandR
-#     """
-#     v: tuple[View] = (
-#         ps("P(p()) ∧ Q(q()) ∧ R(r())"),
-#     )
-#     c: View = ps("~P(p()) ∧ ~Q(q()) ∧ ~R(r())")
 
-# class e12iii(NegationTest, BaseExample):
-#     """
-#     Example 12iii (p. 79)
+class e12ii(Negation, BaseExample):
+    """
+    Example 12ii (p. 78)
 
-#     It is not the case that, supposing S, ((P and Q) or R)
-#     """
-#     v: tuple[View] = (
-#         ps("S(s()) → ((P(p()) ∧ Q(q())) ∨ R(r()))"),
-#     )
-#     c: View = ps("(S(s()) ∧ ~P(p()) ∧ ~R(r())) ∨ (S(s()) ∧ ~Q(q()) ∧ ~R(r()))")
+    ItisnotthecasethatPandQandR
+    """
+
+    v: tuple[View] = (ps("P(p()) ∧ Q(q()) ∧ R(r())"),)
+    c: View = ps("~P(p()) ∧ ~Q(q()) ∧ ~R(r())")
+
+
+class e12iii(Negation, BaseExample):
+    """
+    Example 12iii (p. 79)
+
+    It is not the case that, supposing S, ((P and Q) or R)
+    """
+
+    v: tuple[View] = (ps("S(s()) → ((P(p()) ∧ Q(q())) ∨ R(r()))"),)
+    c: View = ps("(S(s()) ∧ ~P(p()) ∧ ~R(r())) ∨ (S(s()) ∧ ~Q(q()) ∧ ~R(r()))")
 
 
 class e13(DefaultInference, BaseExample):
