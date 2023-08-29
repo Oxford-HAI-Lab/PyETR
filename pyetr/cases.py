@@ -176,7 +176,7 @@ class e12ii(Negation, BaseExample):
     """
 
     v: tuple[View] = (ps("P(p()) ∧ Q(q()) ∧ R(r())"),)
-    c: View = ps("~P(p()) ∧ ~Q(q()) ∧ ~R(r())")
+    c: View = ps("~P(p()) ∨ ~Q(q()) ∨ ~R(r())")
 
 
 class e12iii(Negation, BaseExample):

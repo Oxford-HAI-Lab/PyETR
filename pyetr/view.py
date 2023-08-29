@@ -851,29 +851,261 @@ class View:
             print(f"DeposeOutput: {out}")
         return out
 
-    def inquire(self, other: "View") -> "View":
+    def inquire(self, other: "View", *, verbose: bool = False) -> "View":
+        """
+        Based on definition 4.43
+        """
+        if verbose:
+            print(f"InquireInput: External: {self} Internal {other}")
+
         cond1 = len(self.stage_supp_arb_objects & other.stage_supp_arb_objects) == 0
         cond2 = len(other.stage.arb_objects & other.supposition.arb_objects) == 0
         if cond1 and cond2:
             # O case
-            return self
+            arb_gen = ArbitraryObjectGenerator(
+                self.stage_supp_arb_objects | other.stage_supp_arb_objects
+            )
+            v1 = View.with_restriction(
+                stage=SetOfStates({State({})}),
+                supposition=other.supposition,
+                dependency_relation=other.dependency_relation,
+                issue_structure=other.issue_structure,
+            )
+            v2 = View.with_restriction(
+                stage=other.stage.negation(),
+                supposition=SetOfStates({State({})}),
+                dependency_relation=other.dependency_relation.negation(),
+                issue_structure=other.issue_structure.negation(),
+            )
+
+            v3 = arb_gen.novelise_all(v2)
+            out = self.product(other.sum(v1.product(v3)))
         elif other.stage_supp_arb_objects.issubset(self.stage_supp_arb_objects):
             # I case
-            # view1 = View(
-            #     stage=other.stage,
-            #     supposition=other.supposition,
-            #     dependency_relation=DependencyRelation.from_arb_objects(
-            #         other.stage_supp_arb_objects, dependencies=frozenset()
-            #     ),
-            #     issue_structure=other.issue_structure,
-            # )
-            # view2 = View(
-            #     stage=other.stage,
-            #     supposition=SetOfStates({State({})}),
-            #     dependency_relation=DependencyRelation.from_arb_objects(other.stage.arb_objects, dependencies=frozenset()),
+            view1 = View(
+                stage=other.stage,
+                supposition=other.supposition,
+                dependency_relation=DependencyRelation(set(), set(), frozenset()),
+                issue_structure=other.issue_structure,
+                is_pre_view=True,
+            )
+            view2 = View(
+                stage=other.stage.negation(),
+                supposition=other.supposition,
+                dependency_relation=DependencyRelation(set(), set(), frozenset()),
+                issue_structure=other.issue_structure.negation(),
+                is_pre_view=True,
+            )
 
-            # )
-            # self.product().factor(SetOfStates())
-            raise NotImplementedError
+            out = self.product(view1.sum(view2)).factor(View.get_falsum())
         else:
-            return self
+            out = self
+
+        if verbose:
+            print(f"InquireOutput: {out}")
+        return out
+
+    def suppose(self, other: "View", *, verbose: bool = False) -> "View":
+        """
+        Based on definition 4.44
+        """
+        if verbose:
+            print(f"SupposeInput: External: {self} Internal {other}")
+
+        if len(self.stage_supp_arb_objects & other.stage_supp_arb_objects) == 0:
+            # O case
+            arb_gen = ArbitraryObjectGenerator(
+                self.stage_supp_arb_objects | other.stage_supp_arb_objects
+            )
+            v_prime = View(
+                stage=self.supposition,
+                supposition=SetOfStates({State({})}),
+                dependency_relation=self.dependency_relation,
+                issue_structure=self.issue_structure,
+            ).product(
+                arb_gen.novelise_all(
+                    View(
+                        stage=other.stage,
+                        supposition=other.supposition,
+                        dependency_relation=other.dependency_relation.negation(),
+                        issue_structure=other.issue_structure,
+                    ).depose(verbose=verbose)
+                )
+            )
+            out = (
+                View(
+                    stage=self.stage,
+                    supposition=v_prime.stage,
+                    dependency_relation=self.dependency_relation.fusion(
+                        v_prime.dependency_relation
+                    ),
+                    issue_structure=self.issue_structure | v_prime.issue_structure,
+                )
+                .universal_product(other, verbose=verbose)
+                .existential_sum(other, verbose=verbose)
+                .answer(other, verbose=verbose)
+                .merge(other, verbose=verbose)
+            )
+        elif (
+            (other.stage.arb_objects.issubset(self.stage_supp_arb_objects))
+            and (
+                self.dependency_relation.restriction(other.stage.arb_objects)
+                == other.dependency_relation
+            )
+            and other.supposition.is_verum
+        ):
+            # I case
+            out = (
+                View(
+                    stage=self.stage,
+                    supposition=self.stage * other.stage,
+                    dependency_relation=self.dependency_relation,
+                    issue_structure=self.issue_structure,
+                )
+                .universal_product(other, verbose=verbose)
+                .existential_sum(other, verbose=verbose)
+                .answer(other, verbose=verbose)
+                .merge(other, verbose=verbose)
+            )
+        else:
+            out = self
+
+        if verbose:
+            print(f"InquireOutput: {out}")
+        return out
+
+    def query(self, other: "View", *, verbose: bool = False) -> "View":
+        """
+        Based on definition 4.41
+        """
+
+        def _m_prime() -> set[tuple[Term | ArbitraryObject, ArbitraryObject]]:
+            output_set = set()
+            for t, e in self.issue_matches(other):
+                if isinstance(e, ArbitraryObject) and e in (
+                    other.dependency_relation.existentials
+                    - self.dependency_relation.existentials
+                ):
+                    output_set.add((t, e))
+            return output_set
+
+        def theta(
+            gamma: State,
+            delta: State,
+            m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
+        ) -> bool:
+            for psi in other.supposition:
+                exis = [e for _, e in m_prime]
+                x = psi | delta.replace({e: t for t, e in m_prime})
+                if x.issubset(gamma) and (len(exis) == len(set(exis))):
+                    return True
+            return False
+
+        if verbose:
+            print(f"QueryInput: External: {self} Internal {other}")
+
+        m_prime = _m_prime()
+
+        D1 = other.dependency_relation.dependencies  # TODO: Some operation on this
+        exis_for_pairs = set()
+        for t, e in m_prime:
+            for t_prime, e_prime in m_prime:
+                if (e == e_prime) and (t != t_prime):
+                    exis_for_pairs.add(e)
+
+        D2: set[Dependency] = set()
+        for u in self.dependency_relation.universals:
+            for exi in exis_for_pairs:
+                D2.add(Dependency(existential=exi, universal=u))
+
+        D3: set[Dependency] = set()
+        for t, e in m_prime:
+            if isinstance(t, ArbitraryObject):
+                if t in self.dependency_relation.universals:
+                    D3.add(Dependency(existential=e, universal=t))
+            else:
+                for u in t.arb_objects:
+                    if u in self.dependency_relation.universals:
+                        D3.add(Dependency(existential=e, universal=u))
+
+        D4: set[Dependency] = set()
+        for t_m, _ in m_prime:
+            if isinstance(t_m, ArbitraryObject):
+                e = t_m
+                if e in self.dependency_relation.existentials:
+                    for dep in self.dependency_relation.dependencies:
+                        if e == dep.existential:
+                            D4.add(dep)
+            else:
+                for e in t_m.arb_objects:
+                    if e in self.dependency_relation.existentials:
+                        for dep in self.dependency_relation.dependencies:
+                            if e == dep.existential:
+                                D4.add(dep)
+
+        D5: set[Dependency] = set()
+        D5_u_primes = {d.universal for d in D3 | D4}
+        for _, e_m in m_prime:
+            for u in self.dependency_relation.universals:
+                if all(
+                    [
+                        self.dependency_relation.triangle(u_prime, u)
+                        for u_prime in D5_u_primes
+                    ]
+                ):
+                    D5.add(Dependency(existential=e_m, universal=u))
+
+        dep_so_far = D1 | D2 | D3 | D4 | D5
+
+        D6: set[Dependency] = set()
+        D6_exi_set = (
+            other.dependency_relation.existentials
+            - self.dependency_relation.existentials
+        )
+        for e in D6_exi_set:
+            for e_prime in D6_exi_set:
+                if (
+                    other.dependency_relation.less_sim(e, e_prime) and True
+                ):  # TODO: Some condition here
+                    for dep in dep_so_far:
+                        if dep.existential == e_prime:
+                            D6.add(dep)
+
+        D_s_prime = dep_so_far | D6
+
+        # Stage construction
+        some_pair_thetas = False
+        for delta in other.stage:
+            for gamma in self.stage:
+                if theta(gamma, delta, m_prime):
+                    some_pair_thetas = True
+
+        if not some_pair_thetas:
+            s1 = SetOfStates({State({})})
+        else:
+            s1 = SetOfStates()
+
+        s2 = SetOfStates(
+            {
+                delta
+                for delta in other.stage
+                if any(theta(gamma, delta, m_prime) for gamma in self.stage)
+            }
+        )
+        new_stage = s1 | s2
+
+        new_dep_rel = self.dependency_relation.chain(
+            DependencyRelation(
+                self.dependency_relation.universals,
+                other.dependency_relation.existentials
+                - self.dependency_relation.existentials,
+                dependencies=D_s_prime,
+            )
+        )
+
+        return View.with_restriction(  # TODO: Added with restriction based on square brackets
+            stage=new_stage,
+            supposition=self.supposition,
+            dependency_relation=new_dep_rel,
+            issue_structure=self.issue_structure | other.issue_structure,
+        )
