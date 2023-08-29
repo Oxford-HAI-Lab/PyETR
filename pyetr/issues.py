@@ -69,10 +69,6 @@ class IssueStructure(frozenset[Atom]):
     ) -> "IssueStructure":
         return IssueStructure({a.replace(replacements) for a in self})
 
-    def flip(self):
-        # Flip all arb objects
-        raise NotImplementedError
-
     def negation(self) -> "IssueStructure":
         return self | IssueStructure(~a for a in self)
 
