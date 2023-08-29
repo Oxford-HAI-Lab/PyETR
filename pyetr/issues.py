@@ -72,7 +72,6 @@ class IssueStructure(frozenset[Atom]):
     def flip(self):
         # Flip all arb objects
         raise NotImplementedError
-        # return (self | {~a for a in self}).restriction()
 
     def negation(self) -> "IssueStructure":
         return self | IssueStructure(~a for a in self)

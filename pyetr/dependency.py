@@ -470,6 +470,9 @@ class DependencyRelation:
         return DependencyRelation(new_unis, new_exis, frozenset(new_deps))
 
     def flip(self) -> "DependencyRelation":
+        """
+        Based on 4.31, Negation of a dependency relation
+        """
         # Every new existential now depends on every new universal
         # Except those that the ancestor existential depended on the ancestor universal
         new_unis = {exi.flip() for exi in self.existentials}
@@ -481,6 +484,7 @@ class DependencyRelation:
                 if ancestor_dep not in self.dependencies:
                     new_dep = Dependency(existential=uni.flip(), universal=exi.flip())
                     new_deps.append(new_dep)
+
         return DependencyRelation(
             universals=new_unis, existentials=new_exis, dependencies=frozenset(new_deps)
         )

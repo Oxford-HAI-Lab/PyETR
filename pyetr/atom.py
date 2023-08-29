@@ -188,6 +188,9 @@ class Atom:
                 final_atoms.add(Atom(predicate=self.predicate, terms=tuple(new_terms)))
         return final_atoms
 
+    def flip(self) -> "Atom":
+        raise NotImplementedError
+
 
 class Predicate:
     name: str

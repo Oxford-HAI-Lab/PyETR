@@ -105,6 +105,9 @@ class State(frozenset[Atom]):
     def excluding_emphasis(self) -> "State":
         return State(atom.excluding_emphasis for atom in self)
 
+    def flip(self):
+        return State({atom.flip() for atom in self})
+
 
 class SetOfStates(frozenset[State]):
     def __new__(cls, __iterable: Optional[Iterable[State]] = None, /) -> "SetOfStates":
@@ -183,6 +186,9 @@ class SetOfStates(frozenset[State]):
                 output = output * new_state_set
         assert output is not None
         return output
+
+    def flip(self):
+        return SetOfStates({state.flip() for state in self})
 
     @property
     def is_verum(self):

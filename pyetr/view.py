@@ -452,21 +452,20 @@ class View:
                 print(f"AnswerOutput: {out}")
             return out
 
-    # def negation(self) -> "View":
-    #     """
-    #     Based on definition 4.31
-    #     """
-    #     verum = SetOfStates({State({})})
-    #     stage, _ = stage_supposition_product(
-    #         (self.supposition, verum), (self.stage.negation(), verum)
-    #     )
-    #     raise NotImplementedError
-    #     return View(
-    #         stage=stage.flip(),
-    #         supposition=verum,
-    #         dependency_relation=self.dependency_relation.flip(),
-    #         issue_structure=self.issue_structure.flip(),
-    #     )
+    def negation(self) -> "View":
+        """
+        Based on definition 4.31
+        """
+        verum = SetOfStates({State({})})
+        stage, _ = stage_supposition_product(
+            (self.supposition, verum), (self.stage.negation(), verum)
+        )
+        return View.with_restriction(
+            stage=stage.flip(),
+            supposition=verum,
+            dependency_relation=self.dependency_relation.flip(),
+            issue_structure=self.issue_structure.negation().flip(),
+        )
 
     def merge(self, view: "View", verbose: bool = False) -> "View":
         """
@@ -842,3 +841,30 @@ class View:
         if verbose:
             print(f"DeposeOutput: {out}")
         return out
+
+    def inquire(self, other: "View") -> "View":
+        cond1 = len(self.stage_supp_arb_objects & other.stage_supp_arb_objects) == 0
+        cond2 = len(other.stage.arb_objects & other.supposition.arb_objects) == 0
+        if cond1 and cond2:
+            # O case
+            return self
+        elif other.stage_supp_arb_objects.issubset(self.stage_supp_arb_objects):
+            # I case
+            view1 = View(
+                stage=other.stage,
+                supposition=other.supposition,
+                dependency_relation=DependencyRelation.from_arb_objects(
+                    other.stage_supp_arb_objects, dependencies=frozenset()
+                ),
+                issue_structure=other.issue_structure,
+            )
+            # view2 = View(
+            #     stage=other.stage,
+            #     supposition=SetOfStates({State({})}),
+            #     dependency_relation=DependencyRelation.from_arb_objects(other.stage.arb_objects, dependencies=frozenset()),
+
+            # )
+            # self.product().factor(SetOfStates())
+            raise NotImplementedError
+        else:
+            return self
