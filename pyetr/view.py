@@ -974,7 +974,7 @@ class View:
             out = (
                 View(
                     stage=self.stage,
-                    supposition=self.stage * other.stage,
+                    supposition=self.supposition * other.stage,
                     dependency_relation=self.dependency_relation,
                     issue_structure=self.issue_structure,
                 )
@@ -987,7 +987,7 @@ class View:
             out = self
 
         if verbose:
-            print(f"InquireOutput: {out}")
+            print(f"SupposeOutput: {out}")
         return out
 
     def _query_m_prime(

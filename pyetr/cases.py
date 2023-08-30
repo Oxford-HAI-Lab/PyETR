@@ -9,7 +9,7 @@ from pyetr.view import View
 
 class BaseExample(metaclass=ABCMeta):
     v: tuple[View, ...]
-    c: View
+    c: View | tuple[View, ...]
 
     def __init_subclass__(cls) -> None:
         if not hasattr(cls, "v"):
@@ -22,7 +22,9 @@ class BaseExample(metaclass=ABCMeta):
             assert isinstance(i, View)
         v = cast(tuple[View, ...], v)
         c = getattr(cls, "c")
-        assert isinstance(c, View)
+        assert isinstance(c, View) or (
+            isinstance(c, tuple) and all(isinstance(x, View) for x in c)
+        )
 
     @classmethod
     @abstractmethod
@@ -87,6 +89,16 @@ class WHQuery(BaseTest):
     @classmethod
     def test(cls, verbose: bool = False):
         result = cls.v[0].wh_query(cls.v[1], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class Suppose(BaseTest):
+    v: tuple[View, View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].suppose(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
@@ -345,6 +357,20 @@ class e17(DefaultInference, BaseExample):
     c: View = ps("~Ace(a())")
 
 
+class e19(Suppose, BaseExample):
+    """
+    Example 19, page 84
+
+    Suppose test
+    """
+
+    v: tuple[View, View] = (
+        ps("⊤"),
+        ps("~N(n())"),
+    )
+    c: View = ps("~N(n()) → ~N(n())")
+
+
 class e20(DefaultInference, BaseExample):
     """
     Example 20
@@ -492,6 +518,67 @@ class e48(DefaultInference, BaseExample):
     c: View = ps("⊤")
 
 
+class e50_part1(BaseExample):
+    v: tuple[View, View, View, View] = (
+        ps("L(j(), s()) ∧ L(s(), g())"),
+        ps("M(j()*) ∧ ~M(g()*)"),
+        ps("⊥"),
+        ps("∃a ∃b L(a, b) ∧ M(a*) ∧ ~M(b*)"),
+    )
+    c: tuple[View, View] = (
+        ps("L(j(), s()) ∧ L(s(), g()) ∧ M(j()*) ∧ ~M(g()*)"),
+        ps("⊤"),
+    )
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = (
+            cls.v[0].update(cls.v[1], verbose=verbose).factor(cls.v[2], verbose=verbose)
+        )
+        if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(
+                f"Expected mid result: {cls.c[0]} but received {mid_result}"
+            )
+        result = mid_result.query(cls.v[3], verbose=verbose)
+        # TODO: The book here is probably incorrect, so have updated to be truth as output
+        if not result.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
+
+
+class e50_part2(BaseExample):
+    v: tuple[View, View, View, View] = (
+        ps("L(j(), s()) ∧ L(s(), g())"),
+        ps("M(j()) ∧ ~M(g())"),
+        ps("M(s())"),
+        ps("∃a ∃b L(a, b) ∧ M(a*) ∧ ~M(b*)"),
+    )
+    g1: View = ps(
+        "(L(j(), s()) ∧ L(s(), g()) ∧ M(j()) ∧ ~M(g()) ∧ M(s())) ∨ (L(j(), s()) ∧ L(s(), g()) ∧ M(j()) ∧ ~M(g()) ∧ ~M(s()))"
+    )
+    g2: View = ps(
+        "(L(j(), s()) ∧ L(s(), g()) ∧ M(j()*) ∧ ~M(g()*) ∧ M(s()*)) ∨ (L(j(), s()) ∧ L(s(), g()) ∧ M(j()*) ∧ ~M(g()*) ∧ ~M(s()*))"
+    )
+
+    c: View = ps("∃a ∃b L(a, b) ∧ M(a*) ∧ ~M(b*)")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = (
+            cls.v[0]
+            .update(cls.v[1], verbose=verbose)
+            .inquire(cls.v[2], verbose=verbose)
+        )
+        if not mid_result.is_equivalent_under_arb_sub(cls.g1):
+            raise RuntimeError(
+                f"Expected mid result: {cls.g1} but received {mid_result}"
+            )
+
+        # Should use reorient once this exists
+        result = cls.g2.query(cls.v[3], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
 class e51(BasicStep, BaseExample):
     """
     P1: Every archaeon has a nucleus
@@ -521,6 +608,33 @@ class e52(BasicStep, BaseExample):
         ps("G(John()*)"),
     )
     c: View = ps("F(John()) ∧ G(John()*)")
+
+
+class e53(BaseExample):
+    """
+    Example 53, page 132 & page 175
+
+    P All A are B.
+    C All B are A.
+    """
+
+    v: tuple[View, View, View] = (
+        ps("∀x A(x) → A(x) ∧ B(x)"),
+        ps("∀x B(x)"),
+        ps("∀x B(x) → A(x) ∧ B(x)"),
+    )
+    c: View = ps("∀x B(x) → A(x) ∧ B(x)")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = (
+            cls.v[0]
+            .depose(verbose=verbose)
+            .suppose(cls.v[1], verbose=verbose)
+            .query(cls.v[2], verbose=verbose)
+        )
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
 class e54(BasicStep, BaseExample):
@@ -606,9 +720,33 @@ class e62(WHQuery, BaseExample):
     c = ps("S(j()*) ∨ S(m()*) ∨ ⊤")
 
 
+class e63(WHQuery, BaseExample):
+    """
+    Example 63, page 176
+    """
+
+    v = (
+        ps("(S(j()*) ∧  D(n()*)) ∨ (T(j()) ∧ ~D(j()*) ∧ D(n()*))"),
+        ps("∃a D(a*)"),
+    )
+    c = ps("D(n()*)")
+
+
+class e63_modified(WHQuery, BaseExample):
+    """
+    Example 63, page 176
+    """
+
+    v = (
+        ps("∀x ∃y (S(j()*) ∧  D(n()*)) ∨ (T(j()) ∧ ~D(j()*) ∧ D(f_f(y, x)*))"),
+        ps("∃a D(a*)"),
+    )
+    c = ps("∀x ∃y (D(f_f(y,x)*) ∨ D(n()*))")
+
+
 class UniProduct(BaseExample):
     v = (ps("∀x ∃a (P(x*) ∧ E(x,a)) ∨ ~P(x)"), ps("P(j()*)"))
-    c = ps("∃a (P(j()*) ∧ E(j(),a)) ∨ ~P(j())")
+    c: View = ps("∃a (P(j()*) ∧ E(j(),a)) ∨ ~P(j())")
 
     @classmethod
     def test(cls):
@@ -641,5 +779,3 @@ class QueryTest2(Query, BaseExample):
 
 
 # Example 18
-# Example 50, 177
-# Example 62 & 63
