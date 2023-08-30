@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import overload
+from typing import Literal, cast
 
 from pyetr.add_new_emphasis import add_new_emphasis
 from pyetr.dependency import Dependency, DependencyRelation, dependencies_from_sets
@@ -9,15 +9,14 @@ from pyetr.view import View
 
 from ..atom import Atom, Predicate
 from .parse_string import (
+    AtomicItem,
     BoolAnd,
     BoolNot,
     BoolOr,
-    Constant,
     Falsum,
     Implies,
     Item,
     LogicEmphasis,
-    LogicFunction,
     LogicPredicate,
     Quantified,
     Truth,
@@ -37,34 +36,27 @@ def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> Atom:
     def _parse_term(item: Item) -> Term | ArbitraryObject | Emphasis:
         if isinstance(item, Variable):
             return maps.variable_map[item.name]
-        elif isinstance(item, LogicFunction):
-            return _parse_function(item)
         elif isinstance(item, LogicEmphasis):
             inner = _parse_term(item.arg)
             if isinstance(inner, Emphasis):
                 raise ValueError(f"Second emphasis found in {inner}")
             return Emphasis(inner)
-        elif isinstance(item, Constant):
-            return _parse_constant(item)
+        elif isinstance(item, LogicPredicate):
+            if item.name in maps.constant_map:
+                return Term(maps.constant_map[item.name])
+            elif item.name in maps.function_map:
+                terms: list[Term | ArbitraryObject | Emphasis] = [
+                    _parse_term(item) for item in item.args
+                ]
+                if len(terms) == 0:
+                    new_terms = None
+                else:
+                    new_terms = tuple(terms)
+                return Term(maps.function_map[item.name], new_terms)
+            else:
+                raise ValueError(f"Item: {item} not found in constant or function maps")
         else:
             raise ValueError(f"Invalid item {item}")
-
-    def _parse_constant(constant: Constant) -> Term:
-        if constant.name not in maps.constant_map:
-            raise ValueError(f"{constant} not found in constant map")
-        return Term(maps.constant_map[constant.name])
-
-    def _parse_function(function: LogicFunction) -> Term:
-        if function.name not in maps.function_map:
-            raise ValueError(f"{function} not found in function map")
-        terms: list[Term | ArbitraryObject | Emphasis] = [
-            _parse_term(item) for item in function.args
-        ]
-        if len(terms) == 0:
-            new_terms = None
-        else:
-            new_terms = tuple(terms)
-        return Term(maps.function_map[function.name], new_terms)
 
     terms: list[Term | ArbitraryObject | Emphasis] = [
         _parse_term(item) for item in predicate.args
@@ -111,14 +103,8 @@ def _parse_item(item: Item, maps: Maps) -> SetOfStates:
     elif isinstance(item, LogicEmphasis):
         raise ValueError(f"Logic emphasis {item} found outside of logic predicate")
 
-    elif isinstance(item, LogicFunction):
-        raise ValueError(f"Logic function {item} found outside of logic predicate")
-
     elif isinstance(item, Variable):
         raise ValueError(f"Variable {item} found outside of logic predicate")
-
-    elif isinstance(item, Constant):
-        raise ValueError(f"Constant {item} found outside of logic predicate")
 
     elif isinstance(item, Implies):
         raise ValueError(f"Implies statement {item} found at lower level than top")
@@ -193,32 +179,46 @@ def get_variable_map_and_dependencies(
     )
 
 
-@overload
-def gather_item(item: Item, object_type: type[LogicPredicate]) -> list[LogicPredicate]:
-    ...
+def gather_atomic_item(
+    item: AtomicItem, object_type: Literal["Function"] | Literal["Constant"]
+) -> list[LogicPredicate]:
+    out = []
 
+    if (
+        object_type == "Constant"
+        and isinstance(item, LogicPredicate)
+        and len(item.args) == 0
+    ):
+        out.append(item)
+    elif (
+        object_type == "Function"
+        and isinstance(item, LogicPredicate)
+        and len(item.args) >= 0
+    ):
+        out.append(item)
 
-@overload
-def gather_item(item: Item, object_type: type[LogicFunction]) -> list[LogicFunction]:
-    ...
-
-
-@overload
-def gather_item(item: Item, object_type: type[Constant]) -> list[Constant]:
-    ...
+    if isinstance(item, LogicPredicate):
+        for arg in item.args:
+            out += gather_atomic_item(cast(AtomicItem, arg), object_type)
+    elif isinstance(item, BoolNot) or isinstance(item, LogicEmphasis):
+        out += gather_atomic_item(cast(AtomicItem, item.arg), object_type)
+    else:
+        pass
+    return out
 
 
 def gather_item(
-    item: Item, object_type: type[LogicPredicate] | type[LogicFunction] | type[Constant]
-) -> list[LogicPredicate] | list[LogicFunction] | list[Constant]:
+    item: Item,
+    object_type: Literal["Predicate"] | Literal["Function"] | Literal["Constant"],
+) -> list[LogicPredicate]:
     out = []
 
-    if isinstance(item, object_type):
+    if object_type == "Predicate" and isinstance(item, LogicPredicate):
         out.append(item)
 
-    if isinstance(item, LogicPredicate) or isinstance(item, LogicFunction):
+    if isinstance(item, LogicPredicate) and not object_type == "Predicate":
         for arg in item.args:
-            out += gather_item(arg, object_type)
+            out += gather_atomic_item(cast(AtomicItem, arg), object_type)
     elif isinstance(item, BoolAnd) or isinstance(item, BoolOr):
         for operand in item.operands:
             out += gather_item(operand, object_type)
@@ -236,9 +236,9 @@ def gather_item(
 def build_maps(
     item: Item,
 ) -> tuple[dict[str, Predicate], dict[str, Function], dict[str, Function]]:
-    logic_predicates = gather_item(item, LogicPredicate)
-    logic_functions = gather_item(item, LogicFunction)
-    constants = gather_item(item, Constant)
+    logic_predicates = gather_item(item, "Predicate")
+    logic_functions = gather_item(item, "Function")
+    constants = gather_item(item, "Constant")
 
     predicate_map: dict[str, Predicate] = {}
     for predicate in logic_predicates:

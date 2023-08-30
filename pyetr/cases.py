@@ -366,9 +366,9 @@ class e19(Suppose, BaseExample):
 
     v: tuple[View, View] = (
         ps("⊤"),
-        ps("~N(n())"),
+        ps("~N()"),
     )
-    c: View = ps("~N(n()) → ~N(n())")
+    c: View = ps("~N() → ~N()")
 
 
 class e20(DefaultInference, BaseExample):
@@ -738,10 +738,10 @@ class e63_modified(WHQuery, BaseExample):
     """
 
     v = (
-        ps("∀x ∃y (S(j()*) ∧  D(n()*)) ∨ (T(j()) ∧ ~D(j()*) ∧ D(f_f(y, x)*))"),
+        ps("∀x ∃y (S(j()*) ∧  D(n()*)) ∨ (T(j()) ∧ ~D(j()*) ∧ D(f(y, x)*))"),
         ps("∃a D(a*)"),
     )
-    c = ps("∀x ∃y (D(f_f(y,x)*) ∨ D(n()*))")
+    c = ps("∀x ∃y (D(f(y,x)*) ∨ D(n()*))")
 
 
 class UniProduct(BaseExample):

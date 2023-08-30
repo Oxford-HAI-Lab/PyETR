@@ -1,9 +1,7 @@
 __all__ = [
     "Variable",
-    "LogicFunction",
     "LogicPredicate",
     "LogicEmphasis",
-    "Constant",
     "Quantified",
     "BoolNot",
     "BoolAnd",
@@ -38,19 +36,6 @@ class Variable:
 
     def to_string(self) -> str:
         return self.name
-
-
-class Constant:
-    name: str
-
-    def __init__(self, t) -> None:
-        self.name = t[0][0]
-
-    def __repr__(self) -> str:
-        return f"<Constant name={self.name}>"
-
-    def to_string(self) -> str:
-        return self.name + "()"
 
 
 class Quantified:
@@ -203,30 +188,6 @@ class LogicPredicate:
         return self.name + "(" + ", ".join([a.to_string() for a in self.args]) + ")"
 
 
-class LogicFunction:
-    args: list["Item"]
-    name: str
-
-    def __init__(self, t) -> None:
-        self.name = t[0][1]
-        if len(t[0]) > 2:
-            other = t[0][2]
-            if isinstance(other, Comma):
-                self.args = t[0][2].operands
-            else:
-                self.args = [t[0][2]]
-        else:
-            self.args = []
-
-    def __repr__(self) -> str:
-        return f"<LogicFunction args={self.args} name={self.name}>"
-
-    def to_string(self) -> str:
-        return (
-            "f_" + self.name + "(" + ",".join([a.to_string() for a in self.args]) + ")"
-        )
-
-
 @cache
 def get_expr():
     expr = pp.Forward()
@@ -248,16 +209,15 @@ def get_expr():
     emphasis = pp.Suppress(pp.Char("*"))
 
     predicate_word = pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
-    function_word = pp.Literal("f_") + predicate_word
-    predicate_0 = pp.Group(predicate_word + pp.Suppress("()")).setParseAction(Constant)
-
+    predicate_0 = pp.Group(predicate_word + pp.Suppress("()")).setParseAction(
+        LogicPredicate
+    )
     truth = pp.Char("⊤").setParseAction(Truth)
     falsum = pp.Char("⊥").setParseAction(Falsum)
     comma = pp.Suppress(",")
     nested_and = pp.infixNotation(
         predicate_0 | variable | truth | falsum,
         [
-            (function_word, 1, pp_right, LogicFunction),
             (predicate_word, 1, pp_right, LogicPredicate),
             (emphasis, 1, pp_left, LogicEmphasis),
             (bool_not, 1, pp_right, BoolNot),
@@ -274,20 +234,11 @@ def get_expr():
     return expr
 
 
-Item = (
-    Variable
-    | LogicFunction
-    | LogicPredicate
-    | LogicEmphasis
-    | Constant
-    | Quantified
-    | BoolNot
-    | BoolAnd
-    | BoolOr
-    | Implies
-    | Truth
-    | Falsum
-)
+AtomicItem = Variable | LogicEmphasis | LogicPredicate
+
+StatementItem = Quantified | BoolNot | BoolAnd | BoolOr | Implies | Truth | Falsum
+
+Item = AtomicItem | StatementItem
 
 
 def parse_string(input_string: str) -> list[Item]:

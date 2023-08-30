@@ -5,12 +5,10 @@ from pyetr.parsing.parse_string import (
     BoolNot,
     BoolOr,
     Comma,
-    Constant,
     Falsum,
     Implies,
     Item,
     LogicEmphasis,
-    LogicFunction,
     LogicPredicate,
     Quantified,
     Truth,
@@ -24,12 +22,11 @@ from pyetr.view import View
 def convert_term(term: Term | ArbitraryObject | Emphasis) -> Item:
     if isinstance(term, Term):
         if term.t is None:
-            return Constant([[term.f.name]])
+            return LogicPredicate([[term.f.name]])
         else:
-            return LogicFunction(
+            return LogicPredicate(
                 [
                     [
-                        "f_",
                         term.f.name,
                         Comma([[convert_term(subterm) for subterm in term.t]]),
                     ]
