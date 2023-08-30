@@ -3,7 +3,7 @@ __all__ = ["ArbitraryObjectGenerator"]
 import typing
 from abc import ABCMeta, abstractmethod
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable, TypeVar
 
 if TYPE_CHECKING:
     from .view import View
@@ -90,3 +90,13 @@ class ArbitraryObjectGenerator:
 
     def novelise_all(self, view: "View") -> "View":
         return self.novelise(view.stage_supp_arb_objects, view)
+
+
+from itertools import chain, combinations
+
+IterType = TypeVar("IterType")
+
+
+def powerset(iterable: Iterable[IterType]) -> list[tuple[IterType, ...]]:
+    s = list(iterable)
+    return list(chain.from_iterable(combinations(s, r) for r in range(len(s) + 1)))

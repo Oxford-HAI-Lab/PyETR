@@ -63,6 +63,10 @@ class ArbitraryObject:
     def excluding_emphasis(self) -> "ArbitraryObject":
         return self
 
+    @property
+    def arb_objects(self) -> set["ArbitraryObject"]:
+        return {self}
+
 
 class Emphasis:
     term: "Term | ArbitraryObject"

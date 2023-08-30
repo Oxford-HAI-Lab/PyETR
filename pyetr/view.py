@@ -5,7 +5,7 @@ from itertools import permutations
 from typing import Optional, cast
 
 from pyetr.issues import IssueStructure
-from pyetr.tools import ArbitraryObjectGenerator
+from pyetr.tools import ArbitraryObjectGenerator, powerset
 
 from .atom import Atom
 from .dependency import Dependency, DependencyRelation
@@ -154,17 +154,19 @@ def state_division(
         return state
 
 
-def theta(
+def phi(
     gamma: State,
     delta: State,
     m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
     other_supposition: Supposition,
 ) -> bool:
-    for psi in other_supposition:
-        exis = [e for _, e in m_prime]
-        x = psi | delta.replace({e: t for t, e in m_prime})
-        if x.issubset(gamma) and (len(exis) == len(set(exis))):
-            return True
+    for ms in powerset(m_prime):
+        m_prime_set = set(ms)
+        for psi in other_supposition:
+            exis = [e for _, e in m_prime_set]
+            x = psi | delta.replace({e: t for t, e in m_prime_set})
+            if x.issubset(gamma) and (len(exis) == len(set(exis))):
+                return True
     return False
 
 
@@ -1000,14 +1002,14 @@ class View:
                 output_set.add((t, e))
         return output_set
 
-    def _some_pair_thetas(
+    def _some_pair_phis(
         self,
         other: "View",
         m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
     ):
         for delta in other.stage:
             for gamma in self.stage:
-                if theta(gamma, delta, m_prime, other.supposition):
+                if phi(gamma, delta, m_prime, other.supposition):
                     return True
         return False
 
@@ -1019,109 +1021,108 @@ class View:
         if verbose:
             print(f"QueryInput: External: {self} Internal {other}")
 
-        m_prime = self._query_m_prime(other)
+        if other.dependency_relation.universals.issubset(
+            self.dependency_relation.universals
+        ):
+            m_prime = self._query_m_prime(other)
 
-        D1 = other.dependency_relation.dependencies  # TODO: Some operation on this
-        exis_for_pairs = set()
-        for t, e in m_prime:
-            for t_prime, e_prime in m_prime:
-                if (e == e_prime) and (t != t_prime):
-                    exis_for_pairs.add(e)
+            D1 = other.dependency_relation.restriction(
+                other.stage_supp_arb_objects - self.dependency_relation.existentials
+            ).dependencies
 
-        D2: set[Dependency] = set()
-        for u in self.dependency_relation.universals:
-            for exi in exis_for_pairs:
-                D2.add(Dependency(existential=exi, universal=u))
+            exis_for_pairs = set()
+            for t, e in m_prime:
+                for t_prime, e_prime in m_prime:
+                    if (e == e_prime) and (t != t_prime):
+                        exis_for_pairs.add(e)
+            D2: set[Dependency] = set()
+            for u in self.dependency_relation.universals:
+                for exi in exis_for_pairs:
+                    D2.add(Dependency(existential=exi, universal=u))
 
-        D3: set[Dependency] = set()
-        for t, e in m_prime:
-            if isinstance(t, ArbitraryObject):
-                if t in self.dependency_relation.universals:
-                    D3.add(Dependency(existential=e, universal=t))
-            else:
+            D3: set[Dependency] = set()
+            for t, e in m_prime:
                 for u in t.arb_objects:
                     if u in self.dependency_relation.universals:
                         D3.add(Dependency(existential=e, universal=u))
 
-        D4: set[Dependency] = set()
-        for t_m, _ in m_prime:
-            if isinstance(t_m, ArbitraryObject):
-                e = t_m
-                if e in self.dependency_relation.existentials:
-                    for dep in self.dependency_relation.dependencies:
-                        if e == dep.existential:
-                            D4.add(dep)
-            else:
+            D4: set[Dependency] = set()
+            for t_m, e_m in m_prime:
                 for e in t_m.arb_objects:
                     if e in self.dependency_relation.existentials:
                         for dep in self.dependency_relation.dependencies:
                             if e == dep.existential:
-                                D4.add(dep)
+                                D4.add(
+                                    Dependency(existential=e_m, universal=dep.universal)
+                                )
 
-        D5: set[Dependency] = set()
-        D5_u_primes = {d.universal for d in D3 | D4}
-        for _, e_m in m_prime:
-            for u in self.dependency_relation.universals:
-                if all(
-                    [
-                        self.dependency_relation.triangle(u_prime, u)
-                        for u_prime in D5_u_primes
-                    ]
-                ):
-                    D5.add(Dependency(existential=e_m, universal=u))
+            D5: set[Dependency] = set()
+            D5_u_primes = {d.universal for d in D3 | D4}
+            for _, e_m in m_prime:
+                for u in self.dependency_relation.universals:
+                    if all(
+                        [
+                            self.dependency_relation.triangle(u_prime, u)
+                            for u_prime in D5_u_primes
+                        ]
+                    ):
+                        D5.add(Dependency(existential=e_m, universal=u))
 
-        dep_so_far = D1 | D2 | D3 | D4 | D5
+            dep_so_far = D1 | D2 | D3 | D4 | D5
 
-        D6: set[Dependency] = set()
-        D6_exi_set = (
-            other.dependency_relation.existentials
-            - self.dependency_relation.existentials
-        )
-        for e in D6_exi_set:
-            for e_prime in D6_exi_set:
-                if (
-                    other.dependency_relation.less_sim(e, e_prime) and True
-                ):  # TODO: Some condition here
-                    for dep in dep_so_far:
-                        if dep.existential == e_prime:
-                            D6.add(dep)
-
-        D_s_prime = dep_so_far | D6
-
-        # Stage construction
-        if not self._some_pair_thetas(other, m_prime):
-            s1 = SetOfStates({State({})})
-        else:
-            s1 = SetOfStates()
-
-        s2 = SetOfStates(
-            {
-                delta
-                for delta in other.stage
-                if any(
-                    theta(gamma, delta, m_prime, other.supposition)
-                    for gamma in self.stage
-                )
-            }
-        )
-        new_stage = s1 | s2
-
-        new_dep_rel = self.dependency_relation.chain(
-            DependencyRelation(
-                self.dependency_relation.universals,
+            D6: set[Dependency] = set()
+            D6_exi_set = (
                 other.dependency_relation.existentials
-                - self.dependency_relation.existentials,
-                dependencies=D_s_prime,
+                - self.dependency_relation.existentials
             )
-        )
+            for e in D6_exi_set:
+                for e_prime in D6_exi_set:
+                    if other.dependency_relation.less_sim(e, e_prime) and (
+                        len([e_m for _, e_m in m_prime if e_m == e_prime]) < 2
+                    ):
+                        for dep in dep_so_far:
+                            if dep.existential == e_prime:
+                                D6.add(
+                                    Dependency(existential=e, universal=dep.universal)
+                                )
 
-        out = View.with_restriction(  # TODO: Added with restriction based on square brackets
-            stage=new_stage,
-            supposition=self.supposition,
-            dependency_relation=new_dep_rel,
-            issue_structure=self.issue_structure | other.issue_structure,
-        )
+            D_s_prime = dep_so_far | D6
 
+            # Stage construction
+            if not self._some_pair_phis(other, m_prime):
+                s1 = SetOfStates({State({})})
+            else:
+                s1 = SetOfStates()
+
+            s2 = SetOfStates(
+                {
+                    delta
+                    for delta in other.stage
+                    if any(
+                        phi(gamma, delta, m_prime, other.supposition)
+                        for gamma in self.stage
+                    )
+                }
+            )
+            new_stage = s1 | s2
+
+            new_dep_rel = self.dependency_relation.fusion(
+                DependencyRelation(
+                    self.dependency_relation.universals,
+                    other.dependency_relation.existentials
+                    - self.dependency_relation.existentials,
+                    dependencies=D_s_prime,
+                )
+            )
+
+            out = View.with_restriction(
+                stage=new_stage,
+                supposition=self.supposition,
+                dependency_relation=new_dep_rel,
+                issue_structure=self.issue_structure | other.issue_structure,
+            )
+        else:
+            out = self
         if verbose:
             print(f"QueryOutput: {out}")
         return out
@@ -1134,25 +1135,29 @@ class View:
         if verbose:
             print(f"QueryInput: External: {self} Internal {other}")
 
-        def psi(gamma: State, xi) -> bool:
-            # TODO: What is Xi
-            raise NotImplementedError
-
         if other.dependency_relation.universals.issubset(
             self.dependency_relation.universals
         ):
             m_prime = self._query_m_prime(other)
 
-            if not self._some_pair_thetas(other, m_prime):
+            def psi(gamma: State) -> SetOfStates:
+                out: set[State] = set()
+                for x in powerset(m_prime):
+                    m_prime_set = set(x)
+                    if len({e_n for _, e_n in m_prime_set}) == len(m_prime_set):
+                        for p in other.supposition:
+                            for delta in other.stage:
+                                xi = delta.replace({e_n: t_n for t_n, e_n in m_prime})
+                                if (xi | p).issubset(gamma):
+                                    out.add(xi)
+                return SetOfStates(out)
+
+            if not self._some_pair_phis(other, m_prime):
                 s1 = SetOfStates({State({})})
             else:
                 s1 = SetOfStates()
 
-            s2 = {
-                delta
-                for delta in other.stage
-                if any([psi(gamma, delta) for gamma in self.stage])
-            }
+            s2 = SetOfStates.union(*{psi(gamma) for gamma in self.stage})
 
             out = View.with_restriction(
                 stage=s1 | s2,
