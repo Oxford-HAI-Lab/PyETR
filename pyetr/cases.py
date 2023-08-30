@@ -71,6 +71,26 @@ class Negation(BaseTest):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
+class Query(BaseTest):
+    v: tuple[View, View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].query(cls.v[1], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class WHQuery(BaseTest):
+    v: tuple[View, View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].wh_query(cls.v[1], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
 class e1(DefaultInference, BaseExample):
     """
     Example 1 (p. 61):
@@ -572,6 +592,20 @@ class e58_reversed(BasicStep, BaseExample):
     c: View = ps("∃y C(y) ∧ A(y) ∧ B(y*)")
 
 
+class e62(WHQuery, BaseExample):
+    """
+    Example 62, page 176
+    """
+
+    v = (
+        ps(
+            "(S(j()*) ∧  D(m()) ∧ T(n())) ∨ (S(m()*) ∧ L(n(),m())) ∨ (~S(n()*) ∧ D(b()))"
+        ),
+        ps("∃a S(a*)"),
+    )
+    c = ps("S(j()*) ∨ S(m()*) ∨ ⊤")
+
+
 class UniProduct(BaseExample):
     v = (ps("∀x ∃a (P(x*) ∧ E(x,a)) ∨ ~P(x)"), ps("P(j()*)"))
     c = ps("∃a (P(j()*) ∧ E(j(),a)) ∨ ~P(j())")
@@ -580,3 +614,32 @@ class UniProduct(BaseExample):
     def test(cls):
         result = cls.v[0].universal_product(cls.v[1])
         assert result.is_equivalent_under_arb_sub(cls.c)
+
+
+class QueryTest(Query, BaseExample):
+    """
+    From page 173
+    """
+
+    v = (
+        ps("∀x (T(x, j()) ∧ S(j()*) ∧ S(m()*)) ∨ (T(x, m()) ∧ S(j()*) ∧ S(m()*))"),
+        ps("∀x ∃a T(x, a) ∧ S(a*)"),
+    )
+    c = ps("∀x ∃a T(x, a) ∧ S(a*)")
+
+
+class QueryTest2(Query, BaseExample):
+    """
+    From page 173
+    """
+
+    v = (
+        ps("∀x (T(x, j()) ∧ S(j()*) ∧ S(m()*)) ∨ (T(x, m()) ∧ S(j()*) ∧ S(m()*))"),
+        ps("∃a ∀x T(x, a) ∧ S(a*)"),
+    )
+    c = ps("∀x ∃a T(x, a) ∧ S(a*)")
+
+
+# Example 18
+# Example 50, 177
+# Example 62 & 63

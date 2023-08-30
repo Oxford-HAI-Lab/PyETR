@@ -1002,17 +1002,6 @@ class View:
                 output_set.add((t, e))
         return output_set
 
-    def _some_pair_phis(
-        self,
-        other: "View",
-        m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
-    ):
-        for delta in other.stage:
-            for gamma in self.stage:
-                if phi(gamma, delta, m_prime, other.supposition):
-                    return True
-        return False
-
     def query(self, other: "View", *, verbose: bool = False) -> "View":
         """
         Based on definition 4.41
@@ -1088,8 +1077,17 @@ class View:
 
             D_s_prime = dep_so_far | D6
 
+            def _some_pair_phis(
+                m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
+            ):
+                for delta in other.stage:
+                    for gamma in self.stage:
+                        if phi(gamma, delta, m_prime, other.supposition):
+                            return True
+                return False
+
             # Stage construction
-            if not self._some_pair_phis(other, m_prime):
+            if not _some_pair_phis(m_prime):
                 s1 = SetOfStates({State({})})
             else:
                 s1 = SetOfStates()
@@ -1133,7 +1131,7 @@ class View:
         """
 
         if verbose:
-            print(f"QueryInput: External: {self} Internal {other}")
+            print(f"WHQueryInput: External: {self} Internal {other}")
 
         if other.dependency_relation.universals.issubset(
             self.dependency_relation.universals
@@ -1147,17 +1145,34 @@ class View:
                     if len({e_n for _, e_n in m_prime_set}) == len(m_prime_set):
                         for p in other.supposition:
                             for delta in other.stage:
-                                xi = delta.replace({e_n: t_n for t_n, e_n in m_prime})
+                                xi = delta.replace(
+                                    {e_n: t_n for t_n, e_n in m_prime_set}
+                                )
                                 if (xi | p).issubset(gamma):
                                     out.add(xi)
                 return SetOfStates(out)
 
-            if not self._some_pair_phis(other, m_prime):
+            def _some_gamma_doesnt_phi(
+                m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
+            ):
+                for gamma in self.stage:
+                    if all(
+                        [
+                            not phi(gamma, delta, m_prime, other.supposition)
+                            for delta in other.stage
+                        ]
+                    ):
+                        return True
+                return False
+
+            if _some_gamma_doesnt_phi(m_prime):
                 s1 = SetOfStates({State({})})
             else:
                 s1 = SetOfStates()
 
-            s2 = SetOfStates.union(*{psi(gamma) for gamma in self.stage})
+            s2 = SetOfStates()
+            for gamma in self.stage:
+                s2 |= psi(gamma)
 
             out = View.with_restriction(
                 stage=s1 | s2,
