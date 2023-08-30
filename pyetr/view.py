@@ -154,6 +154,20 @@ def state_division(
         return state
 
 
+def theta(
+    gamma: State,
+    delta: State,
+    m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
+    other_supposition: Supposition,
+) -> bool:
+    for psi in other_supposition:
+        exis = [e for _, e in m_prime]
+        x = psi | delta.replace({e: t for t, e in m_prime})
+        if x.issubset(gamma) and (len(exis) == len(set(exis))):
+            return True
+    return False
+
+
 class View:
     stage: Stage
     supposition: Supposition
@@ -974,37 +988,38 @@ class View:
             print(f"InquireOutput: {out}")
         return out
 
+    def _query_m_prime(
+        self, other: "View"
+    ) -> set[tuple[Term | ArbitraryObject, ArbitraryObject]]:
+        output_set = set()
+        for t, e in self.issue_matches(other):
+            if isinstance(e, ArbitraryObject) and e in (
+                other.dependency_relation.existentials
+                - self.dependency_relation.existentials
+            ):
+                output_set.add((t, e))
+        return output_set
+
+    def _some_pair_thetas(
+        self,
+        other: "View",
+        m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
+    ):
+        for delta in other.stage:
+            for gamma in self.stage:
+                if theta(gamma, delta, m_prime, other.supposition):
+                    return True
+        return False
+
     def query(self, other: "View", *, verbose: bool = False) -> "View":
         """
         Based on definition 4.41
         """
 
-        def _m_prime() -> set[tuple[Term | ArbitraryObject, ArbitraryObject]]:
-            output_set = set()
-            for t, e in self.issue_matches(other):
-                if isinstance(e, ArbitraryObject) and e in (
-                    other.dependency_relation.existentials
-                    - self.dependency_relation.existentials
-                ):
-                    output_set.add((t, e))
-            return output_set
-
-        def theta(
-            gamma: State,
-            delta: State,
-            m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
-        ) -> bool:
-            for psi in other.supposition:
-                exis = [e for _, e in m_prime]
-                x = psi | delta.replace({e: t for t, e in m_prime})
-                if x.issubset(gamma) and (len(exis) == len(set(exis))):
-                    return True
-            return False
-
         if verbose:
             print(f"QueryInput: External: {self} Internal {other}")
 
-        m_prime = _m_prime()
+        m_prime = self._query_m_prime(other)
 
         D1 = other.dependency_relation.dependencies  # TODO: Some operation on this
         exis_for_pairs = set()
@@ -1074,13 +1089,7 @@ class View:
         D_s_prime = dep_so_far | D6
 
         # Stage construction
-        some_pair_thetas = False
-        for delta in other.stage:
-            for gamma in self.stage:
-                if theta(gamma, delta, m_prime):
-                    some_pair_thetas = True
-
-        if not some_pair_thetas:
+        if not self._some_pair_thetas(other, m_prime):
             s1 = SetOfStates({State({})})
         else:
             s1 = SetOfStates()
@@ -1089,7 +1098,10 @@ class View:
             {
                 delta
                 for delta in other.stage
-                if any(theta(gamma, delta, m_prime) for gamma in self.stage)
+                if any(
+                    theta(gamma, delta, m_prime, other.supposition)
+                    for gamma in self.stage
+                )
             }
         )
         new_stage = s1 | s2
@@ -1103,9 +1115,54 @@ class View:
             )
         )
 
-        return View.with_restriction(  # TODO: Added with restriction based on square brackets
+        out = View.with_restriction(  # TODO: Added with restriction based on square brackets
             stage=new_stage,
             supposition=self.supposition,
             dependency_relation=new_dep_rel,
             issue_structure=self.issue_structure | other.issue_structure,
         )
+
+        if verbose:
+            print(f"QueryOutput: {out}")
+        return out
+
+    def wh_query(self, other: "View", *, verbose: bool = False) -> "View":
+        """
+        Based on definition 4.42
+        """
+
+        if verbose:
+            print(f"QueryInput: External: {self} Internal {other}")
+
+        def psi(gamma: State, xi) -> bool:
+            # TODO: What is Xi
+            raise NotImplementedError
+
+        if other.dependency_relation.universals.issubset(
+            self.dependency_relation.universals
+        ):
+            m_prime = self._query_m_prime(other)
+
+            if not self._some_pair_thetas(other, m_prime):
+                s1 = SetOfStates({State({})})
+            else:
+                s1 = SetOfStates()
+
+            s2 = {
+                delta
+                for delta in other.stage
+                if any([psi(gamma, delta) for gamma in self.stage])
+            }
+
+            out = View.with_restriction(
+                stage=s1 | s2,
+                supposition=self.supposition,
+                dependency_relation=self.dependency_relation,
+                issue_structure=self.issue_structure,
+            )
+        else:
+            out = self
+
+        if verbose:
+            print(f"WHQueryOutput: {out}")
+        return out
