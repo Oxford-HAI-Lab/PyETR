@@ -65,6 +65,26 @@ class BasicStep(BaseTest):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
+class Product(BaseTest):
+    v: tuple[View, View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].product(cls.v[1])
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class Sum(BaseTest):
+    v: tuple[View, View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].sum(cls.v[1])
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
 class Factor(BaseTest):
     v: tuple[View, View]
 
@@ -165,6 +185,80 @@ class e3(DefaultInference, BaseExample):
         ps("~Ace(a())"),
     )
     c: View = ps("Queen(q()) ∧ Jack(j())")
+
+
+# e4 is not a test
+
+
+class e5:
+    gamma = "p1() ∧ q1()"
+    delta = "r1() ∧ s1()"
+    epsilon = "p2() ∧ q2()"
+    theta = "r2() ∧ s2()"
+
+
+class e5ii(Product, BaseExample):
+    v: tuple[View, View] = (
+        ps("p1() ∧ q1() ∨ r1() ∧ s1()"),
+        ps(f"p2() ∧ q2() ∨ r2() ∧ s2()"),
+    )
+    c: View = ps(
+        "p1() ∧ q1() ∧ p2() ∧ q2() ∨ r1() ∧ s1() ∧ p2() ∧ q2() ∨ p1() ∧ q1() ∧ r2() ∧ s2() ∨ r1() ∧ s1() ∧ r2() ∧ s2()"
+    )
+
+
+class e5iii(Product, BaseExample):
+    v: tuple[View, View] = (ps(f"{e5.gamma} ∨ {e5.delta}"), View.get_falsum())
+    c: View = View.get_falsum()
+
+
+class e5iv(Product, BaseExample):
+    v: tuple[View, View] = (ps(f"{e5.gamma} ∨ {e5.delta}"), View.get_verum())
+    c: View = ps(f"{e5.gamma} ∨ {e5.delta}")
+
+
+class e5v(Product, BaseExample):
+    v: tuple[View, View] = (
+        View.get_verum(),
+        ps(f"{e5.gamma} ∨ {e5.delta}"),
+    )
+    c: View = ps(f"{e5.gamma} ∨ {e5.delta}")
+
+
+class e6(Product, BaseExample):
+    """
+    Example 6, p72
+
+    There is an Ace and a King = (There is an Ace) x (There is a king)
+    """
+
+    v: tuple[View, View] = (ps("a()"), ps("k()"))
+    c: View = ps("a() ∧ k()")
+
+
+class e7(Sum, BaseExample):
+    """
+    Example 7, p73
+
+    There is an Ace or there is a king = (There is an Ace) + (There is a king)
+    """
+
+    v: tuple[View, View] = (ps("a()"), ps("k()"))
+    c: View = ps("a() ∨ k()")
+
+
+class e8(DefaultInference, BaseExample):
+    """
+    Example 8, p74
+
+    P1 There is an ace and a queen, or else there is a king and a ten
+    P2 There is a king
+
+    C There is a ten (and a king)
+    """
+
+    v: tuple[View, View] = (ps("a() ∧ q() ∨ k() ∧ t()"), ps("k()"))
+    c: View = ps("t()")
 
 
 class e10(DefaultInference, BaseExample):
