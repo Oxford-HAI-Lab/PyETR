@@ -190,7 +190,7 @@ class e3(DefaultInference, BaseExample):
 # e4 is not a test
 
 
-class e5:
+class samples:
     gamma = "p1() ∧ q1()"
     delta = "r1() ∧ s1()"
     epsilon = "p2() ∧ q2()"
@@ -208,21 +208,21 @@ class e5ii(Product, BaseExample):
 
 
 class e5iii(Product, BaseExample):
-    v: tuple[View, View] = (ps(f"{e5.gamma} ∨ {e5.delta}"), View.get_falsum())
+    v: tuple[View, View] = (ps(f"{samples.gamma} ∨ {samples.delta}"), View.get_falsum())
     c: View = View.get_falsum()
 
 
 class e5iv(Product, BaseExample):
-    v: tuple[View, View] = (ps(f"{e5.gamma} ∨ {e5.delta}"), View.get_verum())
-    c: View = ps(f"{e5.gamma} ∨ {e5.delta}")
+    v: tuple[View, View] = (ps(f"{samples.gamma} ∨ {samples.delta}"), View.get_verum())
+    c: View = ps(f"{samples.gamma} ∨ {samples.delta}")
 
 
 class e5v(Product, BaseExample):
     v: tuple[View, View] = (
         View.get_verum(),
-        ps(f"{e5.gamma} ∨ {e5.delta}"),
+        ps(f"{samples.gamma} ∨ {samples.delta}"),
     )
-    c: View = ps(f"{e5.gamma} ∨ {e5.delta}")
+    c: View = ps(f"{samples.gamma} ∨ {samples.delta}")
 
 
 class e6(Product, BaseExample):
@@ -493,6 +493,23 @@ class e20(DefaultInference, BaseExample):
         ps("(Queen(q())) → (Win(bill()))"),
     )
     c: View = ps("Win(mary()) ∨ Win(bill())")
+
+
+class e21(BaseExample):
+    """
+    Example 21
+    """
+
+    v: tuple[View] = (ps(f"⊤ → {samples.delta}"),)
+    c: View = ps(f"⊤ → {samples.delta}").negation()
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        x = View.get_falsum().suppose(cls.v[0], verbose=verbose)
+        # TODO: typo in book here with line break
+        result = x.depose(verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
 class e28(DefaultInference, BaseExample):
