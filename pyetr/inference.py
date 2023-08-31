@@ -20,3 +20,13 @@ def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> V
         else:
             g_prime = g_prime.factor(view, verbose=verbose)
     return g_prime
+
+
+def chapter2_default_inference(v: tuple[View, ...], verbose: bool = False) -> View:
+    out = v[0]
+    for i, view in enumerate(v[1:]):
+        if i == 0:
+            out = out.update(view.depose(verbose=verbose), verbose=verbose)
+        else:
+            out = out.update(view, verbose=verbose)
+    return out.factor(View.get_falsum(), verbose=verbose)

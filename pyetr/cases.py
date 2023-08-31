@@ -2,7 +2,11 @@ __all__ = ["BaseExample"]
 from abc import ABCMeta, abstractmethod
 from typing import cast
 
-from pyetr.inference import basic_step, default_inference_procedure
+from pyetr.inference import (
+    basic_step,
+    chapter2_default_inference,
+    default_inference_procedure,
+)
 from pyetr.parsing import parse_string_to_view as ps
 from pyetr.view import View
 
@@ -41,6 +45,14 @@ class DefaultInference(BaseTest):
     @classmethod
     def test(cls, verbose: bool = False):
         result = default_inference_procedure(cls.v, verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class Chapter2DefaultInference(BaseTest):
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = chapter2_default_inference(cls.v, verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
@@ -455,6 +467,55 @@ class e33(DefaultInference, BaseExample):
     c: View = ps("R(r())")
 
 
+class e40i(Chapter2DefaultInference, BaseExample):
+    """
+    Example 40
+    (P0 Shapes at the bottom of the card are mutually exclusive)
+    P1 If there is a circle at the top of the card, then there is a
+    square on the bottom.
+    P2 There is a triangle on the bottom
+    C Falsum
+    """
+
+    v: tuple[View, View, View] = (
+        ps(
+            "(SquareB() ∧ ~TriangleB() ∧ ~CircleB()) ∨ (~SquareB() ∧ TriangleB() ∧ ~CircleB()) ∨ (~SquareB() ∧ ~TriangleB() ∧ CircleB())"
+        ),
+        ps("CircleT() → CircleT() ∧ SquareB()"),
+        ps("TriangleB()"),
+    )
+    c: View = View.get_falsum()
+
+
+class e40ii(BaseExample):
+    """
+    p120: The reader diverges from the default procedure,
+    and deposes the conditional premise, and switches the premise
+    order.
+    """
+
+    v: tuple[View, View, View] = (
+        ps(
+            "(SquareB() ∧ ~TriangleB() ∧ ~CircleB()) ∨ (~SquareB() ∧ TriangleB() ∧ ~CircleB()) ∨ (~SquareB() ∧ ~TriangleB() ∧ CircleB())"
+        ),
+        ps("TriangleB()"),
+        ps("CircleT() → CircleT() ∧ SquareB()"),
+    )
+    c: View = ps("~SquareB() ∧ TriangleB() ∧ ~CircleB() ∧ ~CircleT()")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = (
+            cls.v[0]
+            .update(cls.v[1], verbose=verbose)
+            .update(cls.v[2].depose(verbose=verbose), verbose=verbose)
+            .factor(View.get_falsum(), verbose=verbose)
+        )
+
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected result: {cls.c} but received {result}")
+
+
 class e41(DefaultInference, BaseExample):
     """
     Example 41
@@ -471,6 +532,26 @@ class e41(DefaultInference, BaseExample):
     c: View = ps("~P(p())")
 
 
+class e42(DefaultInference, BaseExample):
+    """
+    Example 42, p122
+
+    P1 There is a circle at the top of the card only if there is a square
+    at the bottom.
+    P2 There is not a square at the bottom
+    C There is not a circle at the top
+    """
+
+    v: tuple[View, View] = (
+        ps("~SquareB() → ~CircleT() ∧ ~SquareB()"),
+        ps("~SquareB()"),
+    )
+    c: View = ps("~CircleT()")
+
+
+# e43 is not an example
+
+
 class e44_1(DefaultInference, BaseExample):
     """
     Example 44-1
@@ -482,11 +563,86 @@ class e44_1(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("(Saleable(c()) ∧ Elegant(c())) ∨ (~Saleable(c()) ∧ ~Elegant(c())) "),
+        ps("(Saleable(c()) ∧ Elegant(c())) ∨ (~Saleable(c()) ∧ ~Elegant(c()))"),
         ps("(Elegant(c()) ∧ Stable(c())) ∨ (~Elegant(c()) ∧ ~Stable(c()))"),
         ps("Saleable(c()) ∨ Stable(c()) ∨ (Saleable(c()) ∧ Elegant(c()))"),
     )
     c: View = ps("Saleable(c()) ∧ Elegant(c()) ∧ Stable(c())")
+
+
+class e45(BaseExample):
+    """
+    Example 45
+
+    It is possible that Steven is in Madrid and it is possible that Emma is in
+    Berlin.
+    Therefore it is possible that Steven is in Madrid and that Emma is in Berlin.
+    """
+
+    v: tuple[View, View, View] = (ps("M() ∨ ⊤"), ps("B() ∨ ⊤"), ps("(M() ∧ B()) ∨ ⊤"))
+    c: tuple[View, View] = (ps("(M() ∧ B()) ∨ M() ∨ B() ∨ ⊤"), ps("(M() ∧ B()) ∨ ⊤"))
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = cls.v[0].product(cls.v[1])
+
+        if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(
+                f"Expected mid result: {cls.c[0]} but received {mid_result}"
+            )
+
+        result = mid_result.query(cls.v[2], verbose=verbose)
+
+        if not result.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
+
+
+class e46i(BaseExample):
+    """
+    Example 46
+
+    P1 Pat is here then Viv is here
+    P2 Mo is here or else Pat is here, but not both
+
+    C No
+    """
+
+    v: tuple[View, View, View] = (
+        ps("P() → P() ∧ V()"),
+        ps("(M() ∧ ~P()) ∨ (P() ∧ ~M())"),
+        ps("(V() ∧ M()) ∨ ⊤"),
+    )
+    c: tuple[View, View] = (ps("(P() ∧ V() ∧ ~M()) ∨ (~P() ∧ M())"), ps("⊤"))
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = (
+            cls.v[0]
+            .depose(verbose=verbose)
+            .update(cls.v[1], verbose=verbose)
+            .factor(View.get_falsum(), verbose=verbose)
+        )
+
+        if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(
+                f"Expected mid result: {cls.c[0]} but received {mid_result}"
+            )
+
+        result = mid_result.query(cls.v[2], verbose=verbose)
+
+        if not result.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
+
+    class e46ii(Query, BaseExample):
+        """
+        p126, if we had a view{VMR,VMS, T} and applied [{vm, 0}]Q we would get [{vm, 0}]
+        """
+
+        v: tuple[View, View] = (
+            ps("(V() ∧ M() ∧ R()) ∨ (V() ∧ M() ∧ S()) ∨ T()"),
+            ps("(V() ∧ M()) ∨ ⊤"),
+        )
+        c: View = ps("(V() ∧ M()) ∨ ⊤")
 
 
 class e47(DefaultInference, BaseExample):
