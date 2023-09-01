@@ -42,6 +42,8 @@ def stage_supposition_product(
 
 
 def arg_max_states(potentials: list[tuple[int, State]]) -> list[State]:
+    if len(potentials) == 0:
+        return []
     max_potential = max([potential for potential, _ in potentials])
     return [state for potential, state in potentials if potential == max_potential]
 
