@@ -512,6 +512,79 @@ class e21(BaseExample):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
+class e22(BaseExample):
+    """
+    Example 22
+
+    It is not the case that A and B and C
+    """
+
+    v: tuple[View, View, View, View] = (
+        ps(f"a() ∧ b() ∧ c()"),
+        ps("a()"),
+        ps("b()"),
+        ps("c()"),
+    )
+    c: tuple[View, View] = (
+        ps("~a() ∨ ~b() ∨ ~c()"),
+        ps(
+            "~a() ∧ b() ∧ c() ∨ ~a() ∧ b() ∧ ~c() ∨ ~a() ∧ ~b() ∧ c() ∨ ~a() ∧ ~b() ∧ ~c() ∨ a() ∧ ~b() ∧ c() ∨ a() ∧ ~b() ∧ ~c() ∨ a() ∧ b() ∧ ~c()"
+        ),
+    )
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = cls.v[0].negation()
+
+        if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(
+                f"Expected mid result: {cls.c[0]} but received {mid_result}"
+            )
+
+        result = (
+            mid_result.inquire(cls.v[1], verbose=verbose)
+            .inquire(cls.v[2], verbose=verbose)
+            .inquire(cls.v[3], verbose=verbose)
+        )
+
+        if not result.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
+
+
+class e23(BaseExample):
+    """
+    P1 Either Jane is kneeling by the fire and she is looking at the TV or else Mark is
+    standing at the window and he is peering into the garden.
+    P2 Jane is kneeling by the fire
+
+    C Jane is looking at the TV
+    """
+
+    v: tuple[View, View] = (ps("K() ∧ L() ∨ S() ∧ P()"), ps("K()"))
+    c: tuple[View, View] = (
+        ps("K() ∧ L() ∨ S() ∧ P() ∧ K() ∨ S() ∧ P() ∧ ~K()"),
+        ps("L()"),
+    )
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = (
+            View.get_verum()
+            .update(cls.v[0], verbose=verbose)
+            .inquire(cls.v[1], verbose=verbose)
+        )
+
+        if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(
+                f"Expected mid result: {cls.c[0]} but received {mid_result}"
+            )
+
+        result = mid_result.update(cls.v[1], verbose=verbose)
+
+        if not result.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
+
+
 class e28(DefaultInference, BaseExample):
     """
     Example 28
