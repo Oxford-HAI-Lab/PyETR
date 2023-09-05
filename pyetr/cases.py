@@ -858,6 +858,23 @@ class e48(DefaultInference, BaseExample):
     c: View = ps("⊤")
 
 
+class e49(DefaultInference, BaseExample):
+    """
+    Example 49
+
+    P1 Either there is an ace in Mary's hand and some other player has a king,
+    or else there is a queen in John's hand and some other player has a jack.
+    P2 Sally has a king
+    C Truth
+    """
+
+    v: tuple[View, View] = (
+        ps("∃x ∃y Ace(Mary()) ∧ King(x) ∨ Queen(John()) ∧ Jack(y)"),
+        ps("King(Sally())"),
+    )
+    c: View = ps("⊤")
+
+
 class e50_part1(BaseExample):
     v: tuple[View, View, View, View] = (
         ps("L(j(), s()) ∧ L(s(), g())"),
@@ -993,6 +1010,24 @@ class e54(BasicStep, BaseExample):
     c: View = ps("Attack(Whitey()) ∧ Shark(Whitey()*)")
 
 
+class e55(BasicStep, BaseExample):
+    """
+    Example 55
+
+    P1 Montreal is north of New York
+    C New York is south of Montreal
+
+    Secret geographical premise: X north of Y implies Y south of X
+    """
+
+    # TODO: What's wrong with this?
+    v: tuple[View, View] = (
+        ps("North(Montreal(), NewYork())"),
+        ps("∀x ∀y North(x, y) → North(x, y) ∧ South(y, x)"),
+    )
+    c: View = ps("North(Montreal(), NewYork()) ∧ South(NewYork(), Montreal())")
+
+
 class e56_default_inference(DefaultInference, BaseExample):
     """
     P1: Every professor teaches some student
@@ -1044,6 +1079,19 @@ class e58_reversed(BasicStep, BaseExample):
         ps("∃x B(x*) ∧ A(x)"),
     )
     c: View = ps("∃y C(y) ∧ A(y) ∧ B(y*)")
+
+
+class e61(BasicStep, BaseExample):
+    """
+    Example 61
+    P1 All dogs bite some man
+    P2 John is a man
+
+    C All dogs bite John
+    """
+
+    v: tuple[View, View] = (ps("∃x ∀a D(x) ∧ B(x, a) ∧ M(a*) ∧ ~D(x)"), ps("M(j()*)"))
+    c: View = ps("⊥")  # TODO: Is this the correct conclusion/test
 
 
 class e62(WHQuery, BaseExample):
