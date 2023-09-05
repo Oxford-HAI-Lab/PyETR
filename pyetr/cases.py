@@ -585,6 +585,104 @@ class e23(BaseExample):
             raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
 
 
+class e24(BaseExample):
+    """
+    Example 24
+
+    P1 There is an ace
+    C There is an ace or a queen
+    """
+    v: tuple[View, View] = (ps("a()"), ps("q()"))
+    c: tuple[View, View] = (ps("(a() ∧ q()) ∨ (a() ∧ ~q())"), ps("q() ∨ a()"))
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result_1 = cls.v[0].inquire(other=cls.v[1], verbose=verbose)
+
+        if not result_1.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(
+                f"Expected mid result: {cls.c[0]} but received {result_1}"
+            )
+
+        result_2 = result_1.factor(cls.v[1], verbose=verbose).factor(cls.v[0], verbose=verbose)
+
+        if not result_2.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected result: {cls.c[1]} but received {result_2}")
+
+
+class e25i(Query, BaseExample):
+    """
+    Example 25i
+    """
+    v: tuple[View, View] = (ps("(p() ∧ q()) ∨ (p() ∧ r())"), ps("p()"))
+    c: View = ps("p()")
+
+
+class e25ii(Query, BaseExample):
+    """
+    Example 25ii
+    """
+    v: tuple[View, View] = (ps("(p() ∧ q()) ∨ (p() ∧ r())"), ps("q()"))
+    c: View = ps("⊤ ∨ q()")
+
+
+class e25iii(Query, BaseExample):
+    """
+    Example 25iii
+    """
+    v: tuple[View, View] = (ps("(p() ∧ q()) ∨ (p() ∧ r()) ∨ s() ∨ t()"), ps("p() ∨ s()"))
+    c: View = ps("p() ∨ s() ∨ ⊤")
+
+
+class e25iv(Query, BaseExample):
+    """
+    Example 25iv
+    """
+    v: tuple[View, View] = (ps("(p() ∧ q()) ∨ (p() ∧ r()) ∨ s() ∨ t()"), ps("p() ∨ s() ∨ t()"))
+    c: View = ps("p() ∨ s() ∨ t()")
+
+
+class e25v(Query, BaseExample):
+    """
+    Example 25v
+    """
+    v: tuple[View, View] = (ps("(p() ∧ q() ∧ s()) ∨ (p() ∧ r() ∧ s())"), ps("s() → p()"))
+    c: View = ps("p()")
+
+
+class e25vi(Query, BaseExample):
+    """
+    Example 25vi
+    """
+    v: tuple[View, View] = (ps("(p() ∧ q() ∧ s()) ∨ (p() ∧ r() ∧ s())"), ps("t() → p()"))
+    c: View = View.get_verum()
+
+
+class e26(BaseExample):
+    """
+    Example 26
+
+    P1 Either John plays and wins, or Mary plays, or Bill plays
+    C Supposing John plays, John wins
+    """
+    v: tuple[View, View, View] = (ps("(Play(J()) ∧ Win(J())) ∨ Play(M()) ∨ Play(B())"), ps("Play(J())"), ps("Play(J()) → Win(J())") )
+    c: tuple[View, View] = (ps("Play(J()) → (Play(J()) ∧ Win(J()))"), ps("Play(J()) → Win(J())"))
+                                                                                           
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = cls.v[0].suppose(other=cls.v[1])
+
+        if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(
+                f"Expected mid result: {cls.c[0]} but received {mid_result}"
+            )
+
+        result = cls.c[0].query(other=cls.v[2])
+        
+        if not result.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")                                                                                  
+
+
 class e28(DefaultInference, BaseExample):
     """
     Example 28
