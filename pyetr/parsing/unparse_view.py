@@ -141,13 +141,14 @@ def get_quantifiers(
 
 
 def unparse_view(v: View) -> list[Item]:
+    v_stage, v_supposition, v_dependency_relation = v.to_integrated_emp()
     main_item: Item
-    if v.supposition.is_verum:
-        main_item = unparse_set_of_states(v.stage)
+    if v_supposition.is_verum:
+        main_item = unparse_set_of_states(v_stage)
     else:
-        stage = unparse_set_of_states(v.stage)
-        supposition = unparse_set_of_states(v.supposition)
+        stage = unparse_set_of_states(v_stage)
+        supposition = unparse_set_of_states(v_supposition)
         main_item = Implies([[supposition, stage]])
-    all_arb = v.stage.arb_objects | v.supposition.arb_objects
-    output: list[Quantified] = get_quantifiers(all_arb, v.dependency_relation)
+    all_arb = v_stage.arb_objects | v_supposition.arb_objects
+    output: list[Quantified] = get_quantifiers(all_arb, v_dependency_relation)
     return [*output, main_item]

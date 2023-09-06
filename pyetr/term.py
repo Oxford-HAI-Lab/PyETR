@@ -67,6 +67,17 @@ class ArbitraryObject:
     def arb_objects(self) -> set["ArbitraryObject"]:
         return {self}
 
+    def integrate_issue_atoms(
+        self, terms: list["Term | ArbitraryObject | Emphasis"]
+    ) -> "Emphasis | ArbitraryObject":
+        for term in terms:
+            if isinstance(term, Emphasis):
+                return term
+        return self
+
+    def emphasis_count(self) -> int:
+        return 0
+
 
 class Emphasis:
     term: "Term | ArbitraryObject"
@@ -124,6 +135,14 @@ class Emphasis:
     @property
     def excluding_emphasis(self) -> "Term | ArbitraryObject":
         return self.term.excluding_emphasis
+
+    def emphasis_count(self) -> int:
+        return 1
+
+    def integrate_issue_atoms(
+        self, terms: list["Term | ArbitraryObject | Emphasis"]
+    ) -> "Emphasis":
+        return self
 
 
 class Term:
@@ -204,6 +223,20 @@ class Term:
                 subterm.excluding_emphasis for subterm in self.t
             ]
             return Term(f=self.f, t=tuple(new_subterms))
+
+    def integrate_issue_atoms(
+        self, terms: list["Term | ArbitraryObject | Emphasis"]
+    ) -> "Emphasis | Term":
+        for term in terms:
+            if isinstance(term, Emphasis):
+                return term
+        if self.t is None:
+            return self
+
+        return Term(
+            f=self.f,
+            t=tuple([t.integrate_issue_atoms(terms) for i, t in enumerate(self.t)]),
+        )
 
     def replace_emphasis(
         self, existing: Emphasis, new: "Term | ArbitraryObject | Emphasis"

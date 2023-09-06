@@ -1,5 +1,6 @@
 __all__ = ["View"]
 
+from collections import defaultdict
 from functools import reduce
 from itertools import permutations
 from typing import Optional, cast
@@ -271,6 +272,18 @@ class View:
             supposition=supposition.excluding_emphasis,
             dependency_relation=dependency_relation,
             issue_structure=IssueStructure(emphasised_atoms),
+        )
+
+    def to_integrated_emp(self) -> tuple[Stage, Supposition, DependencyRelation]:
+        issue_atoms: dict[Atom, list[Atom]] = defaultdict(list)
+        for atom in self.issue_structure:
+            deemphasised_atom = atom.excluding_emphasis
+            issue_atoms[deemphasised_atom].append(atom)
+
+        return (
+            self.stage.integrate_issue_atoms(issue_atoms),
+            self.supposition.integrate_issue_atoms(issue_atoms),
+            self.dependency_relation,
         )
 
     @property

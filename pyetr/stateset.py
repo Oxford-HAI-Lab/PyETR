@@ -105,6 +105,16 @@ class State(frozenset[Atom]):
     def excluding_emphasis(self) -> "State":
         return State(atom.excluding_emphasis for atom in self)
 
+    def integrate_issue_atoms(self, atoms: dict[Atom, list[Atom]]):
+        new_atoms = set()
+        for atom in self:
+            if atom in atoms:
+                new_atom = atom.integrate_issue_atoms(atoms[atom])
+            else:
+                new_atom = atom
+            new_atoms.add(new_atom)
+        return State(new_atoms)
+
 
 class SetOfStates(frozenset[State]):
     def __new__(cls, __iterable: Optional[Iterable[State]] = None, /) -> "SetOfStates":
@@ -235,3 +245,6 @@ class SetOfStates(frozenset[State]):
     @property
     def excluding_emphasis(self) -> "SetOfStates":
         return SetOfStates(state.excluding_emphasis for state in self)
+
+    def integrate_issue_atoms(self, atoms: dict[Atom, list[Atom]]):
+        return SetOfStates({i.integrate_issue_atoms(atoms) for i in self})

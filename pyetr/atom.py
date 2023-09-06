@@ -188,6 +188,17 @@ class Atom:
                 final_atoms.add(Atom(predicate=self.predicate, terms=tuple(new_terms)))
         return final_atoms
 
+    def integrate_issue_atoms(self, atoms: list["Atom"]) -> "Atom":
+        return Atom(
+            predicate=self.predicate,
+            terms=tuple(
+                [
+                    term.integrate_issue_atoms([atom.terms[i] for atom in atoms])
+                    for i, term in enumerate(self.terms)
+                ]
+            ),
+        )
+
 
 class Predicate:
     name: str
