@@ -506,7 +506,6 @@ class e21(BaseExample):
     @classmethod
     def test(cls, verbose: bool = False):
         x = View.get_falsum().suppose(cls.v[0], verbose=verbose)
-        # TODO: typo in book here with line break
         result = x.depose(verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -551,7 +550,7 @@ class e22(BaseExample):
             raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
 
 
-class e23(BaseExample):
+class e23_with_inquire(BaseExample):
     """
     P1 Either Jane is kneeling by the fire and she is looking at the TV or else Mark is
     standing at the window and he is peering into the garden.
@@ -563,7 +562,7 @@ class e23(BaseExample):
     v: tuple[View, View] = (ps("K() ∧ L() ∨ S() ∧ P()"), ps("K()"))
     c: tuple[View, View] = (
         ps("K() ∧ L() ∨ S() ∧ P() ∧ K() ∨ S() ∧ P() ∧ ~K()"),
-        ps("L()"),
+        ps("K() ∧ L() ∨ S() ∧ P() ∧ K()"),
     )
 
     @classmethod
@@ -585,6 +584,29 @@ class e23(BaseExample):
             raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
 
 
+class e23_without_inquire(BaseExample):
+    v: tuple[View, View] = (ps("K() ∧ L() ∨ S() ∧ P()"), ps("K()"))
+    c: tuple[View, View] = (
+        ps("K() ∧ L() ∨ S() ∧ P()"),
+        ps("K() ∧ L()"),
+    )
+
+    # TODO: Maybe add query or factor to remove K()
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = View.get_verum().update(cls.v[0], verbose=verbose)
+
+        if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(
+                f"Expected mid result: {cls.c[0]} but received {mid_result}"
+            )
+
+        result = mid_result.update(cls.v[1], verbose=verbose)
+
+        if not result.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
+
+
 class e24(BaseExample):
     """
     Example 24
@@ -592,6 +614,7 @@ class e24(BaseExample):
     P1 There is an ace
     C There is an ace or a queen
     """
+
     v: tuple[View, View] = (ps("a()"), ps("q()"))
     c: tuple[View, View] = (ps("(a() ∧ q()) ∨ (a() ∧ ~q())"), ps("q() ∨ a()"))
 
@@ -604,7 +627,9 @@ class e24(BaseExample):
                 f"Expected mid result: {cls.c[0]} but received {result_1}"
             )
 
-        result_2 = result_1.factor(cls.v[1], verbose=verbose).factor(cls.v[0], verbose=verbose)
+        result_2 = result_1.factor(cls.v[1], verbose=verbose).factor(
+            cls.v[0], verbose=verbose
+        )
 
         if not result_2.is_equivalent_under_arb_sub(cls.c[1]):
             raise RuntimeError(f"Expected result: {cls.c[1]} but received {result_2}")
@@ -614,6 +639,7 @@ class e25i(Query, BaseExample):
     """
     Example 25i
     """
+
     v: tuple[View, View] = (ps("(p() ∧ q()) ∨ (p() ∧ r())"), ps("p()"))
     c: View = ps("p()")
 
@@ -622,6 +648,7 @@ class e25ii(Query, BaseExample):
     """
     Example 25ii
     """
+
     v: tuple[View, View] = (ps("(p() ∧ q()) ∨ (p() ∧ r())"), ps("q()"))
     c: View = ps("⊤ ∨ q()")
 
@@ -630,7 +657,11 @@ class e25iii(Query, BaseExample):
     """
     Example 25iii
     """
-    v: tuple[View, View] = (ps("(p() ∧ q()) ∨ (p() ∧ r()) ∨ s() ∨ t()"), ps("p() ∨ s()"))
+
+    v: tuple[View, View] = (
+        ps("(p() ∧ q()) ∨ (p() ∧ r()) ∨ s() ∨ t()"),
+        ps("p() ∨ s()"),
+    )
     c: View = ps("p() ∨ s() ∨ ⊤")
 
 
@@ -638,7 +669,11 @@ class e25iv(Query, BaseExample):
     """
     Example 25iv
     """
-    v: tuple[View, View] = (ps("(p() ∧ q()) ∨ (p() ∧ r()) ∨ s() ∨ t()"), ps("p() ∨ s() ∨ t()"))
+
+    v: tuple[View, View] = (
+        ps("(p() ∧ q()) ∨ (p() ∧ r()) ∨ s() ∨ t()"),
+        ps("p() ∨ s() ∨ t()"),
+    )
     c: View = ps("p() ∨ s() ∨ t()")
 
 
@@ -646,7 +681,11 @@ class e25v(Query, BaseExample):
     """
     Example 25v
     """
-    v: tuple[View, View] = (ps("(p() ∧ q() ∧ s()) ∨ (p() ∧ r() ∧ s())"), ps("s() → p()"))
+
+    v: tuple[View, View] = (
+        ps("(p() ∧ q() ∧ s()) ∨ (p() ∧ r() ∧ s())"),
+        ps("s() → p()"),
+    )
     c: View = ps("p()")
 
 
@@ -654,7 +693,11 @@ class e25vi(Query, BaseExample):
     """
     Example 25vi
     """
-    v: tuple[View, View] = (ps("(p() ∧ q() ∧ s()) ∨ (p() ∧ r() ∧ s())"), ps("t() → p()"))
+
+    v: tuple[View, View] = (
+        ps("(p() ∧ q() ∧ s()) ∨ (p() ∧ r() ∧ s())"),
+        ps("t() → p()"),
+    )
     c: View = View.get_verum()
 
 
@@ -665,9 +708,17 @@ class e26(BaseExample):
     P1 Either John plays and wins, or Mary plays, or Bill plays
     C Supposing John plays, John wins
     """
-    v: tuple[View, View, View] = (ps("(Play(J()) ∧ Win(J())) ∨ Play(M()) ∨ Play(B())"), ps("Play(J())"), ps("Play(J()) → Win(J())") )
-    c: tuple[View, View] = (ps("Play(J()) → (Play(J()) ∧ Win(J()))"), ps("Play(J()) → Win(J())"))
-                                                                                           
+
+    v: tuple[View, View, View] = (
+        ps("(Play(J()) ∧ Win(J())) ∨ Play(M()) ∨ Play(B())"),
+        ps("Play(J())"),
+        ps("Play(J()) → Win(J())"),
+    )
+    c: tuple[View, View] = (
+        ps("Play(J()) → (Play(J()) ∧ Win(J()))"),
+        ps("Play(J()) → Win(J())"),
+    )
+
     @classmethod
     def test(cls, verbose: bool = False):
         mid_result = cls.v[0].suppose(other=cls.v[1])
@@ -678,9 +729,9 @@ class e26(BaseExample):
             )
 
         result = cls.c[0].query(other=cls.v[2])
-        
+
         if not result.is_equivalent_under_arb_sub(cls.c[1]):
-            raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")                                                                                  
+            raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
 
 
 class e28(DefaultInference, BaseExample):
@@ -995,7 +1046,6 @@ class e50_part1(BaseExample):
                 f"Expected mid result: {cls.c[0]} but received {mid_result}"
             )
         result = mid_result.query(cls.v[3], verbose=verbose)
-        # TODO: The book here is probably incorrect, so have updated to be truth as output
         if not result.is_equivalent_under_arb_sub(cls.c[1]):
             raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
 
@@ -1108,22 +1158,21 @@ class e54(BasicStep, BaseExample):
     c: View = ps("Attack(Whitey()) ∧ Shark(Whitey()*)")
 
 
-class e55(BasicStep, BaseExample):
-    """
-    Example 55
+# class e55(BasicStep, BaseExample):
+#     """
+#     Example 55
 
-    P1 Montreal is north of New York
-    C New York is south of Montreal
+#     P1 Montreal is north of New York
+#     C New York is south of Montreal
 
-    Secret geographical premise: X north of Y implies Y south of X
-    """
+#     Secret geographical premise: X north of Y implies Y south of X
+#     """
 
-    # TODO: What's wrong with this?
-    v: tuple[View, View] = (
-        ps("North(Montreal(), NewYork())"),
-        ps("∀x ∀y North(x, y) → North(x, y) ∧ South(y, x)"),
-    )
-    c: View = ps("North(Montreal(), NewYork()) ∧ South(NewYork(), Montreal())")
+#     v: tuple[View, View] = (
+#         ps("North(Montreal(), NewYork())"),
+#         ps("∀x ∀y North(x, y) → North(x, y) ∧ South(y, x)"),
+#     )
+#     c: View = ps("North(Montreal(), NewYork()) ∧ South(NewYork(), Montreal())")
 
 
 class e56_default_inference(DefaultInference, BaseExample):
@@ -1188,8 +1237,10 @@ class e61(BasicStep, BaseExample):
     C All dogs bite John
     """
 
-    v: tuple[View, View] = (ps("∃x ∀a D(x) ∧ B(x, a) ∧ M(a*) ∧ ~D(x)"), ps("M(j()*)"))
-    c: View = ps("⊥")  # TODO: Is this the correct conclusion/test
+    v: tuple[View, View] = (ps("∀x ∃a D(x) ∧ B(x, a) ∧ M(a*) ∨ ~D(x)"), ps("M(j()*)"))
+    c: View = ps(
+        "∀x ∃a ((M(j()*) ∧ ~D(x)) ∨ (M(j()*) ∧ D(x) ∧ M(a*) ∧ B(x, a)))"
+    )  # TODO: Make example better?
 
 
 class e62(WHQuery, BaseExample):

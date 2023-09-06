@@ -172,6 +172,19 @@ def phi(
     return False
 
 
+def _some_gamma_doesnt_phi(
+    self: "View",
+    other: "View",
+    m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
+):
+    for gamma in self.stage:
+        if all(
+            [not phi(gamma, delta, m_prime, other.supposition) for delta in other.stage]
+        ):
+            return True
+    return False
+
+
 class View:
     stage: Stage
     supposition: Supposition
@@ -897,7 +910,7 @@ class View:
             )
 
             v3 = arb_gen.novelise_all(v2)
-            out = self.product(other.sum(v1.product(v3)))
+            out = self.product(other.sum(v1.product(v3))).factor(View.get_falsum())
         elif other.stage_supp_arb_objects.issubset(self.stage_supp_arb_objects):
             # I case
             view1 = View(
@@ -1079,17 +1092,17 @@ class View:
 
             D_s_prime = dep_so_far | D6
 
-            def _some_pair_phis(
-                m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
-            ):
-                for delta in other.stage:
-                    for gamma in self.stage:
-                        if phi(gamma, delta, m_prime, other.supposition):
-                            return True
-                return False
+            # def _some_pair_phis(
+            #     m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
+            # ):
+            #     for delta in other.stage:
+            #         for gamma in self.stage:
+            #             if phi(gamma, delta, m_prime, other.supposition):
+            #                 return True
+            #     return False
 
             # Stage construction
-            if not _some_pair_phis(m_prime):
+            if _some_gamma_doesnt_phi(self, other, m_prime=m_prime):
                 s1 = SetOfStates({State({})})
             else:
                 s1 = SetOfStates()
@@ -1154,20 +1167,7 @@ class View:
                                     out.add(xi)
                 return SetOfStates(out)
 
-            def _some_gamma_doesnt_phi(
-                m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
-            ):
-                for gamma in self.stage:
-                    if all(
-                        [
-                            not phi(gamma, delta, m_prime, other.supposition)
-                            for delta in other.stage
-                        ]
-                    ):
-                        return True
-                return False
-
-            if _some_gamma_doesnt_phi(m_prime):
+            if _some_gamma_doesnt_phi(self, other, m_prime):
                 s1 = SetOfStates({State({})})
             else:
                 s1 = SetOfStates()
