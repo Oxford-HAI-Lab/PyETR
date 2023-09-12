@@ -2,11 +2,7 @@ __all__ = ["BaseExample"]
 from abc import ABCMeta, abstractmethod
 from typing import cast
 
-from pyetr.inference import (
-    basic_step,
-    chapter2_default_inference,
-    default_inference_procedure,
-)
+from pyetr.inference import basic_step, default_inference_procedure
 from pyetr.parsing import parse_string_to_view as ps
 from pyetr.view import View
 
@@ -45,14 +41,6 @@ class DefaultInference(BaseTest):
     @classmethod
     def test(cls, verbose: bool = False):
         result = default_inference_procedure(cls.v, verbose=verbose)
-        if not result.is_equivalent_under_arb_sub(cls.c):
-            raise RuntimeError(f"Expected: {cls.c} but received {result}")
-
-
-class Chapter2DefaultInference(BaseTest):
-    @classmethod
-    def test(cls, verbose: bool = False):
-        result = chapter2_default_inference(cls.v, verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
@@ -800,7 +788,7 @@ class e33(DefaultInference, BaseExample):
     c: View = ps("R(r())")
 
 
-class e40i(Chapter2DefaultInference, BaseExample):
+class e40i(DefaultInference, BaseExample):
     """
     Example 40
     (P0 Shapes at the bottom of the card are mutually exclusive)
