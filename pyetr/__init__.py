@@ -6,7 +6,7 @@ __all__ = [
     "DependencyRelation",
     "SetOfStates",
     "State",
-    "Term",
+    "FunctionalTerm",
     "Function",
     "Emphasis",
     "ArbitraryObject",
@@ -19,6 +19,6 @@ from .atom import Atom, Predicate, equals_predicate
 from .dependency import Dependency, DependencyRelation
 from .parsing import parse_string_to_view
 from .stateset import SetOfStates, State
-from .term import ArbitraryObject, Emphasis, Function, Term
+from .term import ArbitraryObject, Emphasis, Function, FunctionalTerm
 from .tools import ArbitraryObjectGenerator
 from .view import View

@@ -3,18 +3,18 @@ __all__ = ["Predicate", "Atom", "equals_predicate"]
 
 from typing import cast
 
-from .term import ArbitraryObject, Emphasis, Term
+from .term import ArbitraryObject, Emphasis, FunctionalTerm
 
 
 class Atom:
     predicate: "Predicate"
-    terms: tuple[Term | ArbitraryObject | Emphasis, ...]
+    terms: tuple[FunctionalTerm | ArbitraryObject | Emphasis, ...]
     emphasis_count: int
 
     def __init__(
         self,
         predicate: "Predicate",
-        terms: tuple[Term | ArbitraryObject | Emphasis, ...],
+        terms: tuple[FunctionalTerm | ArbitraryObject | Emphasis, ...],
     ) -> None:
         if len(terms) != predicate.arity:
             raise ValueError(
@@ -23,7 +23,7 @@ class Atom:
         self.predicate = predicate
         emphasis_count = 0
         for term in terms:
-            if isinstance(term, Term):
+            if isinstance(term, FunctionalTerm):
                 emphasis_count += term.emphasis_count
             elif isinstance(term, Emphasis):
                 emphasis_count += 1
@@ -34,7 +34,7 @@ class Atom:
     def arb_objects(self) -> set[ArbitraryObject]:
         output_objs = set()
         for term in self.terms:
-            if isinstance(term, Term) or isinstance(term, Emphasis):
+            if isinstance(term, FunctionalTerm) or isinstance(term, Emphasis):
                 output_objs |= term.arb_objects
             elif isinstance(term, ArbitraryObject):
                 output_objs.add(term)
@@ -58,12 +58,12 @@ class Atom:
         return Atom(~self.predicate, self.terms)
 
     @property
-    def emphasis_term(self) -> Term | ArbitraryObject:
+    def emphasis_term(self) -> FunctionalTerm | ArbitraryObject:
         if self.emphasis_count == 1:
             for term in self.terms:
                 if isinstance(term, Emphasis):
                     return term.term
-                elif isinstance(term, Term) and term.emphasis_count > 0:
+                elif isinstance(term, FunctionalTerm) and term.emphasis_count > 0:
                     assert term.emphasis_count == 1
                     return term.emphasis_term
             assert False
@@ -73,16 +73,16 @@ class Atom:
             )
 
     def replace_emphasis(
-        self, existing: Emphasis, new: Term | ArbitraryObject | Emphasis
+        self, existing: Emphasis, new: FunctionalTerm | ArbitraryObject | Emphasis
     ) -> "Atom":
         new_terms = []
         for term in self.terms:
             if term == existing:
                 replacement = new
             else:
-                if isinstance(term, Term) and term.t is not None:
+                if isinstance(term, FunctionalTerm) and term.t is not None:
                     replacement = term.replace_emphasis(existing=existing, new=new)
-                elif isinstance(term, Term) and term.t is None:
+                elif isinstance(term, FunctionalTerm) and term.t is None:
                     replacement = term
                 elif isinstance(term, Emphasis):
                     assert False
@@ -94,17 +94,17 @@ class Atom:
         return Atom(predicate=self.predicate, terms=tuple(new_terms))
 
     def replace(
-        self, replacements: dict[ArbitraryObject, Term | ArbitraryObject]
+        self, replacements: dict[ArbitraryObject, FunctionalTerm | ArbitraryObject]
     ) -> "Atom":
         new_terms = []
         for term in self.terms:
             if term in replacements:
-                assert not isinstance(term, Term)
+                assert not isinstance(term, FunctionalTerm)
                 replacement = replacements[term]
             else:
-                if isinstance(term, Term) and term.t is not None:
+                if isinstance(term, FunctionalTerm) and term.t is not None:
                     replacement = term.replace(replacements)
-                elif isinstance(term, Term) and term.t is None:
+                elif isinstance(term, FunctionalTerm) and term.t is None:
                     replacement = term
                 elif isinstance(term, Emphasis):
                     replacement = term.replace(replacements)
@@ -117,8 +117,8 @@ class Atom:
 
     def replace_low_level(
         self,
-        old_term: Term | ArbitraryObject | Emphasis,
-        new_term: Term | ArbitraryObject | Emphasis,
+        old_term: FunctionalTerm | ArbitraryObject | Emphasis,
+        new_term: FunctionalTerm | ArbitraryObject | Emphasis,
     ) -> "Atom":
         new_terms = []
         for term in self.terms:
@@ -154,17 +154,19 @@ class Atom:
     def get_issue_atoms(self) -> set["Atom"]:
         # Each atom is represented by a list of terms
         def _get_issue_terms(
-            term: "Term | ArbitraryObject | Emphasis",
-        ) -> list[Term] | list[Emphasis]:
-            if isinstance(term, Term):
+            term: "FunctionalTerm | ArbitraryObject | Emphasis",
+        ) -> list[FunctionalTerm] | list[Emphasis]:
+            if isinstance(term, FunctionalTerm):
                 if term.t is not None:
-                    term_sets: list[Term] = []
+                    term_sets: list[FunctionalTerm] = []
                     for i, subterm in enumerate(term.t):
                         subterm_issues = _get_issue_terms(subterm)
                         for subterm_issue in subterm_issues:
                             new_terms = list(term.t)
                             new_terms[i] = subterm_issue
-                            term_sets.append(Term(f=term.f, t=tuple(new_terms)))
+                            term_sets.append(
+                                FunctionalTerm(f=term.f, t=tuple(new_terms))
+                            )
                     return term_sets
                 else:
                     return []
@@ -173,7 +175,8 @@ class Atom:
             elif isinstance(term, Emphasis):
                 active_issue = Emphasis(term.term.excluding_emphasis)
                 return [active_issue] + [
-                    Emphasis(cast(Term, issue)) for issue in _get_issue_terms(term.term)
+                    Emphasis(cast(FunctionalTerm, issue))
+                    for issue in _get_issue_terms(term.term)
                 ]
             else:
                 assert False
@@ -220,7 +223,9 @@ class Predicate:
     def detailed(self) -> str:
         return repr(self)
 
-    def __call__(self, terms: tuple[Term | ArbitraryObject | Emphasis, ...]) -> Atom:
+    def __call__(
+        self, terms: tuple[FunctionalTerm | ArbitraryObject | Emphasis, ...]
+    ) -> Atom:
         return Atom(self, terms)
 
     def __eq__(self, other: object) -> bool:

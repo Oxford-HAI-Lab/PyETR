@@ -6,7 +6,7 @@ from typing import Optional
 
 from pyetr.atom import Atom
 from pyetr.dependency import DependencyRelation
-from pyetr.term import ArbitraryObject, Emphasis, Function, Term
+from pyetr.term import ArbitraryObject, Emphasis, Function, FunctionalTerm
 
 from .stateset import SetOfStates, State
 
@@ -16,14 +16,14 @@ class AtomCandidate:
     A candidate from an atom
     """
 
-    term: ArbitraryObject | Function | Term
+    term: ArbitraryObject | Function | FunctionalTerm
     term_idx: int
     atom_occurrences: int
     _dependency_relation: DependencyRelation
 
     def __init__(
         self,
-        term: ArbitraryObject | Function | Term,
+        term: ArbitraryObject | Function | FunctionalTerm,
         dependency_relation: DependencyRelation,
         term_idx: int,
     ) -> None:
@@ -58,7 +58,7 @@ class AtomCandidate:
 def type_x_beats_y(x: AtomCandidate, y: AtomCandidate) -> bool:
     # Universals have priority over existentials
     # Existentials have priority over functions with 0 arity
-    # Terms have lower priority than functions
+    # FunctionalTerms have lower priority than functions
     if x.is_universal and not y.is_universal:
         return True
     elif x.is_existential and not y.is_existential:
@@ -193,7 +193,7 @@ def get_new_state(
             if current_atom_candidate == atom_candidate:
                 instances_encountered += 1
                 if instance_num == instances_encountered - 1:
-                    new_terms: list[Term | ArbitraryObject | Emphasis] = []
+                    new_terms: list[FunctionalTerm | ArbitraryObject | Emphasis] = []
                     for i, term in enumerate(atom.terms):
                         if atom_candidate.term_idx == i:
                             assert not isinstance(term, Emphasis)

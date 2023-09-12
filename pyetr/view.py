@@ -11,7 +11,7 @@ from pyetr.tools import ArbitraryObjectGenerator, powerset
 from .atom import Atom
 from .dependency import Dependency, DependencyRelation
 from .stateset import SetOfStates, State
-from .term import ArbitraryObject, Term
+from .term import ArbitraryObject, FunctionalTerm
 
 
 def get_subset(
@@ -53,7 +53,7 @@ def substitution(
     arb_gen: ArbitraryObjectGenerator,
     dep_relation: DependencyRelation,
     arb_obj: ArbitraryObject,
-    term: Term | ArbitraryObject,
+    term: FunctionalTerm | ArbitraryObject,
     stage: Stage,
     supposition: Supposition,
     issue_structure: IssueStructure,
@@ -88,7 +88,7 @@ def substitution(
     subs = arb_gen.redraw(Z())
     new_dep_relation = new_dep_relation.replace(subs)
     new_stage = new_stage.replace(
-        cast(dict[ArbitraryObject, Term | ArbitraryObject], subs)
+        cast(dict[ArbitraryObject, FunctionalTerm | ArbitraryObject], subs)
     )
 
     new_stage = new_stage.replace({arb_obj: term})
@@ -97,7 +97,7 @@ def substitution(
     T_prime = old_T.chain(new_dep_relation)
 
     new_issue_structure = issue_structure.replace(
-        cast(dict[ArbitraryObject, Term | ArbitraryObject], subs)
+        cast(dict[ArbitraryObject, FunctionalTerm | ArbitraryObject], subs)
     )
     new_issue_structure = new_issue_structure.replace({arb_obj: term})
 
@@ -160,7 +160,7 @@ def state_division(
 def phi(
     gamma: State,
     delta: State,
-    m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
+    m_prime: set[tuple[FunctionalTerm | ArbitraryObject, ArbitraryObject]],
     other_supposition: Supposition,
 ) -> bool:
     for ms in powerset(m_prime):
@@ -176,7 +176,7 @@ def phi(
 def _some_gamma_doesnt_phi(
     self: "View",
     other: "View",
-    m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
+    m_prime: set[tuple[FunctionalTerm | ArbitraryObject, ArbitraryObject]],
 ):
     for gamma in self.stage:
         if all(
@@ -338,7 +338,7 @@ class View:
         return self.stage.arb_objects | self.supposition.arb_objects
 
     def replace(
-        self, replacements: dict[ArbitraryObject, Term | ArbitraryObject]
+        self, replacements: dict[ArbitraryObject, FunctionalTerm | ArbitraryObject]
     ) -> "View":
         new_stage = self.stage.replace(replacements)
         new_supposition = self.supposition.replace(replacements)
@@ -386,7 +386,10 @@ class View:
                 }
 
                 new_view = other.replace(
-                    cast(dict[ArbitraryObject, Term | ArbitraryObject], replacements)
+                    cast(
+                        dict[ArbitraryObject, FunctionalTerm | ArbitraryObject],
+                        replacements,
+                    )
                 )
                 if new_view == self:
                     return True
@@ -394,8 +397,10 @@ class View:
 
     def issue_matches(
         self, other: "View"
-    ) -> set[tuple[Term | ArbitraryObject, Term | ArbitraryObject]]:
-        pairs: list[tuple[Term | ArbitraryObject, Term | ArbitraryObject]] = []
+    ) -> set[tuple[FunctionalTerm | ArbitraryObject, FunctionalTerm | ArbitraryObject]]:
+        pairs: list[
+            tuple[FunctionalTerm | ArbitraryObject, FunctionalTerm | ArbitraryObject]
+        ] = []
         for atom_self in self.issue_structure:
             for atom_other in other.issue_structure:
                 if atom_self.is_same_emphasis_context(atom_other):
@@ -526,8 +531,8 @@ class View:
 
         def _m_prime(
             gamma: State,
-        ) -> set[tuple[Term | ArbitraryObject, Universal]]:
-            out: set[tuple[Term | ArbitraryObject, Universal]] = set()
+        ) -> set[tuple[FunctionalTerm | ArbitraryObject, Universal]]:
+            out: set[tuple[FunctionalTerm | ArbitraryObject, Universal]] = set()
             for t, u in self.issue_matches(view):
                 if isinstance(
                     u, ArbitraryObject
@@ -642,7 +647,7 @@ class View:
         Based on Definition 4.35
         """
 
-        def _m_prime() -> set[tuple[Universal, Term | ArbitraryObject]]:
+        def _m_prime() -> set[tuple[Universal, FunctionalTerm | ArbitraryObject]]:
             output_set = set()
             for u, t in self.issue_matches(view):
                 if isinstance(u, ArbitraryObject) and u in (
@@ -730,7 +735,7 @@ class View:
 
             return reduce(lambda s1, s2: s1 | s2, final_sets)
 
-        def _m_prime() -> set[tuple[Existential, Term | ArbitraryObject]]:
+        def _m_prime() -> set[tuple[Existential, FunctionalTerm | ArbitraryObject]]:
             output_set = set()
             for e, t in self.issue_matches(view):
                 if isinstance(e, ArbitraryObject) and e in (
@@ -1020,7 +1025,7 @@ class View:
 
     def _query_m_prime(
         self, other: "View"
-    ) -> set[tuple[Term | ArbitraryObject, ArbitraryObject]]:
+    ) -> set[tuple[FunctionalTerm | ArbitraryObject, ArbitraryObject]]:
         output_set = set()
         for t, e in self.issue_matches(other):
             if isinstance(e, ArbitraryObject) and e in (

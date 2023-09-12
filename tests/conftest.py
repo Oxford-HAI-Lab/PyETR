@@ -6,7 +6,7 @@ import pytest
 import pyetr.cases
 from pyetr import ArbitraryObject, Function
 from pyetr.cases import BaseExample
-from pyetr.term import Term
+from pyetr.term import FunctionalTerm
 
 
 class ExampleCollector(pytest.File):
@@ -63,4 +63,4 @@ def arb_obj():
 
 @pytest.fixture
 def term(func, arb_obj):
-    return Term(func, (arb_obj,))
+    return FunctionalTerm(func, (arb_obj,))

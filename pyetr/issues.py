@@ -2,7 +2,7 @@ from typing import AbstractSet, Iterable, Optional
 
 from pyetr.atom import Atom
 from pyetr.stateset import SetOfStates
-from pyetr.term import ArbitraryObject, Term
+from pyetr.term import ArbitraryObject, FunctionalTerm
 
 
 class IssueStructure(frozenset[Atom]):
@@ -65,7 +65,7 @@ class IssueStructure(frozenset[Atom]):
             )
 
     def replace(
-        self, replacements: dict[ArbitraryObject, Term | ArbitraryObject]
+        self, replacements: dict[ArbitraryObject, FunctionalTerm | ArbitraryObject]
     ) -> "IssueStructure":
         return IssueStructure({a.replace(replacements) for a in self})
 

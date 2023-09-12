@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Iterable, TypeVar
 if TYPE_CHECKING:
     from .view import View
 
-from .term import ArbitraryObject, Term
+from .term import ArbitraryObject, FunctionalTerm
 
 
 class NameScheme(Enum):
@@ -85,7 +85,9 @@ class ArbitraryObjectGenerator:
     def novelise(self, arb_objects: set[ArbitraryObject], view: "View") -> "View":
         replacements = self.redraw(arb_objects)
         return view.replace(
-            typing.cast(dict[ArbitraryObject, ArbitraryObject | Term], replacements)
+            typing.cast(
+                dict[ArbitraryObject, ArbitraryObject | FunctionalTerm], replacements
+            )
         )
 
     def novelise_all(self, view: "View") -> "View":
