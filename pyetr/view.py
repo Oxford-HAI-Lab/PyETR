@@ -1105,15 +1105,6 @@ class View:
 
             D_s_prime = dep_so_far | D6
 
-            # def _some_pair_phis(
-            #     m_prime: set[tuple[Term | ArbitraryObject, ArbitraryObject]],
-            # ):
-            #     for delta in other.stage:
-            #         for gamma in self.stage:
-            #             if phi(gamma, delta, m_prime, other.supposition):
-            #                 return True
-            #     return False
-
             # Stage construction
             if _some_gamma_doesnt_phi(self, other, m_prime=m_prime):
                 s1 = SetOfStates({State({})})
