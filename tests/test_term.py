@@ -1,7 +1,7 @@
 import pytest
 
 from pyetr import Function
-from pyetr.term import ArbitraryObject, Emphasis, FunctionalTerm
+from pyetr.term import ArbitraryObject, FunctionalTerm
 
 
 class TestFunction:
@@ -52,22 +52,6 @@ class TestArbitraryObject:
         arb = ArbitraryObject(name="thing")
         assert not arb == func1
 
-
-class TestEmphasis:
-    def test_valid_term(self, term):
-        test = Emphasis(term)
-        assert (
-            test.detailed
-            == "<Emphasis term=<FunctionalTerm f=Function(func, 1) t=(<ArbitraryObject name=x1>,)>>"
-        )
-
-    def test_valid_arb_obj(self, arb_obj):
-        test = Emphasis(arb_obj)
-        assert test.detailed == "<Emphasis term=<ArbitraryObject name=x1>>"
-
-    def test_extract_arb_obj(self, arb_obj):
-        test = Emphasis(arb_obj)
-        assert arb_obj in test.arb_objects
 
 
 class TestFunctionalTerm:
