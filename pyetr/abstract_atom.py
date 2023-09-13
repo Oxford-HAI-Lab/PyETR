@@ -1,4 +1,4 @@
-__all__ = ["AbstractTerm", "AbstractAtom", "AbstractPredicate"]
+__all__ = ["AbstractTerm", "AbstractAtom", "Predicate", "equals_predicate"]
 
 from typing import Generic, TypeVar, cast
 
@@ -6,11 +6,11 @@ from typing import Generic, TypeVar, cast
 AbstractTerm = TypeVar("AbstractTerm")
 
 class AbstractAtom(Generic[AbstractTerm]):
-    predicate: "AbstractPredicate[AbstractTerm]"
+    predicate: "Predicate"
     terms: tuple[AbstractTerm, ...]
     def __init__(
         self,
-        predicate: "AbstractPredicate[AbstractTerm]",
+        predicate: "Predicate",
         terms: tuple[AbstractTerm, ...],
     ) -> None:
         if len(terms) != predicate.arity:
@@ -20,7 +20,7 @@ class AbstractAtom(Generic[AbstractTerm]):
         self.predicate = predicate
         self.terms = terms
 
-class AbstractPredicate(Generic[AbstractTerm]):
+class Predicate:
     name: str
     verifier: bool
     arity: int
@@ -31,22 +31,14 @@ class AbstractPredicate(Generic[AbstractTerm]):
         self.arity = arity
 
     def __invert__(self):
-        return AbstractPredicate(name=self.name, arity=self.arity, _verifier=not self.verifier)
-
-    def __repr__(self) -> str:
-        return f"<AbstractPredicate name={self.name} arity={self.arity}>"
+        return Predicate(name=self.name, arity=self.arity, _verifier=not self.verifier)
 
     @property
     def detailed(self) -> str:
         return repr(self)
 
-    def __call__(
-        self, terms: tuple[AbstractTerm, ...]
-    ) -> AbstractAtom:
-        return AbstractAtom(self, terms)
-
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, AbstractPredicate):
+        if not isinstance(other, Predicate):
             return False
         return (
             self.name == other.name
@@ -56,3 +48,8 @@ class AbstractPredicate(Generic[AbstractTerm]):
 
     def __hash__(self) -> int:
         return hash((self.name, self.arity, self.verifier))
+
+    def __repr__(self) -> str:
+        return f"<Predicate name={self.name} arity={self.arity}>"
+
+equals_predicate = Predicate("=", 2)

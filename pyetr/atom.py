@@ -1,7 +1,7 @@
-__all__ = ["Predicate", "Atom", "equals_predicate"]
+__all__ = ["Atom"]
 
 
-from pyetr.abstract_atom import AbstractAtom, AbstractPredicate
+from pyetr.abstract_atom import AbstractAtom
 
 from .term import ArbitraryObject, FunctionalTerm, Summation, Term
 
@@ -77,9 +77,3 @@ class Atom(AbstractAtom[Term]):
         return hash((self.predicate, self.terms))
 
 
-
-class Predicate(AbstractPredicate[Term]):
-    def __repr__(self) -> str:
-        return f"<Predicate name={self.name} arity={self.arity}>"
-
-equals_predicate = Predicate("=", 2)

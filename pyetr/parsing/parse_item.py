@@ -1,13 +1,17 @@
+from copy import copy
 from dataclasses import dataclass
-from typing import Literal, cast
+from typing import Literal, Optional, TypeVar, cast
 
 from pyetr.add_new_emphasis import add_new_emphasis
 from pyetr.dependency import Dependency, DependencyRelation, dependencies_from_sets
+from pyetr.issues import IssueStructure
+from pyetr.open_atom import OpenAtom, OpenFunctionalTerm, OpenTerm, QuestionMark, get_open_equivalent
 from pyetr.stateset import SetOfStates, State
-from pyetr.term import ArbitraryObject, Emphasis, Function, FunctionalTerm, Summation
+from pyetr.term import ArbitraryObject, Function, FunctionalTerm, Summation, Term
 from pyetr.view import View
 
-from ..atom import Atom, Predicate
+from pyetr.atom import Atom
+from pyetr.abstract_atom import Predicate
 from .parse_string import (
     AtomicItem,
     BoolAnd,
@@ -31,88 +35,131 @@ class Maps:
     function_map: dict[str, Function]
     constant_map: dict[str, Function]
 
+def merge_terms_with_opens(
+    terms: list[Term], open_term_sets: list[list[OpenTerm]]
+):
+    new_terms = [get_open_equivalent(t) for t in terms]
+    new_terms_sets: list[list[OpenTerm]] = []
+    for i, open_terms in enumerate(open_term_sets):
+        if len(open_terms) > 0:
+            for open_term in open_terms:
+                fresh_terms = copy(new_terms)
+                fresh_terms[i] = open_term
+                new_terms_sets.append(fresh_terms)
+    return new_terms_sets
 
-def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> Atom:
-    def _parse_term(item: Item) -> Summation | FunctionalTerm | ArbitraryObject | Emphasis:
+
+T = TypeVar("T")
+def convert_term_to_optional(t: list[T]) -> Optional[tuple[T,...]]:
+    if len(t) == 0:
+        return None
+    else:
+        return tuple(t)
+
+def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> tuple[Atom, list[OpenAtom]]:
+    def _parse_term(item: Item) -> tuple[Term, list[OpenTerm]]:
         if isinstance(item, Variable):
-            return maps.variable_map[item.name]
+            return maps.variable_map[item.name], []
         elif isinstance(item, LogicEmphasis):
-            inner = _parse_term(item.arg)
-            if isinstance(inner, Emphasis):
-                raise ValueError(f"Second emphasis found in {inner}")
-            return Emphasis(inner)
+            parsed_atom, open_terms = _parse_term(item.arg)
+            return parsed_atom, [*open_terms, QuestionMark()]
         elif isinstance(item, LogicPredicate):
             if item.name in maps.constant_map:
-                return FunctionalTerm(maps.constant_map[item.name])
+                return FunctionalTerm(maps.constant_map[item.name]), []
             elif item.name in maps.function_map:
-                terms: list[Summation | FunctionalTerm | ArbitraryObject | Emphasis] = [
-                    _parse_term(item) for item in item.args
-                ]
+                terms: list[Term] = []
+                open_term_sets: list[list[OpenTerm]] = []
+                for arg in item.args:
+                    term, open_terms = _parse_term(arg)
+                    terms.append(term)
+                    open_term_sets.append(open_terms)
+                new_open_terms_sets = merge_terms_with_opens(terms, open_term_sets)
+                f = maps.function_map[item.name]
+                functional_opens = [OpenFunctionalTerm(f=f, t=convert_term_to_optional(t)) for t in new_open_terms_sets]
                 if len(terms) == 0:
                     new_terms = None
                 else:
                     new_terms = tuple(terms)
-                return FunctionalTerm(maps.function_map[item.name], new_terms)
+
+                return FunctionalTerm(f, new_terms), cast(list[OpenTerm],functional_opens)
             else:
                 raise ValueError(f"Item: {item} not found in constant or function maps")
         else:
             raise ValueError(f"Invalid item {item}")
 
-    terms: list[Summation | FunctionalTerm | ArbitraryObject | Emphasis] = [
-        _parse_term(item) for item in predicate.args
-    ]
+
+
+    terms: list[Term] = []
+    open_term_sets: list[list[OpenTerm]] = []
+    for item in predicate.args:
+        term, open_terms = _parse_term(item)
+        terms.append(term)
+        open_term_sets.append(open_terms)
+    new_open_terms_sets = merge_terms_with_opens(terms, open_term_sets)
     if predicate.name not in maps.predicate_map:
         raise ValueError(f"{predicate} not found in predicate map")
-    return maps.predicate_map[predicate.name](tuple(terms))
+    f_predicate = maps.predicate_map[predicate.name]
+    open_atoms = [OpenAtom(predicate=f_predicate, terms=tuple(t)) for t in new_open_terms_sets]
+    return Atom(
+        predicate=f_predicate,
+        terms= tuple(terms)
+    ), open_atoms
 
+def _parse_item_with_issue(item: Item, maps: Maps) -> tuple[SetOfStates, list[OpenAtom]]:
+    def _parse_item(item: Item, maps: Maps, open_atoms: list[OpenAtom]) -> SetOfStates:
+        # Based on definition 4.16
+        if isinstance(item, BoolOr):
+            # based on (i)
+            new_set = SetOfStates(set())
+            for operand in item.operands:
+                parsed_item: SetOfStates = _parse_item(operand, maps, open_atoms)
+                new_set |= parsed_item
+            return new_set
 
-def _parse_item(item: Item, maps: Maps) -> SetOfStates:
-    # Based on definition 4.16
-    if isinstance(item, BoolOr):
-        # based on (i)
-        new_set = SetOfStates(set())
-        for operand in item.operands:
-            parsed_item: SetOfStates = _parse_item(operand, maps)
-            new_set |= parsed_item
-        return new_set
+        elif isinstance(item, BoolAnd):
+            # based on (ii)
+            new_set = SetOfStates({State(set())})
+            for operand in item.operands:
+                parsed_item: SetOfStates = _parse_item(operand, maps, open_atoms)
+                new_set *= parsed_item
+            return new_set
 
-    elif isinstance(item, BoolAnd):
-        # based on (ii)
-        new_set = SetOfStates({State(set())})
-        for operand in item.operands:
-            parsed_item: SetOfStates = _parse_item(operand, maps)
-            new_set *= parsed_item
-        return new_set
+        elif isinstance(item, BoolNot):
+            # based on (iii)
+            new_arg = _parse_item(item.arg, maps, open_atoms)
+            return new_arg.negation()
+        elif isinstance(item, Truth):
+            # based on (iv)
+            return SetOfStates({State({})})
 
-    elif isinstance(item, BoolNot):
-        # based on (iii)
-        new_arg = _parse_item(item.arg, maps)
-        return new_arg.negation()
-    elif isinstance(item, Truth):
-        # based on (iv)
-        return SetOfStates({State({})})
+        elif isinstance(item, Falsum):
+            # based on (v)
+            return SetOfStates({})
 
-    elif isinstance(item, Falsum):
-        # based on (v)
-        return SetOfStates({})
+        elif isinstance(item, LogicPredicate):
+            # based on (vi)
+            atom, o_atoms = _parse_predicate(item, maps)
+            for o_atom in o_atoms:
+                open_atoms.append(o_atom)
+            return SetOfStates({State({atom})})
 
-    elif isinstance(item, LogicPredicate):
-        # based on (vi)
-        return SetOfStates({State({_parse_predicate(item, maps)})})
+        elif isinstance(item, LogicEmphasis):
+            raise ValueError(f"Logic emphasis {item} found outside of logic predicate")
 
-    elif isinstance(item, LogicEmphasis):
-        raise ValueError(f"Logic emphasis {item} found outside of logic predicate")
+        elif isinstance(item, Variable):
+            raise ValueError(f"Variable {item} found outside of logic predicate")
 
-    elif isinstance(item, Variable):
-        raise ValueError(f"Variable {item} found outside of logic predicate")
+        elif isinstance(item, Implies):
+            raise ValueError(f"Implies statement {item} found at lower level than top")
 
-    elif isinstance(item, Implies):
-        raise ValueError(f"Implies statement {item} found at lower level than top")
+        elif isinstance(item, Quantified):
+            raise ValueError(f"Quantified {item} found at lower level than top")
+        else:
+            assert False
 
-    elif isinstance(item, Quantified):
-        raise ValueError(f"Quantified {item} found at lower level than top")
-    else:
-        assert False
+    open_atoms: list[OpenAtom] = []
+    return _parse_item(item,maps, open_atoms), open_atoms
+
 
 
 def _parse_view(
@@ -127,19 +174,21 @@ def _parse_view(
     else:
         supposition = Truth()
         stage = view_item
-    parsed_supposition = _parse_item(supposition, maps)
-    parsed_stage = _parse_item(stage, maps)
-    if (
-        parsed_stage.emphasis_count + parsed_supposition.emphasis_count == 0
-        and add_emphasis
-    ):
-        parsed_stage, parsed_supposition = add_new_emphasis(
-            parsed_stage, parsed_supposition, dependency_relation
-        )
-    return View.from_integrated_emp(
+    parsed_supposition, open_atoms_supp = _parse_item_with_issue(supposition, maps)
+    parsed_stage, open_atoms_stage = _parse_item_with_issue(stage, maps)
+    issue_structure = IssueStructure(open_atoms_supp + open_atoms_stage)
+    # if (
+    #     parsed_stage.emphasis_count + parsed_supposition.emphasis_count == 0
+    #     and add_emphasis
+    # ):
+    #     parsed_stage, parsed_supposition = add_new_emphasis(
+    #         parsed_stage, parsed_supposition, dependency_relation
+    #     )
+    return View.from_no_weights(
         stage=parsed_stage,
         supposition=parsed_supposition,
         dependency_relation=dependency_relation,
+        issue_structure=issue_structure
     )
 
 

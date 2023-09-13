@@ -3,12 +3,11 @@
 from abc import abstractmethod
 from types import NoneType
 from typing import Iterable, Optional
-from pyetr.abstract_atom import AbstractPredicate
 
 from pyetr.multiset import Multiset
 from pyetr.term import ArbitraryObject, FunctionalTerm, Summation, Term
 from .atom import Atom
-from .abstract_atom import AbstractAtom
+from .abstract_atom import AbstractAtom, Predicate
 from .function import Function
 
 class OpenTerm:
@@ -225,6 +224,12 @@ class QuestionMark(OpenTerm):
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "QuestionMark":
         return self
 
+    def __repr__(self) -> str:
+        return "?"
+
+    def __hash__(self) -> int:
+        return hash("?")
+
     @property
     def detailed(self) -> str:
         return f"<QuestionMark>"
@@ -234,14 +239,15 @@ class QuestionMark(OpenTerm):
 
 
 class OpenAtom(AbstractAtom[OpenTerm]):
-    def __init__(self, predicate: AbstractPredicate[OpenTerm], terms: tuple[OpenTerm, ...]) -> None:
+    def __init__(self, predicate: Predicate, terms: tuple[OpenTerm, ...]) -> None:
         super().__init__(predicate=predicate, terms=terms)
         self.validate()
 
-    def question_count(self):
+    def question_count(self) -> int:
         question_count = 0
         for term in self.terms:
             question_count += term.question_count()
+        return question_count
     
     def validate(self):
         if self.question_count() != 1:
@@ -288,6 +294,14 @@ class OpenAtom(AbstractAtom[OpenTerm]):
 
     def __invert__(self):
         return OpenAtom(~self.predicate, self.terms)
+
+    def __repr__(self) -> str:
+        terms = ",".join([repr(i) for i in self.terms])
+        if self.predicate.verifier:
+            tilda = ""
+        else:
+            tilda = "~"
+        return f"{tilda}{self.predicate.name}({terms})"
 
     @property
     def detailed(self) -> str:

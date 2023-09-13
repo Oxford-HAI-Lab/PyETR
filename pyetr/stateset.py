@@ -2,10 +2,9 @@ __all__ = ["State", "SetOfStates"]
 
 from typing import AbstractSet, Iterable, Optional
 
-from pyetr.weight import Weight
-
-from .atom import Atom, equals_predicate
-from .term import ArbitraryObject, FunctionalTerm, Term
+from .atom import Atom
+from .abstract_atom import equals_predicate
+from .term import ArbitraryObject, Term
 
 
 class State(frozenset[Atom]):
