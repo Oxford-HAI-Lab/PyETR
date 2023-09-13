@@ -1,59 +1,35 @@
-__all__ = ["FunctionalTerm", "Function", "Emphasis", "ArbitraryObject"]
+__all__ = ["FunctionalTerm", "Function", "ArbitraryObject"]
 
-from typing import Optional
+from abc import ABC, abstractmethod
+from typing import Iterable, Optional, Self
+
+from .function import Function
 
 from .multiset import Multiset
 
-
-class Function:
-    name: str
-    arity: int
-
-    def __init__(self, name: str, arity: int) -> None:
-        if arity < 0:
-            raise ValueError("arity must not be less than 0")
-        self.name = name
-        self.arity = arity
-
-    def __repr__(self) -> str:
-        return f"Function({self.name}, {self.arity})"
-
+class Term(ABC):
     @property
+    @abstractmethod
     def detailed(self) -> str:
-        return repr(self)
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, Function):
-            return False
-        if self.name == other.name and not (self.arity == other.arity):
-            raise ValueError(
-                f"Equality on two functions of same name {self.name}, {other.name}, different arity {self.arity}, {other.arity}"
-            )
-        return self.name == other.name and self.arity == other.arity
-
-    def __hash__(self) -> int:
-        return hash(self.name) + hash(self.arity)
+        ...
 
 
-class RealNumber(Function):
-    def __init__(self, num: float) -> None:
-        super().__init__(str(num), 0)
+    @abstractmethod
+    def replace(
+        self,
+        replacements: dict["ArbitraryObject", "Term"],
+    ) -> "Term":
+        ...
 
     @property
-    def num(self) -> float:
-        return float(self.name)
-
-    def __hash__(self) -> int:
-        return hash(self.name) + hash(self.arity) + hash("num")
-
-    def __eq__(self, other) -> bool:
-        raise NotImplementedError
+    @abstractmethod
+    def arb_objects(self) -> set["ArbitraryObject"]:
+        ...
 
 
-XBar = Function("XBar", 2)
 
 
-class ArbitraryObject:
+class ArbitraryObject(Term):
     name: str
 
     def __init__(self, name: str):
@@ -75,105 +51,32 @@ class ArbitraryObject:
         return hash(self.name)
 
     def is_same_emphasis_context(
-        self, other: "FunctionalTerm | ArbitraryObject | Emphasis"
+        self, other: Term
     ) -> bool:
         return self == other
-
-    @property
-    def excluding_emphasis(self) -> "ArbitraryObject":
-        return self
 
     @property
     def arb_objects(self) -> set["ArbitraryObject"]:
         return {self}
 
-    def integrate_issue_atoms(
-        self, terms: list["FunctionalTerm | ArbitraryObject | Emphasis"]
-    ) -> "Emphasis | ArbitraryObject":
-        for term in terms:
-            if isinstance(term, Emphasis):
-                return term
-        return self
-
-    def emphasis_count(self) -> int:
-        return 0
-
-
-class Emphasis:
-    term: "FunctionalTerm | ArbitraryObject"
-
-    def __init__(self, t: "FunctionalTerm | ArbitraryObject") -> None:
-        self.term = t
-
-    @property
-    def arb_objects(self) -> set[ArbitraryObject]:
-        output_set = set()
-        subterm = self.term
-        if isinstance(subterm, FunctionalTerm):
-            output_set |= subterm.arb_objects
-        elif isinstance(subterm, ArbitraryObject):
-            output_set.add(subterm)
-        else:
-            assert False
-        return output_set
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, Emphasis):
-            return False
-        return self.term == other.term
-
-    def __hash__(self) -> int:
-        return hash(("Emphasis", self.term))
-
     def replace(
         self,
-        replacements: dict[ArbitraryObject, "FunctionalTerm | ArbitraryObject"],
-    ) -> "Emphasis":
-        if self.term in replacements:
-            replacement = replacements[self.term]
-        else:
-            if isinstance(self.term, FunctionalTerm):
-                replacement = self.term.replace(replacements)
-            elif isinstance(self.term, ArbitraryObject):
-                replacement = self.term
-            else:
-                assert False
-        return Emphasis(t=replacement)
-
-    @property
-    def detailed(self) -> str:
-        return f"<Emphasis term={self.term.detailed}>"
-
-    def __repr__(self) -> str:
-        return f"{self.term}*"
-
-    def is_same_emphasis_context(
-        self, other: "FunctionalTerm | ArbitraryObject | Emphasis"
-    ) -> bool:
-        return isinstance(other, Emphasis)
-
-    @property
-    def excluding_emphasis(self) -> "FunctionalTerm | ArbitraryObject":
-        return self.term.excluding_emphasis
-
-    def emphasis_count(self) -> int:
-        return 1
-
-    def integrate_issue_atoms(
-        self, terms: list["FunctionalTerm | ArbitraryObject | Emphasis"]
-    ) -> "Emphasis":
+        replacements: dict["ArbitraryObject", Term],
+    ) -> Term:
+        if self in replacements:
+            return replacements[self]
         return self
 
 
-class FunctionalTerm:
+
+class FunctionalTerm(Term):
     f: Function
-    t: Optional[tuple["FunctionalTerm | ArbitraryObject | Emphasis", ...]]
-    emphasis_count: int
+    t: Optional[tuple[Term, ...]]
 
     def __init__(
         self,
         f: Function,
-        t: Optional[tuple["FunctionalTerm | ArbitraryObject | Emphasis", ...]] = None,
+        t: Optional[tuple[Term, ...]] = None,
     ):
         if t is None and f.arity > 0:
             raise ValueError(
@@ -185,23 +88,7 @@ class FunctionalTerm:
             )
         self.f = f
         self.t = t
-        if t is None:
-            self.emphasis_count = 0
-        else:
-            self.emphasis_count = self._count_emphasis(t)
 
-    @staticmethod
-    def _count_emphasis(
-        t: tuple["FunctionalTerm | ArbitraryObject | Emphasis", ...]
-    ) -> int:
-        emphasis_count = 0
-        for element in t:
-            if isinstance(element, Emphasis):
-                emphasis_count += 1
-            elif isinstance(element, FunctionalTerm):
-                emphasis_count += element.emphasis_count
-
-        return emphasis_count
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
@@ -210,7 +97,7 @@ class FunctionalTerm:
             return output_set
         else:
             for term in self.t:
-                if isinstance(term, FunctionalTerm) or isinstance(term, Emphasis):
+                if isinstance(term, FunctionalTerm) or isinstance(term, Summation):
                     output_set |= term.arb_objects
                 elif isinstance(term, ArbitraryObject):
                     output_set.add(term)
@@ -240,57 +127,13 @@ class FunctionalTerm:
     def __hash__(self) -> int:
         return hash((self.f, self.t))
 
-    @property
-    def excluding_emphasis(self) -> "FunctionalTerm":
-        if self.t is None:
-            return self
-        else:
-            new_subterms: list["FunctionalTerm | ArbitraryObject | Emphasis"] = [
-                subterm.excluding_emphasis for subterm in self.t
-            ]
-            return FunctionalTerm(f=self.f, t=tuple(new_subterms))
 
-    def integrate_issue_atoms(
-        self, terms: list["FunctionalTerm | ArbitraryObject | Emphasis"]
-    ) -> "Emphasis | FunctionalTerm":
-        for term in terms:
-            if isinstance(term, Emphasis):
-                return term
-        if self.t is None:
-            return self
-
-        return FunctionalTerm(
-            f=self.f,
-            t=tuple([t.integrate_issue_atoms(terms) for i, t in enumerate(self.t)]),
-        )
-
-    def replace_emphasis(
-        self, existing: Emphasis, new: "FunctionalTerm | ArbitraryObject | Emphasis"
-    ) -> "FunctionalTerm":
-        new_terms = []
-        if self.t is None:
-            return self
-        for term in self.t:
-            if term == existing:
-                replacement = new
-            else:
-                if isinstance(term, FunctionalTerm) and term.t is not None:
-                    replacement = term.replace_emphasis(existing, new)
-                elif isinstance(term, Emphasis):
-                    assert False
-                elif isinstance(term, ArbitraryObject):
-                    replacement = term
-                else:
-                    assert False
-            new_terms.append(replacement)
-        return FunctionalTerm(f=self.f, t=tuple(new_terms))
 
     def is_same_emphasis_context(
-        self, other: "FunctionalTerm | ArbitraryObject | Emphasis"
+        self, other: Term
     ) -> bool:
         if (
-            isinstance(other, Emphasis)
-            or isinstance(other, ArbitraryObject)
+            not isinstance(other, FunctionalTerm)
             or self.f != other.f
         ):
             return False
@@ -306,7 +149,7 @@ class FunctionalTerm:
 
     def replace(
         self,
-        replacements: dict[ArbitraryObject, "FunctionalTerm | ArbitraryObject"],
+        replacements: dict[ArbitraryObject, Term],
     ) -> "FunctionalTerm":
         new_terms = []
         if self.t is None:
@@ -317,33 +160,26 @@ class FunctionalTerm:
             else:
                 if isinstance(term, FunctionalTerm) and term.t is not None:
                     replacement = term.replace(replacements)
-                elif isinstance(term, Emphasis):
-                    replacement = term.replace(replacements)
                 elif isinstance(term, ArbitraryObject):
                     replacement = term
+                elif isinstance(term, Summation):
+                    replacement = term.replace(replacements)
                 else:
                     assert False
             new_terms.append(replacement)
         return FunctionalTerm(f=self.f, t=tuple(new_terms))
 
-    @property
-    def emphasis_term(self) -> "FunctionalTerm | ArbitraryObject":
-        if self.emphasis_count == 1 and self.t is not None:
-            for term in self.t:
-                if isinstance(term, Emphasis):
-                    return term.term
-                elif isinstance(term, FunctionalTerm):
-                    if term.emphasis_count > 0:
-                        assert term.emphasis_count == 1
-                        return term.emphasis_term
-            assert False
-        else:
-            raise ValueError(
-                f"Emphasis term requested for term {self} - term does not have exactly one emphasis"
-            )
-
 
 # Changed if clause in 4.2 to separate Arbitrary Objects from FunctionalTerm
 
-# class Summation:
-#     terms: Multiset["Summation | FunctionalTerm | Emphasis | ArbitraryObject"]
+class Summation(Term):
+    t: Multiset[Term]
+
+    def __init__(self,
+        t: Iterable[Term],
+    ):
+        self.t = Multiset[Term](t)
+
+    @property
+    def detailed(self) -> str:
+        raise NotImplementedError
