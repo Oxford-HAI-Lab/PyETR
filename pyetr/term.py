@@ -50,11 +50,6 @@ class ArbitraryObject(Term):
     def __hash__(self) -> int:
         return hash(self.name)
 
-    def is_same_emphasis_context(
-        self, other: Term
-    ) -> bool:
-        return self == other
-
     @property
     def arb_objects(self) -> set["ArbitraryObject"]:
         return {self}
@@ -127,25 +122,6 @@ class FunctionalTerm(Term):
     def __hash__(self) -> int:
         return hash((self.f, self.t))
 
-
-
-    def is_same_emphasis_context(
-        self, other: Term
-    ) -> bool:
-        if (
-            not isinstance(other, FunctionalTerm)
-            or self.f != other.f
-        ):
-            return False
-        if self.t is None and other.t is None:
-            return True
-        elif self.t is None or other.t is None:
-            return False
-        else:
-            for x, y in zip(self.t, other.t):
-                if not x.is_same_emphasis_context(y):
-                    return False
-        return True
 
     def replace(
         self,

@@ -58,7 +58,7 @@ def substitution(
     arb_gen: ArbitraryObjectGenerator,
     dep_relation: DependencyRelation,
     arb_obj: ArbitraryObject,
-    term: FunctionalTerm | ArbitraryObject,
+    term: Term,
     stage: Stage,
     supposition: Supposition,
     issue_structure: IssueStructure,
@@ -401,14 +401,17 @@ class View:
 
     def issue_matches(
         self, other: "View"
-    ) -> set[tuple[FunctionalTerm | ArbitraryObject, FunctionalTerm | ArbitraryObject]]:
+    ) -> set[tuple[Term, Term]]:
         pairs: list[
-            tuple[FunctionalTerm | ArbitraryObject, FunctionalTerm | ArbitraryObject]
+            tuple[Term, Term]
         ] = []
         for atom_self in self.issue_structure:
             for atom_other in other.issue_structure:
-                if atom_self.is_same_emphasis_context(atom_other):
-                    pairs.append((atom_self.emphasis_term, atom_other.emphasis_term))
+                if atom_self.is_same_question_context(atom_other):
+                    rel_atom_l = [atom for atom in self.stage.atoms | self.supposition.atoms if atom_self.refers_to_atom(atom)]
+                    assert len(rel_atom_l) == 1
+                    rel_atom = rel_atom_l[0]
+                    pairs.append((atom_self.get_question_term_for_atom(rel_atom), atom_other.get_question_term_for_atom(rel_atom)))
 
         return set(pairs)
 
@@ -535,8 +538,8 @@ class View:
 
         def _m_prime(
             gamma: State,
-        ) -> set[tuple[FunctionalTerm | ArbitraryObject, Universal]]:
-            out: set[tuple[FunctionalTerm | ArbitraryObject, Universal]] = set()
+        ) -> set[tuple[Term, Universal]]:
+            out: set[tuple[Term, Universal]] = set()
             for t, u in self.issue_matches(view):
                 if isinstance(
                     u, ArbitraryObject
