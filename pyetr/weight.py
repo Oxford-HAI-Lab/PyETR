@@ -39,4 +39,5 @@ class Weight:
         )
 
     def validate_against_dep_rel(self, stage: DependencyRelation):
+        return None
         raise NotImplementedError

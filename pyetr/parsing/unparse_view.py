@@ -15,7 +15,7 @@ from pyetr.parsing.parse_string import (
     Variable,
 )
 from pyetr.stateset import SetOfStates
-from pyetr.term import ArbitraryObject, Emphasis, FunctionalTerm, Summation, Term
+from pyetr.term import ArbitraryObject, FunctionalTerm, Summation, Term
 from pyetr.view import View
 
 
