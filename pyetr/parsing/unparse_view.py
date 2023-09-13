@@ -15,11 +15,11 @@ from pyetr.parsing.parse_string import (
     Variable,
 )
 from pyetr.stateset import SetOfStates
-from pyetr.term import ArbitraryObject, Emphasis, FunctionalTerm
+from pyetr.term import ArbitraryObject, Emphasis, FunctionalTerm, Summation, Term
 from pyetr.view import View
 
 
-def convert_term(term: FunctionalTerm | ArbitraryObject | Emphasis) -> Item:
+def convert_term(term: Term) -> Item:
     if isinstance(term, FunctionalTerm):
         if term.t is None:
             return LogicPredicate([[term.f.name]])

@@ -7,11 +7,13 @@ from typing import Optional, cast
 
 from pyetr.issues import IssueStructure
 from pyetr.tools import ArbitraryObjectGenerator, powerset
+from pyetr.weight import Weight
 
 from .atom import Atom
 from .dependency import Dependency, DependencyRelation
 from .stateset import SetOfStates, State
-from .term import ArbitraryObject, FunctionalTerm
+from .term import ArbitraryObject, FunctionalTerm, Term
+from pyetr import term
 
 
 def get_subset(
@@ -35,6 +37,9 @@ def stage_supposition_product(
     stage_supposition_external: tuple[Stage, Supposition],
     stage_supposition_internal: tuple[Stage, Supposition],
 ) -> tuple[Stage, Supposition]:
+    """
+    Definition 5.15, p208
+    """
     stage_external, supposition_external = stage_supposition_external
     stage_internal, supposition_internal = stage_supposition_internal
     subset = get_subset(stage_external, supposition_internal)
@@ -88,7 +93,7 @@ def substitution(
     subs = arb_gen.redraw(Z())
     new_dep_relation = new_dep_relation.replace(subs)
     new_stage = new_stage.replace(
-        cast(dict[ArbitraryObject, FunctionalTerm | ArbitraryObject], subs)
+        cast(dict[ArbitraryObject, Term], subs)
     )
 
     new_stage = new_stage.replace({arb_obj: term})
@@ -97,7 +102,7 @@ def substitution(
     T_prime = old_T.chain(new_dep_relation)
 
     new_issue_structure = issue_structure.replace(
-        cast(dict[ArbitraryObject, FunctionalTerm | ArbitraryObject], subs)
+        cast(dict[ArbitraryObject, Term], subs)
     )
     new_issue_structure = new_issue_structure.replace({arb_obj: term})
 
@@ -191,6 +196,7 @@ class View:
     supposition: Supposition
     dependency_relation: DependencyRelation
     issue_structure: IssueStructure
+    weights: dict[State, Weight]
 
     def __init__(
         self,
@@ -198,6 +204,7 @@ class View:
         supposition: Supposition,
         dependency_relation: DependencyRelation,
         issue_structure: IssueStructure,
+        weights: dict[State, Weight] = {},
         *,
         is_pre_view=False,
     ) -> None:
@@ -205,19 +212,46 @@ class View:
         self.supposition = supposition
         self.dependency_relation = dependency_relation
         self.issue_structure = issue_structure
+        self.weights = weights
         self.validate(pre_view=is_pre_view)
 
     def validate(self, *, pre_view: bool = False):
+
         self.dependency_relation.validate_against_states(
             self.stage | self.supposition, pre_view=pre_view
         )
+        for s, w in self.weights.items():
+            if s not in self.stage:
+                raise ValueError(f"{s} not in {self.stage}")
+
+            w.validate_against_dep_rel(self.dependency_relation)
+        
+            # Assert weights dict is stage
+            # Assert weights only use arbitrary objects in dependency relation
+            # TODO: Does this use weight or state?
+
         if not pre_view:
             self.issue_structure.validate_against_states(self.stage | self.supposition)
 
-        if self.stage.emphasis_count > 0:
-            raise ValueError(f"Stage {self.stage} contains emphasis")
-        if self.supposition.emphasis_count > 0:
-            raise ValueError(f"Supposition {self.supposition} contains emphasis")
+    @classmethod
+    def from_no_weights(
+        cls,
+        stage: Stage,
+        supposition: Supposition,
+        dependency_relation: DependencyRelation,
+        issue_structure: IssueStructure,
+        *,
+        is_pre_view=False,
+    ):
+        weights = {state: Weight.get_null_weight() for state in stage}
+        return View(
+            stage=stage,
+            supposition=supposition,
+            dependency_relation=dependency_relation,
+            issue_structure=issue_structure,
+            weights=weights,
+            is_pre_view=is_pre_view
+        )
 
     @classmethod
     def get_verum(cls):
@@ -255,36 +289,6 @@ class View:
             issue_structure.restriction((stage | supposition).atoms),
         )
 
-    @classmethod
-    def from_integrated_emp(
-        cls,
-        stage: Stage,
-        supposition: Supposition,
-        dependency_relation: DependencyRelation,
-    ):
-        atoms = stage.atoms | supposition.atoms
-        emphasised_atoms: set[Atom] = set()
-        for a in atoms:
-            emphasised_atoms |= a.get_issue_atoms()
-
-        return cls(
-            stage=stage.excluding_emphasis,
-            supposition=supposition.excluding_emphasis,
-            dependency_relation=dependency_relation,
-            issue_structure=IssueStructure(emphasised_atoms),
-        )
-
-    def to_integrated_emp(self) -> tuple[Stage, Supposition, DependencyRelation]:
-        issue_atoms: dict[Atom, list[Atom]] = defaultdict(list)
-        for atom in self.issue_structure:
-            deemphasised_atom = atom.excluding_emphasis
-            issue_atoms[deemphasised_atom].append(atom)
-
-        return (
-            self.stage.integrate_issue_atoms(issue_atoms),
-            self.supposition.integrate_issue_atoms(issue_atoms),
-            self.dependency_relation,
-        )
 
     @property
     def detailed(self) -> str:
@@ -338,7 +342,7 @@ class View:
         return self.stage.arb_objects | self.supposition.arb_objects
 
     def replace(
-        self, replacements: dict[ArbitraryObject, FunctionalTerm | ArbitraryObject]
+        self, replacements: dict[ArbitraryObject, Term]
     ) -> "View":
         new_stage = self.stage.replace(replacements)
         new_supposition = self.supposition.replace(replacements)
@@ -387,7 +391,7 @@ class View:
 
                 new_view = other.replace(
                     cast(
-                        dict[ArbitraryObject, FunctionalTerm | ArbitraryObject],
+                        dict[ArbitraryObject, Term],
                         replacements,
                     )
                 )
@@ -711,10 +715,10 @@ class View:
             def _big_product(gamma: State) -> SetOfStates:
                 def B(gamma: State, e: Existential) -> State:
                     atoms = set()
-                    for atom in self.issue_structure:
-                        atom_excl = atom.excluding_emphasis
-                        if atom_excl in gamma:
-                            atoms.add(atom_excl)
+                    for open_atom in self.issue_structure:
+                        for atom in gamma:
+                            if open_atom.refers_to_atom(atom):
+                                 atoms.add(atom)
                     return State(atoms)
 
                 return reduce(

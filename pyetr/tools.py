@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Iterable, TypeVar
 if TYPE_CHECKING:
     from .view import View
 
-from .term import ArbitraryObject, FunctionalTerm
+from .term import ArbitraryObject, FunctionalTerm, Term
 
 
 class NameScheme(Enum):
@@ -86,7 +86,7 @@ class ArbitraryObjectGenerator:
         replacements = self.redraw(arb_objects)
         return view.replace(
             typing.cast(
-                dict[ArbitraryObject, ArbitraryObject | FunctionalTerm], replacements
+                dict[ArbitraryObject, Term], replacements
             )
         )
 

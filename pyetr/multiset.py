@@ -1,4 +1,4 @@
-from typing import Generic, Hashable, TypeVar
+from typing import Generic, Hashable, Iterable, TypeVar
 
 T = TypeVar("T", bound=Hashable)
 
@@ -6,7 +6,7 @@ T = TypeVar("T", bound=Hashable)
 class Multiset(Generic[T]):
     _items: list[T]
 
-    def __init__(self, items: list[T]) -> None:
+    def __init__(self, items: Iterable[T]) -> None:
         self._items = sorted(items, key=hash)
 
     def __iter__(self):
@@ -16,7 +16,7 @@ class Multiset(Generic[T]):
         return next(self)
 
     def __repr__(self) -> str:
-        return "Multiset(" + super().__repr__() + ")"
+        return "Multiset(" + self._items.__repr__() + ")"
 
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, Multiset):
@@ -26,6 +26,12 @@ class Multiset(Generic[T]):
     def __hash__(self) -> int:
         return hash("Multiset") + hash(tuple(self._items))
 
+    def __add__(self, other: "Multiset") -> "Multiset":
+        raise NotImplementedError
 
-m = Multiset([1, 3, 2, 3, 3])
-m2 = Multiset([2, 3, 3, 3, 1])
+    def __len__(self):
+        return len(self._items)
+
+    @property
+    def detailed(self):
+        return f"<Multiset items={self._items.__repr__()}>"

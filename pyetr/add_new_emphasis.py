@@ -6,7 +6,7 @@ from typing import Optional
 
 from pyetr.atom import Atom
 from pyetr.dependency import DependencyRelation
-from pyetr.term import ArbitraryObject, Emphasis, Function, FunctionalTerm
+from pyetr.term import ArbitraryObject, Emphasis, Function, FunctionalTerm, Summation, Term
 
 from .stateset import SetOfStates, State
 
@@ -16,14 +16,14 @@ class AtomCandidate:
     A candidate from an atom
     """
 
-    term: ArbitraryObject | Function | FunctionalTerm
+    term: Term
     term_idx: int
     atom_occurrences: int
     _dependency_relation: DependencyRelation
 
     def __init__(
         self,
-        term: ArbitraryObject | Function | FunctionalTerm,
+        term: Term,
         dependency_relation: DependencyRelation,
         term_idx: int,
     ) -> None:
@@ -193,7 +193,7 @@ def get_new_state(
             if current_atom_candidate == atom_candidate:
                 instances_encountered += 1
                 if instance_num == instances_encountered - 1:
-                    new_terms: list[FunctionalTerm | ArbitraryObject | Emphasis] = []
+                    new_terms: list[Summation | FunctionalTerm | ArbitraryObject | Emphasis] = []
                     for i, term in enumerate(atom.terms):
                         if atom_candidate.term_idx == i:
                             assert not isinstance(term, Emphasis)

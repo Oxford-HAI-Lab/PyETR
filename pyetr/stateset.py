@@ -2,8 +2,10 @@ __all__ = ["State", "SetOfStates"]
 
 from typing import AbstractSet, Iterable, Optional
 
+from pyetr.weight import Weight
+
 from .atom import Atom, equals_predicate
-from .term import ArbitraryObject, FunctionalTerm
+from .term import ArbitraryObject, FunctionalTerm, Term
 
 
 class State(frozenset[Atom]):
@@ -47,13 +49,6 @@ class State(frozenset[Atom]):
             arb_objects |= atom.arb_objects
         return arb_objects
 
-    @property
-    def emphasis_count(self) -> int:
-        emphasis_count = 0
-        for atom in self:
-            emphasis_count += atom.emphasis_count
-        return emphasis_count
-
     def __repr__(self) -> str:
         if len(self) == 0:
             return "0"
@@ -64,13 +59,13 @@ class State(frozenset[Atom]):
         return "{" + ",".join(i.detailed for i in self) + "}"
 
     def replace(
-        self, replacements: dict[ArbitraryObject, FunctionalTerm | ArbitraryObject]
+        self, replacements: dict[ArbitraryObject, Term]
     ) -> "State":
         return State([s.replace(replacements) for s in self])
 
     @property
     def is_primitive_absurd(self) -> bool:
-        state = State([a.excluding_emphasis for a in self])
+        state = self
         # LNC
         for atom in state:
             if ~atom in state:
@@ -100,20 +95,6 @@ class State(frozenset[Atom]):
         for atom in self:
             a.add(atom)
         return a
-
-    @property
-    def excluding_emphasis(self) -> "State":
-        return State(atom.excluding_emphasis for atom in self)
-
-    def integrate_issue_atoms(self, atoms: dict[Atom, list[Atom]]):
-        new_atoms = set()
-        for atom in self:
-            if atom in atoms:
-                new_atom = atom.integrate_issue_atoms(atoms[atom])
-            else:
-                new_atom = atom
-            new_atoms.add(new_atom)
-        return State(new_atoms)
 
 
 class SetOfStates(frozenset[State]):
@@ -156,13 +137,6 @@ class SetOfStates(frozenset[State]):
         for state in self:
             arb_objects |= state.arb_objects
         return arb_objects
-
-    @property
-    def emphasis_count(self) -> int:
-        emphasis_count = 0
-        for state in self:
-            emphasis_count += state.emphasis_count
-        return emphasis_count
 
     def __mul__(self, other: "SetOfStates") -> "SetOfStates":
         """
@@ -215,7 +189,7 @@ class SetOfStates(frozenset[State]):
             atoms = set()
             for state in s:
                 for a in state:
-                    atoms.add(a.excluding_emphasis)
+                    atoms.add(a)
             return atoms
 
         self_atoms = _get_atoms(self)
@@ -231,7 +205,7 @@ class SetOfStates(frozenset[State]):
         return "{" + ",".join(i.detailed for i in self) + "}"
 
     def replace(
-        self, replacements: dict[ArbitraryObject, FunctionalTerm | ArbitraryObject]
+        self, replacements: dict[ArbitraryObject, Term]
     ) -> "SetOfStates":
         return SetOfStates([s.replace(replacements) for s in self])
 
@@ -241,10 +215,3 @@ class SetOfStates(frozenset[State]):
         for state in self:
             a |= state.atoms
         return a
-
-    @property
-    def excluding_emphasis(self) -> "SetOfStates":
-        return SetOfStates(state.excluding_emphasis for state in self)
-
-    def integrate_issue_atoms(self, atoms: dict[Atom, list[Atom]]):
-        return SetOfStates({i.integrate_issue_atoms(atoms) for i in self})

@@ -4,7 +4,7 @@ from typing import Literal, cast
 from pyetr.add_new_emphasis import add_new_emphasis
 from pyetr.dependency import Dependency, DependencyRelation, dependencies_from_sets
 from pyetr.stateset import SetOfStates, State
-from pyetr.term import ArbitraryObject, Emphasis, Function, FunctionalTerm
+from pyetr.term import ArbitraryObject, Emphasis, Function, FunctionalTerm, Summation
 from pyetr.view import View
 
 from ..atom import Atom, Predicate
@@ -33,7 +33,7 @@ class Maps:
 
 
 def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> Atom:
-    def _parse_term(item: Item) -> FunctionalTerm | ArbitraryObject | Emphasis:
+    def _parse_term(item: Item) -> Summation | FunctionalTerm | ArbitraryObject | Emphasis:
         if isinstance(item, Variable):
             return maps.variable_map[item.name]
         elif isinstance(item, LogicEmphasis):
@@ -45,7 +45,7 @@ def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> Atom:
             if item.name in maps.constant_map:
                 return FunctionalTerm(maps.constant_map[item.name])
             elif item.name in maps.function_map:
-                terms: list[FunctionalTerm | ArbitraryObject | Emphasis] = [
+                terms: list[Summation | FunctionalTerm | ArbitraryObject | Emphasis] = [
                     _parse_term(item) for item in item.args
                 ]
                 if len(terms) == 0:
@@ -58,7 +58,7 @@ def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> Atom:
         else:
             raise ValueError(f"Invalid item {item}")
 
-    terms: list[FunctionalTerm | ArbitraryObject | Emphasis] = [
+    terms: list[Summation | FunctionalTerm | ArbitraryObject | Emphasis] = [
         _parse_term(item) for item in predicate.args
     ]
     if predicate.name not in maps.predicate_map:
