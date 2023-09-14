@@ -40,34 +40,29 @@ class ArbitraryObject(AbstractArbitraryObject, Term):
         return self
 
 
-class FunctionalTerm(AbstractFunctionalTerm, Term):
+class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
         output_set = set()
-        if self.t is None:
-            return output_set
-        else:
-            for term in self.t:
-                if isinstance(term, FunctionalTerm) or isinstance(term, Summation):
-                    output_set |= term.arb_objects
-                elif isinstance(term, ArbitraryObject):
-                    output_set.add(term)
-                else:
-                    assert False
-            return output_set
+        for term in self.t:
+            if isinstance(term, FunctionalTerm) or isinstance(term, Summation):
+                output_set |= term.arb_objects
+            elif isinstance(term, ArbitraryObject):
+                output_set.add(term)
+            else:
+                assert False
+        return output_set
 
     def replace(
         self,
         replacements: dict[ArbitraryObject, Term],
     ) -> "FunctionalTerm":
         new_terms = []
-        if self.t is None:
-            return self
         for term in self.t:
             if term in replacements:
                 replacement = replacements[term]
             else:
-                if isinstance(term, FunctionalTerm) and term.t is not None:
+                if isinstance(term, FunctionalTerm):
                     replacement = term.replace(replacements)
                 elif isinstance(term, ArbitraryObject):
                     replacement = term
@@ -82,7 +77,7 @@ class FunctionalTerm(AbstractFunctionalTerm, Term):
 # Changed if clause in 4.2 to separate Arbitrary Objects from FunctionalTerm
 
 
-class Summation(AbstractSummation, Term):
+class Summation(AbstractSummation[Term], Term):
     @property
     def arb_objects(self) -> set["ArbitraryObject"]:
         a_objs = set()

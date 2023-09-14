@@ -1,6 +1,6 @@
 from copy import copy
 from dataclasses import dataclass
-from typing import Literal, Optional, TypeVar, cast
+from typing import Literal, TypeVar, cast
 
 from pyetr.abstract_atom import Predicate
 from pyetr.add_new_emphasis import add_new_emphasis
@@ -59,13 +59,6 @@ def merge_terms_with_opens(
 T = TypeVar("T")
 
 
-def convert_term_to_optional(t: list[OpenTerm]) -> Optional[tuple[OpenTerm, ...]]:
-    if len(t) == 0:
-        return None
-    else:
-        return tuple(t)
-
-
 def _parse_predicate(
     predicate: LogicPredicate, maps: Maps
 ) -> tuple[Atom, list[tuple[Term, OpenAtom]]]:
@@ -77,7 +70,7 @@ def _parse_predicate(
             return parsed_term, [*open_terms, (parsed_term, QuestionMark())]
         elif isinstance(item, LogicPredicate):
             if item.name in maps.constant_map:
-                return FunctionalTerm(maps.constant_map[item.name]), []
+                return FunctionalTerm(maps.constant_map[item.name], t=()), []
             elif item.name in maps.function_map:
                 terms: list[Term] = []
                 # These represent a list in term order, where each element is a list of derived open atom pairs
@@ -89,15 +82,10 @@ def _parse_predicate(
                 new_open_terms_sets = merge_terms_with_opens(terms, open_term_sets)
                 f = maps.function_map[item.name]
                 functional_opens = [
-                    (t, OpenFunctionalTerm(f=f, t=convert_term_to_optional(open_terms)))
+                    (t, OpenFunctionalTerm(f=f, t=tuple(open_terms)))
                     for t, open_terms in new_open_terms_sets
                 ]
-                if len(terms) == 0:
-                    new_terms = None
-                else:
-                    new_terms = tuple(terms)
-
-                return FunctionalTerm(f, new_terms), cast(
+                return FunctionalTerm(f, tuple(terms)), cast(
                     list[tuple[Term, OpenTerm]], functional_opens
                 )
             else:

@@ -29,10 +29,8 @@ class Atom(AbstractAtom[Term]):
                 assert not isinstance(term, FunctionalTerm)
                 replacement = replacements[term]
             else:
-                if isinstance(term, FunctionalTerm) and term.t is not None:
+                if isinstance(term, FunctionalTerm):
                     replacement = term.replace(replacements)
-                elif isinstance(term, FunctionalTerm) and term.t is None:
-                    replacement = term
                 elif isinstance(term, ArbitraryObject):
                     replacement = term
                 else:

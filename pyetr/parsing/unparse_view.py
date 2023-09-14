@@ -29,25 +29,21 @@ def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
         ]
         return LogicEmphasis([[convert_term(term, remaining_terms)]])
     if isinstance(term, FunctionalTerm):
-        if term.t is None:
-            return LogicPredicate([[term.f.name]])
-        else:
-            new_subterms: list[Item] = []
-            for i, subterm in enumerate(term.t):
-                rel_open_terms: list[tuple[Term, OpenTerm]] = []
-                for t, o in open_terms:
-                    assert isinstance(o, OpenFunctionalTerm)
-                    assert o.t is not None
-                    rel_open_terms.append((t, o.t[i]))
-                new_subterms.append(convert_term(subterm, rel_open_terms))
-            return LogicPredicate(
+        new_subterms: list[Item] = []
+        for i, subterm in enumerate(term.t):
+            rel_open_terms: list[tuple[Term, OpenTerm]] = []
+            for t, o in open_terms:
+                assert isinstance(o, OpenFunctionalTerm)
+                rel_open_terms.append((t, o.t[i]))
+            new_subterms.append(convert_term(subterm, rel_open_terms))
+        return LogicPredicate(
+            [
                 [
-                    [
-                        term.f.name,
-                        Comma([new_subterms]),
-                    ]
+                    term.f.name,
+                    Comma([new_subterms]),
                 ]
-            )
+            ]
+        )
 
     elif isinstance(term, ArbitraryObject):
         return Variable([term.name])

@@ -39,14 +39,9 @@ class OpenArbitraryObject(AbstractArbitraryObject, OpenTerm):
 
 class OpenFunctionalTerm(AbstractFunctionalTerm[OpenTerm], OpenTerm):
     def __call__(self, term: Term) -> FunctionalTerm:
-        if self.t is None:
-            return FunctionalTerm(f=self.f, t=None)
-        else:
-            return FunctionalTerm(f=self.f, t=tuple([i(term) for i in self.t]))
+        return FunctionalTerm(f=self.f, t=tuple([i(term) for i in self.t]))
 
     def question_count(self) -> int:
-        if self.t is None:
-            return 0
         c = 0
         for i in self.t:
             c += i.question_count()
@@ -55,13 +50,11 @@ class OpenFunctionalTerm(AbstractFunctionalTerm[OpenTerm], OpenTerm):
     def replace(
         self, replacements: dict[ArbitraryObject, Term]
     ) -> "OpenFunctionalTerm":
-        if self.t is None:
-            return OpenFunctionalTerm(f=self.f, t=None)
         new_terms = tuple([term.replace(replacements) for term in self.t])
         return OpenFunctionalTerm(f=self.f, t=new_terms)
 
 
-class OpenSummation(AbstractSummation, OpenTerm):
+class OpenSummation(AbstractSummation[OpenTerm], OpenTerm):
     def __call__(self, term: Term) -> Summation:
         return Summation(t=tuple([i(term) for i in self.t]))
 
@@ -72,8 +65,7 @@ class OpenSummation(AbstractSummation, OpenTerm):
         return c
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenSummation":
-        new_terms = tuple([term.replace(replacements) for term in self.t])
-        return OpenSummation(t=new_terms)
+        return OpenSummation(t=tuple([term.replace(replacements) for term in self.t]))
 
 
 class QuestionMark(OpenTerm):
@@ -107,11 +99,9 @@ def get_open_equivalent(term: Term) -> OpenTerm:
     if isinstance(term, ArbitraryObject):
         return OpenArbitraryObject(term.name)
     elif isinstance(term, FunctionalTerm):
-        if term.t is None:
-            new_terms = None
-        else:
-            new_terms = tuple([get_open_equivalent(i) for i in term.t])
-        return OpenFunctionalTerm(f=term.f, t=new_terms)
+        return OpenFunctionalTerm(
+            f=term.f, t=tuple([get_open_equivalent(i) for i in term.t])
+        )
     elif isinstance(term, Summation):
         return OpenSummation(t=(get_open_equivalent(i) for i in term.t))
     else:
