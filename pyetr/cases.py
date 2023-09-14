@@ -48,7 +48,7 @@ class DefaultInference(BaseTest):
 class BasicStep(BaseTest):
     @classmethod
     def test(cls, verbose: bool = False):
-        result = basic_step(cls.v, verbose=verbose)
+        result = basic_step(v=cls.v, verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 

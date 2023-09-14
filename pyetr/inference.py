@@ -1,7 +1,7 @@
 from .view import View
 
 
-def basic_step(v: tuple[View, ...], verbose: bool = False) -> View:
+def basic_step(*, v: tuple[View, ...], verbose: bool = False) -> View:
     out = View.get_verum()
     for i, view in enumerate(v):
         if i == 0:
@@ -12,7 +12,7 @@ def basic_step(v: tuple[View, ...], verbose: bool = False) -> View:
 
 
 def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> View:
-    g_prime = basic_step(v, verbose=verbose)
+    g_prime = basic_step(v=v, verbose=verbose)
     for i, view in enumerate(v):
         if i == 0:
             g_prime = g_prime.factor(view.depose(verbose=verbose), verbose=verbose)
