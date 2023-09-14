@@ -146,7 +146,9 @@ class DependencyRelation:
         elif arb_object in self.universals:
             return False
         else:
-            raise ValueError(f"Arb object {arb_object} not found in dependency relation")
+            raise ValueError(
+                f"Arb object {arb_object} not found in dependency relation"
+            )
 
     def validate_against_states(self, states: SetOfStates, pre_view: bool = False):
         if pre_view:

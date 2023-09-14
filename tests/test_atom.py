@@ -1,7 +1,8 @@
 import pytest
 
-from pyetr.atom import Atom
 from pyetr.abstract_atom import Predicate
+from pyetr.atom import Atom
+
 
 class TestAtom:
     def test_invalid(self):

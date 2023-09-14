@@ -84,11 +84,7 @@ class ArbitraryObjectGenerator:
 
     def novelise(self, arb_objects: set[ArbitraryObject], view: "View") -> "View":
         replacements = self.redraw(arb_objects)
-        return view.replace(
-            typing.cast(
-                dict[ArbitraryObject, Term], replacements
-            )
-        )
+        return view.replace(typing.cast(dict[ArbitraryObject, Term], replacements))
 
     def novelise_all(self, view: "View") -> "View":
         return self.novelise(view.stage_supp_arb_objects, view)

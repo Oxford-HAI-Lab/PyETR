@@ -53,7 +53,6 @@ class TestArbitraryObject:
         assert not arb == func1
 
 
-
 class TestFunctionalTerm:
     def test_valid(self, func, arb_obj):
         t = FunctionalTerm(func, (arb_obj,))

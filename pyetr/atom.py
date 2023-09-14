@@ -34,9 +34,7 @@ class Atom(AbstractAtom[Term]):
     def __invert__(self):
         return Atom(~self.predicate, self.terms)
 
-    def replace(
-        self, replacements: dict[ArbitraryObject, Term]
-    ) -> "Atom":
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "Atom":
         new_terms = []
         for term in self.terms:
             if term in replacements:
@@ -75,5 +73,3 @@ class Atom(AbstractAtom[Term]):
 
     def __hash__(self) -> int:
         return hash((self.predicate, self.terms))
-
-

@@ -1,5 +1,6 @@
 __all__ = ["Function", "RealNumber", "XBar"]
 
+
 class Function:
     name: str
     arity: int
