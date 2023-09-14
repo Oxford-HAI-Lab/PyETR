@@ -1,5 +1,7 @@
 from pyetr.atom import Atom
 from pyetr.dependency import Dependency, DependencyRelation, dependencies_to_sets
+from pyetr.issues import IssueStructure
+from pyetr.open_atom import OpenAtom, OpenFunctionalTerm, OpenTerm, QuestionMark
 from pyetr.parsing.parse_string import (
     BoolAnd,
     BoolNot,
@@ -19,62 +21,96 @@ from pyetr.term import ArbitraryObject, FunctionalTerm, Summation, Term
 from pyetr.view import View
 
 
-def convert_term(term: Term) -> Item:
+def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
+    if any([isinstance(o, QuestionMark) for _, o in open_terms]):
+        remaining_terms = [
+            (t, o) for t, o in open_terms if not isinstance(o, QuestionMark)
+        ]
+        return LogicEmphasis([[convert_term(term, remaining_terms)]])
     if isinstance(term, FunctionalTerm):
         if term.t is None:
             return LogicPredicate([[term.f.name]])
         else:
+            new_subterms: list[Item] = []
+            for i, subterm in enumerate(term.t):
+                rel_open_terms: list[tuple[Term, OpenTerm]] = []
+                for t, o in open_terms:
+                    assert isinstance(o, OpenFunctionalTerm)
+                    assert o.t is not None
+                    rel_open_terms.append((t, o.t[i]))
+                new_subterms.append(convert_term(subterm, rel_open_terms))
             return LogicPredicate(
                 [
                     [
                         term.f.name,
-                        Comma([[convert_term(subterm) for subterm in term.t]]),
+                        Comma([new_subterms]),
                     ]
                 ]
             )
 
     elif isinstance(term, ArbitraryObject):
         return Variable([term.name])
-    elif isinstance(term, Emphasis):
-        return LogicEmphasis([[convert_term(term.term)]])
     else:
         raise ValueError(f"Invalid term {term} provided")
 
 
-def convert_atom(atom: Atom):
-    inner = LogicPredicate(
-        [[atom.predicate.name, Comma([[convert_term(term) for term in atom.terms]])]]
-    )
+def _convert_atom(atom: Atom, open_atoms: list[tuple[Term, OpenAtom]]):
+    new_terms: list[Item] = []
+    for i, term in enumerate(atom.terms):
+        open_terms = [(t, o.terms[i]) for t, o in open_atoms]
+        new_terms.append(convert_term(term, open_terms))
+    inner = LogicPredicate([[atom.predicate.name, Comma([new_terms])]])
     if atom.predicate.verifier:
         return inner
     else:
         return BoolNot([[inner]])
 
 
-def unparse_set_of_states(s: SetOfStates) -> Item:
+def convert_atom(atom: Atom, issue_structure: IssueStructure, issue_atoms: list[Atom]):
+    open_atoms: list[tuple[Term, OpenAtom]] = []
+    for i, atom_pair in enumerate(issue_structure):
+        issue_atom = issue_atoms[i]
+        if issue_atom == atom:
+            open_atoms.append(atom_pair)
+    return _convert_atom(atom, open_atoms)
+
+
+def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> Item:
     if s.is_falsum:
         return Falsum([])
     elif s.is_verum:
         return Truth([])
     else:
         assert len(s) > 0
+        issue_atoms = [o(t) for t, o in issue_structure]
         if len(s) == 1:
             state = next(iter(s))
             assert len(state) > 0
             if len(state) == 1:
-                atom = next(iter(state))
-                return convert_atom(atom)
+                return convert_atom(next(iter(state)), issue_structure, issue_atoms)
             else:
-                return BoolAnd([[convert_atom(atom) for atom in state]])
+                new_atoms: list[LogicPredicate | BoolNot] = []
+                for atom in state:
+                    new_atoms.append(convert_atom(atom, issue_structure, issue_atoms))
+                return BoolAnd([new_atoms])
         else:
             new_ands: list[LogicPredicate | BoolNot | BoolAnd] = []
             for state in s:
                 assert len(state) > 0
                 if len(state) == 1:
                     atom = next(iter(state))
-                    new_ands.append(convert_atom(atom))
+                    new_ands.append(convert_atom(atom, issue_structure, issue_atoms))
                 else:
-                    new_ands.append(BoolAnd([[convert_atom(atom) for atom in state]]))
+                    new_ands.append(
+                        BoolAnd(
+                            [
+                                [
+                                    convert_atom(atom, issue_structure, issue_atoms)
+                                    for atom in state
+                                ]
+                            ]
+                        )
+                    )
             return BoolOr([new_ands])
 
 
@@ -141,14 +177,14 @@ def get_quantifiers(
 
 
 def unparse_view(v: View) -> list[Item]:
-    v_stage, v_supposition, v_dependency_relation = v.to_integrated_emp()
     main_item: Item
-    if v_supposition.is_verum:
-        main_item = unparse_set_of_states(v_stage)
+    if v.supposition.is_verum:
+        main_item = unparse_set_of_states(v.stage, v.issue_structure)
     else:
-        stage = unparse_set_of_states(v_stage)
-        supposition = unparse_set_of_states(v_supposition)
+        stage = unparse_set_of_states(v.stage, v.issue_structure)
+        supposition = unparse_set_of_states(v.supposition, v.issue_structure)
         main_item = Implies([[supposition, stage]])
-    all_arb = v_stage.arb_objects | v_supposition.arb_objects
-    output: list[Quantified] = get_quantifiers(all_arb, v_dependency_relation)
+    all_arb = v.stage.arb_objects | v.supposition.arb_objects
+    output: list[Quantified] = get_quantifiers(all_arb, v.dependency_relation)
+
     return [*output, main_item]
