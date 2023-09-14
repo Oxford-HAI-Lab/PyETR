@@ -1,7 +1,6 @@
 from pyetr.dependency import DependencyRelation
 from pyetr.function import XBar
 from pyetr.multiset import Multiset
-from pyetr.stateset import SetOfStates
 from pyetr.term import FunctionalTerm, Term
 
 

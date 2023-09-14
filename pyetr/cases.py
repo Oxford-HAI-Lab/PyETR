@@ -29,7 +29,7 @@ class BaseExample(metaclass=ABCMeta):
     @classmethod
     @abstractmethod
     def test(cls, verbose: bool = False):
-        raise NotImplementedError
+        ...
 
 
 class BaseTest:
