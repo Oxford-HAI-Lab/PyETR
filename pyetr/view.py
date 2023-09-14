@@ -201,7 +201,7 @@ class View:
         supposition: Supposition,
         dependency_relation: DependencyRelation,
         issue_structure: IssueStructure,
-        weights: dict[State, Weight] = {},
+        weights: Optional[dict[State, Weight]] = None,
         *,
         is_pre_view=False,
     ) -> None:
@@ -209,7 +209,10 @@ class View:
         self.supposition = supposition
         self.dependency_relation = dependency_relation
         self.issue_structure = issue_structure
-        self.weights = weights
+        if weights is None:
+            self.weights = {state: Weight.get_null_weight() for state in stage}
+        else:
+            self.weights = weights
         self.validate(pre_view=is_pre_view)
 
     def validate(self, *, pre_view: bool = False):
@@ -228,26 +231,6 @@ class View:
 
         if not pre_view:
             self.issue_structure.validate_against_states(self.stage | self.supposition)
-
-    @classmethod
-    def from_no_weights(
-        cls,
-        stage: Stage,
-        supposition: Supposition,
-        dependency_relation: DependencyRelation,
-        issue_structure: IssueStructure,
-        *,
-        is_pre_view=False,
-    ):
-        weights = {state: Weight.get_null_weight() for state in stage}
-        return View(
-            stage=stage,
-            supposition=supposition,
-            dependency_relation=dependency_relation,
-            issue_structure=issue_structure,
-            weights=weights,
-            is_pre_view=is_pre_view,
-        )
 
     @classmethod
     def get_verum(cls):

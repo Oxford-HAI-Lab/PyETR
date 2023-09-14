@@ -148,6 +148,10 @@ def _parse_item_with_issue(
         elif isinstance(item, BoolNot):
             # based on (iii)
             new_arg = _parse_item(item.arg, maps, open_atoms)
+            for i, (t, o) in enumerate(open_atoms):
+                new_atom = o(t)
+                if new_atom in new_arg.atoms:
+                    open_atoms[i] = (t, ~o)
             return new_arg.negation()
         elif isinstance(item, Truth):
             # based on (iv)
@@ -204,7 +208,7 @@ def _parse_view(
     #     parsed_stage, parsed_supposition = add_new_emphasis(
     #         parsed_stage, parsed_supposition, dependency_relation
     #     )
-    return View.from_no_weights(
+    return View(
         stage=parsed_stage,
         supposition=parsed_supposition,
         dependency_relation=dependency_relation,
