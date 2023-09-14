@@ -13,16 +13,16 @@ from .function import Function
 
 
 class Term(AbstractTerm):
+    @property
+    @abstractmethod
+    def arb_objects(self) -> set["ArbitraryObject"]:
+        ...
+
     @abstractmethod
     def replace(
         self,
         replacements: dict["ArbitraryObject", "Term"],
     ) -> "Term":
-        ...
-
-    @property
-    @abstractmethod
-    def arb_objects(self) -> set["ArbitraryObject"]:
         ...
 
 

@@ -77,17 +77,11 @@ class OpenSummation(AbstractSummation, OpenTerm):
 
 
 class QuestionMark(OpenTerm):
-    def question_count(self) -> int:
-        return 1
-
     def __eq__(self, other) -> bool:
         if isinstance(other, QuestionMark):
             return True
         else:
             return False
-
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "QuestionMark":
-        return self
 
     def __repr__(self) -> str:
         return "?"
@@ -101,6 +95,12 @@ class QuestionMark(OpenTerm):
 
     def __call__(self, term: Term) -> Term:
         return term
+
+    def question_count(self) -> int:
+        return 1
+
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "QuestionMark":
+        return self
 
 
 def get_open_equivalent(term: Term) -> OpenTerm:
