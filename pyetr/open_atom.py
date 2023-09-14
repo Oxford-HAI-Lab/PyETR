@@ -56,7 +56,10 @@ class OpenArbitraryObject(OpenTerm):
 
     @property
     def detailed(self) -> str:
-        raise NotImplementedError
+        return f"<ArbitraryObject name={self.name}>"
+
+    def __repr__(self) -> str:
+        return f"{self.name}"
 
 
 class OpenFunctionalTerm(OpenTerm):
@@ -99,7 +102,17 @@ class OpenFunctionalTerm(OpenTerm):
 
     @property
     def detailed(self) -> str:
-        raise NotImplementedError
+        if self.t is None:
+            return f"<OpenFunctionalTerm f={self.f.detailed} t=()>"
+        return f"<OpenFunctionalTerm f={self.f.detailed} t=({','.join(t.detailed for t in self.t)},)>"
+
+    def __repr__(self) -> str:
+        if self.f.arity == 0:
+            return f"{self.f.name}"
+        else:
+            assert self.t is not None
+            terms = ",".join([repr(i) for i in self.t])
+            return f"{self.f.name}({terms})"
 
 
 class OpenSummation(OpenTerm):
@@ -131,6 +144,9 @@ class OpenSummation(OpenTerm):
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenSummation":
         new_terms = tuple([term.replace(replacements) for term in self.t])
         return OpenSummation(t=new_terms)
+
+    def __repr__(self) -> str:
+        raise NotImplementedError
 
     @property
     def detailed(self) -> str:

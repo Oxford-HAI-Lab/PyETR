@@ -43,7 +43,9 @@ class RealNumber(Function):
         return hash(self.name) + hash(self.arity) + hash("num")
 
     def __eq__(self, other) -> bool:
-        raise NotImplementedError
+        if not isinstance(other, RealNumber):
+            return False
+        return self.name == other.name
 
 
 XBar = Function("XBar", 2)
