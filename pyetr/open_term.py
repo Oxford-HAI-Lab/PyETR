@@ -1,15 +1,15 @@
-from abc import ABC, abstractmethod
-from typing import Iterable, Optional
+from abc import abstractmethod
 
-from pyetr.multiset import Multiset
+from pyetr.abstract_term import (
+    AbstractArbitraryObject,
+    AbstractFunctionalTerm,
+    AbstractSummation,
+    AbstractTerm,
+)
 from pyetr.term import ArbitraryObject, FunctionalTerm, Summation, Term
 
-from .abstract_atom import AbstractAtom, Predicate
-from .atom import Atom
-from .function import Function
 
-
-class OpenTerm(ABC):
+class OpenTerm(AbstractTerm):
     @abstractmethod
     def question_count(self) -> int:
         ...
@@ -18,35 +18,17 @@ class OpenTerm(ABC):
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenTerm":
         ...
 
-    @property
-    @abstractmethod
-    def detailed(self) -> str:
-        ...
-
     @abstractmethod
     def __call__(self, term: Term) -> Term:
         ...
 
 
-class OpenArbitraryObject(OpenTerm):
-    name: str
-
-    def __init__(self, name: str):
-        self.name = name
-
+class OpenArbitraryObject(AbstractArbitraryObject, OpenTerm):
     def __call__(self, term: Term) -> ArbitraryObject:
         return ArbitraryObject(name=self.name)
 
     def question_count(self) -> int:
         return 0
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, OpenArbitraryObject):
-            return False
-        return self.name == other.name
-
-    def __hash__(self) -> int:
-        return hash(self.name)
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> OpenTerm:
         for arb_obj in replacements:
@@ -54,22 +36,8 @@ class OpenArbitraryObject(OpenTerm):
                 return get_open_equivalent(replacements[arb_obj])
         return self
 
-    @property
-    def detailed(self) -> str:
-        return f"<ArbitraryObject name={self.name}>"
 
-    def __repr__(self) -> str:
-        return f"{self.name}"
-
-
-class OpenFunctionalTerm(OpenTerm):
-    f: Function
-    t: Optional[tuple[OpenTerm, ...]]
-
-    def __init__(self, f: Function, t: Optional[tuple[OpenTerm, ...]]) -> None:
-        self.f = f
-        self.t = t
-
+class OpenFunctionalTerm(AbstractFunctionalTerm[OpenTerm], OpenTerm):
     def __call__(self, term: Term) -> FunctionalTerm:
         if self.t is None:
             return FunctionalTerm(f=self.f, t=None)
@@ -84,14 +52,6 @@ class OpenFunctionalTerm(OpenTerm):
             c += i.question_count()
         return c
 
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, OpenFunctionalTerm):
-            return False
-        return self.f == other.f and self.t == other.t
-
-    def __hash__(self) -> int:
-        return hash((self.f, self.t))
-
     def replace(
         self, replacements: dict[ArbitraryObject, Term]
     ) -> "OpenFunctionalTerm":
@@ -100,30 +60,8 @@ class OpenFunctionalTerm(OpenTerm):
         new_terms = tuple([term.replace(replacements) for term in self.t])
         return OpenFunctionalTerm(f=self.f, t=new_terms)
 
-    @property
-    def detailed(self) -> str:
-        if self.t is None:
-            return f"<OpenFunctionalTerm f={self.f.detailed} t=()>"
-        return f"<OpenFunctionalTerm f={self.f.detailed} t=({','.join(t.detailed for t in self.t)},)>"
 
-    def __repr__(self) -> str:
-        if self.f.arity == 0:
-            return f"{self.f.name}"
-        else:
-            assert self.t is not None
-            terms = ",".join([repr(i) for i in self.t])
-            return f"{self.f.name}({terms})"
-
-
-class OpenSummation(OpenTerm):
-    t: Multiset[OpenTerm]
-
-    def __init__(
-        self,
-        t: Iterable[OpenTerm],
-    ):
-        self.t = Multiset[OpenTerm](t)
-
+class OpenSummation(AbstractSummation, OpenTerm):
     def __call__(self, term: Term) -> Summation:
         return Summation(t=tuple([i(term) for i in self.t]))
 
@@ -133,24 +71,9 @@ class OpenSummation(OpenTerm):
             c += i.question_count()
         return c
 
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, OpenFunctionalTerm):
-            return False
-        return self.t == other.t
-
-    def __hash__(self) -> int:
-        return hash(self.t)
-
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenSummation":
         new_terms = tuple([term.replace(replacements) for term in self.t])
         return OpenSummation(t=new_terms)
-
-    def __repr__(self) -> str:
-        raise NotImplementedError
-
-    @property
-    def detailed(self) -> str:
-        return f"<OpenSummation {self.t}>"
 
 
 class QuestionMark(OpenTerm):
