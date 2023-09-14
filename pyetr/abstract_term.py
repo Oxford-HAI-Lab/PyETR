@@ -6,11 +6,6 @@ from pyetr.multiset import Multiset
 
 
 class AbstractTerm(ABC):
-    @property
-    @abstractmethod
-    def detailed(self) -> str:
-        ...
-
     @abstractmethod
     def __eq__(self, other) -> bool:
         ...
@@ -21,6 +16,11 @@ class AbstractTerm(ABC):
 
     @abstractmethod
     def __repr__(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
+    def detailed(self) -> str:
         ...
 
 
@@ -38,12 +38,12 @@ class AbstractArbitraryObject(AbstractTerm):
     def __hash__(self) -> int:
         return hash(type(self).__name__ + self.name)
 
+    def __repr__(self) -> str:
+        return f"{self.name}"
+
     @property
     def detailed(self) -> str:
         return f"<{type(self).__name__} name={self.name}>"
-
-    def __repr__(self) -> str:
-        return f"{self.name}"
 
 
 TermType = TypeVar("TermType", bound=AbstractTerm)
@@ -77,12 +77,6 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
     def __hash__(self) -> int:
         return hash((type(self).__name__, self.f, self.t))
 
-    @property
-    def detailed(self) -> str:
-        if self.t is None:
-            return f"<{type(self).__name__} f={self.f.detailed} t=()>"
-        return f"<{type(self).__name__} f={self.f.detailed} t=({','.join(t.detailed for t in self.t)},)>"
-
     def __repr__(self) -> str:
         if self.f.arity == 0:
             return f"{self.f.name}"
@@ -90,6 +84,12 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
             assert self.t is not None
             terms = ",".join([repr(i) for i in self.t])
             return f"{self.f.name}({terms})"
+
+    @property
+    def detailed(self) -> str:
+        if self.t is None:
+            return f"<{type(self).__name__} f={self.f.detailed} t=()>"
+        return f"<{type(self).__name__} f={self.f.detailed} t=({','.join(t.detailed for t in self.t)},)>"
 
 
 class AbstractSummation(Generic[TermType], AbstractTerm):
@@ -101,13 +101,6 @@ class AbstractSummation(Generic[TermType], AbstractTerm):
     ):
         self.t = Multiset[TermType](t)
 
-    def __repr__(self) -> str:
-        raise NotImplementedError
-
-    @property
-    def detailed(self) -> str:
-        return f"<OpenSummation {self.t}>"
-
     def __eq__(self, other) -> bool:
         if not isinstance(other, type(self)):
             return False
@@ -115,3 +108,10 @@ class AbstractSummation(Generic[TermType], AbstractTerm):
 
     def __hash__(self) -> int:
         return hash((type(self).__name__, self.t))
+
+    def __repr__(self) -> str:
+        raise NotImplementedError
+
+    @property
+    def detailed(self) -> str:
+        return f"<OpenSummation {self.t}>"
