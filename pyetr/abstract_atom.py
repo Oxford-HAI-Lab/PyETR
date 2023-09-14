@@ -1,18 +1,18 @@
-__all__ = ["AbstractTerm", "AbstractAtom", "Predicate", "equals_predicate"]
+__all__ = ["AbstractAtom", "Predicate", "equals_predicate"]
 
-from typing import Generic, TypeVar
+from typing import Generic
 
-AbstractTerm = TypeVar("AbstractTerm")
+from pyetr.abstract_term import TermType
 
 
-class AbstractAtom(Generic[AbstractTerm]):
+class AbstractAtom(Generic[TermType]):
     predicate: "Predicate"
-    terms: tuple[AbstractTerm, ...]
+    terms: tuple[TermType, ...]
 
     def __init__(
         self,
         predicate: "Predicate",
-        terms: tuple[AbstractTerm, ...],
+        terms: tuple[TermType, ...],
     ) -> None:
         if len(terms) != predicate.arity:
             raise ValueError(
