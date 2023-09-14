@@ -46,6 +46,6 @@ class Weight:
     def get_null_weight(cls):
         return cls(multiplicative=Multiset([]), additive=Multiset([]))
 
-    def validate_against_dep_rel(self, stage: DependencyRelation):
+    def validate_against_dep_rel(self, dependency_relation: DependencyRelation):
         return None
         raise NotImplementedError
