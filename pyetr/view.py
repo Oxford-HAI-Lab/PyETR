@@ -6,10 +6,10 @@ from typing import Optional, cast
 
 from pyetr.issues import IssueStructure
 from pyetr.tools import ArbitraryObjectGenerator, powerset
-from pyetr.weight import Weight
+from pyetr.weight import Weight, Weights
 
 from .dependency import Dependency, DependencyRelation
-from .stateset import SetOfStates, State
+from .stateset import SetOfStates, Stage, State, Supposition
 from .term import ArbitraryObject, FunctionalTerm, Term
 
 
@@ -24,24 +24,29 @@ def get_subset(
     return SetOfStates(out_set)
 
 
-Stage = SetOfStates
-Supposition = SetOfStates
 Existential = ArbitraryObject
 Universal = ArbitraryObject
 
 
-def stage_supposition_product(
-    stage_supposition_external: tuple[Stage, Supposition],
-    stage_supposition_internal: tuple[Stage, Supposition],
-) -> tuple[Stage, Supposition]:
+def stage_function_product(
+    stage_supposition_external: tuple[Stage, Weights],
+    stage_supposition_internal: tuple[Stage, Supposition, Weights],
+) -> tuple[Stage, Weights]:
     """
     Definition 5.15, p208
     """
-    stage_external, supposition_external = stage_supposition_external
-    stage_internal, supposition_internal = stage_supposition_internal
+    stage_external, weights_external = stage_supposition_external
+    stage_internal, supposition_internal, weights_internal = stage_supposition_internal
+
     subset = get_subset(stage_external, supposition_internal)
-    result_stage = (subset * stage_internal) | stage_external.difference(subset)
-    return result_stage, supposition_external
+    not_subset = stage_external.difference(subset)
+    f_prime = Weights({k: v for k, v in weights_external.items() if k in not_subset})
+    result_stage = not_subset | (subset * stage_internal)
+
+    f = Weights({k: v for k, v in weights_external.items() if k in subset})
+    final_weights = f_prime + (f * weights_internal)
+
+    return result_stage, final_weights
 
 
 def arg_max_states(potentials: list[tuple[int, State]]) -> list[State]:
@@ -191,7 +196,7 @@ class View:
     supposition: Supposition
     dependency_relation: DependencyRelation
     issue_structure: IssueStructure
-    weights: dict[State, Weight]
+    weights: Weights
 
     def __init__(
         self,
@@ -199,7 +204,7 @@ class View:
         supposition: Supposition,
         dependency_relation: DependencyRelation,
         issue_structure: IssueStructure,
-        weights: Optional[dict[State, Weight]] = None,
+        weights: Optional[Weights] = None,
         *,
         is_pre_view=False,
     ) -> None:
@@ -208,7 +213,7 @@ class View:
         self.dependency_relation = dependency_relation
         self.issue_structure = issue_structure
         if weights is None:
-            self.weights = {state: Weight.get_null_weight() for state in stage}
+            self.weights = Weights({state: Weight.get_null_weight() for state in stage})
         else:
             self.weights = weights
         self.validate(pre_view=is_pre_view)
@@ -217,15 +222,12 @@ class View:
         self.dependency_relation.validate_against_states(
             self.stage | self.supposition, pre_view=pre_view
         )
+
         for s, w in self.weights.items():
             if s not in self.stage:
                 raise ValueError(f"{s} not in {self.stage}")
 
             w.validate_against_dep_rel(self.dependency_relation)
-
-            # Assert weights dict is stage
-            # Assert weights only use arbitrary objects in dependency relation
-            # TODO: Does this use weight or state?
 
         if not pre_view:
             self.issue_structure.validate_against_states(self.stage | self.supposition)
@@ -258,12 +260,25 @@ class View:
         supposition: Supposition,
         dependency_relation: DependencyRelation,
         issue_structure: IssueStructure,
+        weights: Optional[Weights] = None,
     ):
+        new_dep_rel = dependency_relation.restriction((stage | supposition).arb_objects)
+        if weights is None:
+            new_weights = None
+        else:
+            new_weights = Weights(
+                {
+                    s: w.restriction(new_dep_rel.universals | new_dep_rel.existentials)
+                    for s, w in weights.items()
+                    if s in stage
+                }
+            )
         return cls(
             stage,
             supposition,
-            dependency_relation.restriction((stage | supposition).arb_objects),
+            new_dep_rel,
             issue_structure.restriction((stage | supposition).atoms),
+            weights=new_weights,
         )
 
     @property
@@ -392,17 +407,18 @@ class View:
         Based on definition 4.27
         """
         # Corresponds to line 4
-        stage, supposition = stage_supposition_product(
-            (self.stage, self.supposition), (view.stage, view.supposition)
+        stage, weights = stage_function_product(
+            (self.stage, self.weights), (view.stage, view.supposition, view.weights)
         )
         dep_relation = inherited_dependencies.fusion(self.dependency_relation).fusion(
             inherited_dependencies.fusion(view.dependency_relation)
         )
         return View.with_restriction(
             stage=stage,
-            supposition=supposition,
+            supposition=self.supposition,
             dependency_relation=dep_relation,
             issue_structure=(self.issue_structure | view.issue_structure),
+            weights=weights,
         )
 
     def product(
@@ -433,11 +449,15 @@ class View:
         dep_relation = inherited_dependencies.fusion(self.dependency_relation).fusion(
             inherited_dependencies.fusion(view.dependency_relation)
         )
+
+        new_weights: Weights = self.weights + view.weights
+
         return View.with_restriction(
             stage=stage,
             supposition=supposition,
             dependency_relation=dep_relation,
             issue_structure=(self.issue_structure | view.issue_structure),
+            weights=new_weights,
         )
 
     def sum(
@@ -488,9 +508,7 @@ class View:
         if verbose:
             print(f"NegationInput: {self}")
         verum = SetOfStates({State({})})
-        stage, _ = stage_supposition_product(
-            (self.supposition, verum), (self.stage.negation(), verum)
-        )
+        stage = self.supposition * self.stage.negation()
         out = View.with_restriction(
             stage=stage,
             supposition=verum,
@@ -855,6 +873,7 @@ class View:
             supposition=self.supposition,
             dependency_relation=self.dependency_relation,
             issue_structure=self.issue_structure,
+            weights=self.weights,
         )
         if verbose:
             print(f"FactorOutput: {out}")

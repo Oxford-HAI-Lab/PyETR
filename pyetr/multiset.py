@@ -26,8 +26,8 @@ class Multiset(Generic[T]):
     def __hash__(self) -> int:
         return hash("Multiset") + hash(tuple(self._items))
 
-    def __add__(self, other: "Multiset") -> "Multiset":
-        raise NotImplementedError
+    def __add__(self, other: "Multiset[T]") -> "Multiset[T]":
+        return Multiset(self._items + other._items)
 
     def __len__(self):
         return len(self._items)

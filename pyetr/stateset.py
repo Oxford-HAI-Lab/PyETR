@@ -210,3 +210,7 @@ class SetOfStates(frozenset[State]):
         for state in self:
             a |= state.atoms
         return a
+
+
+Stage = SetOfStates
+Supposition = SetOfStates

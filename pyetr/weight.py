@@ -1,7 +1,8 @@
 from pyetr.dependency import DependencyRelation
 from pyetr.function import XBar
 from pyetr.multiset import Multiset
-from pyetr.term import FunctionalTerm, Term
+from pyetr.stateset import State
+from pyetr.term import ArbitraryObject, FunctionalTerm, Term
 
 
 class Weight:
@@ -13,6 +14,13 @@ class Weight:
     ) -> None:
         self.multiplicative = multiplicative
         self.additive = additive
+
+    @property
+    def arb_objects(self) -> set[ArbitraryObject]:
+        arbs = set()
+        for multiset in self.multiplicative + self.additive:
+            arbs |= multiset.arb_objects
+        return arbs
 
     def __add__(self, other: "Weight") -> "Weight":
         return Weight(
@@ -47,5 +55,57 @@ class Weight:
         return cls(multiplicative=Multiset([]), additive=Multiset([]))
 
     def validate_against_dep_rel(self, dependency_relation: DependencyRelation):
-        return None
-        raise NotImplementedError
+        if not self.arb_objects.issubset(
+            dependency_relation.universals | dependency_relation.existentials
+        ):
+            raise ValueError(
+                "Arb objects in weights not present in dependency relation"
+            )
+
+    def restriction(self, arb_objects: set[ArbitraryObject]) -> "Weight":
+        if self.arb_objects.issubset(arb_objects):
+            return self
+        else:
+            return Weight.get_null_weight()
+
+    @property
+    def is_null(self):
+        return len(self.multiplicative) == 0 and len(self.additive) == 0
+
+
+class Weights:
+    _weights: dict[State, Weight]
+
+    def __init__(self, weights_dict: dict[State, Weight]) -> None:
+        self._weights = weights_dict
+
+    def __add__(self, other: "Weights") -> "Weights":
+        new_weights: dict[State, Weight] = {}
+        for k, x in self._weights.items():
+            if k not in other._weights:
+                new_weights[k] = x
+            else:
+                new_weights[k] = x + other._weights[k]
+
+        for k, x in other._weights.items():
+            if k not in new_weights:
+                new_weights[k] = x
+        return Weights(new_weights)
+
+    def __getitem__(self, item: State):
+        return self._weights[item]
+
+    def items(self):
+        return self._weights.items()
+
+    def __contains__(self, item: object) -> bool:
+        return item in self._weights
+
+    def __mul__(self, other: "Weights") -> "Weights":
+        new_weights: dict[State, Weight] = {}
+        for state1, weight1 in self._weights.items():
+            for state2, weight2 in self._weights.items():
+                new_state = state1 | state2
+                new_weight = weight1 * weight2
+                new_weights[new_state] = new_weight
+        return Weights(new_weights)
