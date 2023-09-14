@@ -107,7 +107,7 @@ class FunctionalTerm(Term):
         else:
             assert self.t is not None
             terms = ",".join([repr(i) for i in self.t])
-            return f"f_{self.f.name}({terms})"
+            return f"{self.f.name}({terms})"
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, FunctionalTerm):
