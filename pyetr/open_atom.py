@@ -1,9 +1,7 @@
-from pyetr.multiset import Multiset
-from pyetr.term import ArbitraryObject, FunctionalTerm, Summation, Term
+from pyetr.term import ArbitraryObject, Term
 
 from .abstract_atom import AbstractAtom, Predicate
 from .atom import Atom
-from .function import Function
 from .open_term import OpenTerm
 
 

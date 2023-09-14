@@ -4,12 +4,10 @@ from functools import reduce
 from itertools import permutations
 from typing import Optional, cast
 
-from pyetr import term
 from pyetr.issues import IssueStructure
 from pyetr.tools import ArbitraryObjectGenerator, powerset
 from pyetr.weight import Weight
 
-from .atom import Atom
 from .dependency import Dependency, DependencyRelation
 from .stateset import SetOfStates, State
 from .term import ArbitraryObject, FunctionalTerm, Term
