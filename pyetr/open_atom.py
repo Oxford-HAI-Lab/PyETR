@@ -2,7 +2,7 @@
 
 from abc import abstractmethod
 from types import NoneType
-from typing import Iterable, Optional
+from typing import Any, Iterable, Optional
 
 from pyetr.multiset import Multiset
 from pyetr.term import ArbitraryObject, FunctionalTerm, Summation, Term
@@ -43,12 +43,19 @@ class OpenTerm:
     def get_question_term(self, term: Term) -> Optional["Term"]:
         ...
 
+    @abstractmethod
+    def __call__(self, term: Term) -> Term:
+        ...
+
 class OpenArbitraryObject(OpenTerm):
     name: str
 
     def __init__(self, name: str):
         self.name = name
 
+    def __call__(self, term: Term) -> ArbitraryObject:
+        return ArbitraryObject(name=self.name)
+    
     def question_count(self) -> int:
         return 0
 
@@ -66,7 +73,6 @@ class OpenArbitraryObject(OpenTerm):
         return hash(self.name)
 
 
-    @abstractmethod
     def refers_to_term(self, term: ArbitraryObject) -> bool:
         return term.name == self.name
 
@@ -90,6 +96,19 @@ class OpenFunctionalTerm(OpenTerm):
     def __init__(self, f: Function, t: Optional[tuple[OpenTerm, ...]]) -> None:
         self.f = f
         self.t = t
+    
+
+    def __call__(self, term: Term) -> FunctionalTerm:
+        if self.t is None:
+            return FunctionalTerm(
+                f=self.f,
+                t=None
+            )
+        else:
+            return FunctionalTerm(
+                f=self.f,
+                t=tuple([i(term) for i in self.t])
+            )
 
     def question_count(self) -> int:
         if self.t is None:
@@ -154,6 +173,11 @@ class OpenSummation(OpenTerm):
         t: Iterable[OpenTerm],
     ):
         self.t = Multiset[OpenTerm](t)
+
+    def __call__(self, term: Term) -> Summation:
+        return Summation(
+            t=tuple([i(term) for i in self.t])
+        )
 
     def question_count(self) -> int:
         c = 0
@@ -237,11 +261,19 @@ class QuestionMark(OpenTerm):
     def get_question_term(self, term: Term) -> Optional[Term]:
         return term
 
+    def refers_to_term(self, term: Term) -> bool:
+        assert False
 
 class OpenAtom(AbstractAtom[OpenTerm]):
     def __init__(self, predicate: Predicate, terms: tuple[OpenTerm, ...]) -> None:
         super().__init__(predicate=predicate, terms=terms)
         self.validate()
+
+    def __call__(self, term: Term) -> Atom:
+        return Atom(
+            predicate=self.predicate,
+            terms=tuple([t(term) for t in self.terms])
+        )
 
     def question_count(self) -> int:
         question_count = 0
@@ -254,12 +286,13 @@ class OpenAtom(AbstractAtom[OpenTerm]):
             raise ValueError(f"Open atom {self} must contain exactly one question mark")
 
     def refers_to_atom(self, atom: Atom) -> bool:
-        if self.predicate != atom.predicate:
+        if self.predicate != atom.predicate and self.predicate != ~atom.predicate:
             return False
         all_terms_match = True
         for i, term in enumerate(atom.terms):
+            alt_open_term = get_open_equivalent(term)
             open_term = self.terms[i]
-            if not open_term.refers_to_term(term):
+            if not open_term.is_same_emphasis_context(alt_open_term):
                 all_terms_match = False
         return all_terms_match
 
@@ -308,11 +341,10 @@ class OpenAtom(AbstractAtom[OpenTerm]):
         return f"<OpenAtom predicate={self.predicate.detailed} terms=({','.join(t.detailed for t in self.terms)})>"
 
     def get_question_term_for_atom(self, atom: Atom) -> Term:
-        assert self.predicate == atom.predicate
+        assert self.predicate.name == atom.predicate.name
         assert len(self.terms) == len(atom.terms)
         for i, open_term in enumerate(self.terms):
             term = atom.terms[i]
-            assert open_term.refers_to_term(term)
             new_q_term = open_term.get_question_term(term)
             if new_q_term is not None:
                 return new_q_term

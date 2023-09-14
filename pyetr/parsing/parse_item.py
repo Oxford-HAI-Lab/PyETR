@@ -36,61 +36,60 @@ class Maps:
     constant_map: dict[str, Function]
 
 def merge_terms_with_opens(
-    terms: list[Term], open_term_sets: list[list[OpenTerm]]
-):
+    terms: list[Term], open_term_sets: list[list[tuple[Term, OpenTerm]]]
+) -> list[tuple[Term, list[OpenTerm]]]:
     new_terms = [get_open_equivalent(t) for t in terms]
-    new_terms_sets: list[list[OpenTerm]] = []
+    new_terms_sets: list[tuple[Term, list[OpenTerm]]] = []
     for i, open_terms in enumerate(open_term_sets):
         if len(open_terms) > 0:
-            for open_term in open_terms:
+            for t, open_term in open_terms:
                 fresh_terms = copy(new_terms)
                 fresh_terms[i] = open_term
-                new_terms_sets.append(fresh_terms)
+                new_terms_sets.append((t, fresh_terms))
     return new_terms_sets
 
 
 T = TypeVar("T")
-def convert_term_to_optional(t: list[T]) -> Optional[tuple[T,...]]:
+def convert_term_to_optional(t: list[OpenTerm]) -> Optional[tuple[OpenTerm,...]]:
     if len(t) == 0:
         return None
     else:
         return tuple(t)
 
-def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> tuple[Atom, list[OpenAtom]]:
-    def _parse_term(item: Item) -> tuple[Term, list[OpenTerm]]:
+def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> tuple[Atom, list[tuple[Term, OpenAtom]]]:
+    def _parse_term(item: Item) -> tuple[Term, list[tuple[Term, OpenTerm]]]:
         if isinstance(item, Variable):
             return maps.variable_map[item.name], []
         elif isinstance(item, LogicEmphasis):
-            parsed_atom, open_terms = _parse_term(item.arg)
-            return parsed_atom, [*open_terms, QuestionMark()]
+            parsed_term, open_terms = _parse_term(item.arg)
+            return parsed_term, [*open_terms, (parsed_term, QuestionMark())]
         elif isinstance(item, LogicPredicate):
             if item.name in maps.constant_map:
                 return FunctionalTerm(maps.constant_map[item.name]), []
             elif item.name in maps.function_map:
                 terms: list[Term] = []
-                open_term_sets: list[list[OpenTerm]] = []
+                # These represent a list in term order, where each element is a list of derived open atom pairs
+                open_term_sets: list[list[tuple[Term, OpenTerm]]] = []
                 for arg in item.args:
                     term, open_terms = _parse_term(arg)
                     terms.append(term)
                     open_term_sets.append(open_terms)
                 new_open_terms_sets = merge_terms_with_opens(terms, open_term_sets)
                 f = maps.function_map[item.name]
-                functional_opens = [OpenFunctionalTerm(f=f, t=convert_term_to_optional(t)) for t in new_open_terms_sets]
+                functional_opens = [(t, OpenFunctionalTerm(f=f, t=convert_term_to_optional(open_terms))) for t, open_terms in new_open_terms_sets]
                 if len(terms) == 0:
                     new_terms = None
                 else:
                     new_terms = tuple(terms)
 
-                return FunctionalTerm(f, new_terms), cast(list[OpenTerm],functional_opens)
+                return FunctionalTerm(f, new_terms), cast(list[tuple[Term, OpenTerm]], functional_opens)
             else:
                 raise ValueError(f"Item: {item} not found in constant or function maps")
         else:
             raise ValueError(f"Invalid item {item}")
 
-
-
     terms: list[Term] = []
-    open_term_sets: list[list[OpenTerm]] = []
+    open_term_sets: list[list[tuple[Term, OpenTerm]]] = []
     for item in predicate.args:
         term, open_terms = _parse_term(item)
         terms.append(term)
@@ -99,14 +98,14 @@ def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> tuple[Atom, list[
     if predicate.name not in maps.predicate_map:
         raise ValueError(f"{predicate} not found in predicate map")
     f_predicate = maps.predicate_map[predicate.name]
-    open_atoms = [OpenAtom(predicate=f_predicate, terms=tuple(t)) for t in new_open_terms_sets]
+    open_atoms = [(t, OpenAtom(predicate=f_predicate, terms=tuple(open_terms))) for t, open_terms in new_open_terms_sets]
     return Atom(
         predicate=f_predicate,
         terms= tuple(terms)
     ), open_atoms
 
-def _parse_item_with_issue(item: Item, maps: Maps) -> tuple[SetOfStates, list[OpenAtom]]:
-    def _parse_item(item: Item, maps: Maps, open_atoms: list[OpenAtom]) -> SetOfStates:
+def _parse_item_with_issue(item: Item, maps: Maps) -> tuple[SetOfStates, list[tuple[Term, OpenAtom]]]:
+    def _parse_item(item: Item, maps: Maps, open_atoms: list[tuple[Term, OpenAtom]]) -> SetOfStates:
         # Based on definition 4.16
         if isinstance(item, BoolOr):
             # based on (i)
@@ -157,7 +156,7 @@ def _parse_item_with_issue(item: Item, maps: Maps) -> tuple[SetOfStates, list[Op
         else:
             assert False
 
-    open_atoms: list[OpenAtom] = []
+    open_atoms: list[tuple[Term, OpenAtom]] = []
     return _parse_item(item,maps, open_atoms), open_atoms
 
 

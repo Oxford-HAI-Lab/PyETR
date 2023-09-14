@@ -405,13 +405,10 @@ class View:
         pairs: list[
             tuple[Term, Term]
         ] = []
-        for atom_self in self.issue_structure:
-            for atom_other in other.issue_structure:
-                if atom_self.is_same_question_context(atom_other):
-                    rel_atom_l = [atom for atom in self.stage.atoms | self.supposition.atoms if atom_self.refers_to_atom(atom)]
-                    assert len(rel_atom_l) == 1
-                    rel_atom = rel_atom_l[0]
-                    pairs.append((atom_self.get_question_term_for_atom(rel_atom), atom_other.get_question_term_for_atom(rel_atom)))
+        for t1, open_atom_self in self.issue_structure:
+            for t2, open_atom_other in other.issue_structure:
+                if open_atom_self == open_atom_other or open_atom_self == ~open_atom_other:
+                    pairs.append((t1, t2))
 
         return set(pairs)
 
@@ -718,9 +715,10 @@ class View:
             def _big_product(gamma: State) -> SetOfStates:
                 def B(gamma: State, e: Existential) -> State:
                     atoms = set()
-                    for open_atom in self.issue_structure:
+                    for t, open_atom in self.issue_structure:
+                        formed_atom = open_atom(t)
                         for atom in gamma:
-                            if open_atom.refers_to_atom(atom):
+                            if formed_atom == atom:
                                  atoms.add(atom)
                     return State(atoms)
 

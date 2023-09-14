@@ -1274,9 +1274,11 @@ class UniProduct(BaseExample):
     c: View = ps("∃a (P(j()*) ∧ E(j(),a)) ∨ ~P(j())")
 
     @classmethod
-    def test(cls):
-        result = cls.v[0].universal_product(cls.v[1])
-        assert result.is_equivalent_under_arb_sub(cls.c)
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].universal_product(cls.v[1], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
 
 
 class QueryTest(Query, BaseExample):

@@ -159,3 +159,16 @@ class Summation(Term):
     @property
     def detailed(self) -> str:
         raise NotImplementedError
+
+    def replace(
+        self,
+        replacements: dict["ArbitraryObject", "Term"],
+    ) -> "Summation":
+        return Summation(i.replace(replacements) for i in self.t)
+
+    @property
+    def arb_objects(self) -> set["ArbitraryObject"]:
+        a_objs = set()
+        for term in self.t:
+            a_objs |= term.arb_objects
+        return a_objs
