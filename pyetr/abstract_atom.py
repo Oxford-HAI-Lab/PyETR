@@ -1,13 +1,14 @@
 __all__ = ["AbstractTerm", "AbstractAtom", "Predicate", "equals_predicate"]
 
-from typing import Generic, TypeVar, cast
-
+from typing import Generic, TypeVar
 
 AbstractTerm = TypeVar("AbstractTerm")
+
 
 class AbstractAtom(Generic[AbstractTerm]):
     predicate: "Predicate"
     terms: tuple[AbstractTerm, ...]
+
     def __init__(
         self,
         predicate: "Predicate",
@@ -19,6 +20,7 @@ class AbstractAtom(Generic[AbstractTerm]):
             )
         self.predicate = predicate
         self.terms = terms
+
 
 class Predicate:
     name: str
@@ -51,5 +53,6 @@ class Predicate:
 
     def __repr__(self) -> str:
         return f"<Predicate name={self.name} arity={self.arity}>"
+
 
 equals_predicate = Predicate("=", 2)

@@ -17,7 +17,6 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
         else:
             return super().__new__(cls, __iterable)
 
-
     def copy(self) -> "IssueStructure":
         return IssueStructure(super().copy())
 
@@ -27,7 +26,9 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
     def intersection(self, *s: Iterable[object]) -> "IssueStructure":
         return IssueStructure(super().intersection(*s))
 
-    def symmetric_difference(self, __s: Iterable[tuple[Term, OpenAtom]]) -> "IssueStructure":
+    def symmetric_difference(
+        self, __s: Iterable[tuple[Term, OpenAtom]]
+    ) -> "IssueStructure":
         return IssueStructure(super().symmetric_difference(__s))
 
     def union(self, *s: Iterable[tuple[Term, OpenAtom]]) -> "IssueStructure":
@@ -47,7 +48,11 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
 
     def restriction(self, atoms: set[Atom]) -> "IssueStructure":
         return IssueStructure(
-            {(term, open_atom) for term, open_atom in self if open_atom.present_in_atoms(atoms)}
+            {
+                (term, open_atom)
+                for term, open_atom in self
+                if open_atom.present_in_atoms(atoms)
+            }
         )
 
     def validate_against_states(self, states: SetOfStates):
@@ -56,10 +61,10 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
                 f"Issue atoms {self} is not a subset of atoms in stage/supposition: {states.atoms}"
             )
 
-    def replace(
-        self, replacements: dict[ArbitraryObject, Term]
-    ) -> "IssueStructure":
-        return IssueStructure({(t.replace(replacements), a.replace(replacements)) for t, a in self})
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "IssueStructure":
+        return IssueStructure(
+            {(t.replace(replacements), a.replace(replacements)) for t, a in self}
+        )
 
     def negation(self) -> "IssueStructure":
         return self | IssueStructure((t, ~a) for t, a in self)

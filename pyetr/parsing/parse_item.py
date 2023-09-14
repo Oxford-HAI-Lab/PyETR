@@ -2,16 +2,22 @@ from copy import copy
 from dataclasses import dataclass
 from typing import Literal, Optional, TypeVar, cast
 
+from pyetr.abstract_atom import Predicate
 from pyetr.add_new_emphasis import add_new_emphasis
+from pyetr.atom import Atom
 from pyetr.dependency import Dependency, DependencyRelation, dependencies_from_sets
 from pyetr.issues import IssueStructure
-from pyetr.open_atom import OpenAtom, OpenFunctionalTerm, OpenTerm, QuestionMark, get_open_equivalent
+from pyetr.open_atom import (
+    OpenAtom,
+    OpenFunctionalTerm,
+    OpenTerm,
+    QuestionMark,
+    get_open_equivalent,
+)
 from pyetr.stateset import SetOfStates, State
 from pyetr.term import ArbitraryObject, Function, FunctionalTerm, Summation, Term
 from pyetr.view import View
 
-from pyetr.atom import Atom
-from pyetr.abstract_atom import Predicate
 from .parse_string import (
     AtomicItem,
     BoolAnd,
@@ -35,6 +41,7 @@ class Maps:
     function_map: dict[str, Function]
     constant_map: dict[str, Function]
 
+
 def merge_terms_with_opens(
     terms: list[Term], open_term_sets: list[list[tuple[Term, OpenTerm]]]
 ) -> list[tuple[Term, list[OpenTerm]]]:
@@ -50,13 +57,18 @@ def merge_terms_with_opens(
 
 
 T = TypeVar("T")
-def convert_term_to_optional(t: list[OpenTerm]) -> Optional[tuple[OpenTerm,...]]:
+
+
+def convert_term_to_optional(t: list[OpenTerm]) -> Optional[tuple[OpenTerm, ...]]:
     if len(t) == 0:
         return None
     else:
         return tuple(t)
 
-def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> tuple[Atom, list[tuple[Term, OpenAtom]]]:
+
+def _parse_predicate(
+    predicate: LogicPredicate, maps: Maps
+) -> tuple[Atom, list[tuple[Term, OpenAtom]]]:
     def _parse_term(item: Item) -> tuple[Term, list[tuple[Term, OpenTerm]]]:
         if isinstance(item, Variable):
             return maps.variable_map[item.name], []
@@ -76,13 +88,18 @@ def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> tuple[Atom, list[
                     open_term_sets.append(open_terms)
                 new_open_terms_sets = merge_terms_with_opens(terms, open_term_sets)
                 f = maps.function_map[item.name]
-                functional_opens = [(t, OpenFunctionalTerm(f=f, t=convert_term_to_optional(open_terms))) for t, open_terms in new_open_terms_sets]
+                functional_opens = [
+                    (t, OpenFunctionalTerm(f=f, t=convert_term_to_optional(open_terms)))
+                    for t, open_terms in new_open_terms_sets
+                ]
                 if len(terms) == 0:
                     new_terms = None
                 else:
                     new_terms = tuple(terms)
 
-                return FunctionalTerm(f, new_terms), cast(list[tuple[Term, OpenTerm]], functional_opens)
+                return FunctionalTerm(f, new_terms), cast(
+                    list[tuple[Term, OpenTerm]], functional_opens
+                )
             else:
                 raise ValueError(f"Item: {item} not found in constant or function maps")
         else:
@@ -98,14 +115,19 @@ def _parse_predicate(predicate: LogicPredicate, maps: Maps) -> tuple[Atom, list[
     if predicate.name not in maps.predicate_map:
         raise ValueError(f"{predicate} not found in predicate map")
     f_predicate = maps.predicate_map[predicate.name]
-    open_atoms = [(t, OpenAtom(predicate=f_predicate, terms=tuple(open_terms))) for t, open_terms in new_open_terms_sets]
-    return Atom(
-        predicate=f_predicate,
-        terms= tuple(terms)
-    ), open_atoms
+    open_atoms = [
+        (t, OpenAtom(predicate=f_predicate, terms=tuple(open_terms)))
+        for t, open_terms in new_open_terms_sets
+    ]
+    return Atom(predicate=f_predicate, terms=tuple(terms)), open_atoms
 
-def _parse_item_with_issue(item: Item, maps: Maps) -> tuple[SetOfStates, list[tuple[Term, OpenAtom]]]:
-    def _parse_item(item: Item, maps: Maps, open_atoms: list[tuple[Term, OpenAtom]]) -> SetOfStates:
+
+def _parse_item_with_issue(
+    item: Item, maps: Maps
+) -> tuple[SetOfStates, list[tuple[Term, OpenAtom]]]:
+    def _parse_item(
+        item: Item, maps: Maps, open_atoms: list[tuple[Term, OpenAtom]]
+    ) -> SetOfStates:
         # Based on definition 4.16
         if isinstance(item, BoolOr):
             # based on (i)
@@ -157,8 +179,7 @@ def _parse_item_with_issue(item: Item, maps: Maps) -> tuple[SetOfStates, list[tu
             assert False
 
     open_atoms: list[tuple[Term, OpenAtom]] = []
-    return _parse_item(item,maps, open_atoms), open_atoms
-
+    return _parse_item(item, maps, open_atoms), open_atoms
 
 
 def _parse_view(
@@ -187,7 +208,7 @@ def _parse_view(
         stage=parsed_stage,
         supposition=parsed_supposition,
         dependency_relation=dependency_relation,
-        issue_structure=issue_structure
+        issue_structure=issue_structure,
     )
 
 

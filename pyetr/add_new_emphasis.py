@@ -193,7 +193,9 @@ def get_new_state(
             if current_atom_candidate == atom_candidate:
                 instances_encountered += 1
                 if instance_num == instances_encountered - 1:
-                    new_terms: list[Summation | FunctionalTerm | ArbitraryObject | Emphasis] = []
+                    new_terms: list[
+                        Summation | FunctionalTerm | ArbitraryObject | Emphasis
+                    ] = []
                     for i, term in enumerate(atom.terms):
                         if atom_candidate.term_idx == i:
                             assert not isinstance(term, Emphasis)

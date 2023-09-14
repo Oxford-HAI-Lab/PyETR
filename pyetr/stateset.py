@@ -2,8 +2,8 @@ __all__ = ["State", "SetOfStates"]
 
 from typing import AbstractSet, Iterable, Optional
 
-from .atom import Atom
 from .abstract_atom import equals_predicate
+from .atom import Atom
 from .term import ArbitraryObject, Term
 
 
@@ -57,9 +57,7 @@ class State(frozenset[Atom]):
     def detailed(self) -> str:
         return "{" + ",".join(i.detailed for i in self) + "}"
 
-    def replace(
-        self, replacements: dict[ArbitraryObject, Term]
-    ) -> "State":
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "State":
         return State([s.replace(replacements) for s in self])
 
     @property
@@ -203,9 +201,7 @@ class SetOfStates(frozenset[State]):
     def detailed(self) -> str:
         return "{" + ",".join(i.detailed for i in self) + "}"
 
-    def replace(
-        self, replacements: dict[ArbitraryObject, Term]
-    ) -> "SetOfStates":
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "SetOfStates":
         return SetOfStates([s.replace(replacements) for s in self])
 
     @property

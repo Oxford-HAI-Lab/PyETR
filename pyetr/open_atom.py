@@ -1,24 +1,22 @@
-
-
 from abc import abstractmethod
 from types import NoneType
-from typing import Any, Iterable, Optional
+from typing import Iterable, Optional
 
 from pyetr.multiset import Multiset
 from pyetr.term import ArbitraryObject, FunctionalTerm, Summation, Term
-from .atom import Atom
+
 from .abstract_atom import AbstractAtom, Predicate
+from .atom import Atom
 from .function import Function
+
 
 class OpenTerm:
     @abstractmethod
     def question_count(self) -> int:
         ...
-    
+
     @abstractmethod
-    def is_same_emphasis_context(
-        self, other: "OpenTerm"
-    ) -> bool:
+    def is_same_emphasis_context(self, other: "OpenTerm") -> bool:
         ...
 
     @abstractmethod
@@ -33,7 +31,7 @@ class OpenTerm:
     @abstractmethod
     def get_open_equiv(cls, term: Term) -> "OpenTerm":
         ...
-    
+
     @property
     @abstractmethod
     def detailed(self) -> str:
@@ -47,6 +45,7 @@ class OpenTerm:
     def __call__(self, term: Term) -> Term:
         ...
 
+
 class OpenArbitraryObject(OpenTerm):
     name: str
 
@@ -55,13 +54,11 @@ class OpenArbitraryObject(OpenTerm):
 
     def __call__(self, term: Term) -> ArbitraryObject:
         return ArbitraryObject(name=self.name)
-    
+
     def question_count(self) -> int:
         return 0
 
-    def is_same_emphasis_context(
-        self, other: OpenTerm
-    ) -> bool:
+    def is_same_emphasis_context(self, other: OpenTerm) -> bool:
         return self == other
 
     def __eq__(self, other) -> bool:
@@ -71,7 +68,6 @@ class OpenArbitraryObject(OpenTerm):
 
     def __hash__(self) -> int:
         return hash(self.name)
-
 
     def refers_to_term(self, term: ArbitraryObject) -> bool:
         return term.name == self.name
@@ -89,6 +85,7 @@ class OpenArbitraryObject(OpenTerm):
     def get_question_term(self, term: ArbitraryObject) -> NoneType:
         return None
 
+
 class OpenFunctionalTerm(OpenTerm):
     f: Function
     t: Optional[tuple[OpenTerm, ...]]
@@ -96,35 +93,23 @@ class OpenFunctionalTerm(OpenTerm):
     def __init__(self, f: Function, t: Optional[tuple[OpenTerm, ...]]) -> None:
         self.f = f
         self.t = t
-    
 
     def __call__(self, term: Term) -> FunctionalTerm:
         if self.t is None:
-            return FunctionalTerm(
-                f=self.f,
-                t=None
-            )
+            return FunctionalTerm(f=self.f, t=None)
         else:
-            return FunctionalTerm(
-                f=self.f,
-                t=tuple([i(term) for i in self.t])
-            )
+            return FunctionalTerm(f=self.f, t=tuple([i(term) for i in self.t]))
 
     def question_count(self) -> int:
         if self.t is None:
             return 0
         c = 0
         for i in self.t:
-            c+= i.question_count()
+            c += i.question_count()
         return c
 
-    def is_same_emphasis_context(
-        self, other: OpenTerm
-    ) -> bool:
-        if (
-            not isinstance(other, OpenFunctionalTerm)
-            or self.f != other.f
-        ):
+    def is_same_emphasis_context(self, other: OpenTerm) -> bool:
+        if not isinstance(other, OpenFunctionalTerm) or self.f != other.f:
             return False
         if self.t is None and other.t is None:
             return True
@@ -144,14 +129,13 @@ class OpenFunctionalTerm(OpenTerm):
     def __hash__(self) -> int:
         return hash((self.f, self.t))
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenFunctionalTerm":
+    def replace(
+        self, replacements: dict[ArbitraryObject, Term]
+    ) -> "OpenFunctionalTerm":
         if self.t is None:
             return OpenFunctionalTerm(f=self.f, t=None)
         new_terms = tuple([term.replace(replacements) for term in self.t])
-        return OpenFunctionalTerm(
-            f=self.f,
-            t=new_terms
-        )
+        return OpenFunctionalTerm(f=self.f, t=new_terms)
 
     @property
     def detailed(self) -> str:
@@ -166,31 +150,27 @@ class OpenFunctionalTerm(OpenTerm):
                 return q_term
         return None
 
+
 class OpenSummation(OpenTerm):
     t: Multiset[OpenTerm]
 
-    def __init__(self,
+    def __init__(
+        self,
         t: Iterable[OpenTerm],
     ):
         self.t = Multiset[OpenTerm](t)
 
     def __call__(self, term: Term) -> Summation:
-        return Summation(
-            t=tuple([i(term) for i in self.t])
-        )
+        return Summation(t=tuple([i(term) for i in self.t]))
 
     def question_count(self) -> int:
         c = 0
         for i in self.t:
-            c+= i.question_count()
+            c += i.question_count()
         return c
 
-    def is_same_emphasis_context(
-        self, other: OpenTerm
-    ) -> bool:
-        if (
-            not isinstance(other, OpenFunctionalTerm)
-        ):
+    def is_same_emphasis_context(self, other: OpenTerm) -> bool:
+        if not isinstance(other, OpenFunctionalTerm):
             return False
         if self.t is None and other.t is None:
             return True
@@ -210,13 +190,10 @@ class OpenSummation(OpenTerm):
     def __hash__(self) -> int:
         return hash(self.t)
 
-
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenSummation":
         new_terms = tuple([term.replace(replacements) for term in self.t])
-        return OpenSummation(
-            t=new_terms
-        )
-    
+        return OpenSummation(t=new_terms)
+
     @property
     def detailed(self) -> str:
         return f"<OpenSummation {self.t}>"
@@ -230,17 +207,16 @@ class OpenSummation(OpenTerm):
                 return q_term
         return None
 
+
 class QuestionMark(OpenTerm):
     def question_count(self) -> int:
         return 1
 
-    def is_same_emphasis_context(
-        self, other: OpenTerm
-    ) -> bool:
+    def is_same_emphasis_context(self, other: OpenTerm) -> bool:
         return True
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, QuestionMark):
+        if isinstance(other, QuestionMark):
             return True
         else:
             return False
@@ -264,6 +240,7 @@ class QuestionMark(OpenTerm):
     def refers_to_term(self, term: Term) -> bool:
         assert False
 
+
 class OpenAtom(AbstractAtom[OpenTerm]):
     def __init__(self, predicate: Predicate, terms: tuple[OpenTerm, ...]) -> None:
         super().__init__(predicate=predicate, terms=terms)
@@ -271,8 +248,7 @@ class OpenAtom(AbstractAtom[OpenTerm]):
 
     def __call__(self, term: Term) -> Atom:
         return Atom(
-            predicate=self.predicate,
-            terms=tuple([t(term) for t in self.terms])
+            predicate=self.predicate, terms=tuple([t(term) for t in self.terms])
         )
 
     def question_count(self) -> int:
@@ -280,7 +256,7 @@ class OpenAtom(AbstractAtom[OpenTerm]):
         for term in self.terms:
             question_count += term.question_count()
         return question_count
-    
+
     def validate(self):
         if self.question_count() != 1:
             raise ValueError(f"Open atom {self} must contain exactly one question mark")
@@ -309,21 +285,16 @@ class OpenAtom(AbstractAtom[OpenTerm]):
             return True
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Atom):
+        if not isinstance(other, OpenAtom):
             return False
         return self.predicate == other.predicate and self.terms == other.terms
 
     def __hash__(self) -> int:
         return hash((self.predicate, self.terms))
-    
-    def replace(
-        self, replacements: dict[ArbitraryObject, Term]
-    ) -> "OpenAtom":
+
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenAtom":
         new_terms = tuple([term.replace(replacements) for term in self.terms])
-        return OpenAtom(
-            predicate=self.predicate,
-            terms = new_terms
-        )
+        return OpenAtom(predicate=self.predicate, terms=new_terms)
 
     def __invert__(self):
         return OpenAtom(~self.predicate, self.terms)
@@ -349,7 +320,6 @@ class OpenAtom(AbstractAtom[OpenTerm]):
             if new_q_term is not None:
                 return new_q_term
         assert False
-
 
 
 def get_open_equivalent(term: Term) -> OpenTerm:

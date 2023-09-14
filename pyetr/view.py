@@ -1,10 +1,10 @@
 __all__ = ["View"]
 
-from collections import defaultdict
 from functools import reduce
 from itertools import permutations
 from typing import Optional, cast
 
+from pyetr import term
 from pyetr.issues import IssueStructure
 from pyetr.tools import ArbitraryObjectGenerator, powerset
 from pyetr.weight import Weight
@@ -13,7 +13,6 @@ from .atom import Atom
 from .dependency import Dependency, DependencyRelation
 from .stateset import SetOfStates, State
 from .term import ArbitraryObject, FunctionalTerm, Term
-from pyetr import term
 
 
 def get_subset(
@@ -92,9 +91,7 @@ def substitution(
     new_stage = stage
     subs = arb_gen.redraw(Z())
     new_dep_relation = new_dep_relation.replace(subs)
-    new_stage = new_stage.replace(
-        cast(dict[ArbitraryObject, Term], subs)
-    )
+    new_stage = new_stage.replace(cast(dict[ArbitraryObject, Term], subs))
 
     new_stage = new_stage.replace({arb_obj: term})
 
@@ -216,7 +213,6 @@ class View:
         self.validate(pre_view=is_pre_view)
 
     def validate(self, *, pre_view: bool = False):
-
         self.dependency_relation.validate_against_states(
             self.stage | self.supposition, pre_view=pre_view
         )
@@ -225,7 +221,7 @@ class View:
                 raise ValueError(f"{s} not in {self.stage}")
 
             w.validate_against_dep_rel(self.dependency_relation)
-        
+
             # Assert weights dict is stage
             # Assert weights only use arbitrary objects in dependency relation
             # TODO: Does this use weight or state?
@@ -250,7 +246,7 @@ class View:
             dependency_relation=dependency_relation,
             issue_structure=issue_structure,
             weights=weights,
-            is_pre_view=is_pre_view
+            is_pre_view=is_pre_view,
         )
 
     @classmethod
@@ -288,7 +284,6 @@ class View:
             dependency_relation.restriction((stage | supposition).arb_objects),
             issue_structure.restriction((stage | supposition).atoms),
         )
-
 
     @property
     def detailed(self) -> str:
@@ -341,9 +336,7 @@ class View:
     def stage_supp_arb_objects(self) -> set[ArbitraryObject]:
         return self.stage.arb_objects | self.supposition.arb_objects
 
-    def replace(
-        self, replacements: dict[ArbitraryObject, Term]
-    ) -> "View":
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "View":
         new_stage = self.stage.replace(replacements)
         new_supposition = self.supposition.replace(replacements)
         new_issue_structure = self.issue_structure.replace(replacements)
@@ -399,15 +392,14 @@ class View:
                     return True
         return False
 
-    def issue_matches(
-        self, other: "View"
-    ) -> set[tuple[Term, Term]]:
-        pairs: list[
-            tuple[Term, Term]
-        ] = []
+    def issue_matches(self, other: "View") -> set[tuple[Term, Term]]:
+        pairs: list[tuple[Term, Term]] = []
         for t1, open_atom_self in self.issue_structure:
             for t2, open_atom_other in other.issue_structure:
-                if open_atom_self == open_atom_other or open_atom_self == ~open_atom_other:
+                if (
+                    open_atom_self == open_atom_other
+                    or open_atom_self == ~open_atom_other
+                ):
                     pairs.append((t1, t2))
 
         return set(pairs)
@@ -719,7 +711,7 @@ class View:
                         formed_atom = open_atom(t)
                         for atom in gamma:
                             if formed_atom == atom:
-                                 atoms.add(atom)
+                                atoms.add(atom)
                     return State(atoms)
 
                 return reduce(

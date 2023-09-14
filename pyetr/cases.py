@@ -1280,7 +1280,6 @@ class UniProduct(BaseExample):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
-
 class QueryTest(Query, BaseExample):
     """
     From page 173

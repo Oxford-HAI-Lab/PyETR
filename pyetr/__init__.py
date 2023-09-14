@@ -14,8 +14,8 @@ __all__ = [
     "parse_string_to_view",
 ]
 
-from .atom import Atom
 from .abstract_atom import Predicate, equals_predicate
+from .atom import Atom
 from .dependency import Dependency, DependencyRelation
 from .parsing import parse_string_to_view
 from .stateset import SetOfStates, State

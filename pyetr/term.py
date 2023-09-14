@@ -1,18 +1,17 @@
 __all__ = ["FunctionalTerm", "Function", "ArbitraryObject"]
 
 from abc import ABC, abstractmethod
-from typing import Iterable, Optional, Self
+from typing import Iterable, Optional
 
 from .function import Function
-
 from .multiset import Multiset
+
 
 class Term(ABC):
     @property
     @abstractmethod
     def detailed(self) -> str:
         ...
-
 
     @abstractmethod
     def replace(
@@ -25,8 +24,6 @@ class Term(ABC):
     @abstractmethod
     def arb_objects(self) -> set["ArbitraryObject"]:
         ...
-
-
 
 
 class ArbitraryObject(Term):
@@ -63,7 +60,6 @@ class ArbitraryObject(Term):
         return self
 
 
-
 class FunctionalTerm(Term):
     f: Function
     t: Optional[tuple[Term, ...]]
@@ -83,7 +79,6 @@ class FunctionalTerm(Term):
             )
         self.f = f
         self.t = t
-
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
@@ -122,7 +117,6 @@ class FunctionalTerm(Term):
     def __hash__(self) -> int:
         return hash((self.f, self.t))
 
-
     def replace(
         self,
         replacements: dict[ArbitraryObject, Term],
@@ -148,10 +142,12 @@ class FunctionalTerm(Term):
 
 # Changed if clause in 4.2 to separate Arbitrary Objects from FunctionalTerm
 
+
 class Summation(Term):
     t: Multiset[Term]
 
-    def __init__(self,
+    def __init__(
+        self,
         t: Iterable[Term],
     ):
         self.t = Multiset[Term](t)
