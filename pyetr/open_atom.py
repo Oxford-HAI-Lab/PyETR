@@ -1,5 +1,4 @@
-from abc import abstractmethod
-from types import NoneType
+from abc import ABC, abstractmethod
 from typing import Iterable, Optional
 
 from pyetr.multiset import Multiset
@@ -10,35 +9,18 @@ from .atom import Atom
 from .function import Function
 
 
-class OpenTerm:
+class OpenTerm(ABC):
     @abstractmethod
     def question_count(self) -> int:
-        ...
-
-    @abstractmethod
-    def is_same_emphasis_context(self, other: "OpenTerm") -> bool:
         ...
 
     @abstractmethod
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenTerm":
         ...
 
-    @abstractmethod
-    def refers_to_term(self, term: Term) -> bool:
-        ...
-
-    @classmethod
-    @abstractmethod
-    def get_open_equiv(cls, term: Term) -> "OpenTerm":
-        ...
-
     @property
     @abstractmethod
     def detailed(self) -> str:
-        ...
-
-    @abstractmethod
-    def get_question_term(self, term: Term) -> Optional["Term"]:
         ...
 
     @abstractmethod
@@ -58,9 +40,6 @@ class OpenArbitraryObject(OpenTerm):
     def question_count(self) -> int:
         return 0
 
-    def is_same_emphasis_context(self, other: OpenTerm) -> bool:
-        return self == other
-
     def __eq__(self, other) -> bool:
         if not isinstance(other, OpenArbitraryObject):
             return False
@@ -69,21 +48,15 @@ class OpenArbitraryObject(OpenTerm):
     def __hash__(self) -> int:
         return hash(self.name)
 
-    def refers_to_term(self, term: ArbitraryObject) -> bool:
-        return term.name == self.name
-
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> OpenTerm:
         for arb_obj in replacements:
-            if self.refers_to_term(arb_obj):
+            if arb_obj.name == self.name:
                 return get_open_equivalent(replacements[arb_obj])
         return self
 
     @property
     def detailed(self) -> str:
         raise NotImplementedError
-
-    def get_question_term(self, term: ArbitraryObject) -> NoneType:
-        return None
 
 
 class OpenFunctionalTerm(OpenTerm):
@@ -108,19 +81,6 @@ class OpenFunctionalTerm(OpenTerm):
             c += i.question_count()
         return c
 
-    def is_same_emphasis_context(self, other: OpenTerm) -> bool:
-        if not isinstance(other, OpenFunctionalTerm) or self.f != other.f:
-            return False
-        if self.t is None and other.t is None:
-            return True
-        elif self.t is None or other.t is None:
-            return False
-        else:
-            for x, y in zip(self.t, other.t):
-                if not x.is_same_emphasis_context(y):
-                    return False
-            return True
-
     def __eq__(self, other) -> bool:
         if not isinstance(other, OpenFunctionalTerm):
             return False
@@ -141,15 +101,6 @@ class OpenFunctionalTerm(OpenTerm):
     def detailed(self) -> str:
         raise NotImplementedError
 
-    def get_question_term(self, term: FunctionalTerm) -> Optional[Term]:
-        if self.t is None:
-            return None
-        for open_term in self.t:
-            q_term = open_term.get_question_term(term)
-            if q_term is not None:
-                return q_term
-        return None
-
 
 class OpenSummation(OpenTerm):
     t: Multiset[OpenTerm]
@@ -169,19 +120,6 @@ class OpenSummation(OpenTerm):
             c += i.question_count()
         return c
 
-    def is_same_emphasis_context(self, other: OpenTerm) -> bool:
-        if not isinstance(other, OpenFunctionalTerm):
-            return False
-        if self.t is None and other.t is None:
-            return True
-        elif self.t is None or other.t is None:
-            return False
-        else:
-            for x, y in zip(self.t, other.t):
-                if not x.is_same_emphasis_context(y):
-                    return False
-            return True
-
     def __eq__(self, other) -> bool:
         if not isinstance(other, OpenFunctionalTerm):
             return False
@@ -198,22 +136,10 @@ class OpenSummation(OpenTerm):
     def detailed(self) -> str:
         return f"<OpenSummation {self.t}>"
 
-    def get_question_term(self, term: FunctionalTerm) -> Optional[Term]:
-        if self.t is None:
-            return None
-        for open_term in self.t:
-            q_term = open_term.get_question_term(term)
-            if q_term is not None:
-                return q_term
-        return None
-
 
 class QuestionMark(OpenTerm):
     def question_count(self) -> int:
         return 1
-
-    def is_same_emphasis_context(self, other: OpenTerm) -> bool:
-        return True
 
     def __eq__(self, other) -> bool:
         if isinstance(other, QuestionMark):
@@ -234,11 +160,8 @@ class QuestionMark(OpenTerm):
     def detailed(self) -> str:
         return f"<QuestionMark>"
 
-    def get_question_term(self, term: Term) -> Optional[Term]:
+    def __call__(self, term: Term) -> Term:
         return term
-
-    def refers_to_term(self, term: Term) -> bool:
-        assert False
 
 
 class OpenAtom(AbstractAtom[OpenTerm]):
@@ -260,29 +183,6 @@ class OpenAtom(AbstractAtom[OpenTerm]):
     def validate(self):
         if self.question_count() != 1:
             raise ValueError(f"Open atom {self} must contain exactly one question mark")
-
-    def refers_to_atom(self, atom: Atom) -> bool:
-        if self.predicate != atom.predicate and self.predicate != ~atom.predicate:
-            return False
-        all_terms_match = True
-        for i, term in enumerate(atom.terms):
-            alt_open_term = get_open_equivalent(term)
-            open_term = self.terms[i]
-            if not open_term.is_same_emphasis_context(alt_open_term):
-                all_terms_match = False
-        return all_terms_match
-
-    def present_in_atoms(self, atoms: set[Atom]) -> bool:
-        return any([self.refers_to_atom(a) for a in atoms])
-
-    def is_same_question_context(self, other: "OpenAtom") -> bool:
-        if self.predicate != other.predicate and self.predicate != ~other.predicate:
-            return False
-        else:
-            for x, y in zip(self.terms, other.terms):
-                if not x.is_same_emphasis_context(y):
-                    return False
-            return True
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, OpenAtom):
@@ -310,16 +210,6 @@ class OpenAtom(AbstractAtom[OpenTerm]):
     @property
     def detailed(self) -> str:
         return f"<OpenAtom predicate={self.predicate.detailed} terms=({','.join(t.detailed for t in self.terms)})>"
-
-    def get_question_term_for_atom(self, atom: Atom) -> Term:
-        assert self.predicate.name == atom.predicate.name
-        assert len(self.terms) == len(atom.terms)
-        for i, open_term in enumerate(self.terms):
-            term = atom.terms[i]
-            new_q_term = open_term.get_question_term(term)
-            if new_q_term is not None:
-                return new_q_term
-        assert False
 
 
 def get_open_equivalent(term: Term) -> OpenTerm:

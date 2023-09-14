@@ -48,18 +48,16 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
 
     def restriction(self, atoms: set[Atom]) -> "IssueStructure":
         return IssueStructure(
-            {
-                (term, open_atom)
-                for term, open_atom in self
-                if open_atom.present_in_atoms(atoms)
-            }
+            {(term, open_atom) for term, open_atom in self if open_atom(term) in atoms}
         )
 
     def validate_against_states(self, states: SetOfStates):
-        if not all({a.present_in_atoms(states.atoms) for _, a in self}):
-            raise ValueError(
-                f"Issue atoms {self} is not a subset of atoms in stage/supposition: {states.atoms}"
-            )
+        for t, a in self:
+            atom = a(t)
+            if atom not in states.atoms and ~atom not in states.atoms:
+                raise ValueError(
+                    f"Issue atom {(t, a)} is not a subset of atoms in stage/supposition: {states.atoms}"
+                )
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "IssueStructure":
         return IssueStructure(
