@@ -21,6 +21,26 @@ class AbstractAtom(Generic[TermType]):
         self.predicate = predicate
         self.terms = terms
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, type(self)):
+            return False
+        return self.predicate == other.predicate and self.terms == other.terms
+
+    def __hash__(self) -> int:
+        return hash((type(self).__name__, self.predicate, self.terms))
+
+    def __repr__(self) -> str:
+        terms = ",".join([repr(i) for i in self.terms])
+        if self.predicate.verifier:
+            tilda = ""
+        else:
+            tilda = "~"
+        return f"{tilda}{self.predicate.name}({terms})"
+
+    @property
+    def detailed(self) -> str:
+        return f"<{type(self).__name__} predicate={self.predicate.detailed} terms=({','.join(t.detailed for t in self.terms)})>"
+
 
 class Predicate:
     name: str

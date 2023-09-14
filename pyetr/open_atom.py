@@ -25,29 +25,9 @@ class OpenAtom(AbstractAtom[OpenTerm]):
         if self.question_count() != 1:
             raise ValueError(f"Open atom {self} must contain exactly one question mark")
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, OpenAtom):
-            return False
-        return self.predicate == other.predicate and self.terms == other.terms
-
-    def __hash__(self) -> int:
-        return hash((self.predicate, self.terms))
-
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenAtom":
         new_terms = tuple([term.replace(replacements) for term in self.terms])
         return OpenAtom(predicate=self.predicate, terms=new_terms)
 
     def __invert__(self):
         return OpenAtom(~self.predicate, self.terms)
-
-    def __repr__(self) -> str:
-        terms = ",".join([repr(i) for i in self.terms])
-        if self.predicate.verifier:
-            tilda = ""
-        else:
-            tilda = "~"
-        return f"{tilda}{self.predicate.name}({terms})"
-
-    @property
-    def detailed(self) -> str:
-        return f"<OpenAtom predicate={self.predicate.detailed} terms=({','.join(t.detailed for t in self.terms)})>"

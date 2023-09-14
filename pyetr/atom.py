@@ -19,18 +19,6 @@ class Atom(AbstractAtom[Term]):
                 assert False
         return output_objs
 
-    @property
-    def detailed(self) -> str:
-        return f"<Atom predicate={self.predicate.detailed} terms=({','.join(t.detailed for t in self.terms)})>"
-
-    def __repr__(self) -> str:
-        terms = ",".join([repr(i) for i in self.terms])
-        if self.predicate.verifier:
-            tilda = ""
-        else:
-            tilda = "~"
-        return f"{tilda}{self.predicate.name}({terms})"
-
     def __invert__(self):
         return Atom(~self.predicate, self.terms)
 
@@ -65,11 +53,3 @@ class Atom(AbstractAtom[Term]):
                 new_terms.append(old_term)
 
         return Atom(predicate=self.predicate, terms=tuple(new_terms))
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Atom):
-            return False
-        return self.predicate == other.predicate and self.terms == other.terms
-
-    def __hash__(self) -> int:
-        return hash((self.predicate, self.terms))
