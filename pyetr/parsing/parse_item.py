@@ -7,8 +7,8 @@ from pyetr.add_new_emphasis import add_new_emphasis
 from pyetr.atom import Atom
 from pyetr.dependency import Dependency, DependencyRelation, dependencies_from_sets
 from pyetr.issues import IssueStructure
-from pyetr.open_atom import (
-    OpenAtom,
+from pyetr.open_atom import OpenAtom
+from pyetr.open_term import (
     OpenFunctionalTerm,
     OpenTerm,
     QuestionMark,
