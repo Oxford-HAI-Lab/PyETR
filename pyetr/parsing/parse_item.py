@@ -15,7 +15,7 @@ from pyetr.open_term import (
     get_open_equivalent,
 )
 from pyetr.stateset import SetOfStates, State
-from pyetr.term import ArbitraryObject, Function, FunctionalTerm, Summation, Term
+from pyetr.term import ArbitraryObject, Function, FunctionalTerm, Term
 from pyetr.view import View
 
 from .parse_string import (

@@ -954,16 +954,17 @@ class e46i(BaseExample):
         if not result.is_equivalent_under_arb_sub(cls.c[1]):
             raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
 
-    class e46ii(Query, BaseExample):
-        """
-        p126, if we had a view{VMR,VMS, T} and applied [{vm, 0}]Q we would get [{vm, 0}]
-        """
 
-        v: tuple[View, View] = (
-            ps("(V() ∧ M() ∧ R()) ∨ (V() ∧ M() ∧ S()) ∨ T()"),
-            ps("(V() ∧ M()) ∨ ⊤"),
-        )
-        c: View = ps("(V() ∧ M()) ∨ ⊤")
+class e46ii(Query, BaseExample):
+    """
+    p126, if we had a view{VMR,VMS, T} and applied [{vm, 0}]Q we would get [{vm, 0}]
+    """
+
+    v: tuple[View, View] = (
+        ps("(V() ∧ M() ∧ R()) ∨ (V() ∧ M() ∧ S()) ∨ T()"),
+        ps("(V() ∧ M()) ∨ ⊤"),
+    )
+    c: View = ps("(V() ∧ M()) ∨ ⊤")
 
 
 class e47(DefaultInference, BaseExample):

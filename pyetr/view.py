@@ -473,7 +473,7 @@ class View:
             # Corresponds to line 1
             return self._sum(view, inherited_dependencies)
 
-    def answer(self, other: "View", verbose: bool = False) -> "View":
+    def atomic_answer(self, other: "View", verbose: bool = False) -> "View":
         """
         Based on definition 4.30
         """
@@ -487,7 +487,7 @@ class View:
             supposition = self.supposition
             potentials: list[tuple[int, State]] = []
             for s in self.stage:
-                potential = SetOfStates({s}).answer_potential(other.stage)
+                potential = SetOfStates({s}).atomic_answer_potential(other.stage)
                 potentials.append((potential, s))
             stage = SetOfStates(arg_max_states(potentials))
 
@@ -496,6 +496,7 @@ class View:
                 supposition=supposition,
                 dependency_relation=self.dependency_relation,
                 issue_structure=self.issue_structure,
+                weights=self.weights,
             )
             if verbose:
                 print(f"AnswerOutput: {out}")
@@ -616,7 +617,7 @@ class View:
         out = (
             self.universal_product(view, verbose=verbose)
             .existential_sum(view, verbose=verbose)
-            .answer(view, verbose=verbose)
+            .atomic_answer(view, verbose=verbose)
             .merge(view, verbose=verbose)
         )
         if verbose:
@@ -989,7 +990,7 @@ class View:
                 )
                 .universal_product(other, verbose=verbose)
                 .existential_sum(other, verbose=verbose)
-                .answer(other, verbose=verbose)
+                .atomic_answer(other, verbose=verbose)
                 .merge(other, verbose=verbose)
             )
         elif (
@@ -1010,7 +1011,7 @@ class View:
                 )
                 .universal_product(other, verbose=verbose)
                 .existential_sum(other, verbose=verbose)
-                .answer(other, verbose=verbose)
+                .atomic_answer(other, verbose=verbose)
                 .merge(other, verbose=verbose)
             )
         else:

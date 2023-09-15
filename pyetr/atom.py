@@ -3,7 +3,7 @@ __all__ = ["Atom"]
 
 from pyetr.abstract_atom import AbstractAtom
 
-from .term import ArbitraryObject, FunctionalTerm, Summation, Term
+from .term import ArbitraryObject, FunctionalTerm, Multiset, Term
 
 
 class Atom(AbstractAtom[Term]):
@@ -11,7 +11,7 @@ class Atom(AbstractAtom[Term]):
     def arb_objects(self) -> set[ArbitraryObject]:
         output_objs = set()
         for term in self.terms:
-            if isinstance(term, FunctionalTerm) or isinstance(term, Summation):
+            if isinstance(term, FunctionalTerm) or isinstance(term, Multiset):
                 output_objs |= term.arb_objects
             elif isinstance(term, ArbitraryObject):
                 output_objs.add(term)

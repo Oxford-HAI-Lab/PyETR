@@ -1,12 +1,15 @@
 __all__ = ["Function", "RealNumber", "XBar"]
 
 
+from typing import Optional
+
+
 class Function:
     name: str
-    arity: int
+    arity: Optional[int]
 
-    def __init__(self, name: str, arity: int) -> None:
-        if arity < 0:
+    def __init__(self, name: str, arity: Optional[int]) -> None:
+        if arity is not None and arity < 0:
             raise ValueError("arity must not be less than 0")
         self.name = name
         self.arity = arity
@@ -49,3 +52,4 @@ class RealNumber(Function):
 
 
 XBar = Function("XBar", 2)
+Summation = Function("Summation", None)

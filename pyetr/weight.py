@@ -1,17 +1,14 @@
 from pyetr.dependency import DependencyRelation
 from pyetr.function import XBar
-from pyetr.multiset import Multiset
 from pyetr.stateset import State
-from pyetr.term import ArbitraryObject, FunctionalTerm, Term
+from pyetr.term import ArbitraryObject, FunctionalTerm, Multiset, Term
 
 
 class Weight:
-    multiplicative: Multiset[Term]
-    additive: Multiset[Term]
+    multiplicative: Multiset
+    additive: Multiset
 
-    def __init__(
-        self, multiplicative: Multiset[Term], additive: Multiset[Term]
-    ) -> None:
+    def __init__(self, multiplicative: Multiset, additive: Multiset) -> None:
         self.multiplicative = multiplicative
         self.additive = additive
 
@@ -34,7 +31,7 @@ class Weight:
         elif len(other.multiplicative) == 0:
             v_cross_w = self.multiplicative
         else:
-            v_cross_w = Multiset[Term](
+            v_cross_w = Multiset(
                 [
                     FunctionalTerm(f=XBar, t=(s_i, t_j))
                     for s_i in self.multiplicative

@@ -3,10 +3,10 @@ from abc import abstractmethod
 from pyetr.abstract_term import (
     AbstractArbitraryObject,
     AbstractFunctionalTerm,
-    AbstractSummation,
+    AbstractMultiset,
     AbstractTerm,
 )
-from pyetr.term import ArbitraryObject, FunctionalTerm, Summation, Term
+from pyetr.term import ArbitraryObject, FunctionalTerm, Multiset, Term
 
 
 class OpenTerm(AbstractTerm):
@@ -54,20 +54,6 @@ class OpenFunctionalTerm(AbstractFunctionalTerm[OpenTerm], OpenTerm):
         return OpenFunctionalTerm(f=self.f, t=new_terms)
 
 
-class OpenSummation(AbstractSummation[OpenTerm], OpenTerm):
-    def __call__(self, term: Term) -> Summation:
-        return Summation(t=tuple([i(term) for i in self.t]))
-
-    def question_count(self) -> int:
-        c = 0
-        for i in self.t:
-            c += i.question_count()
-        return c
-
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenSummation":
-        return OpenSummation(t=tuple([term.replace(replacements) for term in self.t]))
-
-
 class QuestionMark(OpenTerm):
     def __eq__(self, other) -> bool:
         if isinstance(other, QuestionMark):
@@ -95,6 +81,23 @@ class QuestionMark(OpenTerm):
         return self
 
 
+class OpenMultiset(AbstractMultiset[OpenTerm], OpenTerm):
+    def __call__(self, term: Term) -> Multiset:
+        return Multiset(tuple([i(term) for i in self]))
+
+    def question_count(self) -> int:
+        c = 0
+        for i in self:
+            c += i.question_count()
+        return c
+
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenMultiset":
+        return OpenMultiset(tuple([term.replace(replacements) for term in self]))
+
+    def __add__(self, other: "OpenMultiset") -> "OpenMultiset":
+        return OpenMultiset(self._items + other._items)
+
+
 def get_open_equivalent(term: Term) -> OpenTerm:
     if isinstance(term, ArbitraryObject):
         return OpenArbitraryObject(term.name)
@@ -102,7 +105,7 @@ def get_open_equivalent(term: Term) -> OpenTerm:
         return OpenFunctionalTerm(
             f=term.f, t=tuple([get_open_equivalent(i) for i in term.t])
         )
-    elif isinstance(term, Summation):
-        return OpenSummation(t=(get_open_equivalent(i) for i in term.t))
+    elif isinstance(term, Multiset):
+        return OpenMultiset(get_open_equivalent(i) for i in term)
     else:
         assert False

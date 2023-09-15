@@ -1,10 +1,13 @@
 __all__ = ["State", "SetOfStates"]
 
-from typing import AbstractSet, Iterable, Optional
+from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
 from .abstract_atom import equals_predicate
 from .atom import Atom
 from .term import ArbitraryObject, Term
+
+if TYPE_CHECKING:
+    from pyetr.weight import Weights
 
 
 class State(frozenset[Atom]):
@@ -177,21 +180,22 @@ class SetOfStates(frozenset[State]):
     def is_falsum(self):
         return len(self) == 0
 
-    def answer_potential(self, other: "SetOfStates") -> int:
+    def atomic_answer_potential(self, other: "SetOfStates") -> int:
         """
-        Based on definition 4.29
+        Based on definition A.67
         """
+        return len(self.atoms.intersection(other.atoms))
 
-        def _get_atoms(s: "SetOfStates"):
-            atoms = set()
-            for state in s:
-                for a in state:
-                    atoms.add(a)
-            return atoms
-
-        self_atoms = _get_atoms(self)
-        other_atoms = _get_atoms(other)
-        return len(self_atoms.intersection(other_atoms))
+    def equilibrium_answer_potential(
+        self, other: "SetOfStates", weights: "Weights"
+    ) -> int:
+        """
+        Based on definition A.67
+        """
+        raise NotImplementedError
+        # Y = SetOfStates()
+        # Summation(Weights({delta: Weight(Summation()) for delta in Y}))
+        # return len(self.atoms.intersection(other.atoms))
 
     def __repr__(self) -> str:
         terms = ",".join([repr(i) for i in self])

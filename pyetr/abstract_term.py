@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Generic, Iterable, TypeVar
+from typing import Generic, TypeVar
 
 from pyetr.function import Function
-from pyetr.multiset import Multiset
+from pyetr.multiset import GenericMultiset
 
 
 class AbstractTerm(ABC):
@@ -85,26 +85,5 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
         return f"<{type(self).__name__} f={self.f.detailed} t=({','.join(t.detailed for t in self.t)},)>"
 
 
-class AbstractSummation(Generic[TermType], AbstractTerm):
-    t: Multiset[TermType]
-
-    def __init__(
-        self,
-        t: Iterable[TermType],
-    ):
-        self.t = Multiset[TermType](t)
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, type(self)):
-            return False
-        return self.t == other.t
-
-    def __hash__(self) -> int:
-        return hash((type(self).__name__, self.t))
-
-    def __repr__(self) -> str:
-        raise NotImplementedError
-
-    @property
-    def detailed(self) -> str:
-        return f"<OpenSummation {self.t}>"
+class AbstractMultiset(Generic[TermType], GenericMultiset[TermType], AbstractTerm):
+    pass

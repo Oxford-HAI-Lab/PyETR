@@ -18,7 +18,7 @@ from pyetr.parsing.parse_string import (
     Variable,
 )
 from pyetr.stateset import SetOfStates
-from pyetr.term import ArbitraryObject, FunctionalTerm, Summation, Term
+from pyetr.term import ArbitraryObject, FunctionalTerm, Term
 from pyetr.view import View
 
 
@@ -91,10 +91,11 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
                     new_atoms.append(convert_atom(atom, issue_structure, issue_atoms))
                 return BoolAnd([new_atoms])
         else:
-            new_ands: list[LogicPredicate | BoolNot | BoolAnd] = []
+            new_ands: list[LogicPredicate | BoolNot | BoolAnd | Truth] = []
             for state in s:
-                assert len(state) > 0
-                if len(state) == 1:
+                if len(state) == 0:
+                    new_ands.append(Truth([]))
+                elif len(state) == 1:
                     atom = next(iter(state))
                     new_ands.append(convert_atom(atom, issue_structure, issue_atoms))
                 else:
