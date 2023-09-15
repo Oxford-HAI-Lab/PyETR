@@ -6,7 +6,8 @@ from typing import Optional
 
 from pyetr.atom import Atom
 from pyetr.dependency import DependencyRelation
-from pyetr.term import ArbitraryObject, Function, FunctionalTerm, Term
+from pyetr.function import Function
+from pyetr.term import ArbitraryObject, FunctionalTerm, Term
 
 from .stateset import SetOfStates, State
 

@@ -6,6 +6,7 @@ from pyetr.abstract_atom import Predicate
 from pyetr.add_new_emphasis import add_new_emphasis
 from pyetr.atom import Atom
 from pyetr.dependency import Dependency, DependencyRelation, dependencies_from_sets
+from pyetr.function import Function
 from pyetr.issues import IssueStructure
 from pyetr.open_atom import OpenAtom
 from pyetr.open_term import (
@@ -15,7 +16,7 @@ from pyetr.open_term import (
     get_open_equivalent,
 )
 from pyetr.stateset import SetOfStates, State
-from pyetr.term import ArbitraryObject, Function, FunctionalTerm, Term
+from pyetr.term import ArbitraryObject, FunctionalTerm, Term
 from pyetr.view import View
 
 from .parse_string import (

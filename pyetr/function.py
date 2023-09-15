@@ -1,15 +1,39 @@
-__all__ = ["Function", "RealNumber", "XBar"]
+__all__ = ["Function", "RealNumber"]
+
+
+from typing import TYPE_CHECKING, Callable, Optional
+
+if TYPE_CHECKING:
+    from pyetr.abstract_term import AbstractFunctionalTerm
 
 
 class Function:
     name: str
     arity: int
+    _func_caller: Optional[
+        Callable[["AbstractFunctionalTerm"], Optional["AbstractFunctionalTerm"]]
+    ]
 
-    def __init__(self, name: str, arity: int) -> None:
+    def __init__(
+        self,
+        name: str,
+        arity: int,
+        func_caller: Optional[
+            Callable[["AbstractFunctionalTerm"], Optional["AbstractFunctionalTerm"]]
+        ] = None,
+    ) -> None:
         if arity < 0:
             raise ValueError("arity must not be less than 0")
         self.name = name
         self.arity = arity
+        self._func_caller = func_caller
+
+    def __call__(
+        self, func_term: "AbstractFunctionalTerm"
+    ) -> Optional["AbstractFunctionalTerm"]:
+        if self._func_caller is None:
+            return None
+        return self._func_caller(func_term)
 
     def __repr__(self) -> str:
         return f"Function({self.name}, {self.arity})"
@@ -46,7 +70,3 @@ class RealNumber(Function):
         if not isinstance(other, RealNumber):
             return False
         return self.name == other.name
-
-
-XBar = Function("XBar", 2)
-Summation = Function("Summation", 1)

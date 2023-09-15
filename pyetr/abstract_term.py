@@ -24,6 +24,9 @@ class AbstractTerm(ABC):
         ...
 
 
+TermType = TypeVar("TermType", bound=AbstractTerm)
+
+
 class AbstractArbitraryObject(AbstractTerm):
     name: str
 
@@ -46,9 +49,6 @@ class AbstractArbitraryObject(AbstractTerm):
         return f"<{type(self).__name__} name={self.name}>"
 
 
-TermType = TypeVar("TermType", bound=AbstractTerm)
-
-
 class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
     f: Function
     t: tuple[TermType, ...]
@@ -64,6 +64,10 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
             )
         self.f = f
         self.t = t
+        out = f(self)
+        if out is not None:
+            self.f = out.f
+            self.t = out.t
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, type(self)):
