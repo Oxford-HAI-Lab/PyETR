@@ -2,9 +2,11 @@ __all__ = ["State", "SetOfStates"]
 
 from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
+from pyetr.special_funcs import Summation, XBar
+
 from .abstract_atom import equals_predicate
 from .atom import Atom
-from .term import ArbitraryObject, Term
+from .term import ArbitraryObject, FunctionalTerm, Multiset, Term
 
 if TYPE_CHECKING:
     from pyetr.weight import Weights
@@ -188,14 +190,27 @@ class SetOfStates(frozenset[State]):
 
     def equilibrium_answer_potential(
         self, other: "SetOfStates", weights: "Weights"
-    ) -> int:
+    ) -> FunctionalTerm:
         """
         Based on definition A.67
         """
-        raise NotImplementedError
-        # Y = SetOfStates()
-        # Summation(Weights({delta: Weight(Summation()) for delta in Y}))
-        # return len(self.atoms.intersection(other.atoms))
+        Y = SetOfStates(
+            {delta for delta in self if any([gamma.issubset(delta) for gamma in other])}
+        )
+
+        # TODO: Sum done recursively anyway?
+        expr1 = Multiset(
+            [
+                FunctionalTerm(f=Summation, t=(weights[delta].multiplicative,))
+                for delta in Y
+            ]
+        )
+        expr1_sum = FunctionalTerm(f=Summation, t=(expr1,))
+        expr2 = Multiset(
+            [FunctionalTerm(f=Summation, t=(weights[delta].additive,)) for delta in Y]
+        )
+        expr2_sum = FunctionalTerm(f=Summation, t=(expr2,))
+        return FunctionalTerm(f=XBar, t=(expr1_sum, expr2_sum))
 
     def __repr__(self) -> str:
         terms = ",".join([repr(i) for i in self])

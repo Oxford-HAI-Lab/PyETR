@@ -28,7 +28,12 @@ def summation_func(term: AbstractFunctionalTerm) -> AbstractFunctionalTerm:
         ):
             new_total += term.f.num
         else:
-            return AbstractFunctionalTerm(Summation, (AbstractMultiset(terms_to_sum),))
+            if terms_to_sum == list(multiset):
+                return term
+            else:
+                return AbstractFunctionalTerm(
+                    Summation, (AbstractMultiset(terms_to_sum),)
+                )
     return AbstractFunctionalTerm(RealNumber(new_total), ())
 
 
@@ -52,7 +57,10 @@ def multiplication_func(term: AbstractFunctionalTerm) -> AbstractFunctionalTerm:
             RealNumber(processed_term1.f.num * processed_term2.f.num), ()
         )
     else:
-        return AbstractFunctionalTerm(XBar, (processed_term1, processed_term2))
+        if processed_term1 == term1 and processed_term2 == term2:
+            return term
+        else:
+            return AbstractFunctionalTerm(XBar, (processed_term1, processed_term2))
 
 
 XBar = Function("XBar", 2, func_caller=multiplication_func)

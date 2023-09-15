@@ -4,6 +4,7 @@ from functools import reduce
 from itertools import permutations
 from typing import Optional, cast
 
+from pyetr.function import RealNumber
 from pyetr.issues import IssueStructure
 from pyetr.tools import ArbitraryObjectGenerator, powerset
 from pyetr.weight import Weight, Weights
@@ -47,13 +48,6 @@ def stage_function_product(
     final_weights = f_prime + (f * weights_internal)
 
     return result_stage, final_weights
-
-
-def arg_max_states(potentials: list[tuple[int, State]]) -> list[State]:
-    if len(potentials) == 0:
-        return []
-    max_potential = max([potential for potential, _ in potentials])
-    return [state for potential, state in potentials if potential == max_potential]
 
 
 def substitution(
@@ -475,21 +469,32 @@ class View:
 
     def atomic_answer(self, other: "View", verbose: bool = False) -> "View":
         """
-        Based on definition 4.30
+        Based on definition A.67
         """
         if verbose:
-            print(f"AnswerInput: External: {self} Internal {other}")
+            print(f"AtomicAnswerInput: External: {self} Internal {other}")
         if not other.supposition.is_verum:
             if verbose:
-                print(f"AnswerOutput: {self}")
+                print(f"AtomicAnswerOutput: {self}")
             return self
         else:
+
+            def _arg_max(potentials: list[tuple[int, State]]) -> list[State]:
+                if len(potentials) == 0:
+                    return []
+                max_potential = max([potential for potential, _ in potentials])
+                return [
+                    state
+                    for potential, state in potentials
+                    if potential == max_potential
+                ]
+
             supposition = self.supposition
             potentials: list[tuple[int, State]] = []
             for s in self.stage:
                 potential = SetOfStates({s}).atomic_answer_potential(other.stage)
                 potentials.append((potential, s))
-            stage = SetOfStates(arg_max_states(potentials))
+            stage = SetOfStates(_arg_max(potentials))
 
             out = View.with_restriction(
                 stage=stage,
@@ -499,8 +504,70 @@ class View:
                 weights=self.weights,
             )
             if verbose:
-                print(f"AnswerOutput: {out}")
+                print(f"AtomicAnswerOutput: {out}")
             return out
+
+    def equibrium_answer(self, other: "View", verbose: bool = False) -> "View":
+        """
+        Based on definition A.66
+        """
+        if verbose:
+            print(f"EquilibriumAnswerInput: External: {self} Internal {other}")
+        if not other.supposition.is_verum:
+            if verbose:
+                print(f"EquilibriumAnswerOutput: {self}")
+            return self
+        else:
+
+            def _arg_max(ps: list[tuple[FunctionalTerm, State]]) -> list[State]:
+                if len(ps) == 0:
+                    return []
+
+                nums = []
+                for p, _ in ps:
+                    assert isinstance(p.f, RealNumber)
+                    nums.append(p.f.num)
+                max_potential = max(nums)
+
+                new_states = []
+                for p, state in ps:
+                    assert isinstance(p.f, RealNumber)
+                    if p.f.num == max_potential:
+                        new_states.append(state)
+                return new_states
+
+            supposition = self.supposition
+            potentials: list[tuple[FunctionalTerm, State]] = []
+            for s in self.stage:
+                potential = other.stage.equilibrium_answer_potential(
+                    SetOfStates({s}), other.weights
+                )
+                potentials.append((potential, s))
+
+            if not all([isinstance(ft.f, RealNumber) for ft, _ in potentials]):
+                return self
+            stage = SetOfStates(_arg_max(potentials))
+
+            out = View.with_restriction(
+                stage=stage,
+                supposition=supposition,
+                dependency_relation=self.dependency_relation,
+                issue_structure=self.issue_structure,
+                weights=self.weights,
+            )
+            if verbose:
+                print(f"EquilibriumAnswerOutput: {out}")
+            return out
+
+    def answer(self, other: "View", verbose: bool = False) -> "View":
+        if verbose:
+            print(f"AnswerInput: External: {self} Internal {other}")
+        out = self.equibrium_answer(other, verbose=verbose).atomic_answer(
+            other, verbose=verbose
+        )
+        if verbose:
+            print(f"AnswerOutput: {self}")
+        return out
 
     def negation(self, verbose: bool = False) -> "View":
         """
@@ -617,7 +684,7 @@ class View:
         out = (
             self.universal_product(view, verbose=verbose)
             .existential_sum(view, verbose=verbose)
-            .atomic_answer(view, verbose=verbose)
+            .answer(view, verbose=verbose)
             .merge(view, verbose=verbose)
         )
         if verbose:
@@ -887,12 +954,17 @@ class View:
         if verbose:
             print(f"DeposeInput: {self}")
         verum = SetOfStates({State({})})
-        new_stage = self.stage | self.supposition.negation()
+        sup_negation = self.supposition.negation()
+        new_stage = self.stage | sup_negation
+        new_weights = self.weights + Weights(
+            {state: Weight.get_null_weight() for state in sup_negation}
+        )
         out = View.with_restriction(
             stage=new_stage,
             supposition=verum,
             dependency_relation=self.dependency_relation,
             issue_structure=self.issue_structure.negation(),
+            weights=new_weights,
         )
         if verbose:
             print(f"DeposeOutput: {out}")
@@ -954,7 +1026,7 @@ class View:
 
     def suppose(self, other: "View", *, verbose: bool = False) -> "View":
         """
-        Based on definition 4.44
+        Based on definition A.76
         """
         if verbose:
             print(f"SupposeInput: External: {self} Internal {other}")
@@ -990,7 +1062,7 @@ class View:
                 )
                 .universal_product(other, verbose=verbose)
                 .existential_sum(other, verbose=verbose)
-                .atomic_answer(other, verbose=verbose)
+                .answer(other, verbose=verbose)
                 .merge(other, verbose=verbose)
             )
         elif (
@@ -1011,7 +1083,7 @@ class View:
                 )
                 .universal_product(other, verbose=verbose)
                 .existential_sum(other, verbose=verbose)
-                .atomic_answer(other, verbose=verbose)
+                .answer(other, verbose=verbose)
                 .merge(other, verbose=verbose)
             )
         else:
