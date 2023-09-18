@@ -65,6 +65,11 @@ class State(frozenset[Atom]):
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "State":
         return State([s.replace(replacements) for s in self])
 
+    def replace_term(self, old_term: Term, new_term: Term) -> "State":
+        return State(
+            {i.replace_term(old_term=old_term, new_term=new_term) for i in self}
+        )
+
     @property
     def is_primitive_absurd(self) -> bool:
         state = self

@@ -51,3 +51,10 @@ class Atom(AbstractAtom[Term]):
                 new_terms.append(old_term)
 
         return Atom(predicate=self.predicate, terms=tuple(new_terms))
+
+    def replace_term(
+        self,
+        old_term: Term,
+        new_term: Term,
+    ):
+        raise NotImplementedError

@@ -71,6 +71,13 @@ class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
             new_terms.append(replacement)
         return FunctionalTerm(f=self.f, t=tuple(new_terms))
 
+    def replace_term(
+        self,
+        old_term: Term,
+        new_term: Term,
+    ):
+        raise NotImplementedError
+
 
 class Multiset(AbstractMultiset[Term], Term):
     @property
@@ -85,6 +92,13 @@ class Multiset(AbstractMultiset[Term], Term):
 
     def __add__(self, other: "Multiset") -> "Multiset":
         return Multiset(self._items + other._items)
+
+    def replace_term(
+        self,
+        old_term: Term,
+        new_term: Term,
+    ):
+        raise NotImplementedError
 
 
 # Changed if clause in 4.2 to separate Arbitrary Objects from FunctionalTerm

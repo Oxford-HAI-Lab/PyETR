@@ -1,7 +1,7 @@
 from pyetr.dependency import DependencyRelation
 from pyetr.special_funcs import XBar
 from pyetr.stateset import SetOfStates, State
-from pyetr.term import ArbitraryObject, FunctionalTerm, Multiset
+from pyetr.term import ArbitraryObject, FunctionalTerm, Multiset, Term
 
 
 class Weight:
@@ -60,14 +60,37 @@ class Weight:
             )
 
     def restriction(self, arb_objects: set[ArbitraryObject]) -> "Weight":
-        if self.arb_objects.issubset(arb_objects):
-            return self
-        else:
-            return Weight.get_null_weight()
+        return Weight(
+            multiplicative=Multiset(
+                [t for t in self.multiplicative if t.arb_objects.issubset(arb_objects)]
+            ),
+            additive=Multiset(
+                [t for t in self.additive if t.arb_objects.issubset(arb_objects)]
+            ),
+        )
+        # if self.arb_objects.issubset(arb_objects):
+        #     return self
+        # else:
+        #     return Weight.get_null_weight()
 
     @property
     def is_null(self):
         return len(self.multiplicative) == 0 and len(self.additive) == 0
+
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "Weight":
+        return Weight(
+            multiplicative=Multiset(
+                [i.replace(replacements) for i in self.multiplicative]
+            ),
+            additive=Multiset([i.replace(replacements) for i in self.additive]),
+        )
+
+    def replace_term(
+        self,
+        old_term: Term,
+        new_term: Term,
+    ) -> "Weight":
+        raise NotImplementedError
 
 
 class Weights:
@@ -106,10 +129,13 @@ class Weights:
     def __mul__(self, other: "Weights") -> "Weights":
         new_weights: dict[State, Weight] = {}
         for state1, weight1 in self._weights.items():
-            for state2, weight2 in self._weights.items():
+            for state2, weight2 in other._weights.items():
                 new_state = state1 | state2
                 new_weight = weight1 * weight2
-                new_weights[new_state] = new_weight
+                if new_state in new_weights:
+                    new_weights[new_state] += new_weight
+                else:
+                    new_weights[new_state] = new_weight
         return Weights(new_weights)
 
     @classmethod
@@ -118,3 +144,6 @@ class Weights:
 
     def in_set_of_states(self, set_of_states: SetOfStates) -> "Weights":
         return Weights({k: v for k, v in self.items() if k in set_of_states})
+
+    def __repr__(self) -> str:
+        return "{" + ",".join([f"{w}.{s}" for s, w in self.items()]) + "}"

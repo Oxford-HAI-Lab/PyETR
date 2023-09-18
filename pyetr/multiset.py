@@ -16,7 +16,7 @@ class GenericMultiset(Generic[T]):
         return next(self)
 
     def __repr__(self) -> str:
-        return f"{type(self).__name__} (" + self._items.__repr__() + ")"
+        return f"⟪{','.join([repr(i) for i in self._items])}⟫"
 
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, GenericMultiset):

@@ -7,8 +7,9 @@ from typing import Optional, cast
 from pyetr.function import RealNumber
 from pyetr.issues import IssueStructure
 from pyetr.tools import ArbitraryObjectGenerator, powerset
-from pyetr.weight import Weights
+from pyetr.weight import Weight, Weights
 
+from .abstract_atom import equals_predicate
 from .dependency import Dependency, DependencyRelation
 from .stateset import SetOfStates, Stage, State, Supposition
 from .term import ArbitraryObject, FunctionalTerm, Term
@@ -186,11 +187,11 @@ def _some_gamma_doesnt_phi(
 
 
 class View:
-    stage: Stage
-    supposition: Supposition
-    dependency_relation: DependencyRelation
-    issue_structure: IssueStructure
-    weights: Weights
+    _stage: Stage
+    _supposition: Supposition
+    _dependency_relation: DependencyRelation
+    _issue_structure: IssueStructure
+    _weights: Weights
 
     def __init__(
         self,
@@ -202,15 +203,35 @@ class View:
         *,
         is_pre_view=False,
     ) -> None:
-        self.stage = stage
-        self.supposition = supposition
-        self.dependency_relation = dependency_relation
-        self.issue_structure = issue_structure
+        self._stage = stage
+        self._supposition = supposition
+        self._dependency_relation = dependency_relation
+        self._issue_structure = issue_structure
         if weights is None:
-            self.weights = Weights.get_null_weights(stage)
+            self._weights = Weights.get_null_weights(stage)
         else:
-            self.weights = weights
+            self._weights = weights
         self.validate(pre_view=is_pre_view)
+
+    @property
+    def stage(self) -> Stage:
+        return self._stage
+
+    @property
+    def supposition(self) -> Supposition:
+        return self._supposition
+
+    @property
+    def dependency_relation(self) -> DependencyRelation:
+        return self._dependency_relation
+
+    @property
+    def issue_structure(self) -> IssueStructure:
+        return self._issue_structure
+
+    @property
+    def weights(self) -> Weights:
+        return self._weights
 
     def validate(self, *, pre_view: bool = False):
         self.dependency_relation.validate_against_states(
@@ -223,6 +244,9 @@ class View:
 
             w.validate_against_dep_rel(self.dependency_relation)
 
+        for state in self.stage:
+            if state not in self.weights:
+                raise ValueError(f"{state} not in {self.weights}")
         if not pre_view:
             self.issue_structure.validate_against_states(self.stage | self.supposition)
 
@@ -270,10 +294,10 @@ class View:
                 }
             )
         return cls(
-            stage,
-            supposition,
-            new_dep_rel,
-            issue_structure.restriction((stage | supposition).atoms),
+            stage=stage,
+            supposition=supposition,
+            dependency_relation=new_dep_rel,
+            issue_structure=issue_structure.restriction((stage | supposition).atoms),
             weights=new_weights,
         )
 
@@ -294,7 +318,11 @@ class View:
             issue_string = ""
         else:
             issue_string = f" issues={self.issue_structure}"
-        return f"{self.stage}^{self.supposition}{issue_string}{dep_string}"
+
+        weight_string = f" weights={self.weights}"
+        return (
+            f"{self.stage}^{self.supposition}{issue_string}{dep_string}{weight_string}"
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, View):
@@ -329,7 +357,21 @@ class View:
         return self.stage.arb_objects | self.supposition.arb_objects
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "View":
-        new_stage = self.stage.replace(replacements)
+        new_stage_set: set[State] = set()
+        new_weights_dict: dict[State, Weight] = {}
+        for state in self.stage:
+            new_state = state.replace(replacements)
+            new_stage_set.add(new_state)
+            current_weight = self.weights[state]
+            new_weight = current_weight.replace(replacements)
+            if new_state in new_weights_dict:
+                new_weights_dict[new_state] = new_weights_dict[new_state] + new_weight
+            else:
+                new_weights_dict[new_state] = new_weight
+
+        new_stage = SetOfStates(new_stage_set)
+        new_weights = Weights(new_weights_dict)
+
         new_supposition = self.supposition.replace(replacements)
         new_issue_structure = self.issue_structure.replace(replacements)
         filtered_replacements = {
@@ -344,6 +386,7 @@ class View:
                 new_stage.arb_objects | new_supposition.arb_objects
             ),
             issue_structure=new_issue_structure,
+            weights=new_weights,
         )
 
     def is_equivalent_under_arb_sub(self, other: "View") -> bool:
@@ -930,20 +973,76 @@ class View:
             else:
                 return gamma_prime & expr
 
-        if not other.is_falsum:
-            new_stage = SetOfStates([state_factor(state=gamma) for gamma in self.stage])
+        def identity_factor_condition() -> bool:
+            if len(other.stage) != 1:
+                return False
+            first_state = next(iter(other.stage))
+            if len(first_state) != 1:
+                return False
+            first_atom = next(iter(first_state))
+            if first_atom.predicate != equals_predicate:
+                return False
+            if len(other.issue_structure) != 1:
+                return False
+            if not other.supposition.is_verum:
+                return False
+            if (
+                self.dependency_relation.restriction(
+                    other.dependency_relation.universals
+                    | other.dependency_relation.existentials
+                )
+                != other.dependency_relation
+            ):
+                return False
+            return True
 
-        else:
+        if other.is_falsum:
+            new_weights = self.weights
             new_stage = SetOfStates(
                 gamma for gamma in self.stage if not gamma.is_primitive_absurd
             )
+        elif identity_factor_condition():
+            first_state = next(iter(other.stage))
+            first_atom = next(iter(first_state))
+            assert len(first_atom.terms) == 2
+            t1, t2 = first_atom.terms
+            expr1_states = SetOfStates(
+                {gamma for gamma in self.stage if first_atom not in gamma}
+            )
+            expr1_weights = self.weights.in_set_of_states(expr1_states)
+
+            new_states = set()
+            new_weights_dict: dict[State, Weight] = {}
+            for gamma in self.stage:
+                if first_atom in gamma:
+                    gamma_prime = gamma.replace_term(t2, t1)
+                    weight = self.weights[gamma]
+                    if gamma_prime in new_weights_dict:
+                        new_weights_dict[gamma_prime] = new_weights_dict[
+                            gamma_prime
+                        ] + weight.replace_term(t2, t1)
+                    else:
+                        new_weights_dict[gamma_prime] = weight.replace_term(t2, t1)
+                    new_states.add(gamma_prime)
+            new_stage = expr1_states | SetOfStates(new_states)
+            new_weights = expr1_weights + Weights(new_weights_dict)
+        else:
+            new_states = set()
+            new_weights_dict: dict[State, Weight] = {}
+            for gamma in self.stage:
+                gamma_prime = state_factor(state=gamma)
+                weight = self.weights[gamma]
+                new_weights_dict[gamma_prime] = weight
+                new_states.add(gamma_prime)
+            new_weights = Weights(new_weights_dict)
+            new_stage = SetOfStates(new_states)
 
         out = View.with_restriction(
             stage=new_stage,
             supposition=self.supposition,
             dependency_relation=self.dependency_relation,
             issue_structure=self.issue_structure,
-            weights=self.weights,
+            weights=new_weights,
         )
         if verbose:
             print(f"FactorOutput: {out}")
@@ -989,34 +1088,31 @@ class View:
                 supposition=other.supposition,
                 dependency_relation=other.dependency_relation,
                 issue_structure=other.issue_structure,
+                weights=None,
             )
             v2 = View.with_restriction(
                 stage=other.stage.negation(),
                 supposition=SetOfStates({State({})}),
                 dependency_relation=other.dependency_relation.negation(),
                 issue_structure=other.issue_structure.negation(),
+                weights=None,
             )
-
             v3 = arb_gen.novelise_all(v2)
             out = self.product(other.sum(v1.product(v3))).factor(View.get_falsum())
-        elif other.stage_supp_arb_objects.issubset(self.stage_supp_arb_objects):
+        elif other.stage_supp_arb_objects.issubset(
+            self.stage_supp_arb_objects
+        ) and other.dependency_relation == self.dependency_relation.restriction(
+            self.stage_supp_arb_objects
+        ):
             # I case
-            view1 = View(
-                stage=other.stage,
-                supposition=other.supposition,
-                dependency_relation=DependencyRelation(set(), set(), frozenset()),
-                issue_structure=other.issue_structure,
-                is_pre_view=True,
-            )
-            view2 = View(
+            view2 = View.with_restriction(
                 stage=other.stage.negation(),
                 supposition=other.supposition,
-                dependency_relation=DependencyRelation(set(), set(), frozenset()),
+                dependency_relation=other.dependency_relation,
                 issue_structure=other.issue_structure.negation(),
-                is_pre_view=True,
+                weights=None,
             )
-
-            out = self.product(view1.sum(view2)).factor(View.get_falsum())
+            out = self.product(other.sum(view2)).factor(View.get_falsum())
         else:
             out = self
 
