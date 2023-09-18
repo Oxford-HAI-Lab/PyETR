@@ -1,6 +1,6 @@
 from pyetr.dependency import DependencyRelation
 from pyetr.special_funcs import XBar
-from pyetr.stateset import State
+from pyetr.stateset import SetOfStates, State
 from pyetr.term import ArbitraryObject, FunctionalTerm, Multiset
 
 
@@ -106,3 +106,10 @@ class Weights:
                 new_weight = weight1 * weight2
                 new_weights[new_state] = new_weight
         return Weights(new_weights)
+
+    @classmethod
+    def get_null_weights(cls, states: SetOfStates) -> "Weights":
+        return cls({state: Weight.get_null_weight() for state in states})
+
+    def in_set_of_states(self, set_of_states: SetOfStates) -> "Weights":
+        return Weights({k: v for k, v in self.items() if k in set_of_states})

@@ -7,7 +7,7 @@ from typing import Optional, cast
 from pyetr.function import RealNumber
 from pyetr.issues import IssueStructure
 from pyetr.tools import ArbitraryObjectGenerator, powerset
-from pyetr.weight import Weight, Weights
+from pyetr.weight import Weights
 
 from .dependency import Dependency, DependencyRelation
 from .stateset import SetOfStates, Stage, State, Supposition
@@ -41,10 +41,10 @@ def stage_function_product(
 
     subset = get_subset(stage_external, supposition_internal)
     not_subset = stage_external.difference(subset)
-    f_prime = Weights({k: v for k, v in weights_external.items() if k in not_subset})
+    f_prime = weights_external.in_set_of_states(not_subset)
     result_stage = not_subset | (subset * stage_internal)
 
-    f = Weights({k: v for k, v in weights_external.items() if k in subset})
+    f = weights_external.in_set_of_states(subset)
     final_weights = f_prime + (f * weights_internal)
 
     return result_stage, final_weights
@@ -207,7 +207,7 @@ class View:
         self.dependency_relation = dependency_relation
         self.issue_structure = issue_structure
         if weights is None:
-            self.weights = Weights({state: Weight.get_null_weight() for state in stage})
+            self.weights = Weights.get_null_weights(stage)
         else:
             self.weights = weights
         self.validate(pre_view=is_pre_view)
@@ -234,6 +234,7 @@ class View:
             supposition=verum,
             dependency_relation=DependencyRelation(set(), set(), frozenset()),
             issue_structure=IssueStructure(),
+            weights=None,
         )
 
     @classmethod
@@ -245,6 +246,7 @@ class View:
             supposition=verum,
             dependency_relation=DependencyRelation(set(), set(), frozenset()),
             issue_structure=IssueStructure(),
+            weights=None,
         )
 
     @classmethod
@@ -956,9 +958,7 @@ class View:
         verum = SetOfStates({State({})})
         sup_negation = self.supposition.negation()
         new_stage = self.stage | sup_negation
-        new_weights = self.weights + Weights(
-            {state: Weight.get_null_weight() for state in sup_negation}
-        )
+        new_weights = self.weights + Weights.get_null_weights(sup_negation)
         out = View.with_restriction(
             stage=new_stage,
             supposition=verum,
