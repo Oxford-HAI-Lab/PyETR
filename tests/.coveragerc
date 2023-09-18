@@ -1,0 +1,9 @@
+[report]
+exclude_lines = 
+    pragma: not covered
+    @overload
+    @abstractmethod
+    def __eq__
+    raise ValueError
+    assert False
+show_missing = True

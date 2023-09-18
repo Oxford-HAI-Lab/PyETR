@@ -89,6 +89,11 @@ class Weights:
                 new_weights[k] = x
         return Weights(new_weights)
 
+    @property
+    def detailed(self):
+        weight_details = {s.detailed: w.detailed for s, w in self._weights.items()}
+        return f"<Weights {weight_details}>"
+
     def __getitem__(self, item: State):
         return self._weights[item]
 
