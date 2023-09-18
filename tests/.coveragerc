@@ -5,5 +5,7 @@ exclude_lines =
     @abstractmethod
     def __eq__
     raise ValueError
+    raise RuntimeError
+    raise TypeError
     assert False
 show_missing = True
