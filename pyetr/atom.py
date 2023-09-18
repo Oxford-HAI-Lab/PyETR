@@ -57,4 +57,8 @@ class Atom(AbstractAtom[Term]):
         old_term: Term,
         new_term: Term,
     ):
-        raise NotImplementedError
+        new_terms = [
+            term.replace_term(old_term=old_term, new_term=new_term)
+            for term in self.terms
+        ]
+        return Atom(predicate=self.predicate, terms=tuple(new_terms))

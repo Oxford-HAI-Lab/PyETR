@@ -23,6 +23,14 @@ class Term(AbstractTerm):
     ) -> "Term":
         ...
 
+    @abstractmethod
+    def replace_term(
+        self,
+        old_term: "Term",
+        new_term: "Term",
+    ) -> "Term":
+        ...
+
 
 class ArbitraryObject(AbstractArbitraryObject, Term):
     @property
@@ -36,6 +44,16 @@ class ArbitraryObject(AbstractArbitraryObject, Term):
         if self in replacements:
             return replacements[self]
         return self
+
+    def replace_term(
+        self,
+        old_term: Term,
+        new_term: Term,
+    ) -> Term:
+        if self == old_term:
+            return new_term
+        else:
+            return old_term
 
 
 class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
@@ -75,8 +93,15 @@ class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
         self,
         old_term: Term,
         new_term: Term,
-    ):
-        raise NotImplementedError
+    ) -> Term:
+        if self == old_term:
+            return new_term
+        else:
+            new_terms = [
+                term.replace_term(old_term=old_term, new_term=new_term)
+                for term in self.t
+            ]
+            return FunctionalTerm(f=self.f, t=tuple(new_terms))
 
 
 class Multiset(AbstractMultiset[Term], Term):
@@ -97,8 +122,14 @@ class Multiset(AbstractMultiset[Term], Term):
         self,
         old_term: Term,
         new_term: Term,
-    ):
-        raise NotImplementedError
+    ) -> "Term":
+        if self == old_term:
+            return new_term
+        else:
+            new_terms = [
+                term.replace_term(old_term=old_term, new_term=new_term) for term in self
+            ]
+            return Multiset(new_terms)
 
 
 # Changed if clause in 4.2 to separate Arbitrary Objects from FunctionalTerm

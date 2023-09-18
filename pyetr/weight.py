@@ -68,10 +68,6 @@ class Weight:
                 [t for t in self.additive if t.arb_objects.issubset(arb_objects)]
             ),
         )
-        # if self.arb_objects.issubset(arb_objects):
-        #     return self
-        # else:
-        #     return Weight.get_null_weight()
 
     @property
     def is_null(self):
@@ -90,7 +86,12 @@ class Weight:
         old_term: Term,
         new_term: Term,
     ) -> "Weight":
-        raise NotImplementedError
+        return Weight(
+            multiplicative=self.multiplicative.replace_term(
+                old_term, new_term
+            ),  # type:ignore
+            additive=self.additive.replace_term(old_term, new_term),  # type:ignore
+        )
 
 
 class Weights:
@@ -122,6 +123,12 @@ class Weights:
 
     def items(self):
         return self._weights.items()
+
+    def values(self):
+        return self._weights.values()
+
+    def keys(self):
+        return self._weights.keys()
 
     def __contains__(self, item: object) -> bool:
         return item in self._weights

@@ -59,6 +59,7 @@ def substitution(
     stage: Stage,
     supposition: Supposition,
     issue_structure: IssueStructure,
+    weights: Optional[Weights],
 ) -> "View":
     """
     Based on definition 4.32
@@ -86,12 +87,24 @@ def substitution(
     old_T = dep_relation
 
     new_dep_relation = dep_relation
-    new_stage = stage
     subs = arb_gen.redraw(Z())
     new_dep_relation = new_dep_relation.replace(subs)
-    new_stage = new_stage.replace(cast(dict[ArbitraryObject, Term], subs))
 
-    new_stage = new_stage.replace({arb_obj: term})
+    if weights is None:
+        weights = Weights.get_null_weights(stage)
+
+    weights_dict: dict[State, Weight] = {}
+    for state in stage:
+        new_state = state.replace(cast(dict[ArbitraryObject, Term], subs))
+        new_state = new_state.replace({arb_obj: term})
+        new_weight = weights[state].replace(cast(dict[ArbitraryObject, Term], subs))
+        new_weight = new_weight.replace({arb_obj: term})
+        if new_state in weights_dict:
+            weights_dict[new_state] += new_weight
+        else:
+            weights_dict[new_state] = new_weight
+    new_stage = SetOfStates(weights_dict.keys())
+    new_weights = Weights(weights_dict)
 
     new_dep_relation = new_dep_relation.restriction(set(subs.values()))
     T_prime = old_T.chain(new_dep_relation)
@@ -109,6 +122,7 @@ def substitution(
         supposition=supposition,
         dependency_relation=T_prime,
         issue_structure=new_issue_structure,
+        weights=new_weights,
         is_pre_view=True,
     )
 
@@ -673,22 +687,24 @@ class View:
                 m_prime = _m_prime(gamma)
                 if len(m_prime) == 0:
                     views_for_sum.append(
-                        View(
+                        View.with_restriction(
                             SetOfStates({gamma}),
                             self.supposition,
                             self.dependency_relation,
                             self.issue_structure,
-                            is_pre_view=True,
+                            self.weights,
                         ).product(view, inherited_dependencies=r_fuse_s)
                     )
                 else:
                     product_factors: list[View] = [
-                        View(
+                        View.with_restriction(
                             SetOfStates({gamma}),
                             self.supposition,
                             self.dependency_relation,
                             self.issue_structure,
-                        )
+                            self.weights,
+                        ),
+                        view,
                     ] + [
                         substitution(
                             arb_gen=arb_gen,
@@ -698,6 +714,7 @@ class View:
                             stage=view.stage,
                             supposition=SetOfStates({State({})}),
                             issue_structure=view.issue_structure,
+                            weights=view.weights,
                         )
                         for t, u in m_prime
                     ]
@@ -782,12 +799,12 @@ class View:
                 return self
             r_fuse_s = self.dependency_relation.fusion(view.dependency_relation)
             product_factors: list[View] = [
-                View(
+                View.with_restriction(
                     stage=SetOfStates({State({})}),
                     supposition=self.supposition,
                     dependency_relation=self.dependency_relation,
                     issue_structure=self.issue_structure,
-                    is_pre_view=True,
+                    weights=None,
                 )
             ] + [
                 substitution(
@@ -798,6 +815,7 @@ class View:
                     stage=self.stage,
                     supposition=SetOfStates({State({})}),
                     issue_structure=self.issue_structure,
+                    weights=self.weights,
                 )
                 for u, t in m_prime
             ]
@@ -815,7 +833,7 @@ class View:
         Based on Definition 4.37
         """
 
-        def _big_union(e: Existential) -> SetOfStates:
+        def _big_union(e: Existential) -> Weights:
             def _big_product(gamma: State) -> SetOfStates:
                 def B(gamma: State, e: Existential) -> State:
                     atoms = set()
@@ -833,16 +851,22 @@ class View:
 
             assert e in self.stage_supp_arb_objects
             final_sets: list[SetOfStates] = []
+
+            new_weights: dict[State, Weight] = {}
             for gamma in self.stage:
                 if e in gamma.arb_objects:
+                    new_weights[gamma] = self.weights[gamma]
+                    proto_sets: set[State] = set()
                     x_set = State([x for x in gamma if e not in x.arb_objects])
                     for delta in _big_product(gamma):
                         if not delta.issubset(gamma):
-                            x_set.union(delta)
+                            proto_sets.add(x_set.union(delta))
+                    final_sets.append(SetOfStates({gamma}) | SetOfStates(proto_sets))
 
-                    final_sets.append(SetOfStates({gamma}) | SetOfStates({x_set}))
+            output_set = reduce(lambda s1, s2: s1 | s2, final_sets)
 
-            return reduce(lambda s1, s2: s1 | s2, final_sets)
+            final_weights = Weights(new_weights) + Weights.get_null_weights(output_set)
+            return final_weights
 
         def _m_prime() -> set[tuple[Existential, FunctionalTerm | ArbitraryObject]]:
             output_set = set()
@@ -876,20 +900,26 @@ class View:
                     self.stage_supp_arb_objects | view.stage_supp_arb_objects
                 )
                 r_fuse_s = self.dependency_relation.fusion(view.dependency_relation)
-                sum_result: View = reduce(
-                    lambda v1, v2: v1.sum(v2, r_fuse_s),
-                    [
+                # TODO: Is this the null weights?
+                to_sum: list["View"] = []
+                for e, t in m_prime:
+                    weights = _big_union(e)
+                    stage = SetOfStates(weights.keys())
+                    to_sum.append(
                         substitution(
                             arb_gen=arb_gen,
                             dep_relation=r_fuse_s,
                             arb_obj=e,
                             term=t,
-                            stage=_big_union(e),
+                            stage=stage,
                             supposition=self.supposition,
                             issue_structure=self.issue_structure,
+                            weights=weights,
                         )
-                        for e, t in m_prime
-                    ],
+                    )
+                sum_result: View = reduce(
+                    lambda v1, v2: v1.sum(v2, r_fuse_s),
+                    to_sum,
                 )
                 out = self.sum(sum_result, r_fuse_s)
                 if verbose:
@@ -1282,18 +1312,26 @@ class View:
             else:
                 s1 = SetOfStates()
 
-            s2 = SetOfStates(
-                {
-                    delta
-                    for delta in other.stage
-                    if any(
-                        phi(gamma, delta, m_prime, other.supposition)
-                        for gamma in self.stage
-                    )
-                }
-            )
+            weight_dict: dict[State, Weight] = {}
+            for delta in other.stage:
+                for gamma in self.stage:
+                    if phi(gamma, delta, m_prime, other.supposition):
+                        if delta in weight_dict:
+                            other_weight = other.weights[delta]
+                            if other_weight.is_null:
+                                weight_dict[delta] += self.weights[gamma]
+                            else:
+                                weight_dict[delta] += other_weight
+                        else:
+                            other_weight = other.weights[delta]
+                            if other_weight.is_null:
+                                weight_dict[delta] = self.weights[gamma]
+                            else:
+                                weight_dict[delta] = other_weight
+            s2 = SetOfStates(weight_dict.keys())
+            s2_weights = Weights(weight_dict)
             new_stage = s1 | s2
-
+            new_weights = Weights.get_null_weights(s1) + s2_weights
             new_dep_rel = self.dependency_relation.fusion(
                 DependencyRelation(
                     self.dependency_relation.universals,
@@ -1308,6 +1346,7 @@ class View:
                 supposition=self.supposition,
                 dependency_relation=new_dep_rel,
                 issue_structure=self.issue_structure | other.issue_structure,
+                weights=new_weights,
             )
         else:
             out = self
