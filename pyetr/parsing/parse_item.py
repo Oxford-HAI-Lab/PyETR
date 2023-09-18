@@ -3,9 +3,8 @@ from dataclasses import dataclass
 from typing import Literal, TypeVar, cast
 
 from pyetr.abstract_atom import Predicate
-from pyetr.add_new_emphasis import add_new_emphasis
 from pyetr.atom import Atom
-from pyetr.dependency import Dependency, DependencyRelation, dependencies_from_sets
+from pyetr.dependency import DependencyRelation, dependencies_from_sets
 from pyetr.function import Function
 from pyetr.issues import IssueStructure
 from pyetr.open_atom import OpenAtom
