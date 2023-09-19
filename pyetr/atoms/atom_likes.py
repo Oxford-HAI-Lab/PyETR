@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from typing import Generic, TypeVar
 
 from .abstract import AbstractAtom
@@ -44,15 +43,6 @@ class PredicateAtomLike(Generic[TermType]):
         else:
             tilda = "~"
         return f"{tilda}{self.predicate.name}({terms})"
-
-    @property
-    @abstractmethod
-    def arb_objects(self) -> set[ArbitraryObject]:
-        ...
-
-    @abstractmethod
-    def __invert__(self):
-        ...
 
 
 class DoAtomLike(Generic[AtomType]):

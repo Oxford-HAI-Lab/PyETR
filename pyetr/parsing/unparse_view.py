@@ -89,10 +89,15 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
             state = next(iter(s))
             assert len(state) > 0
             if len(state) == 1:
-                return convert_atom(next(iter(state)), issue_structure, issue_atoms)
+                # TODO: Fix for doatoms
+                atom = next(iter(state))
+                assert isinstance(atom, Atom)
+                return convert_atom(atom, issue_structure, issue_atoms)
             else:
                 new_atoms: list[LogicPredicate | BoolNot] = []
                 for atom in state:
+                    # TODO: Fix for doatoms
+                    assert isinstance(atom, Atom)
                     new_atoms.append(convert_atom(atom, issue_structure, issue_atoms))
                 return BoolAnd([new_atoms])
         else:
@@ -102,14 +107,18 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
                     new_ands.append(Truth([]))
                 elif len(state) == 1:
                     atom = next(iter(state))
+                    # TODO: Fix for doatoms
+                    assert isinstance(atom, Atom)
                     new_ands.append(convert_atom(atom, issue_structure, issue_atoms))
                 else:
+                    # TODO: Fix for doatoms
                     new_ands.append(
                         BoolAnd(
                             [
                                 [
                                     convert_atom(atom, issue_structure, issue_atoms)
                                     for atom in state
+                                    if isinstance(atom, Atom)
                                 ]
                             ]
                         )

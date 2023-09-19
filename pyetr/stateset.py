@@ -3,6 +3,8 @@ __all__ = ["State", "SetOfStates"]
 from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
 from pyetr.atoms import Atom, equals_predicate
+from pyetr.atoms.abstract import AbstractComplete
+from pyetr.atoms.atom_likes import PredicateAtomLike
 from pyetr.atoms.terms import (
     ArbitraryObject,
     FunctionalTerm,
@@ -16,8 +18,10 @@ if TYPE_CHECKING:
     from pyetr.weight import Weights
 
 
-class State(frozenset[Atom]):
-    def __new__(cls, __iterable: Optional[Iterable[Atom]] = None, /) -> "State":
+class State(frozenset[AbstractComplete]):
+    def __new__(
+        cls, __iterable: Optional[Iterable[AbstractComplete]] = None, /
+    ) -> "State":
         if __iterable is None:
             return super().__new__(cls)
         else:
@@ -32,22 +36,22 @@ class State(frozenset[Atom]):
     def intersection(self, *s: Iterable[object]) -> "State":
         return State(super().intersection(*s))
 
-    def symmetric_difference(self, __s: Iterable[Atom]) -> "State":
+    def symmetric_difference(self, __s: Iterable[AbstractComplete]) -> "State":
         return State(super().symmetric_difference(__s))
 
-    def union(self, *s: Iterable[Atom]) -> "State":
+    def union(self, *s: Iterable[AbstractComplete]) -> "State":
         return State(super().union(*s))
 
-    def __and__(self, __value: AbstractSet[Atom]) -> "State":
+    def __and__(self, __value: AbstractSet[AbstractComplete]) -> "State":
         return State(super().__and__(__value))
 
-    def __or__(self, __value: AbstractSet[Atom]) -> "State":
+    def __or__(self, __value: AbstractSet[AbstractComplete]) -> "State":
         return State(super().__or__(__value))
 
-    def __sub__(self, __value: AbstractSet[Atom]) -> "State":
+    def __sub__(self, __value: AbstractSet[AbstractComplete]) -> "State":
         return State(super().__sub__(__value))
 
-    def __xor__(self, __value: AbstractSet[Atom]) -> "State":
+    def __xor__(self, __value: AbstractSet[AbstractComplete]) -> "State":
         return State(super().__xor__(__value))
 
     @property
@@ -84,17 +88,25 @@ class State(frozenset[Atom]):
 
         # Aristotle
         for atom in state:
-            if (atom.predicate == equals_predicate) and (not atom.predicate.verifier):
+            if (
+                isinstance(atom, Atom)
+                and (atom.predicate == equals_predicate)
+                and (not atom.predicate.verifier)
+            ):
                 if atom.terms[0] == atom.terms[1]:
                     return True
 
         # Leibniz
         for atom in state:
-            if (atom.predicate == equals_predicate) and atom.predicate.verifier:
+            if (
+                isinstance(atom, Atom)
+                and (atom.predicate == equals_predicate)
+                and atom.predicate.verifier
+            ):
                 t = atom.terms[0]
                 t_prime = atom.terms[1]
                 for x in state:
-                    if t in x.terms:
+                    if isinstance(x, Atom) and t in x.terms:
                         new_x = ~x.replace_low_level(old_term=t, new_term=t_prime)
                         if new_x in state:
                             return True
