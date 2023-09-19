@@ -1,11 +1,11 @@
-from pyetr.term import ArbitraryObject, Term
-
-from .abstract_atom import AbstractAtom, Predicate
+from .abstract import AbstractAtom
 from .atom import Atom
-from .open_term import OpenTerm
+from .atom_likes import PredicateAtomLike
+from .predicate import Predicate
+from .terms import ArbitraryObject, OpenTerm, Term
 
 
-class OpenAtom(AbstractAtom[OpenTerm]):
+class OpenAtom(PredicateAtomLike[OpenTerm], AbstractAtom):
     def __init__(self, predicate: Predicate, terms: tuple[OpenTerm, ...]) -> None:
         super().__init__(predicate=predicate, terms=terms)
         self.validate()

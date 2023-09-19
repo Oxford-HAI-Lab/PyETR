@@ -1,7 +1,6 @@
 import pytest
 
-from pyetr import Function
-from pyetr.term import ArbitraryObject, FunctionalTerm
+from pyetr import ArbitraryObject, Function, FunctionalTerm
 
 
 class TestFunction:

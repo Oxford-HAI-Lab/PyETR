@@ -2,20 +2,20 @@ from copy import copy
 from dataclasses import dataclass
 from typing import Literal, TypeVar, cast
 
-from pyetr.abstract_atom import Predicate
-from pyetr.atom import Atom
-from pyetr.dependency import DependencyRelation, dependencies_from_sets
-from pyetr.function import Function
-from pyetr.issues import IssueStructure
-from pyetr.open_atom import OpenAtom
-from pyetr.open_term import (
+from pyetr.atoms import Atom, OpenAtom, Predicate
+from pyetr.atoms.terms import (
+    ArbitraryObject,
+    Function,
+    FunctionalTerm,
     OpenFunctionalTerm,
     OpenTerm,
     QuestionMark,
+    Term,
     get_open_equivalent,
 )
+from pyetr.dependency import DependencyRelation, dependencies_from_sets
+from pyetr.issues import IssueStructure
 from pyetr.stateset import SetOfStates, State
-from pyetr.term import ArbitraryObject, FunctionalTerm, Term
 from pyetr.view import View
 
 from .parse_string import (

@@ -4,9 +4,8 @@ from pathlib import Path
 import pytest
 
 import pyetr.cases
-from pyetr import ArbitraryObject, Function
+from pyetr import ArbitraryObject, Function, FunctionalTerm
 from pyetr.cases import BaseExample
-from pyetr.term import FunctionalTerm
 
 
 class ExampleCollector(pytest.File):

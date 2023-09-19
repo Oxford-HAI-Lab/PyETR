@@ -1,8 +1,14 @@
-from pyetr.atom import Atom
+from pyetr.atoms import Atom, OpenAtom
+from pyetr.atoms.terms import (
+    ArbitraryObject,
+    FunctionalTerm,
+    OpenFunctionalTerm,
+    OpenTerm,
+    QuestionMark,
+    Term,
+)
 from pyetr.dependency import Dependency, DependencyRelation, dependencies_to_sets
 from pyetr.issues import IssueStructure
-from pyetr.open_atom import OpenAtom
-from pyetr.open_term import OpenFunctionalTerm, OpenTerm, QuestionMark
 from pyetr.parsing.parse_string import (
     BoolAnd,
     BoolNot,
@@ -18,7 +24,6 @@ from pyetr.parsing.parse_string import (
     Variable,
 )
 from pyetr.stateset import SetOfStates
-from pyetr.term import ArbitraryObject, FunctionalTerm, Term
 from pyetr.view import View
 
 

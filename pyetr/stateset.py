@@ -2,11 +2,15 @@ __all__ = ["State", "SetOfStates"]
 
 from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
-from pyetr.special_funcs import Summation, XBar
-
-from .abstract_atom import equals_predicate
-from .atom import Atom
-from .term import ArbitraryObject, FunctionalTerm, Multiset, Term
+from pyetr.atoms import Atom, equals_predicate
+from pyetr.atoms.terms import (
+    ArbitraryObject,
+    FunctionalTerm,
+    Multiset,
+    Summation,
+    Term,
+    XBar,
+)
 
 if TYPE_CHECKING:
     from pyetr.weight import Weights
