@@ -93,18 +93,17 @@ def substitution(
     if weights is None:
         weights = Weights.get_null_weights(stage)
 
-    weights_dict: dict[State, Weight] = {}
+    new_weights = Weights({})
+
     for state in stage:
         new_state = state.replace(cast(dict[ArbitraryObject, Term], subs))
         new_state = new_state.replace({arb_obj: term})
         new_weight = weights[state].replace(cast(dict[ArbitraryObject, Term], subs))
         new_weight = new_weight.replace({arb_obj: term})
-        if new_state in weights_dict:
-            weights_dict[new_state] += new_weight
-        else:
-            weights_dict[new_state] = new_weight
-    new_stage = SetOfStates(weights_dict.keys())
-    new_weights = Weights(weights_dict)
+
+        new_weights._adding(new_state, new_weight)
+
+    new_stage = SetOfStates(new_weights.keys())
 
     new_dep_relation = new_dep_relation.restriction(set(subs.values()))
     T_prime = old_T.chain(new_dep_relation)
@@ -176,13 +175,21 @@ def phi(
     delta: State,
     m_prime: set[tuple[FunctionalTerm | ArbitraryObject, ArbitraryObject]],
     other_supposition: Supposition,
+    gamma_weight: Weight,
+    delta_weight: Weight,
 ) -> bool:
     for ms in powerset(m_prime):
         m_prime_set = set(ms)
         for psi in other_supposition:
             exis = [e for _, e in m_prime_set]
-            x = psi | delta.replace({e: t for t, e in m_prime_set})
-            if x.issubset(gamma) and (len(exis) == len(set(exis))):
+            replacements: dict[ArbitraryObject, Term] = {e: t for t, e in m_prime_set}
+            delta_rep = delta.replace(replacements)
+            x = psi | delta_rep
+            weight_condition = (
+                delta_weight.is_null
+                or delta_weight.replace(replacements) == gamma_weight
+            )
+            if x.issubset(gamma) and (len(exis) == len(set(exis))) and weight_condition:
                 return True
     return False
 
@@ -194,7 +201,17 @@ def _some_gamma_doesnt_phi(
 ):
     for gamma in self.stage:
         if all(
-            [not phi(gamma, delta, m_prime, other.supposition) for delta in other.stage]
+            [
+                not phi(
+                    gamma,
+                    delta,
+                    m_prime,
+                    other.supposition,
+                    self.weights[gamma],
+                    other.weights[delta],
+                )
+                for delta in other.stage
+            ]
         ):
             return True
     return False
@@ -213,7 +230,7 @@ class View:
         supposition: Supposition,
         dependency_relation: DependencyRelation,
         issue_structure: IssueStructure,
-        weights: Optional[Weights] = None,
+        weights: Optional[Weights],
         *,
         is_pre_view=False,
     ) -> None:
@@ -294,7 +311,7 @@ class View:
         supposition: Supposition,
         dependency_relation: DependencyRelation,
         issue_structure: IssueStructure,
-        weights: Optional[Weights] = None,
+        weights: Optional[Weights],
     ):
         new_dep_rel = dependency_relation.restriction((stage | supposition).arb_objects)
         if weights is None:
@@ -372,19 +389,15 @@ class View:
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "View":
         new_stage_set: set[State] = set()
-        new_weights_dict: dict[State, Weight] = {}
+        new_weights: Weights = Weights({})
         for state in self.stage:
             new_state = state.replace(replacements)
             new_stage_set.add(new_state)
             current_weight = self.weights[state]
             new_weight = current_weight.replace(replacements)
-            if new_state in new_weights_dict:
-                new_weights_dict[new_state] = new_weights_dict[new_state] + new_weight
-            else:
-                new_weights_dict[new_state] = new_weight
+            new_weights._adding(new_state, new_weight)
 
         new_stage = SetOfStates(new_stage_set)
-        new_weights = Weights(new_weights_dict)
 
         new_supposition = self.supposition.replace(replacements)
         new_issue_structure = self.issue_structure.replace(replacements)
@@ -641,6 +654,7 @@ class View:
             supposition=verum,
             dependency_relation=self.dependency_relation.negation(),
             issue_structure=self.issue_structure.negation(),
+            weights=None,
         )
         if verbose:
             print(f"NegationOutput: {out}")
@@ -939,22 +953,25 @@ class View:
             other_stage=other.stage,
             other_supposition=other.supposition,
         ):
-            new_stage = SetOfStates(
-                [
-                    state_division(
-                        state=gamma,
-                        self_stage=self.stage,
-                        other_stage=other.stage,
-                        other_supposition=other.supposition,
-                    )
-                    for gamma in self.stage
-                ]
-            )
+            new_weights: Weights = Weights({})
+            for gamma in self.stage:
+                new_state = state_division(
+                    state=gamma,
+                    self_stage=self.stage,
+                    other_stage=other.stage,
+                    other_supposition=other.supposition,
+                )
+                new_weight = self.weights[gamma]
+                new_weights._adding(new_state, new_weight)
+
+            new_stage = SetOfStates(new_weights.keys())
+
             return View.with_restriction(
                 stage=new_stage,
                 supposition=self.supposition,
                 dependency_relation=self.dependency_relation,
                 issue_structure=self.issue_structure,
+                weights=new_weights,
             )
         else:
             return self
@@ -1041,31 +1058,21 @@ class View:
             )
             expr1_weights = self.weights.in_set_of_states(expr1_states)
 
-            new_states = set()
-            new_weights_dict: dict[State, Weight] = {}
+            expr2_weights: Weights = Weights({})
             for gamma in self.stage:
                 if first_atom in gamma:
                     gamma_prime = gamma.replace_term(t2, t1)
-                    weight = self.weights[gamma]
-                    if gamma_prime in new_weights_dict:
-                        new_weights_dict[gamma_prime] = new_weights_dict[
-                            gamma_prime
-                        ] + weight.replace_term(t2, t1)
-                    else:
-                        new_weights_dict[gamma_prime] = weight.replace_term(t2, t1)
-                    new_states.add(gamma_prime)
-            new_stage = expr1_states | SetOfStates(new_states)
-            new_weights = expr1_weights + Weights(new_weights_dict)
+                    expr2_weights._adding(
+                        gamma_prime, self.weights[gamma].replace_term(t2, t1)
+                    )
+
+            new_stage = expr1_states | SetOfStates(expr2_weights.keys())
+            new_weights = expr1_weights + expr2_weights
         else:
-            new_states = set()
-            new_weights_dict: dict[State, Weight] = {}
+            new_weights = Weights({})
             for gamma in self.stage:
-                gamma_prime = state_factor(state=gamma)
-                weight = self.weights[gamma]
-                new_weights_dict[gamma_prime] = weight
-                new_states.add(gamma_prime)
-            new_weights = Weights(new_weights_dict)
-            new_stage = SetOfStates(new_states)
+                new_weights._adding(state_factor(state=gamma), self.weights[gamma])
+            new_stage = SetOfStates(new_weights.keys())
 
         out = View.with_restriction(
             stage=new_stage,
@@ -1167,6 +1174,8 @@ class View:
                 supposition=SetOfStates({State({})}),
                 dependency_relation=self.dependency_relation,
                 issue_structure=self.issue_structure,
+                weights=None,
+                is_pre_view=True,
             ).product(
                 arb_gen.novelise_all(
                     View(
@@ -1174,6 +1183,7 @@ class View:
                         supposition=other.supposition,
                         dependency_relation=other.dependency_relation.negation(),
                         issue_structure=other.issue_structure,
+                        weights=other.weights,
                     ).depose(verbose=verbose)
                 )
             )
@@ -1185,6 +1195,7 @@ class View:
                         v_prime.dependency_relation
                     ),
                     issue_structure=self.issue_structure | v_prime.issue_structure,
+                    weights=self.weights,
                 )
                 .universal_product(other, verbose=verbose)
                 .existential_sum(other, verbose=verbose)
@@ -1206,6 +1217,7 @@ class View:
                     supposition=self.supposition * other.stage,
                     dependency_relation=self.dependency_relation,
                     issue_structure=self.issue_structure,
+                    weights=self.weights,
                 )
                 .universal_product(other, verbose=verbose)
                 .existential_sum(other, verbose=verbose)
@@ -1311,25 +1323,24 @@ class View:
                 s1 = SetOfStates({State({})})
             else:
                 s1 = SetOfStates()
-
-            weight_dict: dict[State, Weight] = {}
+            s2_weights: Weights = Weights({})
             for delta in other.stage:
                 for gamma in self.stage:
-                    if phi(gamma, delta, m_prime, other.supposition):
-                        if delta in weight_dict:
-                            other_weight = other.weights[delta]
-                            if other_weight.is_null:
-                                weight_dict[delta] += self.weights[gamma]
-                            else:
-                                weight_dict[delta] += other_weight
+                    if phi(
+                        gamma,
+                        delta,
+                        m_prime,
+                        other.supposition,
+                        self.weights[gamma],
+                        other.weights[delta],
+                    ):
+                        other_weight = other.weights[delta]
+                        if other_weight.is_null:
+                            s2_weights._adding(delta, self.weights[gamma])
                         else:
-                            other_weight = other.weights[delta]
-                            if other_weight.is_null:
-                                weight_dict[delta] = self.weights[gamma]
-                            else:
-                                weight_dict[delta] = other_weight
-            s2 = SetOfStates(weight_dict.keys())
-            s2_weights = Weights(weight_dict)
+                            s2_weights._adding(delta, other_weight)
+
+            s2 = SetOfStates(s2_weights.keys())
             new_stage = s1 | s2
             new_weights = Weights.get_null_weights(s1) + s2_weights
             new_dep_rel = self.dependency_relation.fusion(
@@ -1367,34 +1378,41 @@ class View:
         ):
             m_prime = self._query_m_prime(other)
 
-            def psi(gamma: State) -> SetOfStates:
-                out: set[State] = set()
+            def xi_fka_psi(gamma: State) -> Weights:
+                weights: Weights = Weights({})
                 for x in powerset(m_prime):
                     m_prime_set = set(x)
+                    replacements: dict[ArbitraryObject, Term] = {
+                        e_n: t_n for t_n, e_n in m_prime_set
+                    }
                     if len({e_n for _, e_n in m_prime_set}) == len(m_prime_set):
                         for p in other.supposition:
                             for delta in other.stage:
-                                xi = delta.replace(
-                                    {e_n: t_n for t_n, e_n in m_prime_set}
-                                )
+                                xi = delta.replace(replacements)
                                 if (xi | p).issubset(gamma):
-                                    out.add(xi)
-                return SetOfStates(out)
+                                    w = other.weights[delta].replace(replacements)
+                                    # TODO: This is not exactly what's in the book, because here we count
+                                    # each w.xi possibly multiple times, whereas the book (a little ambiguously,
+                                    # but interpreted strictly) collapses the multiplicities to 1.
+                                    weights._adding(xi, w)
+                return weights
 
             if _some_gamma_doesnt_phi(self, other, m_prime):
-                s1 = SetOfStates({State({})})
+                H = SetOfStates({State({})})
             else:
-                s1 = SetOfStates()
+                H = SetOfStates()
 
-            s2 = SetOfStates()
+            s2_weights: Weights = Weights({})
             for gamma in self.stage:
-                s2 |= psi(gamma)
+                s2_weights += xi_fka_psi(gamma)
 
+            new_weights = Weights.get_null_weights(H) + s2_weights
             out = View.with_restriction(
-                stage=s1 | s2,
+                stage=SetOfStates(new_weights.keys()),
                 supposition=self.supposition,
                 dependency_relation=self.dependency_relation,
                 issue_structure=self.issue_structure,
+                weights=new_weights,
             )
         else:
             out = self

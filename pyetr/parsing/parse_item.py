@@ -201,6 +201,7 @@ def _parse_view(
         supposition=parsed_supposition,
         dependency_relation=dependency_relation,
         issue_structure=issue_structure,
+        weights=None,
     )
 
 

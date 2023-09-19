@@ -121,6 +121,12 @@ class Weights:
     def __getitem__(self, item: State):
         return self._weights[item]
 
+    def _adding(self, state: State, weight: Weight):
+        if state in self:
+            self._weights[state] += weight
+        else:
+            self._weights[state] = weight
+
     def items(self):
         return self._weights.items()
 
