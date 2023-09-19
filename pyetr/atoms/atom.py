@@ -1,12 +1,12 @@
 __all__ = ["Atom"]
 
 
-from .abstract import AbstractAtom
+from .abstract import AbstractAtom, AbstractComplete
 from .atom_likes import PredicateAtomLike
 from .terms.term import ArbitraryObject, FunctionalTerm, Multiset, Term
 
 
-class Atom(PredicateAtomLike[Term], AbstractAtom):
+class Atom(PredicateAtomLike[Term], AbstractComplete):
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
         output_objs = set()
