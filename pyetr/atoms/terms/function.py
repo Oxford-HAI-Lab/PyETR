@@ -4,7 +4,7 @@ __all__ = ["Function", "RealNumber"]
 from typing import TYPE_CHECKING, Callable, Optional
 
 if TYPE_CHECKING:
-    from pyetr.abstract_term import AbstractFunctionalTerm
+    from .abstract_term import AbstractFunctionalTerm
 
 
 class Function:

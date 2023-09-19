@@ -2,8 +2,8 @@ __all__ = ["Dependency", "DependencyRelation"]
 
 from typing import Iterable
 
+from .atoms.terms import ArbitraryObject
 from .stateset import SetOfStates
-from .term import ArbitraryObject
 
 Universal = ArbitraryObject
 Existential = ArbitraryObject

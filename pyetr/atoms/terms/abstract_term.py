@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from pyetr.function import Function
-from pyetr.multiset import GenericMultiset
+from .function import Function
+from .multiset import GenericMultiset
 
 
 class AbstractTerm(ABC):

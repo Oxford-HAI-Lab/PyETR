@@ -1,7 +1,6 @@
 import pytest
 
-from pyetr.abstract_atom import Predicate
-from pyetr.atom import Atom
+from pyetr.atoms import Atom, Predicate
 
 
 class TestAtom:

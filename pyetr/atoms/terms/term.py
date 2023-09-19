@@ -2,7 +2,7 @@ __all__ = ["Term", "ArbitraryObject", "FunctionalTerm", "Multiset"]
 
 from abc import abstractmethod
 
-from pyetr.abstract_term import (
+from .abstract_term import (
     AbstractArbitraryObject,
     AbstractFunctionalTerm,
     AbstractMultiset,

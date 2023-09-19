@@ -1,12 +1,12 @@
 from abc import abstractmethod
 
-from pyetr.abstract_term import (
+from .abstract_term import (
     AbstractArbitraryObject,
     AbstractFunctionalTerm,
     AbstractMultiset,
     AbstractTerm,
 )
-from pyetr.term import ArbitraryObject, FunctionalTerm, Multiset, Term
+from .term import ArbitraryObject, FunctionalTerm, Multiset, Term
 
 
 class OpenTerm(AbstractTerm):

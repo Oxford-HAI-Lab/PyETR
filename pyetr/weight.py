@@ -1,7 +1,6 @@
+from pyetr.atoms.terms import ArbitraryObject, FunctionalTerm, Multiset, Term, XBar
 from pyetr.dependency import DependencyRelation
-from pyetr.special_funcs import XBar
 from pyetr.stateset import SetOfStates, State
-from pyetr.term import ArbitraryObject, FunctionalTerm, Multiset, Term
 
 
 class Weight:

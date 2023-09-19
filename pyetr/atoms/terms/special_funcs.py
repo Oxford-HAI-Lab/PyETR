@@ -1,5 +1,5 @@
-from pyetr.abstract_term import AbstractFunctionalTerm, AbstractMultiset, AbstractTerm
-from pyetr.function import Function, RealNumber
+from .abstract_term import AbstractFunctionalTerm, AbstractMultiset, AbstractTerm
+from .function import Function, RealNumber
 
 
 def _process_func(term: AbstractTerm) -> AbstractTerm:
