@@ -7,13 +7,15 @@ from .stateset import SetOfStates
 
 class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
     # IssueStructure contains (is) a set of atoms where each has exactly one emphasis
-    # Atoms in the stage and supposition have 0 emphasis
+    # Atoms in the stage and supposition have 0 emphasis#
+
     def __new__(
         cls, __iterable: Optional[Iterable[tuple[Term, OpenAtom]]] = None, /
     ) -> "IssueStructure":
         if __iterable is None:
             return super().__new__(cls)
         else:
+            cls.validate(__iterable)
             return super().__new__(cls, __iterable)
 
     def copy(self) -> "IssueStructure":
@@ -49,6 +51,14 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
         return IssueStructure(
             {(term, open_atom) for term, open_atom in self if open_atom(term) in atoms}
         )
+
+    @classmethod
+    def validate(cls, __iterable: Iterable[tuple[Term, OpenAtom]]):
+        for _, o in __iterable:
+            if o.question_count() != 1:
+                raise ValueError(
+                    f"Open atom {o} must contain exactly one question mark"
+                )
 
     def validate_against_states(self, states: SetOfStates):
         for t, a in self:

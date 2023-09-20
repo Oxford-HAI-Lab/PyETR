@@ -24,6 +24,10 @@ class OpenAtom(AbstractAtom):
     def __call__(self, term: Term) -> "Atom":
         ...
 
+    @abstractmethod
+    def question_count(self) -> int:
+        ...
+
 
 class Atom(AbstractAtom):
     @property
