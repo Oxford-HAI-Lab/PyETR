@@ -1,9 +1,8 @@
 from typing import AbstractSet, Iterable, Optional
 
-from pyetr.atoms import Atom
-from pyetr.atoms.abstract import AbstractOpen
-from pyetr.atoms.terms import ArbitraryObject, Term
-from pyetr.stateset import SetOfStates
+from .atoms import AbstractOpen, Atom
+from .atoms.terms import ArbitraryObject, Term
+from .stateset import SetOfStates
 
 
 class IssueStructure(frozenset[tuple[Term, AbstractOpen]]):

@@ -1,10 +1,9 @@
 from typing import Self
 
-from pyetr.atoms.terms.term import ArbitraryObject, Term
-
 from .abstract import AbstractComplete
 from .atom import Atom
 from .atom_likes import DoAtomLike
+from .terms import ArbitraryObject, Term
 
 
 class DoAtom(DoAtomLike[Atom], AbstractComplete):

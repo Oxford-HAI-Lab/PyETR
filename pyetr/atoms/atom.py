@@ -1,9 +1,9 @@
 __all__ = ["Atom"]
 
 
-from .abstract import AbstractAtom, AbstractComplete
+from .abstract import AbstractComplete
 from .atom_likes import PredicateAtomLike
-from .terms.term import ArbitraryObject, FunctionalTerm, Multiset, Term
+from .terms import ArbitraryObject, FunctionalTerm, Multiset, Term
 
 
 class Atom(PredicateAtomLike[Term], AbstractComplete):

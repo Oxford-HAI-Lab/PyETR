@@ -1,11 +1,10 @@
 from typing import Self
 
-from pyetr.atoms.doatom import DoAtom
-from pyetr.atoms.open_atom import OpenAtom
-from pyetr.atoms.terms.term import ArbitraryObject, Term
-
 from .abstract import AbstractOpen
 from .atom_likes import DoAtomLike
+from .doatom import DoAtom
+from .open_atom import OpenAtom
+from .terms import ArbitraryObject, Term
 
 
 class OpenDoAtom(DoAtomLike[OpenAtom], AbstractOpen):

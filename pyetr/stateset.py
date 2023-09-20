@@ -2,10 +2,8 @@ __all__ = ["State", "SetOfStates"]
 
 from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
-from pyetr.atoms import Atom, equals_predicate
-from pyetr.atoms.abstract import AbstractComplete
-from pyetr.atoms.atom_likes import PredicateAtomLike
-from pyetr.atoms.terms import (
+from .atoms import AbstractComplete, Atom, equals_predicate
+from .atoms.terms import (
     ArbitraryObject,
     FunctionalTerm,
     Multiset,

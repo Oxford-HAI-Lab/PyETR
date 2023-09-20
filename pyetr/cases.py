@@ -2,9 +2,9 @@ __all__ = ["BaseExample"]
 from abc import ABCMeta, abstractmethod
 from typing import cast
 
-from pyetr.inference import basic_step, default_inference_procedure
-from pyetr.parsing import parse_string_to_view as ps
-from pyetr.view import View
+from .inference import basic_step, default_inference_procedure
+from .parsing import parse_string_to_view as ps
+from .view import View
 
 
 class BaseExample(metaclass=ABCMeta):

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Iterable, TypeVar
 if TYPE_CHECKING:
     from .view import View
 
-from pyetr.atoms.terms import ArbitraryObject, Term
+from .atoms.terms import ArbitraryObject, Term
 
 
 class NameScheme(Enum):
