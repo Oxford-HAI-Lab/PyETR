@@ -108,7 +108,7 @@ class WHQuery(BaseTest):
 
     @classmethod
     def test(cls, verbose: bool = False):
-        result = cls.v[0].wh_query(cls.v[1], verbose=verbose)
+        result = cls.v[0].which(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
