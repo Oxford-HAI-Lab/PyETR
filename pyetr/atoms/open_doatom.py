@@ -1,13 +1,13 @@
 from typing import Self
 
-from .abstract import AbstractOpen
+from .abstract import OpenAtom
 from .atom_likes import DoAtomLike
 from .doatom import DoAtom
 from .open_predicate_atom import OpenPredicateAtom
 from .terms import ArbitraryObject, Term
 
 
-class OpenDoAtom(DoAtomLike[OpenPredicateAtom], AbstractOpen):
+class OpenDoAtom(DoAtomLike[OpenPredicateAtom], OpenAtom):
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> Self:
         return OpenDoAtom({atom.replace(replacements) for atom in self.atoms})
 

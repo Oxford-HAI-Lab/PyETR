@@ -1,12 +1,12 @@
 from typing import Self
 
-from .abstract import AbstractComplete
+from .abstract import Atom
 from .atom_likes import DoAtomLike
 from .predicate_atom import PredicateAtom
 from .terms import ArbitraryObject, Term
 
 
-class DoAtom(DoAtomLike[PredicateAtom], AbstractComplete):
+class DoAtom(DoAtomLike[PredicateAtom], Atom):
     def __invert__(self):
         return DoAtom(atoms=self.atoms, polarity=(not self.polarity))
 

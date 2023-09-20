@@ -1,13 +1,13 @@
 from typing import Self
 
-from .abstract import AbstractOpen
+from .abstract import OpenAtom
 from .atom_likes import PredicateAtomLike
 from .predicate import Predicate
 from .predicate_atom import PredicateAtom
 from .terms import ArbitraryObject, OpenTerm, Term
 
 
-class OpenPredicateAtom(PredicateAtomLike[OpenTerm], AbstractOpen):
+class OpenPredicateAtom(PredicateAtomLike[OpenTerm], OpenAtom):
     def __init__(self, predicate: Predicate, terms: tuple[OpenTerm, ...]) -> None:
         super().__init__(predicate=predicate, terms=terms)
         self.validate()
