@@ -1,6 +1,6 @@
 from typing import AbstractSet, Iterable, Optional
 
-from .atoms import AbstractOpen, Atom
+from .atoms import AbstractOpen, PredicateAtom
 from .atoms.terms import ArbitraryObject, Term
 from .stateset import SetOfStates
 
@@ -53,7 +53,7 @@ class IssueStructure(frozenset[tuple[Term, AbstractOpen]]):
     ) -> "IssueStructure":
         return IssueStructure(super().__xor__(__value))
 
-    def restriction(self, atoms: set[Atom]) -> "IssueStructure":
+    def restriction(self, atoms: set[PredicateAtom]) -> "IssueStructure":
         return IssueStructure(
             {(term, open_atom) for term, open_atom in self if open_atom(term) in atoms}
         )

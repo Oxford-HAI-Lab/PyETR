@@ -1,6 +1,6 @@
 __all__ = [
     "Predicate",
-    "Atom",
+    "PredicateAtom",
     "equals_predicate",
     "Dependency",
     "DependencyRelation",
@@ -16,7 +16,7 @@ __all__ = [
     "OpenDoAtom",
 ]
 
-from .atoms import Atom, DoAtom, OpenDoAtom, Predicate, equals_predicate
+from .atoms import DoAtom, OpenDoAtom, Predicate, PredicateAtom, equals_predicate
 from .atoms.terms import ArbitraryObject, Function, FunctionalTerm
 from .dependency import Dependency, DependencyRelation
 from .parsing import parse_string_to_view

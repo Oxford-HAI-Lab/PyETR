@@ -4,7 +4,7 @@ from functools import reduce
 from itertools import permutations
 from typing import Optional, cast
 
-from .atoms import Atom, equals_predicate
+from .atoms import PredicateAtom, equals_predicate
 from .atoms.terms import ArbitraryObject, FunctionalTerm, RealNumber, Term
 from .dependency import Dependency, DependencyRelation
 from .issues import IssueStructure
@@ -1025,7 +1025,7 @@ class View:
             if len(first_state) != 1:
                 return False
             first_atom = next(iter(first_state))
-            if not isinstance(first_atom, Atom):
+            if not isinstance(first_atom, PredicateAtom):
                 return False
             if first_atom.predicate != equals_predicate:
                 return False
@@ -1051,7 +1051,7 @@ class View:
         elif identity_factor_condition():
             first_state = next(iter(other.stage))
             first_atom = next(iter(first_state))
-            assert isinstance(first_atom, Atom)
+            assert isinstance(first_atom, PredicateAtom)
             assert len(first_atom.terms) == 2
             t1, t2 = first_atom.terms
             expr1_states = SetOfStates(

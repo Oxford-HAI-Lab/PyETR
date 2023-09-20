@@ -1,19 +1,19 @@
 from typing import Self
 
 from .abstract import AbstractOpen
-from .atom import Atom
 from .atom_likes import PredicateAtomLike
 from .predicate import Predicate
+from .predicate_atom import PredicateAtom
 from .terms import ArbitraryObject, OpenTerm, Term
 
 
-class OpenAtom(PredicateAtomLike[OpenTerm], AbstractOpen):
+class OpenPredicateAtom(PredicateAtomLike[OpenTerm], AbstractOpen):
     def __init__(self, predicate: Predicate, terms: tuple[OpenTerm, ...]) -> None:
         super().__init__(predicate=predicate, terms=terms)
         self.validate()
 
-    def __call__(self, term: Term) -> Atom:
-        return Atom(
+    def __call__(self, term: Term) -> PredicateAtom:
+        return PredicateAtom(
             predicate=self.predicate, terms=tuple([t(term) for t in self.terms])
         )
 
@@ -29,7 +29,7 @@ class OpenAtom(PredicateAtomLike[OpenTerm], AbstractOpen):
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> Self:
         new_terms = tuple([term.replace(replacements) for term in self.terms])
-        return OpenAtom(predicate=self.predicate, terms=new_terms)
+        return OpenPredicateAtom(predicate=self.predicate, terms=new_terms)
 
     def __invert__(self) -> Self:
-        return OpenAtom(~self.predicate, self.terms)
+        return OpenPredicateAtom(~self.predicate, self.terms)
