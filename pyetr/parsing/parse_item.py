@@ -2,7 +2,7 @@ from copy import copy
 from dataclasses import dataclass
 from typing import Literal, TypeVar, cast
 
-from pyetr.atoms import Atom, OpenAtom, Predicate
+from pyetr.atoms import OpenPredicateAtom, Predicate, PredicateAtom
 from pyetr.atoms.terms import (
     ArbitraryObject,
     Function,
@@ -61,7 +61,7 @@ T = TypeVar("T")
 
 def _parse_predicate(
     predicate: LogicPredicate, maps: Maps
-) -> tuple[Atom, list[tuple[Term, OpenAtom]]]:
+) -> tuple[PredicateAtom, list[tuple[Term, OpenPredicateAtom]]]:
     def _parse_term(item: Item) -> tuple[Term, list[tuple[Term, OpenTerm]]]:
         if isinstance(item, Variable):
             return maps.variable_map[item.name], []
@@ -104,17 +104,17 @@ def _parse_predicate(
         raise ValueError(f"{predicate} not found in predicate map")
     f_predicate = maps.predicate_map[predicate.name]
     open_atoms = [
-        (t, OpenAtom(predicate=f_predicate, terms=tuple(open_terms)))
+        (t, OpenPredicateAtom(predicate=f_predicate, terms=tuple(open_terms)))
         for t, open_terms in new_open_terms_sets
     ]
-    return Atom(predicate=f_predicate, terms=tuple(terms)), open_atoms
+    return PredicateAtom(predicate=f_predicate, terms=tuple(terms)), open_atoms
 
 
 def _parse_item_with_issue(
     item: Item, maps: Maps
-) -> tuple[SetOfStates, list[tuple[Term, OpenAtom]]]:
+) -> tuple[SetOfStates, list[tuple[Term, OpenPredicateAtom]]]:
     def _parse_item(
-        item: Item, maps: Maps, open_atoms: list[tuple[Term, OpenAtom]]
+        item: Item, maps: Maps, open_atoms: list[tuple[Term, OpenPredicateAtom]]
     ) -> SetOfStates:
         # Based on definition 4.16
         if isinstance(item, BoolOr):
@@ -170,7 +170,7 @@ def _parse_item_with_issue(
         else:
             assert False
 
-    open_atoms: list[tuple[Term, OpenAtom]] = []
+    open_atoms: list[tuple[Term, OpenPredicateAtom]] = []
     return _parse_item(item, maps, open_atoms), open_atoms
 
 

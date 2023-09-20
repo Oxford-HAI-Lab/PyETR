@@ -1,6 +1,6 @@
 from .abstract import AbstractComplete, AbstractOpen
-from .atom import Atom
 from .doatom import DoAtom
-from .open_atom import OpenAtom
 from .open_doatom import OpenDoAtom
+from .open_predicate_atom import OpenPredicateAtom
 from .predicate import Predicate, equals_predicate
+from .predicate_atom import PredicateAtom

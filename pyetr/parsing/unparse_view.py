@@ -1,6 +1,6 @@
 from typing import cast
 
-from pyetr.atoms import Atom, OpenAtom
+from pyetr.atoms import OpenPredicateAtom, PredicateAtom
 from pyetr.atoms.terms import (
     ArbitraryObject,
     FunctionalTerm,
@@ -58,7 +58,9 @@ def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
         raise ValueError(f"Invalid term {term} provided")
 
 
-def _convert_atom(atom: Atom, open_atoms: list[tuple[Term, OpenAtom]]):
+def _convert_atom(
+    atom: PredicateAtom, open_atoms: list[tuple[Term, OpenPredicateAtom]]
+):
     new_terms: list[Item] = []
     for i, term in enumerate(atom.terms):
         open_terms = [(t, o.terms[i]) for t, o in open_atoms]
@@ -70,13 +72,17 @@ def _convert_atom(atom: Atom, open_atoms: list[tuple[Term, OpenAtom]]):
         return BoolNot([[inner]])
 
 
-def convert_atom(atom: Atom, issue_structure: IssueStructure, issue_atoms: list[Atom]):
-    open_atoms: list[tuple[Term, OpenAtom]] = []
+def convert_atom(
+    atom: PredicateAtom,
+    issue_structure: IssueStructure,
+    issue_atoms: list[PredicateAtom],
+):
+    open_atoms: list[tuple[Term, OpenPredicateAtom]] = []
     for i, atom_pair in enumerate(issue_structure):
         issue_atom = issue_atoms[i]
         if issue_atom == atom:
-            assert isinstance(atom_pair[1], OpenAtom)
-            atom_pair = cast(tuple[Term, OpenAtom], atom_pair)
+            assert isinstance(atom_pair[1], OpenPredicateAtom)
+            atom_pair = cast(tuple[Term, OpenPredicateAtom], atom_pair)
             open_atoms.append(atom_pair)
     return _convert_atom(atom, open_atoms)
 
@@ -88,20 +94,20 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
         return Truth([])
     else:
         assert len(s) > 0
-        issue_atoms = cast(list[Atom], [o(t) for t, o in issue_structure])
+        issue_atoms = cast(list[PredicateAtom], [o(t) for t, o in issue_structure])
         if len(s) == 1:
             state = next(iter(s))
             assert len(state) > 0
             if len(state) == 1:
                 # TODO: Fix for doatoms
                 atom = next(iter(state))
-                assert isinstance(atom, Atom)
+                assert isinstance(atom, PredicateAtom)
                 return convert_atom(atom, issue_structure, issue_atoms)
             else:
                 new_atoms: list[LogicPredicate | BoolNot] = []
                 for atom in state:
                     # TODO: Fix for doatoms
-                    assert isinstance(atom, Atom)
+                    assert isinstance(atom, PredicateAtom)
                     new_atoms.append(convert_atom(atom, issue_structure, issue_atoms))
                 return BoolAnd([new_atoms])
         else:
@@ -112,7 +118,7 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
                 elif len(state) == 1:
                     atom = next(iter(state))
                     # TODO: Fix for doatoms
-                    assert isinstance(atom, Atom)
+                    assert isinstance(atom, PredicateAtom)
                     new_ands.append(convert_atom(atom, issue_structure, issue_atoms))
                 else:
                     # TODO: Fix for doatoms
@@ -122,7 +128,7 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
                                 [
                                     convert_atom(atom, issue_structure, issue_atoms)
                                     for atom in state
-                                    if isinstance(atom, Atom)
+                                    if isinstance(atom, PredicateAtom)
                                 ]
                             ]
                         )

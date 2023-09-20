@@ -1,4 +1,4 @@
-__all__ = ["Atom"]
+__all__ = ["PredicateAtom"]
 
 
 from .abstract import AbstractComplete
@@ -6,7 +6,7 @@ from .atom_likes import PredicateAtomLike
 from .terms import ArbitraryObject, FunctionalTerm, Multiset, Term
 
 
-class Atom(PredicateAtomLike[Term], AbstractComplete):
+class PredicateAtom(PredicateAtomLike[Term], AbstractComplete):
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
         output_objs = set()
@@ -20,9 +20,9 @@ class Atom(PredicateAtomLike[Term], AbstractComplete):
         return output_objs
 
     def __invert__(self):
-        return Atom(~self.predicate, self.terms)
+        return PredicateAtom(~self.predicate, self.terms)
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "Atom":
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "PredicateAtom":
         new_terms = []
         for term in self.terms:
             if term in replacements:
@@ -36,13 +36,13 @@ class Atom(PredicateAtomLike[Term], AbstractComplete):
                 else:
                     assert False
             new_terms.append(replacement)
-        return Atom(predicate=self.predicate, terms=tuple(new_terms))
+        return PredicateAtom(predicate=self.predicate, terms=tuple(new_terms))
 
     def replace_low_level(
         self,
         old_term: Term,
         new_term: Term,
-    ) -> "Atom":
+    ) -> "PredicateAtom":
         new_terms = []
         for term in self.terms:
             if old_term == term:
@@ -50,7 +50,7 @@ class Atom(PredicateAtomLike[Term], AbstractComplete):
             elif isinstance(term, ArbitraryObject):
                 new_terms.append(old_term)
 
-        return Atom(predicate=self.predicate, terms=tuple(new_terms))
+        return PredicateAtom(predicate=self.predicate, terms=tuple(new_terms))
 
     def replace_term(
         self,
@@ -61,4 +61,4 @@ class Atom(PredicateAtomLike[Term], AbstractComplete):
             term.replace_term(old_term=old_term, new_term=new_term)
             for term in self.terms
         ]
-        return Atom(predicate=self.predicate, terms=tuple(new_terms))
+        return PredicateAtom(predicate=self.predicate, terms=tuple(new_terms))

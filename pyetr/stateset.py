@@ -2,7 +2,7 @@ __all__ = ["State", "SetOfStates"]
 
 from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
-from .atoms import AbstractComplete, Atom, equals_predicate
+from .atoms import AbstractComplete, PredicateAtom, equals_predicate
 from .atoms.terms import (
     ArbitraryObject,
     FunctionalTerm,
@@ -87,7 +87,7 @@ class State(frozenset[AbstractComplete]):
         # Aristotle
         for atom in state:
             if (
-                isinstance(atom, Atom)
+                isinstance(atom, PredicateAtom)
                 and (atom.predicate == equals_predicate)
                 and (not atom.predicate.verifier)
             ):
@@ -97,21 +97,21 @@ class State(frozenset[AbstractComplete]):
         # Leibniz
         for atom in state:
             if (
-                isinstance(atom, Atom)
+                isinstance(atom, PredicateAtom)
                 and (atom.predicate == equals_predicate)
                 and atom.predicate.verifier
             ):
                 t = atom.terms[0]
                 t_prime = atom.terms[1]
                 for x in state:
-                    if isinstance(x, Atom) and t in x.terms:
+                    if isinstance(x, PredicateAtom) and t in x.terms:
                         new_x = ~x.replace_low_level(old_term=t, new_term=t_prime)
                         if new_x in state:
                             return True
         return False
 
     @property
-    def atoms(self) -> set[Atom]:
+    def atoms(self) -> set[PredicateAtom]:
         a = set()
         for atom in self:
             a.add(atom)
@@ -243,7 +243,7 @@ class SetOfStates(frozenset[State]):
         return SetOfStates([s.replace(replacements) for s in self])
 
     @property
-    def atoms(self) -> set[Atom]:
+    def atoms(self) -> set[PredicateAtom]:
         a = set()
         for state in self:
             a |= state.atoms
