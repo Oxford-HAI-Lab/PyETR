@@ -1368,13 +1368,13 @@ class View:
             print(f"QueryOutput: {out}")
         return out
 
-    def wh_query(self, other: "View", *, verbose: bool = False) -> "View":
+    def which(self, other: "View", *, verbose: bool = False) -> "View":
         """
         Based on definition 4.42
         """
 
         if verbose:
-            print(f"WHQueryInput: External: {self} Internal {other}")
+            print(f"WhichInput: External: {self} Internal {other}")
 
         if other.dependency_relation.universals.issubset(
             self.dependency_relation.universals

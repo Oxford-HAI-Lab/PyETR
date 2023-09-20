@@ -39,10 +39,10 @@ class PredicateAtomLike(Generic[TermType]):
     def __repr__(self) -> str:
         terms = ",".join([repr(i) for i in self.terms])
         if self.predicate.verifier:
-            tilda = ""
+            tilde = ""
         else:
-            tilda = "~"
-        return f"{tilda}{self.predicate.name}({terms})"
+            tilde = "~"
+        return f"{tilde}{self.predicate.name}({terms})"
 
 
 class DoAtomLike(Generic[AtomType]):
