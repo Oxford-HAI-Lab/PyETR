@@ -1,6 +1,6 @@
-from pyetr.atoms.terms import ArbitraryObject, FunctionalTerm, Multiset, Term, XBar
-from pyetr.dependency import DependencyRelation
-from pyetr.stateset import SetOfStates, State
+from .atoms.terms import ArbitraryObject, FunctionalTerm, Multiset, Term, XBar
+from .dependency import DependencyRelation
+from .stateset import SetOfStates, State
 
 
 class Weight:

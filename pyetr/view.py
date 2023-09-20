@@ -4,15 +4,13 @@ from functools import reduce
 from itertools import permutations
 from typing import Optional, cast
 
-from pyetr.atoms.atom import Atom
-from pyetr.atoms.terms import ArbitraryObject, FunctionalTerm, RealNumber, Term
-from pyetr.issues import IssueStructure
-from pyetr.tools import ArbitraryObjectGenerator, powerset
-from pyetr.weight import Weight, Weights
-
-from .atoms import equals_predicate
+from .atoms import Atom, equals_predicate
+from .atoms.terms import ArbitraryObject, FunctionalTerm, RealNumber, Term
 from .dependency import Dependency, DependencyRelation
+from .issues import IssueStructure
 from .stateset import SetOfStates, Stage, State, Supposition
+from .tools import ArbitraryObjectGenerator, powerset
+from .weight import Weight, Weights
 
 
 def get_subset(
