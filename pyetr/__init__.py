@@ -12,9 +12,11 @@ __all__ = [
     "ArbitraryObjectGenerator",
     "View",
     "parse_string_to_view",
+    "DoAtom",
+    "OpenDoAtom",
 ]
 
-from .atoms import Atom, Predicate, equals_predicate
+from .atoms import Atom, DoAtom, OpenDoAtom, Predicate, equals_predicate
 from .atoms.terms import ArbitraryObject, Function, FunctionalTerm
 from .dependency import Dependency, DependencyRelation
 from .parsing import parse_string_to_view

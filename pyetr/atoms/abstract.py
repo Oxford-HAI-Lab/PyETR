@@ -1,18 +1,28 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Self
 
 from .terms import ArbitraryObject, Term
 
 
-class AbstractAtom:
+class AbstractAtom(ABC):
     @property
     @abstractmethod
     def detailed(self) -> str:
         ...
 
+    @abstractmethod
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> Self:
+        ...
+
+    @abstractmethod
+    def __invert__(self) -> Self:
+        ...
+
 
 class AbstractOpen(AbstractAtom):
-    pass
+    @abstractmethod
+    def __call__(self, term: Term) -> "AbstractComplete":
+        ...
 
 
 class AbstractComplete(AbstractAtom):
@@ -22,17 +32,9 @@ class AbstractComplete(AbstractAtom):
         ...
 
     @abstractmethod
-    def __invert__(self) -> Self:
-        ...
-
-    @abstractmethod
     def replace_term(
         self,
         old_term: Term,
         new_term: Term,
     ) -> Self:
-        ...
-
-    @abstractmethod
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> Self:
         ...

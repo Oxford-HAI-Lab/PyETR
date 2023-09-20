@@ -1,3 +1,5 @@
+from typing import cast
+
 from pyetr.atoms import Atom, OpenAtom
 from pyetr.atoms.terms import (
     ArbitraryObject,
@@ -73,6 +75,8 @@ def convert_atom(atom: Atom, issue_structure: IssueStructure, issue_atoms: list[
     for i, atom_pair in enumerate(issue_structure):
         issue_atom = issue_atoms[i]
         if issue_atom == atom:
+            assert isinstance(atom_pair[1], OpenAtom)
+            atom_pair = cast(tuple[Term, OpenAtom], atom_pair)
             open_atoms.append(atom_pair)
     return _convert_atom(atom, open_atoms)
 
@@ -84,7 +88,7 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
         return Truth([])
     else:
         assert len(s) > 0
-        issue_atoms = [o(t) for t, o in issue_structure]
+        issue_atoms = cast(list[Atom], [o(t) for t, o in issue_structure])
         if len(s) == 1:
             state = next(iter(s))
             assert len(state) > 0

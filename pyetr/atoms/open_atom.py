@@ -1,3 +1,5 @@
+from typing import Self
+
 from .abstract import AbstractOpen
 from .atom import Atom
 from .atom_likes import PredicateAtomLike
@@ -25,9 +27,9 @@ class OpenAtom(PredicateAtomLike[OpenTerm], AbstractOpen):
         if self.question_count() != 1:
             raise ValueError(f"Open atom {self} must contain exactly one question mark")
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenAtom":
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> Self:
         new_terms = tuple([term.replace(replacements) for term in self.terms])
         return OpenAtom(predicate=self.predicate, terms=new_terms)
 
-    def __invert__(self):
+    def __invert__(self) -> Self:
         return OpenAtom(~self.predicate, self.terms)
