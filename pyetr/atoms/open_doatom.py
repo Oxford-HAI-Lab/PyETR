@@ -16,3 +16,9 @@ class OpenDoAtom(DoAtomLike[OpenPredicateAtom], OpenAtom):
 
     def __call__(self, term: Term) -> DoAtom:
         return DoAtom(atoms={atom(term) for atom in self.atoms})
+
+    def question_count(self) -> int:
+        question_count = 0
+        for atom in self.atoms:
+            question_count += atom.question_count()
+        return question_count
