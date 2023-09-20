@@ -1,4 +1,4 @@
-from .abstract import AbstractComplete, AbstractOpen
+from .abstract import Atom, OpenAtom
 from .doatom import DoAtom
 from .open_doatom import OpenDoAtom
 from .open_predicate_atom import OpenPredicateAtom

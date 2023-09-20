@@ -19,13 +19,13 @@ class AbstractAtom(ABC):
         ...
 
 
-class AbstractOpen(AbstractAtom):
+class OpenAtom(AbstractAtom):
     @abstractmethod
-    def __call__(self, term: Term) -> "AbstractComplete":
+    def __call__(self, term: Term) -> "Atom":
         ...
 
 
-class AbstractComplete(AbstractAtom):
+class Atom(AbstractAtom):
     @property
     @abstractmethod
     def arb_objects(self) -> set[ArbitraryObject]:

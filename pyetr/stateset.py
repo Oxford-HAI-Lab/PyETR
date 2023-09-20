@@ -2,7 +2,7 @@ __all__ = ["State", "SetOfStates"]
 
 from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
-from .atoms import AbstractComplete, PredicateAtom, equals_predicate
+from .atoms import Atom, PredicateAtom, equals_predicate
 from .atoms.terms import (
     ArbitraryObject,
     FunctionalTerm,
@@ -16,10 +16,8 @@ if TYPE_CHECKING:
     from pyetr.weight import Weights
 
 
-class State(frozenset[AbstractComplete]):
-    def __new__(
-        cls, __iterable: Optional[Iterable[AbstractComplete]] = None, /
-    ) -> "State":
+class State(frozenset[Atom]):
+    def __new__(cls, __iterable: Optional[Iterable[Atom]] = None, /) -> "State":
         if __iterable is None:
             return super().__new__(cls)
         else:
@@ -34,22 +32,22 @@ class State(frozenset[AbstractComplete]):
     def intersection(self, *s: Iterable[object]) -> "State":
         return State(super().intersection(*s))
 
-    def symmetric_difference(self, __s: Iterable[AbstractComplete]) -> "State":
+    def symmetric_difference(self, __s: Iterable[Atom]) -> "State":
         return State(super().symmetric_difference(__s))
 
-    def union(self, *s: Iterable[AbstractComplete]) -> "State":
+    def union(self, *s: Iterable[Atom]) -> "State":
         return State(super().union(*s))
 
-    def __and__(self, __value: AbstractSet[AbstractComplete]) -> "State":
+    def __and__(self, __value: AbstractSet[Atom]) -> "State":
         return State(super().__and__(__value))
 
-    def __or__(self, __value: AbstractSet[AbstractComplete]) -> "State":
+    def __or__(self, __value: AbstractSet[Atom]) -> "State":
         return State(super().__or__(__value))
 
-    def __sub__(self, __value: AbstractSet[AbstractComplete]) -> "State":
+    def __sub__(self, __value: AbstractSet[Atom]) -> "State":
         return State(super().__sub__(__value))
 
-    def __xor__(self, __value: AbstractSet[AbstractComplete]) -> "State":
+    def __xor__(self, __value: AbstractSet[Atom]) -> "State":
         return State(super().__xor__(__value))
 
     @property
@@ -111,7 +109,7 @@ class State(frozenset[AbstractComplete]):
         return False
 
     @property
-    def atoms(self) -> set[PredicateAtom]:
+    def atoms(self) -> set[Atom]:
         a = set()
         for atom in self:
             a.add(atom)
@@ -243,7 +241,7 @@ class SetOfStates(frozenset[State]):
         return SetOfStates([s.replace(replacements) for s in self])
 
     @property
-    def atoms(self) -> set[PredicateAtom]:
+    def atoms(self) -> set[Atom]:
         a = set()
         for state in self:
             a |= state.atoms

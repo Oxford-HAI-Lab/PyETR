@@ -1,15 +1,15 @@
 from typing import AbstractSet, Iterable, Optional
 
-from .atoms import AbstractOpen, PredicateAtom
+from .atoms import Atom, OpenAtom
 from .atoms.terms import ArbitraryObject, Term
 from .stateset import SetOfStates
 
 
-class IssueStructure(frozenset[tuple[Term, AbstractOpen]]):
+class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
     # IssueStructure contains (is) a set of atoms where each has exactly one emphasis
     # Atoms in the stage and supposition have 0 emphasis
     def __new__(
-        cls, __iterable: Optional[Iterable[tuple[Term, AbstractOpen]]] = None, /
+        cls, __iterable: Optional[Iterable[tuple[Term, OpenAtom]]] = None, /
     ) -> "IssueStructure":
         if __iterable is None:
             return super().__new__(cls)
@@ -26,34 +26,26 @@ class IssueStructure(frozenset[tuple[Term, AbstractOpen]]):
         return IssueStructure(super().intersection(*s))
 
     def symmetric_difference(
-        self, __s: Iterable[tuple[Term, AbstractOpen]]
+        self, __s: Iterable[tuple[Term, OpenAtom]]
     ) -> "IssueStructure":
         return IssueStructure(super().symmetric_difference(__s))
 
-    def union(self, *s: Iterable[tuple[Term, AbstractOpen]]) -> "IssueStructure":
+    def union(self, *s: Iterable[tuple[Term, OpenAtom]]) -> "IssueStructure":
         return IssueStructure(super().union(*s))
 
-    def __and__(
-        self, __value: AbstractSet[tuple[Term, AbstractOpen]]
-    ) -> "IssueStructure":
+    def __and__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
         return IssueStructure(super().__and__(__value))
 
-    def __or__(
-        self, __value: AbstractSet[tuple[Term, AbstractOpen]]
-    ) -> "IssueStructure":
+    def __or__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
         return IssueStructure(super().__or__(__value))
 
-    def __sub__(
-        self, __value: AbstractSet[tuple[Term, AbstractOpen]]
-    ) -> "IssueStructure":
+    def __sub__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
         return IssueStructure(super().__sub__(__value))
 
-    def __xor__(
-        self, __value: AbstractSet[tuple[Term, AbstractOpen]]
-    ) -> "IssueStructure":
+    def __xor__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
         return IssueStructure(super().__xor__(__value))
 
-    def restriction(self, atoms: set[PredicateAtom]) -> "IssueStructure":
+    def restriction(self, atoms: set[Atom]) -> "IssueStructure":
         return IssueStructure(
             {(term, open_atom) for term, open_atom in self if open_atom(term) in atoms}
         )
