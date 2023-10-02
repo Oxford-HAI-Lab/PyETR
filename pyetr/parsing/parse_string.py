@@ -19,40 +19,12 @@ from typing import Any, ClassVar, Optional
 import pyparsing as pp
 from pyparsing import ParserElement
 
+from pyetr.common_parsing import Quantified, Variable
+
 ParserElement.enablePackrat()
 
 pp_left = pp.opAssoc.LEFT  # type:ignore
 pp_right = pp.opAssoc.RIGHT  # type:ignore
-
-
-class Variable:
-    name: str
-
-    def __init__(self, t) -> None:
-        self.name = t[0]
-
-    def __repr__(self) -> str:
-        return f"<Variable name={self.name}>"
-
-    def to_string(self) -> str:
-        return self.name
-
-
-class Quantified:
-    variable: Variable
-    quantifier: str
-
-    def __init__(self, t) -> None:
-        variables = t[0].variables
-        assert len(variables) == 1
-        self.variable = variables[0]
-        self.quantifier = t[0].quantifier
-
-    def __repr__(self) -> str:
-        return f"<Quantified variable={self.variable} quantifier={self.quantifier}>"
-
-    def to_string(self) -> str:
-        return self.quantifier + self.variable.to_string()
 
 
 class SingleOperand:
