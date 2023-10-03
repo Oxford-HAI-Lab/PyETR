@@ -1,4 +1,5 @@
 from pyetr.new_parsing.parse_string import parse_string
+from pyetr.new_parsing.parse_view import parse_pv
 
 test_string = "Ax Ey {Test(x,1003)~Test2(y)~do(A(x)B(y))Test3()do()~do(),Test4(y()),0,0,P(x**y)G(34,56.6,-78.4,-4,5==4)}"  # {John()|x=* Mary()|0.004=+ Teaches(x, Fred())P(), y|4|6.2=+ Teaches(y*, John())} ^{Q(4.5*)}"
 # test_string = "Ax Ey {Test3(g(x,z(),y**z(o,p)))Test4()}"  # {John()|x=* Mary()|0.004=+ Teaches(x, Fred())P(), y|4|6.2=+ Teaches(y*, John())} ^{Q(4.5*)}"
@@ -8,6 +9,7 @@ out = parse_string(test_string)
 
 print(test_string)
 print(out.to_string())
+print(parse_pv(out))
 
 # def log_func(x):
 #     return 1 + math.log(1 + x)
