@@ -1,5 +1,7 @@
 import sys
+from dataclasses import dataclass
 from functools import cache
+from typing import Optional
 
 import pyparsing as pp
 from pyparsing import ParserElement
@@ -63,7 +65,7 @@ class DoAtom:
             not_str = ""
         else:
             not_str = "~"
-        out = ",".join([a.to_string() for a in self.atoms])
+        out = "".join([a.to_string() for a in self.atoms])
         return f"{not_str}do({out})"
 
 
@@ -93,6 +95,8 @@ class Truth:
 
 
 class Supposition:
+    states: list[State]
+
     def __init__(self, t) -> None:
         self.states = t
 
@@ -110,17 +114,17 @@ class Term:
 
 
 class Comma:
-    operands: list["Term"]
+    args: list["Term"]
 
     def __init__(self, t) -> None:
         assert len(t) == 1
-        self.operands = t[0]
+        self.args = t[0]
 
     def __repr__(self) -> str:
-        return f"<Comma operands={self.operands}>"
+        return f"<Comma args={self.args}>"
 
     def to_string(self):
-        return ",".join([o.to_string() for o in self.operands])
+        return ",".join([o.to_string() for o in self.args])
 
 
 class Function(Term):
@@ -134,7 +138,10 @@ class Function(Term):
         else:
             items = t[0]
             self.name = items[0]
-            self.args = items[1].operands
+            if len(items) == 2 and isinstance(items[1], Comma):
+                self.args = items[1].args
+            else:
+                self.args = items[1:]
 
     def __repr__(self) -> str:
         return f"<Function name={self.name} args={self.args}>"
@@ -174,7 +181,7 @@ class Emphasis(Term):
         return f"<Emphasis arg={self.arg}>"
 
     def to_string(self):
-        return f"*{self.arg.to_string()}"
+        return f"{self.arg.to_string()}*"
 
 
 class Xbar(Term):
@@ -219,6 +226,84 @@ class Real(Term):
 
     def to_string(self):
         return f"{self.num}"
+
+    def __repr__(self) -> str:
+        return f"<Real num={self.num}>"
+
+
+class Weight:
+    multiset: list["Term"]
+
+    def __init__(self, t) -> None:
+        self.multiset = t
+
+
+class AdditiveWeight(Weight):
+    def to_string(self):
+        return f"{'|'.join([i.to_string() for i in self.multiset])}=+"
+
+    def __repr__(self) -> str:
+        return f"<AdditiveWeight num={self.multiset}>"
+
+
+class MultiplicativeWeight(Weight):
+    def to_string(self):
+        return f"{'|'.join([i.to_string() for i in self.multiset])}=*"
+
+    def __repr__(self) -> str:
+        return f"<MultiplicativeWeight num={self.multiset}>"
+
+
+class WeightedState:
+    additive: Optional[AdditiveWeight]
+    multiplicative: Optional[MultiplicativeWeight]
+    state: State
+
+    def __init__(self, t) -> None:
+        self.additive = None
+        self.multiplicative = None
+        state = None
+        for i in t:
+            if isinstance(i, State):
+                assert state is None
+                state = i
+            if isinstance(i, AdditiveWeight):
+                assert self.additive is None
+                self.additive = i
+            if isinstance(i, MultiplicativeWeight):
+                assert self.multiplicative is None
+                self.multiplicative = i
+        assert state is not None
+        self.state = state
+
+    def to_string(self):
+        if self.additive:
+            add_str = self.additive.to_string() + " "
+        else:
+            add_str = ""
+        if self.multiplicative:
+            mul_str = self.multiplicative.to_string() + " "
+        else:
+            mul_str = ""
+
+        return f"{mul_str}{add_str}{self.state.to_string()}"
+
+    def __repr__(self) -> str:
+        return f"<WeightedState state={self.state} additive={self.additive} multiplicative={self.multiplicative}>"
+
+
+class Stage:
+    states: list[WeightedState]
+
+    def __init__(self, t) -> None:
+        self.states = t
+
+    def __repr__(self) -> str:
+        return f"<Stage states={self.states}>"
+
+    def to_string(self) -> str:
+        out = ",".join([s.to_string() for s in self.states])
+        return "{" + f"{out}" + "}"
 
 
 @cache
@@ -273,13 +358,13 @@ def get_expr():
     do_word = pp.Literal("do")
     predicate_word = pp.Word(pp.alphanums) + ~do_word
 
-    atom_contents = get_terms(variable).setResultsName("terms", listAllMatches=True)
+    terms = get_terms(variable).setResultsName("terms", listAllMatches=True)
 
     atom = (
         pp.Optional("~")
         + predicate_word
         + pp.Suppress("(")
-        + atom_contents
+        + terms
         + pp.Suppress(")").setResultsName("atom", listAllMatches=True)
     ).setParseAction(Atom)
     doatom = (
@@ -287,7 +372,7 @@ def get_expr():
             pp.Optional("~")
             + pp.Suppress(do_word)
             + pp.Suppress("(")
-            + pp.Optional(pp.DelimitedList(atom, ","))
+            + pp.ZeroOrMore(atom)
             + pp.Suppress(")")
         )
         .setResultsName("doatom", listAllMatches=True)
@@ -308,11 +393,64 @@ def get_expr():
         .setResultsName("supposition", listAllMatches=True)
         .setParseAction(Supposition)
     )
+    weights = pp.DelimitedList(terms, "|")
+    additive_weight = pp.Optional(
+        (weights + pp.Suppress(pp.Literal("=+"))).setParseAction(AdditiveWeight)
+    )
+    multiplicative_weight = pp.Optional(
+        (weights + pp.Suppress(pp.Literal("=*"))).setParseAction(MultiplicativeWeight)
+    )
+    weighted_state = (
+        (multiplicative_weight + additive_weight) + (verum | state)
+    ).setParseAction(WeightedState)
+    stage = (
+        (
+            pp.Suppress("{")
+            + pp.Optional(pp.DelimitedList(weighted_state, ","))
+            + pp.Suppress("}")
+        )
+        .setResultsName("stage", listAllMatches=True)
+        .setParseAction(Stage)
+    )
 
-    expr <<= pp.ZeroOrMore(quantified_expr) + supposition
+    expr <<= (
+        pp.ZeroOrMore(quantified_expr)
+        + stage
+        + pp.Optional(pp.Suppress(pp.Literal("^")) + supposition)
+    )
     return expr
 
 
-def parse_string(input_string: str):
+@dataclass
+class ParserView:
+    quantifiers: list[Quantified]
+    stage: Stage
+    supposition: Optional[Supposition]
+
+    def to_string(self) -> str:
+        if len(self.quantifiers) == 0:
+            quant_str = ""
+        else:
+            quant_str = " ".join([s.to_string() for s in self.quantifiers]) + " "
+        if self.supposition is None:
+            supp_str = ""
+        else:
+            supp_str = f"^{self.supposition.to_string()}"
+        return f"{quant_str}{self.stage.to_string()}{supp_str}"
+
+
+def parse_string(input_string: str) -> ParserView:
     expr = get_expr()
-    return expr.parse_string(input_string, parseAll=True).as_list()
+    out = expr.parse_string(input_string, parseAll=True).as_list()
+    quantifieds = []
+    stage = None
+    supposition = None
+    for i in out:
+        if isinstance(i, Quantified):
+            quantifieds.append(i)
+        elif isinstance(i, Stage):
+            stage = i
+        elif isinstance(i, Supposition):
+            supposition = i
+    assert stage is not None
+    return ParserView(quantifiers=quantifieds, stage=stage, supposition=supposition)
