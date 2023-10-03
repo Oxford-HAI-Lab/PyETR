@@ -70,6 +70,8 @@ class DoAtom:
 
 
 class State:
+    atoms: list[Atom | DoAtom]
+
     def __init__(self, t) -> None:
         self.atoms = t
 
@@ -128,7 +130,7 @@ class Comma:
 
 
 class Function(Term):
-    args: list["Term"]
+    args: list[Term]
     name: str
 
     def __init__(self, t) -> None:

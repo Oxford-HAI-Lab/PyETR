@@ -1,4 +1,3 @@
-from copy import copy
 from dataclasses import dataclass
 from typing import Literal, TypeVar, cast
 
@@ -12,6 +11,10 @@ from pyetr.atoms.terms import (
     QuestionMark,
     Term,
     get_open_equivalent,
+)
+from pyetr.common_parsing import (
+    get_variable_map_and_dependencies,
+    merge_terms_with_opens,
 )
 from pyetr.dependency import DependencyRelation, dependencies_from_sets
 from pyetr.issues import IssueStructure
@@ -42,20 +45,6 @@ class Maps:
     constant_map: dict[str, Function]
 
 
-def merge_terms_with_opens(
-    terms: list[Term], open_term_sets: list[list[tuple[Term, OpenTerm]]]
-) -> list[tuple[Term, list[OpenTerm]]]:
-    new_terms = [get_open_equivalent(t) for t in terms]
-    new_terms_sets: list[tuple[Term, list[OpenTerm]]] = []
-    for i, open_terms in enumerate(open_term_sets):
-        if len(open_terms) > 0:
-            for t, open_term in open_terms:
-                fresh_terms = copy(new_terms)
-                fresh_terms[i] = open_term
-                new_terms_sets.append((t, fresh_terms))
-    return new_terms_sets
-
-
 T = TypeVar("T")
 
 
@@ -72,15 +61,17 @@ def _parse_predicate(
             if item.name in maps.constant_map:
                 return FunctionalTerm(maps.constant_map[item.name], t=()), []
             elif item.name in maps.function_map:
-                terms: list[Term] = []
                 # These represent a list in term order, where each element is a list of derived open atom pairs
+                f = maps.function_map[item.name]
+
+                terms: list[Term] = []
                 open_term_sets: list[list[tuple[Term, OpenTerm]]] = []
                 for arg in item.args:
                     term, open_terms = _parse_term(arg)
                     terms.append(term)
                     open_term_sets.append(open_terms)
                 new_open_terms_sets = merge_terms_with_opens(terms, open_term_sets)
-                f = maps.function_map[item.name]
+
                 functional_opens = [
                     (t, OpenFunctionalTerm(f=f, t=tuple(open_terms)))
                     for t, open_terms in new_open_terms_sets
@@ -207,38 +198,6 @@ def _parse_view(
 
 Universal = ArbitraryObject
 Existential = ArbitraryObject
-
-
-def get_variable_map_and_dependencies(
-    quantifieds: list[Quantified],
-) -> tuple[dict[str, ArbitraryObject], DependencyRelation]:
-    variable_map: dict[str, ArbitraryObject] = {}
-    encountered_universals: list[tuple[Universal, set[Existential]]] = []
-    existentials: set[Existential] = set()
-    universals: set[Universal] = set()
-    for quantified in quantifieds:
-        if quantified.quantifier == "∃":
-            arb_obj = ArbitraryObject(name=quantified.variable.name)
-            existentials.add(arb_obj)
-            for _, exi_set in encountered_universals:
-                exi_set.add(arb_obj)
-        else:
-            arb_obj = ArbitraryObject(name=quantified.variable.name)
-            universals.add(arb_obj)
-            encountered_universals.append((arb_obj, set()))
-
-        if quantified.variable.name not in variable_map:
-            variable_map[quantified.variable.name] = arb_obj
-        else:
-            raise ValueError(
-                f"Variable {quantified.variable.name} appears twice in quantifiers"
-            )
-
-    return variable_map, DependencyRelation(
-        universals=universals,
-        existentials=existentials,
-        dependencies=dependencies_from_sets(encountered_universals),
-    )
 
 
 def gather_atomic_item(
