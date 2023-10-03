@@ -125,7 +125,7 @@ class Comma:
 
 class Function(Term):
     args: list["Term"]
-    name: Comma
+    name: str
 
     def __init__(self, t) -> None:
         if len(t) == 1 and isinstance(t[0], str):
@@ -142,6 +142,24 @@ class Function(Term):
     def to_string(self):
         out = ",".join([o.to_string() for o in self.args])
         return f"{self.name}({out})"
+
+
+class Summation(Term):
+    args: list["Term"]
+
+    def __init__(self, t) -> None:
+        if len(t) == 1 and isinstance(t[0], str):
+            self.args = []
+        else:
+            items = t[0]
+            self.args = items[1].operands
+
+    def __repr__(self) -> str:
+        return f"<Summation args={self.args}>"
+
+    def to_string(self):
+        out = ",".join([o.to_string() for o in self.args])
+        return f"σ({out})"
 
 
 class Emphasis(Term):
@@ -167,7 +185,7 @@ class Xbar(Term):
         if len(t) == 1:
             items = t[0]
             self.left = items[0]
-            self.right = items[2]
+            self.right = items[1]
 
     def __repr__(self) -> str:
         return f"<Xbar left={self.left} right={self.right}>"
@@ -176,17 +194,34 @@ class Xbar(Term):
         return f"{self.left.to_string()}**{self.right.to_string()}"
 
 
+class Real(Term):
+    num: float
+
+    def __init__(self, t) -> None:
+        self.num = float("".join(t))
+
+    def to_string(self):
+        return f"{self.num}"
+
+
 @cache
 def get_terms(variable: ParserElement) -> ParserElement:
     function_word = (
         pp.Literal("++") | pp.Literal("σ") | pp.Word(pp.alphas, pp.alphanums)
     ).setResultsName("predicate")
+
     function_0 = (function_word + pp.Suppress("()")).setParseAction(Function)
     emphasis = pp.Suppress(pp.Char("*"))
-    xbar = pp.Literal("**")
+    xbar = pp.Suppress(pp.Literal("**") | pp.Literal("x̄"))
     comma = pp.Suppress(",")
+    real_word = (
+        pp.Optional(pp.Literal("-"))
+        + pp.Word(pp.nums)
+        + pp.Optional(pp.Literal(".") + pp.Word(pp.nums))
+    )
+    reals = real_word.setResultsName("reals").setParseAction(Real)
     terms = pp.infixNotation(
-        function_0 | variable,
+        function_0 | reals | variable,
         [
             (function_word, 1, pp_right, Function),
             (xbar, 2, pp_left, Xbar),
@@ -204,9 +239,9 @@ def get_expr():
     expr = pp.Forward()
 
     new_alphanums = pp.alphanums.replace("A", "").replace("E", "")
-
+    new_alphas = pp.alphas.replace("A", "").replace("E", "")
     variable = (
-        pp.Word(new_alphanums)
+        pp.Word(init_chars=new_alphas, body_chars=new_alphanums)
         .setResultsName("variables", listAllMatches=True)
         .setParseAction(Variable)
     )
