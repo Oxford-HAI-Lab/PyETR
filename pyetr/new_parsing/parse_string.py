@@ -26,11 +26,15 @@ class Atom:
         if t[0] == "~":
             self.verifier = False
             self.predicate_name = t[1]
-            self.terms = t[2:]
+            self.terms = list(t[2:])
         else:
             self.verifier = True
             self.predicate_name = t[0]
-            self.terms = t[1:]
+            self.terms = list(t[1:])
+        if len(self.terms) == 1:
+            first_term = self.terms[0]
+            if isinstance(first_term, Comma):
+                self.terms = list(first_term.args)
 
     def __repr__(self) -> str:
         return f"<Atom name={self.predicate_name} terms={self.terms} verifier={self.verifier}>"
@@ -74,7 +78,7 @@ class State:
     atoms: list[Atom | DoAtom]
 
     def __init__(self, t) -> None:
-        self.atoms = t
+        self.atoms = list(t)
 
     def __repr__(self) -> str:
         return f"<State atoms={self.atoms}>"
@@ -101,7 +105,7 @@ class Supposition:
     states: list[State]
 
     def __init__(self, t) -> None:
-        self.states = t
+        self.states = list(t)
 
     def __repr__(self) -> str:
         return f"<Supposition states={self.states}>"
@@ -222,7 +226,7 @@ class Weight:
     multiset: list["Term"]
 
     def __init__(self, t) -> None:
-        self.multiset = t
+        self.multiset = [i for i in t]
 
 
 class AdditiveWeight(Weight):
