@@ -14,7 +14,7 @@ from pyetr.atoms.terms import (
     Term,
 )
 from pyetr.atoms.terms.function import RealNumber
-from pyetr.atoms.terms.special_funcs import XBar
+from pyetr.atoms.terms.special_funcs import Summation, XBar
 from pyetr.common_parsing import (
     Variable,
     get_variable_map_and_dependencies,
@@ -64,6 +64,26 @@ def parse_term(
         return FunctionalTerm(f, tuple(terms)), cast(
             list[tuple[Term, OpenTerm]], functional_opens
         )
+    elif isinstance(t, parsing.Real):
+        return FunctionalTerm(RealNumber(t.num), ()), []
+    elif isinstance(t, parsing.Xbar):
+        new_left, new_issues1 = parse_term(
+            t.left, variable_map=variable_map, function_map=function_map
+        )
+        new_right, new_issues2 = parse_term(
+            t.right, variable_map=variable_map, function_map=function_map
+        )
+        return FunctionalTerm(XBar, (new_left, new_right)), new_issues1 + new_issues2
+    elif isinstance(t, parsing.Summation):
+        issues: list[tuple[Term, OpenTerm]] = []
+        new_args: list[Term] = []
+        for arg in t.args:
+            new_arg, new_issues = parse_term(
+                arg, variable_map=variable_map, function_map=function_map
+            )
+            new_args.append(new_arg)
+            issues += new_issues
+        return FunctionalTerm(Summation, (Multiset(new_args),)), issues
     else:
         raise ValueError(f"Invalid term {t}")
 
@@ -189,7 +209,7 @@ def gather_funcs(term: parsing.Term) -> list[Function]:
     elif isinstance(term, Variable):
         pass
     else:
-        assert False
+        raise TypeError(f"term type {term} not recognised")
     return list(set(funcs))
 
 
@@ -232,7 +252,6 @@ def parse_pv(pv: parsing.ParserView) -> View:
     w_stage, issues = parse_weighted_states(
         pv.stage.states, variable_map=variable_map, function_map=function_map
     )
-    issues: list[tuple[Term, OpenAtom]] = []
     if pv.supposition is not None:
         supp_states: list[State] = []
         for s in pv.supposition.states:
