@@ -1,5 +1,6 @@
 from typing import Optional, cast
 
+import pyetr.new_parsing.parse_string as parsing
 from pyetr.atoms import Atom, OpenAtom, OpenPredicateAtom, Predicate, PredicateAtom
 from pyetr.atoms.doatom import DoAtom
 from pyetr.atoms.open_doatom import OpenDoAtom
@@ -25,8 +26,6 @@ from pyetr.issues import IssueStructure
 from pyetr.stateset import SetOfStates, State
 from pyetr.view import View
 from pyetr.weight import Weight, Weights
-
-from . import parse_string as parsing
 
 
 def parse_term(

@@ -150,16 +150,18 @@ class DependencyRelation:
                 f"Arb object {arb_object} not found in dependency relation"
             )
 
-    def validate_against_states(self, states: SetOfStates, pre_view: bool = False):
+    def validate_against_states(
+        self, arb_objects: set[ArbitraryObject], pre_view: bool = False
+    ):
         if pre_view:
-            if not (self.universals | self.existentials).issuperset(states.arb_objects):
+            if not (self.universals | self.existentials).issuperset(arb_objects):
                 raise ValueError(
-                    f"Universals with existentials: {self.universals | self.existentials} not superset of states {states.arb_objects}"
+                    f"Universals with existentials: {self.universals | self.existentials} not superset of states {arb_objects}"
                 )
         else:
-            if states.arb_objects != self.universals | self.existentials:
+            if arb_objects != self.universals | self.existentials:
                 raise ValueError(
-                    f"Universals with existentials: {self.universals | self.existentials} not the same as states {states.arb_objects}"
+                    f"Universals with existentials: {self.universals | self.existentials} not the same as states {arb_objects}"
                 )
 
     @property
