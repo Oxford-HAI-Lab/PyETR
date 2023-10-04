@@ -45,11 +45,11 @@ class PredicateAtomLike(Generic[TermType]):
 
 
 class DoAtomLike(Generic[AtomType]):
-    atoms: set[AtomType]
+    atoms: list[AtomType]
     polarity: bool
 
     def __init__(self, atoms: Iterable[AtomType], polarity: bool = True) -> None:
-        self.atoms = set(atoms)
+        self.atoms = list(set(atoms))
         self.polarity = polarity
 
     @property

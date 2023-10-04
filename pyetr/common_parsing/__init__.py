@@ -3,7 +3,12 @@ from copy import copy
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom, get_open_atom_equivalent
 from pyetr.atoms.predicate_atom import PredicateAtom
 from pyetr.atoms.terms import ArbitraryObject, OpenTerm, Term, get_open_equivalent
-from pyetr.dependency import DependencyRelation, dependencies_from_sets
+from pyetr.dependency import (
+    Dependency,
+    DependencyRelation,
+    dependencies_from_sets,
+    dependencies_to_sets,
+)
 
 Universal = ArbitraryObject
 Existential = ArbitraryObject
@@ -104,3 +109,65 @@ def merge_atoms_with_opens(
                 fresh_atoms[i] = open_atom
                 new_atoms_sets.append((t, fresh_atoms))
     return new_atoms_sets
+
+
+class QuantList:
+    variables: list[Variable]
+    quantifier: str
+
+    def __init__(self, variables: list[Variable], quantifier: str) -> None:
+        self.variables = variables
+        self.quantifier = quantifier
+
+
+def order_quantifieds(
+    unordered_quantifieds: dict[str, Quantified], dependencies: frozenset[Dependency]
+) -> list[Quantified]:
+    # All unspecified exis get put to the front
+    # The ordering is based on the right most having the least
+    # restrictions, then moving left with more and more deps
+    # Therefore, we must start with the smallest exi sets
+    exis_used: list[str] = []
+    univs_used: list[str] = []
+    dep_sets = dependencies_to_sets(dependencies)
+    sorted_universals: list[tuple[int, ArbitraryObject, set[ArbitraryObject]]] = sorted(
+        [(len(exi_set), uni, exi_set) for uni, exi_set in dep_sets]
+    )
+    final_out: list[Quantified] = []
+    for _, uni, exi_set in sorted_universals:
+        # Fill list from the front
+        new_exis: list[Quantified] = []
+        for exi in exi_set:
+            if exi.name not in exis_used:
+                exis_used.append(exi.name)
+                new_exis.append(unordered_quantifieds[exi.name])
+        univs_used.append(uni.name)
+        final_out = [unordered_quantifieds[uni.name], *new_exis, *final_out]
+
+    for name, quantified in unordered_quantifieds.items():
+        if quantified.quantifier == "∃":
+            if name not in exis_used:
+                final_out.insert(0, quantified)
+        elif quantified.quantifier == "∀":
+            if name not in univs_used:
+                final_out.append(quantified)
+        else:
+            assert False
+
+    return final_out
+
+
+def get_quantifiers(
+    arb_objects: set[ArbitraryObject], dependency_relation: DependencyRelation
+) -> list[Quantified]:
+    unordered_quantifieds: dict[str, Quantified] = {}
+    for arb_object in arb_objects:
+        if arb_object.name not in unordered_quantifieds:
+            if dependency_relation.is_existential(arb_object):
+                quant = "∃"
+            else:
+                quant = "∀"
+            unordered_quantifieds[arb_object.name] = Quantified(
+                [QuantList([Variable([arb_object.name])], quantifier=quant)]
+            )
+    return order_quantifieds(unordered_quantifieds, dependency_relation.dependencies)
