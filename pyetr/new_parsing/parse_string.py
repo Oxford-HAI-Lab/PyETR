@@ -1,4 +1,5 @@
 import sys
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import cache
 from typing import Optional
@@ -110,9 +111,10 @@ class Supposition:
         return "{" + f"{out}" + "}"
 
 
-class Term:
+class Term(ABC):
+    @abstractmethod
     def to_string(self) -> str:
-        raise NotImplementedError
+        ...
 
 
 class Comma:
@@ -201,23 +203,6 @@ class Xbar(Term):
 
     def to_string(self):
         return f"{self.left.to_string()}**{self.right.to_string()}"
-
-
-class Equals(Term):
-    left: Term
-    right: Term
-
-    def __init__(self, t) -> None:
-        if len(t) == 1:
-            items = t[0]
-            self.left = items[0]
-            self.right = items[1]
-
-    def __repr__(self) -> str:
-        return f"<Equals left={self.left} right={self.right}>"
-
-    def to_string(self):
-        return f"{self.left.to_string()}=={self.right.to_string()}"
 
 
 class Real(Term):
@@ -317,7 +302,6 @@ def get_terms(variable: ParserElement) -> ParserElement:
     function_0 = (function_word + pp.Suppress("()")).setParseAction(Function)
     emphasis = pp.Suppress(pp.Char("*"))
     xbar = pp.Suppress(pp.Literal("**") | pp.Literal("x̄"))
-    equals = pp.Suppress(pp.Literal("=="))
     comma = pp.Suppress(",")
     real_word = (
         pp.Optional(pp.Literal("-"))
@@ -330,7 +314,6 @@ def get_terms(variable: ParserElement) -> ParserElement:
         [
             (function_word, 1, pp_right, Function),
             (xbar, 2, pp_left, Xbar),
-            (equals, 2, pp_left, Equals),
             (emphasis, 1, pp_left, Emphasis),
             (comma, 2, pp_left, Comma),
         ],
@@ -358,7 +341,7 @@ def get_expr():
     quantified_expr = pp.Group(quantifier + variable).setParseAction(Quantified)
 
     do_word = pp.Literal("do")
-    predicate_word = pp.Word(pp.alphanums) + ~do_word
+    predicate_word = (pp.Word(pp.alphanums) + ~do_word) | pp.Literal("==")
 
     terms = get_terms(variable).setResultsName("terms", listAllMatches=True)
 

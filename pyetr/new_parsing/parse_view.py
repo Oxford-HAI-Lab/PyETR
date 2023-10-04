@@ -1,6 +1,8 @@
-from typing import cast
+from typing import Optional, cast
 
 from pyetr.atoms import Atom, OpenAtom, OpenPredicateAtom, Predicate, PredicateAtom
+from pyetr.atoms.doatom import DoAtom
+from pyetr.atoms.open_doatom import OpenDoAtom
 from pyetr.atoms.terms import (
     ArbitraryObject,
     Function,
@@ -11,9 +13,12 @@ from pyetr.atoms.terms import (
     QuestionMark,
     Term,
 )
+from pyetr.atoms.terms.function import RealNumber
+from pyetr.atoms.terms.special_funcs import XBar
 from pyetr.common_parsing import (
     Variable,
     get_variable_map_and_dependencies,
+    merge_atoms_with_opens,
     merge_terms_with_opens,
 )
 from pyetr.issues import IssueStructure
@@ -63,7 +68,7 @@ def parse_term(
         raise ValueError(f"Invalid term {t}")
 
 
-def parse_atom(
+def parse_predicate_atom(
     atom: parsing.Atom,
     variable_map: dict[str, ArbitraryObject],
     function_map: dict[str, Function],
@@ -89,6 +94,30 @@ def parse_atom(
     return PredicateAtom(predicate=predicate, terms=tuple(terms)), open_atoms
 
 
+def parse_do_atom(
+    atom: parsing.DoAtom,
+    variable_map: dict[str, ArbitraryObject],
+    function_map: dict[str, Function],
+) -> tuple[DoAtom, list[tuple[Term, OpenDoAtom]]]:
+    atoms: list[PredicateAtom] = []
+    open_atom_sets: list[list[tuple[Term, OpenPredicateAtom]]] = []
+    for a in atom.atoms:
+        parsed_a, open_atoms = parse_predicate_atom(
+            a, variable_map=variable_map, function_map=function_map
+        )
+        atoms.append(parsed_a)
+        open_atom_sets.append(open_atoms)
+
+    new_open_terms_sets = merge_atoms_with_opens(atoms, open_atom_sets)
+
+    open_do_atoms = [
+        (t, OpenDoAtom(atoms=set(open_atoms), polarity=atom.polarity))
+        for t, open_atoms in new_open_terms_sets
+    ]
+
+    return DoAtom(polarity=atom.polarity, atoms=set(atoms)), open_do_atoms
+
+
 def parse_state(
     s: parsing.State,
     variable_map: dict[str, ArbitraryObject],
@@ -98,13 +127,15 @@ def parse_state(
     new_atoms: list[Atom] = []
     for atom in s.atoms:
         if isinstance(atom, parsing.Atom):
-            parsed_atom, new_issues = parse_atom(
+            parsed_atom, new_issues = parse_predicate_atom(
                 atom, variable_map=variable_map, function_map=function_map
             )
-            new_atoms.append(parsed_atom)
-            issues += new_issues
         else:
-            raise NotImplementedError
+            parsed_atom, new_issues = parse_do_atom(
+                atom, variable_map=variable_map, function_map=function_map
+            )
+        new_atoms.append(parsed_atom)
+        issues += new_issues
     return State(new_atoms), issues
 
 
@@ -142,13 +173,62 @@ def parse_weighted_states(
     return weights, issues
 
 
-def get_function_map():
-    raise NotImplementedError
+def gather_funcs(term: parsing.Term) -> list[Function]:
+    funcs: list[Function] = []
+    if isinstance(term, parsing.Real):
+        funcs.append(RealNumber(term.num))
+    elif isinstance(term, parsing.Xbar):
+        funcs.append(XBar)
+    elif isinstance(term, parsing.Emphasis):
+        funcs += gather_funcs(term.arg)
+    elif isinstance(term, parsing.Summation):
+        for arg in term.args:
+            funcs += gather_funcs(arg)
+    elif isinstance(term, parsing.Function):
+        funcs.append(Function(term.name, arity=len(term.args)))
+    elif isinstance(term, Variable):
+        pass
+    else:
+        assert False
+    return list(set(funcs))
+
+
+def get_function_map(
+    stage: parsing.Stage, supposition: Optional[parsing.Supposition]
+) -> dict[str, Function]:
+    terms_to_scan: list[parsing.Term] = []
+    for state in stage.states:
+        if state.additive is not None:
+            terms_to_scan += state.additive.multiset
+        if state.multiplicative is not None:
+            terms_to_scan += state.multiplicative.multiset
+        for atom in state.state.atoms:
+            if isinstance(atom, parsing.Atom):
+                terms_to_scan += atom.terms
+            else:
+                for a in atom.atoms:
+                    terms_to_scan += a.terms
+
+    if supposition is not None:
+        for state in supposition.states:
+            for atom in state.atoms:
+                if isinstance(atom, parsing.Atom):
+                    terms_to_scan += atom.terms
+                else:
+                    for a in atom.atoms:
+                        terms_to_scan += a.terms
+
+    new_funcs: list[Function] = []
+
+    for term in terms_to_scan:
+        new_funcs += gather_funcs(term)
+
+    return {f.name: f for f in new_funcs}
 
 
 def parse_pv(pv: parsing.ParserView) -> View:
     variable_map, dep_rel = get_variable_map_and_dependencies(pv.quantifiers)
-    function_map = get_function_map()
+    function_map = get_function_map(pv.stage, pv.supposition)
     w_stage, issues = parse_weighted_states(
         pv.stage.states, variable_map=variable_map, function_map=function_map
     )

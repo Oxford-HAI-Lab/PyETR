@@ -1,5 +1,7 @@
 from copy import copy
 
+from pyetr.atoms.open_predicate_atom import OpenPredicateAtom, get_open_atom_equivalent
+from pyetr.atoms.predicate_atom import PredicateAtom
 from pyetr.atoms.terms import ArbitraryObject, OpenTerm, Term, get_open_equivalent
 from pyetr.dependency import DependencyRelation, dependencies_from_sets
 
@@ -87,3 +89,18 @@ def merge_terms_with_opens(
                 fresh_terms[i] = open_term
                 new_terms_sets.append((t, fresh_terms))
     return new_terms_sets
+
+
+def merge_atoms_with_opens(
+    atoms: list[PredicateAtom],
+    open_atom_sets: list[list[tuple[Term, OpenPredicateAtom]]],
+) -> list[tuple[Term, list[OpenPredicateAtom]]]:
+    new_atoms = [get_open_atom_equivalent(a) for a in atoms]
+    new_atoms_sets: list[tuple[Term, list[OpenPredicateAtom]]] = []
+    for i, open_atoms in enumerate(open_atom_sets):
+        if len(open_atoms) > 0:
+            for t, open_atom in open_atoms:
+                fresh_atoms = copy(new_atoms)
+                fresh_atoms[i] = open_atom
+                new_atoms_sets.append((t, fresh_atoms))
+    return new_atoms_sets

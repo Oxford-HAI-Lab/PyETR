@@ -1,8 +1,9 @@
 from typing import Self
 
+from pyetr.atoms.terms.open_term import get_open_equivalent
+
 from .abstract import OpenAtom
 from .atom_likes import PredicateAtomLike
-from .predicate import Predicate
 from .predicate_atom import PredicateAtom
 from .terms import ArbitraryObject, OpenTerm, Term
 
@@ -25,3 +26,10 @@ class OpenPredicateAtom(PredicateAtomLike[OpenTerm], OpenAtom):
 
     def __invert__(self) -> Self:
         return OpenPredicateAtom(~self.predicate, self.terms)
+
+
+def get_open_atom_equivalent(atom: PredicateAtom) -> OpenPredicateAtom:
+    return OpenPredicateAtom(
+        predicate=atom.predicate,
+        terms=tuple([get_open_equivalent(t) for t in atom.terms]),
+    )
