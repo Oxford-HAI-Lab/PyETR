@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from typing import cast
 
 from .inference import basic_step, default_inference_procedure
+from .new_parsing import parse_string_to_view as ps2
 from .parsing import parse_string_to_view as ps
 from .view import View
 
@@ -1268,6 +1269,82 @@ class e63_modified(WHQuery, BaseExample):
         ps("∃a D(a*)"),
     )
     c = ps("∀x ∃y (D(f(y,x)*) ∨ D(n()*))")
+
+
+class e64i(BaseExample):
+    """
+    Example 64, p189, p223
+
+    A device has been invented for screening a population for a disease known as psylicrapitis.
+    The device is a very good one, but not perfect. If someone is a sufferer, there is a 90% chance
+    that he will recorded positively. If he is not a sufferer, there is still a 1% chance that he will
+    be recorded positively.
+
+    Roughly 1% of the population has the disease. Mr Smith has been tested, and the result is positive.
+
+    What is the chance that he is in fact a sufferer?
+    """
+
+    # TODO: Is this supposed to be default inference? Note incorrect depose
+    # TODO: Note typo line 2 introduction of P
+    v = (
+        ps2("∀x {90=* S(x)T(x), S(x)~T(x)}^{S(x)}"),
+        ps2("∀x {1=* ~S(x)T(x), ~S(x)~T(x)} ^ {~S(x)}"),
+        ps2("{T(Smith())}"),
+        ps2("∀x {x=* S(Smith())}"),
+    )
+    c: View = ps2("{90=* S(Smith()), 0}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = (
+            cls.v[0]
+            .depose(verbose=verbose)
+            .update(cls.v[1], verbose=verbose)
+            .update(cls.v[2], verbose=verbose)
+            .factor(View.get_falsum())
+            .which(cls.v[3])
+        )
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class e71:
+    """
+    Example 71, and 78, page 212
+
+    There is a box in which there is a yellow card or a brown card, but not both.
+
+    Given the preceding assertion, according to you, what is the probability of the following situation?
+
+    In the box there is a yellow card and there is not a brown card
+    """
+
+    # TODO: Note typo on 212, By~Bb -> By~By
+    v = (
+        ps2("{B(yellow())~B(brown()), ~B(yellow())B(brown())}"),
+        ps2("{50=* 0}^{B(yellow())~B(brown())}"),
+        ps2("{50=* 0}^{~B(yellow())B(brown())}"),
+        ps2("{B(yellow())~B(brown())}"),
+    )
+    c = (
+        ps2("{50=* B(yellow())~B(brown()), 50=* ~B(yellow())B(brown())}"),
+        ps2("{50=* B(yellow())~B(brown()), 0}"),
+    )
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = (
+            cls.v[0]
+            .inquire(cls.v[1], verbose=verbose)
+            .inquire(cls.v[2], verbose=verbose)
+        )
+        if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(f"Expected: {cls.c[0]} but received {mid_result}")
+
+        result = mid_result.query(cls.v[3], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected: {cls.c[1]} but received {mid_result}")
 
 
 class UniProduct(BaseExample):

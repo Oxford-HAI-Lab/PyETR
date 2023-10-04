@@ -264,7 +264,8 @@ class View:
 
     def validate(self, *, pre_view: bool = False):
         self.dependency_relation.validate_against_states(
-            self.stage | self.supposition, pre_view=pre_view
+            (self.stage | self.supposition).arb_objects | self.weights.arb_objects,
+            pre_view=pre_view,
         )
 
         for s, w in self.weights.items():
@@ -348,7 +349,10 @@ class View:
         else:
             issue_string = f" issues={self.issue_structure}"
 
-        weight_string = f" weights={self.weights}"
+        if all([i.is_null for i in self.weights.values()]):
+            weight_string = ""
+        else:
+            weight_string = f" weights={self.weights}"
         return (
             f"{self.stage}^{self.supposition}{issue_string}{dep_string}{weight_string}"
         )
@@ -361,6 +365,7 @@ class View:
             and self.supposition == other.supposition
             and self.dependency_relation == other.dependency_relation
             and self.issue_structure == other.issue_structure
+            and self.weights == other.weights
         )
 
     def __hash__(self) -> int:
@@ -370,6 +375,7 @@ class View:
                 self.supposition,
                 self.dependency_relation,
                 self.issue_structure,
+                self.weights,
             )
         )
 

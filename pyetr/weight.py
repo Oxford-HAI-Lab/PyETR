@@ -11,6 +11,16 @@ class Weight:
         self.multiplicative = multiplicative
         self.additive = additive
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Weight):
+            return False
+        return (self.multiplicative == other.multiplicative) and (
+            self.additive == other.additive
+        )
+
+    def __hash__(self) -> int:
+        return hash((self.multiplicative, self.additive))
+
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
         arbs = set()
@@ -99,6 +109,24 @@ class Weights:
     def __init__(self, weights_dict: dict[State, Weight]) -> None:
         self._weights = weights_dict
 
+    def __iter__(self):
+        return iter(self._weights)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Weights):
+            return False
+        return self._weights == other._weights
+
+    def __hash__(self) -> int:
+        return hash(self._weights)
+
+    @property
+    def arb_objects(self) -> set[ArbitraryObject]:
+        arbs = set()
+        for weight in self.values():
+            arbs |= weight.arb_objects
+        return arbs
+
     def __add__(self, other: "Weights") -> "Weights":
         new_weights: dict[State, Weight] = {}
         for k, x in self._weights.items():
@@ -118,6 +146,8 @@ class Weights:
         return f"<Weights {weight_details}>"
 
     def __getitem__(self, item: State):
+        if item not in self._weights:
+            raise ValueError(f"{self} and {item}")
         return self._weights[item]
 
     def _adding(self, state: State, weight: Weight):
