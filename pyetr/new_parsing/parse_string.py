@@ -226,7 +226,7 @@ class Weight:
     multiset: list["Term"]
 
     def __init__(self, t) -> None:
-        self.multiset = [i for i in t]
+        self.multiset = list(t)
 
 
 class AdditiveWeight(Weight):
@@ -287,7 +287,7 @@ class Stage:
     states: list[WeightedState]
 
     def __init__(self, t) -> None:
-        self.states = t
+        self.states = list(t)
 
     def __repr__(self) -> str:
         return f"<Stage states={self.states}>"
