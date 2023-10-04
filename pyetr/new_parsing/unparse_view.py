@@ -1,28 +1,61 @@
 from typing import cast
 
 import pyetr.new_parsing.parse_string as parsing
-from pyetr.atoms.abstract import Atom
-from pyetr.atoms.doatom import DoAtom
-from pyetr.atoms.open_doatom import OpenDoAtom
-from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
-from pyetr.atoms.predicate_atom import PredicateAtom
-from pyetr.atoms.terms.open_term import OpenTerm
-from pyetr.atoms.terms.term import Term
-from pyetr.common_parsing import get_quantifiers
+from pyetr.atoms import Atom, DoAtom, OpenDoAtom, OpenPredicateAtom, PredicateAtom
+from pyetr.atoms.terms import (
+    ArbitraryObject,
+    FunctionalTerm,
+    OpenFunctionalTerm,
+    OpenTerm,
+    QuestionMark,
+    RealNumber,
+    Summation,
+    Term,
+    XBar,
+)
+from pyetr.common_parsing import Variable, get_quantifiers
 from pyetr.issues import IssueStructure
 from pyetr.stateset import State, Supposition
 from pyetr.view import View
 from pyetr.weight import Weight, Weights
 
 
-def unparse_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> parsing.Term:
-    raise NotImplementedError
+def unparse_term(
+    term: Term, open_terms: list[tuple[Term, OpenTerm]]
+) -> parsing.Term | Variable:
+    if any([isinstance(o, QuestionMark) for _, o in open_terms]):
+        remaining_terms = [
+            (t, o) for t, o in open_terms if not isinstance(o, QuestionMark)
+        ]
+        return parsing.Emphasis([[unparse_term(term, remaining_terms)]])
+    if isinstance(term, FunctionalTerm):
+        new_subterms: list[parsing.Term | Variable] = []
+        for i, subterm in enumerate(term.t):
+            rel_open_terms: list[tuple[Term, OpenTerm]] = []
+            for t, o in open_terms:
+                assert isinstance(o, OpenFunctionalTerm)
+                rel_open_terms.append((t, o.t[i]))
+            new_subterms.append(unparse_term(subterm, rel_open_terms))
+
+        if isinstance(term.f, RealNumber):
+            return parsing.Real([term.f.num])
+        elif term.f == XBar:
+            return parsing.Xbar([list(term.t)])
+        elif term.f == Summation:
+            return parsing.Summation([term.f.name, parsing.Comma(term.t)])
+        else:
+            return parsing.Function([term.f.name, parsing.Comma([new_subterms])])
+
+    elif isinstance(term, ArbitraryObject):
+        return Variable([term.name])
+    else:
+        raise ValueError(f"Invalid term {term} provided")
 
 
 def unparse_predicate_atom(
     predicate_atom: PredicateAtom, open_atoms: list[tuple[Term, OpenPredicateAtom]]
 ) -> parsing.Atom:
-    new_terms: list[parsing.Term] = []
+    new_terms: list[parsing.Term | Variable] = []
     for i, term in enumerate(predicate_atom.terms):
         open_terms = [(t, o.terms[i]) for t, o in open_atoms]
         new_terms.append(unparse_term(term, open_terms))
