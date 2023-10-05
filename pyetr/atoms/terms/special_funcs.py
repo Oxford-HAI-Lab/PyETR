@@ -14,6 +14,7 @@ def _process_func(term: AbstractTerm) -> AbstractTerm:
 def summation_func(term: AbstractFunctionalTerm) -> AbstractFunctionalTerm:
     # If all num are real, return Summation
     # Else return real
+
     if term.f != Summation:
         raise ValueError(f"Summation func must receive a summation")
     subterms = term.t
@@ -24,9 +25,9 @@ def summation_func(term: AbstractFunctionalTerm) -> AbstractFunctionalTerm:
     new_total: float = 0
     for sum_term in terms_to_sum:
         if isinstance(sum_term, AbstractFunctionalTerm) and isinstance(
-            term.f, RealNumber
+            sum_term.f, RealNumber
         ):
-            new_total += term.f.num
+            new_total += sum_term.f.num
         else:
             if terms_to_sum == list(multiset):
                 return term

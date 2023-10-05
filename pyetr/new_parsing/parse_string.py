@@ -176,7 +176,7 @@ class Summation(Term):
             self.args = []
         else:
             items = t[0]
-            self.args = items[1].operands
+            self.args = items[1].args
 
     def __repr__(self) -> str:
         return f"<Summation args={self.args}>"
@@ -308,9 +308,7 @@ class Stage:
 
 @cache
 def get_terms(variable: ParserElement) -> ParserElement:
-    function_word = (
-        pp.Literal("++") | pp.Literal("σ") | pp.Word(pp.alphas, pp.alphanums)
-    ).setResultsName("predicate")
+    function_word = (pp.Word(pp.alphas, pp.alphanums)).setResultsName("predicate")
 
     function_0 = (function_word + pp.Suppress("()")).setParseAction(Function)
     emphasis = pp.Suppress(pp.Char("*"))
@@ -322,9 +320,11 @@ def get_terms(variable: ParserElement) -> ParserElement:
         + pp.Optional(pp.Literal(".") + pp.Word(pp.nums))
     )
     reals = real_word.setResultsName("reals").setParseAction(Real)
+    summation_word = pp.Literal("++") | pp.Literal("σ")
     terms = pp.infixNotation(
         function_0 | reals | variable,
         [
+            (summation_word, 1, pp_right, Summation),
             (function_word, 1, pp_right, Function),
             (xbar, 2, pp_left, Xbar),
             (emphasis, 1, pp_left, Emphasis),
