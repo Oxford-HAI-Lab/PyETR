@@ -144,12 +144,11 @@ class Function(Term):
             self.name = t[0]
             self.args = []
         else:
-            items = t[0]
-            self.name = items[0]
-            if len(items) == 2 and isinstance(items[1], Comma):
-                self.args = items[1].args
+            self.name = t[0]
+            if len(t) == 2 and isinstance(t[1], Comma):
+                self.args = t[1].args
             else:
-                self.args = items[1:]
+                self.args = t[1:]
 
     def __repr__(self) -> str:
         return f"<Function name={self.name} args={self.args}>"
@@ -213,7 +212,7 @@ class Real(Term):
     num: float
 
     def __init__(self, t) -> None:
-        self.num = float("".join(t))
+        self.num = float("".join([str(i) for i in t]))
 
     def to_string(self):
         return f"{self.num}"
