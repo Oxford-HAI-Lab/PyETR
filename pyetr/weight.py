@@ -50,7 +50,15 @@ class Weight:
         return Weight(multiplicative=v_cross_w, additive=self.additive + other.additive)
 
     def __repr__(self) -> str:
-        return f"{self.multiplicative}×.{self.additive}+"
+        if len(self.multiplicative) == 0:
+            multi_str = ""
+        else:
+            multi_str = f"{self.multiplicative}×."
+        if len(self.additive) == 0:
+            add_str = ""
+        else:
+            add_str = f"{self.additive}+."
+        return f"{multi_str}{add_str}"
 
     @property
     def detailed(self):
@@ -188,4 +196,4 @@ class Weights:
         return Weights({k: v for k, v in self.items() if k in set_of_states})
 
     def __repr__(self) -> str:
-        return "{" + ",".join([f"{w}.{s}" for s, w in self.items()]) + "}"
+        return "{" + ",".join([f"{w}{s}" for s, w in self.items()]) + "}"

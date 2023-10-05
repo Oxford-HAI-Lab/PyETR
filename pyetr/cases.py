@@ -2,6 +2,9 @@ __all__ = ["BaseExample"]
 from abc import ABCMeta, abstractmethod
 from typing import cast
 
+from pyetr.atoms.terms.function import RealNumber
+from pyetr.atoms.terms.term import FunctionalTerm
+
 from .inference import basic_step, default_inference_procedure
 from .new_parsing import parse_string_to_view as ps
 from .view import View
@@ -1297,11 +1300,121 @@ class e64i(BaseExample):
             .depose(verbose=verbose)
             .update(cls.v[1], verbose=verbose)
             .update(cls.v[2], verbose=verbose)
-            .factor(View.get_falsum())
-            .which(cls.v[3])
+            .factor(View.get_falsum(), verbose=verbose)
+            .which(cls.v[3], verbose=verbose)
         )
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class e64ii(e64i):
+    v = (
+        ps("∀x {90=* P(x)S(x)T(x), P(x)S(x)~T(x)}^{P(x)S(x)}"),
+        ps("∀x {1=* P(x)~S(x)T(x), P(x)~S(x)~T(x)} ^ {P(x)~S(x)}"),
+        ps("∀x {1=* P(x)S(x), P(x)~S(x)} ^ {P(x)}"),
+        ps("{P(Smith())T(Smith())}"),
+        ps("∀x {x=* S(Smith())}"),
+    )
+    c: View = ps("{90=* S(Smith()), 0}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = (
+            cls.v[0]
+            .depose(verbose=verbose)
+            .update(cls.v[1], verbose=verbose)
+            .update(cls.v[2], verbose=verbose)
+            .update(cls.v[3], verbose=verbose)
+            .factor(View.get_falsum(), verbose=verbose)
+            .which(cls.v[4], verbose=verbose)
+        )
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class e65(BaseExample):
+    """
+    Example 65 p190, p224
+
+    (Base-rate neglect with doctors and realistic disease) Imagine you conduct
+    a screening using the hemoccult test in a certain region. For symptom-free
+    people over 50 years old who participate in screening using the hemocult test,
+    the following information is available for this region.
+
+    The probability that one of these people has colorectal cancer is 0.3%. If a
+    person has colorectal cancer, the probability is 50 that he will have a positive
+    hemocult test. If a person does not have a colorectal cancer, the probability is
+    3% that he will still have a positive hemoccult test in your screening. What is
+    the probability that this person actually has colorectal cancer?
+    """
+
+    v = (
+        ps("∀x {0.3=* P(x)C(x), P(x)~C(x)}^{P(x)}"),
+        ps("∀x {50=* P(x)C(x)T(x),P(x)C(x)~T(x)}^{P(x)C(x)}"),
+        ps("∀x {3=* P(x)~C(x)T(x),P(x)~C(x)~T(x)}^{P(x)~C(x)}"),
+        ps("∃a {P(a)T(a)}"),
+        ps("∃a ∀x {x=* C(a)}"),  # TODO: Specifically has no dep
+    )
+    c: View = ps("∃a {15=* C(a), 0}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = (
+            cls.v[0]
+            .depose(verbose=verbose)
+            .update(cls.v[1], verbose=verbose)
+            .update(cls.v[2], verbose=verbose)
+            .update(cls.v[3], verbose=verbose)
+            .factor(View.get_falsum(), verbose=verbose)
+            .which(cls.v[4], verbose=verbose)
+        )
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class e66i(BaseExample):
+    """
+    Example 66, p191, p225
+
+    Think of 100 people.
+
+    1. One of the disease psylicrapitis, and he is likely to be positive.
+    2. Of those who do not have the disease, 1 will also test positive.
+
+    How many of those who test positive do have the disease? Out of ? # TODO: Why this ?
+    """
+
+    v = (
+        ps("{1=* D()T(), 1=* ~D()T(), 98=* ~D()}"),
+        ps("{D()P()}"),
+    )
+    c: View = ps("{}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].stage.equilibrium_answer_potential(
+            cls.v[1].stage, cls.v[1].weights
+        )
+        out = FunctionalTerm(f=RealNumber(num=1), t=())
+        if not result == out:
+            raise RuntimeError(f"Expected: {out} but received {result}")
+
+
+class e66ii(e66i):
+    v = (
+        ps("{1=* D()T(), 1=* ~D()T(), 98=* ~D()}"),
+        ps("{P()}"),
+    )
+    c: View = ps("{}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].stage.equilibrium_answer_potential(
+            cls.v[1].stage, cls.v[1].weights
+        )
+        out = FunctionalTerm(f=RealNumber(num=2), t=())
+        if not result == out:
+            raise RuntimeError(f"Expected: {out} but received {result}")
 
 
 class e71(BaseExample):
