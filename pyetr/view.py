@@ -349,13 +349,11 @@ class View:
         else:
             issue_string = f" issues={self.issue_structure}"
 
-        if all([i.is_null for i in self.weights.values()]):
-            weight_string = ""
-        else:
-            weight_string = f" weights={self.weights}"
-        return (
-            f"{self.stage}^{self.supposition}{issue_string}{dep_string}{weight_string}"
-        )
+        # if all([i.is_null for i in self.weights.values()]):
+        #     weight_string = ""
+        # else:
+        #     weight_string = f" weights={self.weights}"
+        return f"{self.weights}^{self.supposition}{issue_string}{dep_string}"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, View):
