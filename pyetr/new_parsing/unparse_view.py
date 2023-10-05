@@ -1,4 +1,3 @@
-from audioop import mul
 from typing import Optional, cast
 
 import pyetr.new_parsing.parse_string as parsing

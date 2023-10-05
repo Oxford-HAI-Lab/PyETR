@@ -1309,7 +1309,7 @@ class e64i(BaseExample):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
-class e71:
+class e71(BaseExample):
     """
     Example 71, and 78, page 212
 
@@ -1327,7 +1327,7 @@ class e71:
         ps2("{50=* 0}^{~B(yellow())B(brown())}"),
         ps2("{B(yellow())~B(brown())}"),
     )
-    c = (
+    c: tuple[View, View] = (
         ps2("{50=* B(yellow())~B(brown()), 50=* ~B(yellow())B(brown())}"),
         ps2("{50=* B(yellow())~B(brown()), 0}"),
     )
