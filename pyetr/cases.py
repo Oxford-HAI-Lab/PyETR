@@ -136,7 +136,7 @@ class e1(DefaultInference, BaseExample):
 
     v: tuple[View, View] = (
         ps(
-            "{PeeringIntoTheGarden(Mark())StandingAtTheWindow(Mark()),KneelingByTheFire(Jane())LookingAtTV(Jane())}"
+            "{KneelingByTheFire(Jane())LookingAtTV(Jane()), PeeringIntoTheGarden(Mark())StandingAtTheWindow(Mark())}"
         ),
         ps("{KneelingByTheFire(Jane())}"),
     )
@@ -188,8 +188,8 @@ class samples:
 
 class e5ii(Product, BaseExample):
     v: tuple[View, View] = (
-        ps(f"{samples.delta},{samples.gamma}"),
-        ps(f"{samples.epsilon},{samples.theta}"),
+        ps("{" + f"{samples.delta},{samples.gamma}" + "}"),
+        ps("{" + f"{samples.epsilon},{samples.theta}" + "}"),
     )
     c: View = ps(
         "{p2()r1()q2()s1(),s2()r1()r2()s1(),s2()p1()q1()r2(),p2()p1()q1()q2()}"
@@ -197,7 +197,10 @@ class e5ii(Product, BaseExample):
 
 
 class e5iii(Product, BaseExample):
-    v: tuple[View, View] = (ps(f"{samples.gamma}, {samples.delta}"), View.get_falsum())
+    v: tuple[View, View] = (
+        ps("{" + f"{samples.gamma}, {samples.delta}" + "}"),
+        View.get_falsum(),
+    )
     c: View = View.get_falsum()
 
 
@@ -484,8 +487,8 @@ class e21(BaseExample):
     Example 21
     """
 
-    v: tuple[View] = (ps(f"{samples.delta}"),)
-    c: View = ps(f"{samples.delta}").negation()
+    v: tuple[View] = (ps("{" + f"{samples.delta}" + "}"),)
+    c: View = ps("{" + f"{samples.delta}" + "}").negation()
 
     @classmethod
     def test(cls, verbose: bool = False):

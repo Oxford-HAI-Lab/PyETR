@@ -70,7 +70,7 @@ def unparse_term(
         elif term.f == XBar:
             return parsing.Xbar([list(new_subterms)])
         elif term.f == Summation:
-            return parsing.Summation([term.f.name, parsing.Comma([new_subterms])])
+            return parsing.Summation([[term.f.name, parsing.Comma([new_subterms])]])
         else:
             return parsing.Function([term.f.name, parsing.Comma([new_subterms])])
 
