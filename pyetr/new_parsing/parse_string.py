@@ -144,11 +144,21 @@ class Function(Term):
             self.name = t[0]
             self.args = []
         else:
-            self.name = t[0]
-            if len(t) == 2 and isinstance(t[1], Comma):
-                self.args = t[1].args
+            if len(t) == 2:
+                self.name = t[0]
+                if isinstance(t[1], Comma):
+                    self.args = t[1].args
+                else:
+                    self.args = [t[1]]
+            elif len(t) == 1:
+                items = t[0]
+                self.name = items[0]
+                if isinstance(items[1], Comma):
+                    self.args = items[1].args
+                else:
+                    self.args = [items[1]]
             else:
-                self.args = t[1:]
+                assert False
 
     def __repr__(self) -> str:
         return f"<Function name={self.name} args={self.args}>"
