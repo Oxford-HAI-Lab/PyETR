@@ -4,7 +4,6 @@ from typing import cast
 
 from .inference import basic_step, default_inference_procedure
 from .new_parsing import parse_string_to_view as ps
-from .new_parsing import parse_string_to_view as ps2
 from .view import View
 
 
@@ -1284,12 +1283,12 @@ class e64i(BaseExample):
     # TODO: Is this supposed to be default inference? Note incorrect depose
     # TODO: Note typo line 2 introduction of P
     v = (
-        ps2("∀x {90=* S(x)T(x), S(x)~T(x)}^{S(x)}"),
-        ps2("∀x {1=* ~S(x)T(x), ~S(x)~T(x)} ^ {~S(x)}"),
-        ps2("{T(Smith())}"),
-        ps2("∀x {x=* S(Smith())}"),
+        ps("∀x {90=* S(x)T(x), S(x)~T(x)}^{S(x)}"),
+        ps("∀x {1=* ~S(x)T(x), ~S(x)~T(x)} ^ {~S(x)}"),
+        ps("{T(Smith())}"),
+        ps("∀x {x=* S(Smith())}"),
     )
-    c: View = ps2("{90=* S(Smith()), 0}")
+    c: View = ps("{90=* S(Smith()), 0}")
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -1318,14 +1317,14 @@ class e71(BaseExample):
 
     # TODO: Note typo on 212, By~Bb -> By~By
     v = (
-        ps2("{B(yellow())~B(brown()), ~B(yellow())B(brown())}"),
-        ps2("{50=* 0}^{B(yellow())~B(brown())}"),
-        ps2("{50=* 0}^{~B(yellow())B(brown())}"),
-        ps2("{B(yellow())~B(brown())}"),
+        ps("{B(yellow())~B(brown()), ~B(yellow())B(brown())}"),
+        ps("{50=* 0}^{B(yellow())~B(brown())}"),
+        ps("{50=* 0}^{~B(yellow())B(brown())}"),
+        ps("{B(yellow())~B(brown())}"),
     )
     c: tuple[View, View] = (
-        ps2("{50=* B(yellow())~B(brown()), 50=* ~B(yellow())B(brown())}"),
-        ps2("{50=* B(yellow())~B(brown()), 0}"),
+        ps("{50=* B(yellow())~B(brown()), 50=* ~B(yellow())B(brown())}"),
+        ps("{50=* B(yellow())~B(brown()), 0}"),
     )
 
     @classmethod
