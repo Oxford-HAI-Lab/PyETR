@@ -1,4 +1,5 @@
-from typing import cast
+from audioop import mul
+from typing import Optional, cast
 
 import pyetr.new_parsing.parse_string as parsing
 from pyetr.atoms import Atom, DoAtom, OpenDoAtom, OpenPredicateAtom, PredicateAtom
@@ -13,11 +14,31 @@ from pyetr.atoms.terms import (
     Term,
     XBar,
 )
+from pyetr.atoms.terms.open_term import OpenMultiset
+from pyetr.atoms.terms.term import Multiset
 from pyetr.common_parsing import Variable, get_quantifiers
 from pyetr.issues import IssueStructure
 from pyetr.stateset import State, Supposition
 from pyetr.view import View
 from pyetr.weight import Weight, Weights
+
+
+def unparse_multiset(
+    multiset: Multiset, open_multisets: Optional[list[tuple[Term, OpenMultiset]]] = None
+) -> list[parsing.Term | Variable]:
+    if open_multisets is None:
+        new_subterms: list[parsing.Term | Variable] = []
+        for i, subterm in enumerate(multiset):
+            new_subterms.append(unparse_term(subterm, []))
+        return new_subterms
+    else:
+        new_subterms: list[parsing.Term | Variable] = []
+        for i, subterm in enumerate(multiset):
+            rel_open_terms: list[tuple[Term, OpenTerm]] = []
+            for t, o in open_multisets:
+                rel_open_terms.append((t, o._items[i]))
+            new_subterms.append(unparse_term(subterm, rel_open_terms))
+        return new_subterms
 
 
 def unparse_term(
@@ -29,25 +50,35 @@ def unparse_term(
         ]
         return parsing.Emphasis([[unparse_term(term, remaining_terms)]])
     if isinstance(term, FunctionalTerm):
-        new_subterms: list[parsing.Term | Variable] = []
-        for i, subterm in enumerate(term.t):
-            rel_open_terms: list[tuple[Term, OpenTerm]] = []
-            for t, o in open_terms:
-                assert isinstance(o, OpenFunctionalTerm)
-                rel_open_terms.append((t, o.t[i]))
-            new_subterms.append(unparse_term(subterm, rel_open_terms))
+        if len(term.t) == 1 and isinstance(term.t[0], Multiset):
+            multi = term.t[0]
+            open_multis: list[tuple[Term, OpenMultiset]] = []
+            for t, open_term in open_terms:
+                if isinstance(open_term, OpenMultiset):
+                    open_multis.append((t, open_term))
+            new_subterms = unparse_multiset(multiset=multi, open_multisets=open_multis)
+        else:
+            new_subterms: list[parsing.Term | Variable] = []
+            for i, subterm in enumerate(term.t):
+                rel_open_terms: list[tuple[Term, OpenTerm]] = []
+                for t, o in open_terms:
+                    assert isinstance(o, OpenFunctionalTerm)
+                    rel_open_terms.append((t, o.t[i]))
+                new_subterms.append(unparse_term(subterm, rel_open_terms))
 
         if isinstance(term.f, RealNumber):
             return parsing.Real([term.f.num])
         elif term.f == XBar:
-            return parsing.Xbar([list(term.t)])
+            return parsing.Xbar([list(new_subterms)])
         elif term.f == Summation:
-            return parsing.Summation([term.f.name, parsing.Comma(term.t)])
+            return parsing.Summation([term.f.name, parsing.Comma([new_subterms])])
         else:
             return parsing.Function([term.f.name, parsing.Comma([new_subterms])])
 
     elif isinstance(term, ArbitraryObject):
         return Variable([term.name])
+    elif isinstance(term, Multiset):
+        assert False
     else:
         raise ValueError(f"Invalid term {term} provided")
 
@@ -111,9 +142,11 @@ def unparse_weighted_state(
         parsing.State | parsing.AdditiveWeight | parsing.MultiplicativeWeight
     ] = [unparse_state(state, issue_structure)]
     if len(weight.additive) > 0:
-        items.append(parsing.AdditiveWeight(weight.additive))
+        items.append(parsing.AdditiveWeight(unparse_multiset(weight.additive)))
     if len(weight.multiplicative) > 0:
-        items.append(parsing.MultiplicativeWeight(weight.additive))
+        items.append(
+            parsing.MultiplicativeWeight(unparse_multiset(weight.multiplicative))
+        )
     return parsing.WeightedState(items)
 
 

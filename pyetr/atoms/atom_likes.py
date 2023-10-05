@@ -62,7 +62,7 @@ class DoAtomLike(Generic[AtomType]):
         return self.atoms == other.atoms and self.polarity == other.polarity
 
     def __hash__(self) -> int:
-        return hash((type(self).__name__, self.atoms, self.polarity))
+        return hash((type(self).__name__, tuple(self.atoms), self.polarity))
 
     def __repr__(self) -> str:
         terms = ",".join([repr(i) for i in self.atoms])
