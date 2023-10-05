@@ -3,8 +3,8 @@ from abc import ABCMeta, abstractmethod
 from typing import cast
 
 from .inference import basic_step, default_inference_procedure
+from .new_parsing import parse_string_to_view as ps
 from .new_parsing import parse_string_to_view as ps2
-from .parsing import parse_string_to_view as ps
 from .view import View
 
 
@@ -136,11 +136,11 @@ class e1(DefaultInference, BaseExample):
 
     v: tuple[View, View] = (
         ps(
-            "(KneelingByTheFire(Jane()) ∧ LookingAtTV(Jane())) ∨ (StandingAtTheWindow(Mark()) ∧ PeeringIntoTheGarden(Mark()))"
+            "{PeeringIntoTheGarden(Mark())StandingAtTheWindow(Mark()),KneelingByTheFire(Jane())LookingAtTV(Jane())}"
         ),
-        ps("KneelingByTheFire(Jane())"),
+        ps("{KneelingByTheFire(Jane())}"),
     )
-    c: View = ps("LookingAtTV(Jane())")
+    c: View = ps("{LookingAtTV(Jane())}")
 
 
 class e2(DefaultInference, BaseExample):
@@ -153,10 +153,10 @@ class e2(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(A(x()) ∧ Q(y())) ∨ (K(z()) ∧ T(w()))"),
-        ps("K(z())"),
+        ps("{T(w())K(z()),Q(y())A(x())}"),
+        ps("{K(z())}"),
     )
-    c: View = ps("T(w())")
+    c: View = ps("{T(w())}")
 
 
 class e3(DefaultInference, BaseExample):
@@ -170,48 +170,51 @@ class e3(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(Ace(a()) ∧ King(k())) ∨ (Queen(q()) ∧ Jack(j()))"),
-        ps("~Ace(a())"),
+        ps("{King(k())Ace(a()),Jack(j())Queen(q())}"),
+        ps("{~Ace(a())}"),
     )
-    c: View = ps("Queen(q()) ∧ Jack(j())")
+    c: View = ps("{Jack(j())Queen(q())}")
 
 
 # e4 is not a test
 
 
 class samples:
-    gamma = "p1() ∧ q1()"
-    delta = "r1() ∧ s1()"
-    epsilon = "p2() ∧ q2()"
-    theta = "r2() ∧ s2()"
+    gamma = "p1()q1()"
+    delta = "r1()s1()"
+    epsilon = "p2()q2()"
+    theta = "s2()r2()"
 
 
 class e5ii(Product, BaseExample):
     v: tuple[View, View] = (
-        ps("p1() ∧ q1() ∨ r1() ∧ s1()"),
-        ps(f"p2() ∧ q2() ∨ r2() ∧ s2()"),
+        ps(f"{samples.delta},{samples.gamma}"),
+        ps(f"{samples.epsilon},{samples.theta}"),
     )
     c: View = ps(
-        "p1() ∧ q1() ∧ p2() ∧ q2() ∨ r1() ∧ s1() ∧ p2() ∧ q2() ∨ p1() ∧ q1() ∧ r2() ∧ s2() ∨ r1() ∧ s1() ∧ r2() ∧ s2()"
+        "{p2()r1()q2()s1(),s2()r1()r2()s1(),s2()p1()q1()r2(),p2()p1()q1()q2()}"
     )
 
 
 class e5iii(Product, BaseExample):
-    v: tuple[View, View] = (ps(f"{samples.gamma} ∨ {samples.delta}"), View.get_falsum())
+    v: tuple[View, View] = (ps(f"{samples.gamma}, {samples.delta}"), View.get_falsum())
     c: View = View.get_falsum()
 
 
 class e5iv(Product, BaseExample):
-    v: tuple[View, View] = (ps(f"{samples.gamma} ∨ {samples.delta}"), View.get_verum())
-    c: View = ps(f"{samples.gamma} ∨ {samples.delta}")
+    v: tuple[View, View] = (
+        ps("{" + f"{samples.gamma}, {samples.delta}" + "}"),
+        View.get_verum(),
+    )
+    c: View = ps("{" + f"{samples.gamma}, {samples.delta}" + "}")
 
 
 class e5v(Product, BaseExample):
     v: tuple[View, View] = (
         View.get_verum(),
-        ps(f"{samples.gamma} ∨ {samples.delta}"),
+        ps("{" + f"{samples.gamma}, {samples.delta}" + "}"),
     )
-    c: View = ps(f"{samples.gamma} ∨ {samples.delta}")
+    c: View = ps("{" + f"{samples.gamma}, {samples.delta}" + "}")
 
 
 class e6(Product, BaseExample):
@@ -221,8 +224,8 @@ class e6(Product, BaseExample):
     There is an Ace and a King = (There is an Ace) x (There is a king)
     """
 
-    v: tuple[View, View] = (ps("a()"), ps("k()"))
-    c: View = ps("a() ∧ k()")
+    v: tuple[View, View] = (ps("{a()}"), ps("{k()}"))
+    c: View = ps("{a()k()}")
 
 
 class e7(Sum, BaseExample):
@@ -232,8 +235,8 @@ class e7(Sum, BaseExample):
     There is an Ace or there is a king = (There is an Ace) + (There is a king)
     """
 
-    v: tuple[View, View] = (ps("a()"), ps("k()"))
-    c: View = ps("a() ∨ k()")
+    v: tuple[View, View] = (ps("{a()}"), ps("{k()}"))
+    c: View = ps("{a(),k()}")
 
 
 class e8(DefaultInference, BaseExample):
@@ -246,8 +249,8 @@ class e8(DefaultInference, BaseExample):
     C There is a ten (and a king)
     """
 
-    v: tuple[View, View] = (ps("a() ∧ q() ∨ k() ∧ t()"), ps("k()"))
-    c: View = ps("t()")
+    v: tuple[View, View] = (ps("{t()k(),a()q()}"), ps("{k()}"))
+    c: View = ps("{t()}")
 
 
 class e10(DefaultInference, BaseExample):
@@ -260,10 +263,10 @@ class e10(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("K(x())"),
-        ps("(A(x()) ∧ Q(y())) ∨ (K(z()) ∧ T(w()))"),
+        ps("{K(x())}"),
+        ps("{T(w())K(z()),Q(y())A(x())}"),
     )
-    c: View = ps("⊤")
+    c: View = ps("{0}")
 
 
 class e11(BasicStep, BaseExample):
@@ -277,11 +280,11 @@ class e11(BasicStep, BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("Smokes(j()) ∨ Smokes(m())"),
-        ps("Smokes(j()) → Drinks(j())"),
-        ps("Smokes(m()) → Eats(m())"),
+        ps("{Smokes(j()),Smokes(m())}"),
+        ps("{Drinks(j())}^{Smokes(j())}"),
+        ps("{Eats(m())}^{Smokes(m())}"),
     )
-    c: View = ps("(Smokes(j()) ∧ Drinks(j())) ∨ (Smokes(m()) ∧ Eats(m()))")
+    c: View = ps("{Smokes(j())Drinks(j()),Eats(m())Smokes(m())}")
 
 
 class e12i(Negation, BaseExample):
@@ -291,8 +294,8 @@ class e12i(Negation, BaseExample):
     ItisnotthecasethatPorQorR
     """
 
-    v: tuple[View] = (ps("P(p()) ∨ Q(q()) ∨ R(r())"),)
-    c: View = ps("~P(p()) ∧ ~Q(q()) ∧ ~R(r())")
+    v: tuple[View] = (ps("{P(p()),Q(q()),R(r())}"),)
+    c: View = ps("{~R(r())~Q(q())~P(p())}")
 
 
 class e12ii(Negation, BaseExample):
@@ -302,8 +305,8 @@ class e12ii(Negation, BaseExample):
     ItisnotthecasethatPandQandR
     """
 
-    v: tuple[View] = (ps("P(p()) ∧ Q(q()) ∧ R(r())"),)
-    c: View = ps("~P(p()) ∨ ~Q(q()) ∨ ~R(r())")
+    v: tuple[View] = (ps("{P(p())R(r())Q(q())}"),)
+    c: View = ps("{~R(r()),~P(p()),~Q(q())}")
 
 
 class e12iii(Negation, BaseExample):
@@ -313,8 +316,8 @@ class e12iii(Negation, BaseExample):
     It is not the case that, supposing S, ((P and Q) or R)
     """
 
-    v: tuple[View] = (ps("S(s()) → ((P(p()) ∧ Q(q())) ∨ R(r()))"),)
-    c: View = ps("(S(s()) ∧ ~P(p()) ∧ ~R(r())) ∨ (S(s()) ∧ ~Q(q()) ∧ ~R(r()))")
+    v: tuple[View] = (ps("{P(p())Q(q()),R(r())}^{S(s())}"),)
+    c: View = ps("{~P(p())S(s())~R(r()),~R(r())~Q(q())S(s())}")
 
 
 class e13(DefaultInference, BaseExample):
@@ -327,10 +330,10 @@ class e13(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(IsAce(a()) ∧ IsKing(k())) ∨ (IsQueen(q()) ∧ IsJack(j()))"),
-        ps("~IsAce(a())"),
+        ps("{IsQueen(q())IsJack(j()),IsAce(a())IsKing(k())}"),
+        ps("{~IsAce(a())}"),
     )
-    c: View = ps("IsQueen(q()) ∧ IsJack(j())")
+    c: View = ps("{IsQueen(q())IsJack(j())}")
 
 
 class e14_1(Factor, BaseExample):
@@ -339,10 +342,10 @@ class e14_1(Factor, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(P(p()) ∧ Q(q())) ∨ (P(p()) ∧ R(r()))"),
-        ps("P(p())"),
+        ps("{P(p())R(r()),P(p())Q(q())}"),
+        ps("{P(p())}"),
     )
-    c: View = ps("Q(q()) ∨ R(r())")
+    c: View = ps("{Q(q()),R(r())}")
 
 
 class e14_2(Factor, BaseExample):
@@ -351,12 +354,10 @@ class e14_2(Factor, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps(
-            "(P(p()) ∧ Q(q()) ∧ S(s())) ∨ (P(p()) ∧ R(r()) ∧ S(s())) ∨ (P(p()) ∧ R(r()))"
-        ),
-        ps("(S(s())) → (P(p()))"),
+        ps("{P(p())R(r()),P(p())S(s())R(r()),P(p())S(s())Q(q())}"),
+        ps("{P(p())}^{S(s())}"),
     )
-    c: View = ps("(Q(q()) ∧ S(s())) ∨ (R(r()) ∧ S(s())) ∨ (P(p()) ∧ R(r()))")
+    c: View = ps("{Q(q())S(s()),P(p())R(r()),S(s())R(r())}")
 
 
 class e14_3(Factor, BaseExample):
@@ -365,12 +366,10 @@ class e14_3(Factor, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps(
-            "(P(p()) ∧ R(r())) ∨ (Q(q()) ∧ S(s())) ∨ (P(p()) ∧ S(s())) ∨ (Q(q()) ∧ R(r()))"
-        ),
-        ps("P(p()) ∨ Q(q())"),
+        ps("{P(p())S(s()),Q(q())S(s()),P(p())R(r()),Q(q())R(r())}"),
+        ps("{P(p()),Q(q())}"),
     )
-    c: View = ps("R(r()) ∨ S(s())")
+    c: View = ps("{S(s()),R(r())}")
 
 
 class e14_6(Factor, BaseExample):
@@ -379,10 +378,10 @@ class e14_6(Factor, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(P(p()) ∧ R(r())) ∨ (Q(q()) ∧ S(s()))"),
-        ps("P(p()) ∨ Q(q()) ∨ T(t())"),
+        ps("{Q(q())S(s()),P(p())R(r())}"),
+        ps("{T(t()),P(p()),Q(q())}"),
     )
-    c: View = ps("(P(p()) ∧ R(r())) ∨ (Q(q()) ∧ S(s()))")
+    c: View = ps("{Q(q())S(s()),P(p())R(r())}")
 
 
 class e14_7(Factor, BaseExample):
@@ -391,10 +390,10 @@ class e14_7(Factor, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(P(p()) ∧ R(r())) ∨ (Q(q()) ∧ S(s())) ∨ P(p())"),
-        ps("P(p()) ∨ Q(q())"),
+        ps("{Q(q())S(s()),P(p())R(r()),P(p())}"),
+        ps("{P(p()),Q(q())}"),
     )
-    c: View = ps("R(r()) ∨ S(s()) ∨ ⊤")
+    c: View = ps("{0,S(s()),R(r())}")
 
 
 class e15(DefaultInference, BaseExample):
@@ -408,13 +407,11 @@ class e15(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps(
-            "(Ace(a()) ∧ Jack(j()) ∧ Queen(q())) ∨ (Eight(e()) ∧ Ten(t()) ∧ Four(f())) ∨ (Ace(a()))"
-        ),
-        ps("Ace(a()) ∧ Jack(j()) ∧ Eight(e()) ∧ Ten(t())"),
-        ps("~Queen(q())"),
+        ps("{Ace(a()),Jack(j())Queen(q())Ace(a()),Four(f())Ten(t())Eight(e())}"),
+        ps("{Jack(j())Ten(t())Ace(a())Eight(e())}"),
+        ps("{~Queen(q())}"),
     )
-    c: View = ps("Four(f())")
+    c: View = ps("{Four(f())}")
 
 
 class e16(DefaultInference, BaseExample):
@@ -427,13 +424,11 @@ class e16(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps(
-            "(Ten(t()) ∧ Eight(e()) ∧ Four(f())) ∨ (Jack(j()) ∧ King(k()) ∧ Queen(q())) ∨ (Ace(a()))"
-        ),
-        ps("~Four(f())"),
-        ps("~Ace(a())"),
+        ps("{King(k())Jack(j())Queen(q()),Ace(a()),Four(f())Ten(t())Eight(e())}"),
+        ps("{~Four(f())}"),
+        ps("{~Ace(a())}"),
     )
-    c: View = ps("Jack(j()) ∧ King(k()) ∧ Queen(q())")
+    c: View = ps("{King(k())Jack(j())Queen(q())}")
 
 
 class e17(DefaultInference, BaseExample):
@@ -446,10 +441,10 @@ class e17(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(King(k()) ∧ ~Ace(a())) ∨ (Ace(a()) ∧ ~King(k()))"),
-        ps("King(k())"),
+        ps("{~King(k())Ace(a()),King(k())~Ace(a())}"),
+        ps("{King(k())}"),
     )
-    c: View = ps("~Ace(a())")
+    c: View = ps("{~Ace(a())}")
 
 
 class e19(Suppose, BaseExample):
@@ -460,10 +455,10 @@ class e19(Suppose, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("⊤"),
-        ps("~N()"),
+        ps("{0}"),
+        ps("{~N()}"),
     )
-    c: View = ps("~N() → ~N()")
+    c: View = ps("{~N()}^{~N()}")
 
 
 class e20(DefaultInference, BaseExample):
@@ -477,11 +472,11 @@ class e20(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("King(k()) ∨ Queen(q())"),
-        ps("(King(k())) → (Win(mary()))"),
-        ps("(Queen(q())) → (Win(bill()))"),
+        ps("{Queen(q()),King(k())}"),
+        ps("{Win(mary())}^{King(k())}"),
+        ps("{Win(bill())}^{Queen(q())}"),
     )
-    c: View = ps("Win(mary()) ∨ Win(bill())")
+    c: View = ps("{Win(bill()),Win(mary())}")
 
 
 class e21(BaseExample):
@@ -489,8 +484,8 @@ class e21(BaseExample):
     Example 21
     """
 
-    v: tuple[View] = (ps(f"⊤ → {samples.delta}"),)
-    c: View = ps(f"⊤ → {samples.delta}").negation()
+    v: tuple[View] = (ps(f"{samples.delta}"),)
+    c: View = ps(f"{samples.delta}").negation()
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -508,15 +503,15 @@ class e22(BaseExample):
     """
 
     v: tuple[View, View, View, View] = (
-        ps(f"a() ∧ b() ∧ c()"),
-        ps("a()"),
-        ps("b()"),
-        ps("c()"),
+        ps("{a()c()b()}"),
+        ps("{a()}"),
+        ps("{b()}"),
+        ps("{c()}"),
     )
     c: tuple[View, View] = (
-        ps("~a() ∨ ~b() ∨ ~c()"),
+        ps("{~c(),~b(),~a()}"),
         ps(
-            "~a() ∧ b() ∧ c() ∨ ~a() ∧ b() ∧ ~c() ∨ ~a() ∧ ~b() ∧ c() ∨ ~a() ∧ ~b() ∧ ~c() ∨ a() ∧ ~b() ∧ c() ∨ a() ∧ ~b() ∧ ~c() ∨ a() ∧ b() ∧ ~c()"
+            "{~c()a()~b(),~c()~a()~b(),~c()~a()b(),~c()a()b(),a()~b()c(),~a()c()b(),~a()~b()c()}"
         ),
     )
 
@@ -548,10 +543,10 @@ class e23_with_inquire(BaseExample):
     C Jane is looking at the TV
     """
 
-    v: tuple[View, View] = (ps("K() ∧ L() ∨ S() ∧ P()"), ps("K()"))
+    v: tuple[View, View] = (ps("{L()K(),P()S()}"), ps("{K()}"))
     c: tuple[View, View] = (
-        ps("K() ∧ L() ∨ S() ∧ P() ∧ K() ∨ S() ∧ P() ∧ ~K()"),
-        ps("K() ∧ L() ∨ S() ∧ P() ∧ K()"),
+        ps("{P()S()~K(),L()K(),P()S()K()}"),
+        ps("{L()K(),P()S()K()}"),
     )
 
     @classmethod
@@ -574,10 +569,10 @@ class e23_with_inquire(BaseExample):
 
 
 class e23_without_inquire(BaseExample):
-    v: tuple[View, View] = (ps("K() ∧ L() ∨ S() ∧ P()"), ps("K()"))
+    v: tuple[View, View] = (ps("{L()K(),P()S()}"), ps("{K()}"))
     c: tuple[View, View] = (
-        ps("K() ∧ L() ∨ S() ∧ P()"),
-        ps("K() ∧ L()"),
+        ps("{L()K(),P()S()}"),
+        ps("{L()K()}"),
     )
 
     # TODO: Maybe add query or factor to remove K()
@@ -604,8 +599,8 @@ class e24(BaseExample):
     C There is an ace or a queen
     """
 
-    v: tuple[View, View] = (ps("a()"), ps("q()"))
-    c: tuple[View, View] = (ps("(a() ∧ q()) ∨ (a() ∧ ~q())"), ps("q() ∨ a()"))
+    v: tuple[View, View] = (ps("{a()}"), ps("{q()}"))
+    c: tuple[View, View] = (ps("{a()~q(),a()q()}"), ps("{a(),q()}"))
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -629,8 +624,8 @@ class e25i(Query, BaseExample):
     Example 25i
     """
 
-    v: tuple[View, View] = (ps("(p() ∧ q()) ∨ (p() ∧ r())"), ps("p()"))
-    c: View = ps("p()")
+    v: tuple[View, View] = (ps("{p()r(),p()q()}"), ps("{p()}"))
+    c: View = ps("{p()}")
 
 
 class e25ii(Query, BaseExample):
@@ -638,8 +633,8 @@ class e25ii(Query, BaseExample):
     Example 25ii
     """
 
-    v: tuple[View, View] = (ps("(p() ∧ q()) ∨ (p() ∧ r())"), ps("q()"))
-    c: View = ps("⊤ ∨ q()")
+    v: tuple[View, View] = (ps("{p()r(),p()q()}"), ps("{q()}"))
+    c: View = ps("{0,q()}")
 
 
 class e25iii(Query, BaseExample):
@@ -648,10 +643,10 @@ class e25iii(Query, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(p() ∧ q()) ∨ (p() ∧ r()) ∨ s() ∨ t()"),
-        ps("p() ∨ s()"),
+        ps("{t(),p()r(),p()q(),s()}"),
+        ps("{p(),s()}"),
     )
-    c: View = ps("p() ∨ s() ∨ ⊤")
+    c: View = ps("{0,p(),s()}")
 
 
 class e25iv(Query, BaseExample):
@@ -660,10 +655,10 @@ class e25iv(Query, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(p() ∧ q()) ∨ (p() ∧ r()) ∨ s() ∨ t()"),
-        ps("p() ∨ s() ∨ t()"),
+        ps("{t(),p()r(),p()q(),s()}"),
+        ps("{t(),p(),s()}"),
     )
-    c: View = ps("p() ∨ s() ∨ t()")
+    c: View = ps("{t(),p(),s()}")
 
 
 class e25v(Query, BaseExample):
@@ -672,10 +667,10 @@ class e25v(Query, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(p() ∧ q() ∧ s()) ∨ (p() ∧ r() ∧ s())"),
-        ps("s() → p()"),
+        ps("{s()p()q(),p()r()s()}"),
+        ps("{p()}^{s()}"),
     )
-    c: View = ps("p()")
+    c: View = ps("{p()}")
 
 
 class e25vi(Query, BaseExample):
@@ -684,8 +679,8 @@ class e25vi(Query, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(p() ∧ q() ∧ s()) ∨ (p() ∧ r() ∧ s())"),
-        ps("t() → p()"),
+        ps("{s()p()q(),p()r()s()}"),
+        ps("{p()}^{t()}"),
     )
     c: View = View.get_verum()
 
@@ -699,13 +694,13 @@ class e26(BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("(Play(J()) ∧ Win(J())) ∨ Play(M()) ∨ Play(B())"),
-        ps("Play(J())"),
-        ps("Play(J()) → Win(J())"),
+        ps("{Play(J())Win(J()),Play(B()),Play(M())}"),
+        ps("{Play(J())}"),
+        ps("{Win(J())}^{Play(J())}"),
     )
     c: tuple[View, View] = (
-        ps("Play(J()) → (Play(J()) ∧ Win(J()))"),
-        ps("Play(J()) → Win(J())"),
+        ps("{Play(J())Win(J())}^{Play(J())}"),
+        ps("{Win(J())}^{Play(J())}"),
     )
 
     @classmethod
@@ -734,11 +729,11 @@ class e28(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("Tiger(t()) ∨ ~Tiger(t())"),
-        ps("(Tiger(t())) → (Tiger(t()) ∧ Orange(o()))"),
-        ps("Orange(o())"),
+        ps("{~Tiger(t()),Tiger(t())}"),
+        ps("{Orange(o())Tiger(t())}^{Tiger(t())}"),
+        ps("{Orange(o())}"),
     )
-    c: View = ps("Tiger(t())")
+    c: View = ps("{Tiger(t())}")
 
 
 class e32_1(DefaultInference, BaseExample):
@@ -751,10 +746,10 @@ class e32_1(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(P(p())) → (P(p()) ∧ Q(q()))"),
-        ps("P(p())"),
+        ps("{P(p())Q(q())}^{P(p())}"),
+        ps("{P(p())}"),
     )
-    c: View = ps("Q(q())")
+    c: View = ps("{Q(q())}")
 
 
 class e32_2(DefaultInference, BaseExample):
@@ -767,10 +762,10 @@ class e32_2(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("P(p())"),
-        ps("(P(p())) → (P(p()) ∧ Q(q()))"),
+        ps("{P(p())}"),
+        ps("{P(p())Q(q())}^{P(p())}"),
     )
-    c: View = ps("Q(q())")
+    c: View = ps("{Q(q())}")
 
 
 class e33(DefaultInference, BaseExample):
@@ -783,10 +778,10 @@ class e33(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(R(r())) → (R(r()) ∧ E(e()))"),
-        ps("E(e())"),
+        ps("{E(e())R(r())}^{R(r())}"),
+        ps("{E(e())}"),
     )
-    c: View = ps("R(r())")
+    c: View = ps("{R(r())}")
 
 
 class e40i(DefaultInference, BaseExample):
@@ -801,10 +796,10 @@ class e40i(DefaultInference, BaseExample):
 
     v: tuple[View, View, View] = (
         ps(
-            "(SquareB() ∧ ~TriangleB() ∧ ~CircleB()) ∨ (~SquareB() ∧ TriangleB() ∧ ~CircleB()) ∨ (~SquareB() ∧ ~TriangleB() ∧ CircleB())"
+            "{~CircleB()~TriangleB()SquareB(),CircleB()~TriangleB()~SquareB(),~CircleB()TriangleB()~SquareB()}"
         ),
-        ps("CircleT() → CircleT() ∧ SquareB()"),
-        ps("TriangleB()"),
+        ps("{CircleT()SquareB()}^{CircleT()}"),
+        ps("{TriangleB()}"),
     )
     c: View = View.get_falsum()
 
@@ -818,12 +813,12 @@ class e40ii(BaseExample):
 
     v: tuple[View, View, View] = (
         ps(
-            "(SquareB() ∧ ~TriangleB() ∧ ~CircleB()) ∨ (~SquareB() ∧ TriangleB() ∧ ~CircleB()) ∨ (~SquareB() ∧ ~TriangleB() ∧ CircleB())"
+            "{~CircleB()~TriangleB()SquareB(),CircleB()~TriangleB()~SquareB(),~CircleB()TriangleB()~SquareB()}"
         ),
-        ps("TriangleB()"),
-        ps("CircleT() → CircleT() ∧ SquareB()"),
+        ps("{TriangleB()}"),
+        ps("{CircleT()SquareB()}^{CircleT()}"),
     )
-    c: View = ps("~SquareB() ∧ TriangleB() ∧ ~CircleB() ∧ ~CircleT()")
+    c: View = ps("{~CircleB()~CircleT()TriangleB()~SquareB()}")
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -848,10 +843,10 @@ class e41(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(~Q(q())) → (~Q(q()) ∧ ~P(p()))"),
-        ps("~Q(q())"),
+        ps("{~Q(q())~P(p())}^{~Q(q())}"),
+        ps("{~Q(q())}"),
     )
-    c: View = ps("~P(p())")
+    c: View = ps("{~P(p())}")
 
 
 class e42(DefaultInference, BaseExample):
@@ -865,10 +860,10 @@ class e42(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("~SquareB() → ~CircleT() ∧ ~SquareB()"),
-        ps("~SquareB()"),
+        ps("{~CircleT()~SquareB()}^{~SquareB()}"),
+        ps("{~SquareB()}"),
     )
-    c: View = ps("~CircleT()")
+    c: View = ps("{~CircleT()}")
 
 
 # e43 is not an example
@@ -885,11 +880,11 @@ class e44_1(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("(Saleable(c()) ∧ Elegant(c())) ∨ (~Saleable(c()) ∧ ~Elegant(c()))"),
-        ps("(Elegant(c()) ∧ Stable(c())) ∨ (~Elegant(c()) ∧ ~Stable(c()))"),
-        ps("Saleable(c()) ∨ Stable(c()) ∨ (Saleable(c()) ∧ Elegant(c()))"),
+        ps("{Saleable(c())Elegant(c()),~Elegant(c())~Saleable(c())}"),
+        ps("{~Stable(c())~Elegant(c()),Stable(c())Elegant(c())}"),
+        ps("{Saleable(c())Elegant(c()),Stable(c()),Saleable(c())}"),
     )
-    c: View = ps("Saleable(c()) ∧ Elegant(c()) ∧ Stable(c())")
+    c: View = ps("{Stable(c())Saleable(c())Elegant(c())}")
 
 
 class e45(BaseExample):
@@ -901,8 +896,8 @@ class e45(BaseExample):
     Therefore it is possible that Steven is in Madrid and that Emma is in Berlin.
     """
 
-    v: tuple[View, View, View] = (ps("M() ∨ ⊤"), ps("B() ∨ ⊤"), ps("(M() ∧ B()) ∨ ⊤"))
-    c: tuple[View, View] = (ps("(M() ∧ B()) ∨ M() ∨ B() ∨ ⊤"), ps("(M() ∧ B()) ∨ ⊤"))
+    v: tuple[View, View, View] = (ps("{0,M()}"), ps("{0,B()}"), ps("{0,B()M()}"))
+    c: tuple[View, View] = (ps("{0,M(),B(),B()M()}"), ps("{0,B()M()}"))
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -930,11 +925,11 @@ class e46i(BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("P() → P() ∧ V()"),
-        ps("(M() ∧ ~P()) ∨ (P() ∧ ~M())"),
-        ps("(V() ∧ M()) ∨ ⊤"),
+        ps("{V()P()}^{P()}"),
+        ps("{~P()M(),P()~M()}"),
+        ps("{0,V()M()}"),
     )
-    c: tuple[View, View] = (ps("(P() ∧ V() ∧ ~M()) ∨ (~P() ∧ M())"), ps("⊤"))
+    c: tuple[View, View] = (ps("{~P()M(),V()P()~M()}"), ps("{0}"))
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -962,10 +957,10 @@ class e46ii(Query, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("(V() ∧ M() ∧ R()) ∨ (V() ∧ M() ∧ S()) ∨ T()"),
-        ps("(V() ∧ M()) ∨ ⊤"),
+        ps("{V()S()M(),V()R()M(),T()}"),
+        ps("{0,V()M()}"),
     )
-    c: View = ps("(V() ∧ M()) ∨ ⊤")
+    c: View = ps("{0,V()M()}")
 
 
 class e47(DefaultInference, BaseExample):
@@ -977,10 +972,10 @@ class e47(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("∃x Thermotogum(x*) ∧ StainsGramNegative(x)"),
-        ps("Thermotogum(Maritima()*)"),
+        ps("∃x {StainsGramNegative(x)Thermotogum(x*)}"),
+        ps("{Thermotogum(Maritima()*)}"),
     )
-    c: View = ps("StainsGramNegative(Maritima())")
+    c: View = ps("{StainsGramNegative(Maritima())}")
 
 
 class e48(DefaultInference, BaseExample):
@@ -991,10 +986,10 @@ class e48(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("∃x D(x*) ∧ T(x)"),
-        ps("~D(Turgidum()*)"),
+        ps("∃x {D(x*)T(x)}"),
+        ps("{~D(Turgidum()*)}"),
     )
-    c: View = ps("⊤")
+    c: View = ps("{0}")
 
 
 class e49(DefaultInference, BaseExample):
@@ -1008,22 +1003,22 @@ class e49(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("∃x ∃y Ace(Mary()) ∧ King(x) ∨ Queen(John()) ∧ Jack(y)"),
-        ps("King(Sally())"),
+        ps("∃x ∃y {Ace(Mary())King(x),Queen(John())Jack(y)}"),
+        ps("{King(Sally())}"),
     )
-    c: View = ps("⊤")
+    c: View = ps("{0}")
 
 
 class e50_part1(BaseExample):
     v: tuple[View, View, View, View] = (
-        ps("L(j(), s()) ∧ L(s(), g())"),
-        ps("M(j()*) ∧ ~M(g()*)"),
-        ps("⊥"),
-        ps("∃a ∃b L(a, b) ∧ M(a*) ∧ ~M(b*)"),
+        ps("{L(j(),s())L(s(),g())}"),
+        ps("{M(j()*)~M(g()*)}"),
+        ps("{}"),
+        ps("∃b ∃a {M(a*)L(a,b)~M(b*)}"),
     )
     c: tuple[View, View] = (
-        ps("L(j(), s()) ∧ L(s(), g()) ∧ M(j()*) ∧ ~M(g()*)"),
-        ps("⊤"),
+        ps("{L(j(),s())M(j()*)~M(g()*)L(s(),g())}"),
+        ps("{0}"),
     )
 
     @classmethod
@@ -1042,19 +1037,19 @@ class e50_part1(BaseExample):
 
 class e50_part2(BaseExample):
     v: tuple[View, View, View, View] = (
-        ps("L(j(), s()) ∧ L(s(), g())"),
-        ps("M(j()) ∧ ~M(g())"),
-        ps("M(s())"),
-        ps("∃a ∃b L(a, b) ∧ M(a*) ∧ ~M(b*)"),
+        ps("{L(j(),s())L(s(),g())}"),
+        ps("{M(j())~M(g())}"),
+        ps("{M(s())}"),
+        ps("∃b ∃a {M(a*)L(a,b)~M(b*)}"),
     )
     g1: View = ps(
-        "(L(j(), s()) ∧ L(s(), g()) ∧ M(j()) ∧ ~M(g()) ∧ M(s())) ∨ (L(j(), s()) ∧ L(s(), g()) ∧ M(j()) ∧ ~M(g()) ∧ ~M(s()))"
+        "{M(j())L(s(),g())L(j(),s())~M(g())M(s()),M(j())L(s(),g())L(j(),s())~M(g())~M(s())}"
     )
     g2: View = ps(
-        "(L(j(), s()) ∧ L(s(), g()) ∧ M(j()*) ∧ ~M(g()*) ∧ M(s()*)) ∨ (L(j(), s()) ∧ L(s(), g()) ∧ M(j()*) ∧ ~M(g()*) ∧ ~M(s()*))"
+        "{M(j()*)L(s(),g())L(j(),s())~M(g()*)M(s()),M(j()*)L(s(),g())L(j(),s())~M(g()*)~M(s()*)}"
     )
 
-    c: View = ps("∃a ∃b L(a, b) ∧ M(a*) ∧ ~M(b*)")
+    c: View = ps("∃b ∃a {M(a*)L(a,b)~M(b*)}")
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -1083,10 +1078,10 @@ class e51(BasicStep, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("∀x (IsArcheon(x*) → IsArcheon(x) ∧ HasNucleus(x))"),
-        ps("IsArcheon(Halobacterium()*)"),
+        ps("∀x {IsArcheon(x*)HasNucleus(x)}^{IsArcheon(x*)}"),
+        ps("{IsArcheon(Halobacterium()*)}"),
     )
-    c: View = ps("IsArcheon(Halobacterium()*) ∧ HasNucleus(Halobacterium())")
+    c: View = ps("{HasNucleus(Halobacterium())IsArcheon(Halobacterium()*)}")
 
 
 class e52(BasicStep, BaseExample):
@@ -1099,10 +1094,10 @@ class e52(BasicStep, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("∀x (F(x)) → (F(x) ∧ G(x*))"),
-        ps("G(John()*)"),
+        ps("∀x {F(x)G(x*)}^{F(x)}"),
+        ps("{G(John()*)}"),
     )
-    c: View = ps("F(John()) ∧ G(John()*)")
+    c: View = ps("{G(John()*)F(John())}")
 
 
 class e53(BaseExample):
@@ -1114,11 +1109,11 @@ class e53(BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("∀x A(x) → A(x) ∧ B(x)"),
-        ps("∀x B(x)"),
-        ps("∀x B(x) → A(x) ∧ B(x)"),
+        ps("∀x {A(x)B(x)}^{A(x)}"),
+        ps("∀x {B(x)}"),
+        ps("∀x {A(x)B(x)}^{B(x)}"),
     )
-    c: View = ps("∀x B(x) → A(x) ∧ B(x)")
+    c: View = ps("∀x {A(x)B(x)}^{B(x)}")
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -1142,10 +1137,10 @@ class e54(BasicStep, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("∀x (Shark(x*)) → ((Shark(x) ∧ Attack(x)) ∨ ⊤)"),
-        ps("Shark(Whitey()*)"),
+        ps("∀x {0,Shark(x*)Attack(x)}^{Shark(x*)}"),
+        ps("{Shark(Whitey()*)}"),
     )
-    c: View = ps("Attack(Whitey()) ∧ Shark(Whitey()*)")
+    c: View = ps("{Shark(Whitey()*)Attack(Whitey())}")
 
 
 # class e55(BasicStep, BaseExample):
@@ -1159,10 +1154,10 @@ class e54(BasicStep, BaseExample):
 #     """
 
 #     v: tuple[View, View] = (
-#         ps("North(Montreal(), NewYork())"),
-#         ps("∀x ∀y North(x, y) → North(x, y) ∧ South(y, x)"),
+#         ps("{North(Montreal(),NewYork())}"),
+#         ps("∀y ∀x {North(x,y)South(y,x)}^{North(x,y)}"),
 #     )
-#     c: View = ps("North(Montreal(), NewYork()) ∧ South(NewYork(), Montreal())")
+#     c: View = ps("{North(Montreal(),NewYork())South(NewYork(),Montreal())}")
 
 
 class e56_default_inference(DefaultInference, BaseExample):
@@ -1174,15 +1169,15 @@ class e56_default_inference(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("∀x ∃y Professor(x) → Professor(x) ∧ Student(y*) ∧ Teaches(x, y)"),
-        ps("∀z ∃w Student(z*) → Student(z) ∧ Book(w) ∧ Reads(z, w)"),
+        ps("∀x ∃y {Student(y*)Teaches(x,y)Professor(x)}^{Professor(x)}"),
+        ps("∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}"),
     )
-    c: View = ps("∃y ∃b ⊤ ∨ Reads(y,b) ∧ Book(b)")
+    c: View = ps("∃b ∃y {0,Book(b)Reads(y,b)}")
 
 
 class e56_basic_step(BasicStep, e56_default_inference):
     c: View = ps(
-        "∀a ∃b ∃c Professor(a) → Professor(a) ∧ Student(b*) ∧ Teaches(a, b) ∧ Reads(b, c) ∧ Book(c)"
+        "∀a ∃c ∃b {Book(c)Student(b*)Professor(a)Teaches(a,b)Reads(b,c)}^{Professor(a)}"
     ).depose()
 
 
@@ -1196,10 +1191,10 @@ class e57(BasicStep, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("∀x (B(x*)) → (B(x) ∧ A(x))"),
-        ps("∃x C(x) ∧ B(x*)"),
+        ps("∀x {B(x*)A(x)}^{B(x*)}"),
+        ps("∃x {B(x*)C(x)}"),
     )
-    c: View = ps("∃y A(y) ∧ B(y*) ∧ C(y)")
+    c: View = ps("∃y {A(y)C(y)B(y*)}")
 
 
 class e58_reversed(BasicStep, BaseExample):
@@ -1212,10 +1207,10 @@ class e58_reversed(BasicStep, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("∀y (C(y)) → C(y) ∧ B(y*)"),
-        ps("∃x B(x*) ∧ A(x)"),
+        ps("∀y {B(y*)C(y)}^{C(y)}"),
+        ps("∃x {B(x*)A(x)}"),
     )
-    c: View = ps("∃y C(y) ∧ A(y) ∧ B(y*)")
+    c: View = ps("∃y {A(y)C(y)B(y*)}")
 
 
 class e61(BasicStep, BaseExample):
@@ -1227,9 +1222,9 @@ class e61(BasicStep, BaseExample):
     C All dogs bite John
     """
 
-    v: tuple[View, View] = (ps("∀x ∃a D(x) ∧ B(x, a) ∧ M(a*) ∨ ~D(x)"), ps("M(j()*)"))
+    v: tuple[View, View] = (ps("∀x ∃a {~D(x),M(a*)D(x)B(x,a)}"), ps("{M(j()*)}"))
     c: View = ps(
-        "∀x ∃a ((M(j()*) ∧ ~D(x)) ∨ (M(j()*) ∧ D(x) ∧ M(a*) ∧ B(x, a)))"
+        "∀x ∃a {M(j()*)M(a*)D(x)B(x,a),M(j()*)~D(x)}"
     )  # TODO: Make example better?
 
 
@@ -1239,12 +1234,10 @@ class e62(WHQuery, BaseExample):
     """
 
     v = (
-        ps(
-            "(S(j()*) ∧  D(m()) ∧ T(n())) ∨ (S(m()*) ∧ L(n(),m())) ∨ (~S(n()*) ∧ D(b()))"
-        ),
-        ps("∃a S(a*)"),
+        ps("{L(n(),m())S(m()*),D(m())T(n())S(j()*),D(b())~S(n()*)}"),
+        ps("∃a {S(a*)}"),
     )
-    c = ps("S(j()*) ∨ S(m()*) ∨ ⊤")
+    c = ps("{0,S(j()*),S(m()*)}")
 
 
 class e63(WHQuery, BaseExample):
@@ -1253,10 +1246,10 @@ class e63(WHQuery, BaseExample):
     """
 
     v = (
-        ps("(S(j()*) ∧  D(n()*)) ∨ (T(j()) ∧ ~D(j()*) ∧ D(n()*))"),
-        ps("∃a D(a*)"),
+        ps("{S(j()*)D(n()*),D(n()*)~D(j()*)T(j())}"),
+        ps("∃a {D(a*)}"),
     )
-    c = ps("D(n()*)")
+    c = ps("{D(n()*)}")
 
 
 class e63_modified(WHQuery, BaseExample):
@@ -1265,10 +1258,10 @@ class e63_modified(WHQuery, BaseExample):
     """
 
     v = (
-        ps("∀x ∃y (S(j()*) ∧  D(n()*)) ∨ (T(j()) ∧ ~D(j()*) ∧ D(f(y, x)*))"),
-        ps("∃a D(a*)"),
+        ps("∀x ∃y {S(j()*)D(n()*),D(f(y,x)*)~D(j()*)T(j())}"),
+        ps("∃a {D(a*)}"),
     )
-    c = ps("∀x ∃y (D(f(y,x)*) ∨ D(n()*))")
+    c = ps("∀x ∃y {D(n()*),D(f(y,x)*)}")
 
 
 class e64i(BaseExample):
@@ -1348,8 +1341,8 @@ class e71(BaseExample):
 
 
 class UniProduct(BaseExample):
-    v = (ps("∀x ∃a (P(x*) ∧ E(x,a)) ∨ ~P(x)"), ps("P(j()*)"))
-    c: View = ps("∃a (P(j()*) ∧ E(j(),a)) ∨ ~P(j())")
+    v = (ps("∀x ∃a {P(x)E(x,a),~P(x*)}"), ps("{P(j()*)}"))
+    c: View = ps("∃a {~P(j()*),P(j())E(j(),a)}")
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -1364,10 +1357,10 @@ class QueryTest(Query, BaseExample):
     """
 
     v = (
-        ps("∀x (T(x, j()) ∧ S(j()*) ∧ S(m()*)) ∨ (T(x, m()) ∧ S(j()*) ∧ S(m()*))"),
-        ps("∀x ∃a T(x, a) ∧ S(a*)"),
+        ps("∀x {T(x,m())S(m()*)S(j()*),T(x,j())S(m()*)S(j()*)}"),
+        ps("∀x ∃a {T(x,a)S(a*)}"),
     )
-    c = ps("∀x ∃a T(x, a) ∧ S(a*)")
+    c = ps("∀x ∃a {T(x,a)S(a*)}")
 
 
 class QueryTest2(Query, BaseExample):
@@ -1376,10 +1369,10 @@ class QueryTest2(Query, BaseExample):
     """
 
     v = (
-        ps("∀x (T(x, j()) ∧ S(j()*) ∧ S(m()*)) ∨ (T(x, m()) ∧ S(j()*) ∧ S(m()*))"),
-        ps("∃a ∀x T(x, a) ∧ S(a*)"),
+        ps("∀x {T(x,m())S(m()*)S(j()*),T(x,j())S(m()*)S(j()*)}"),
+        ps("∃a ∀x {T(x,a)S(a*)}"),
     )
-    c = ps("∀x ∃a T(x, a) ∧ S(a*)")
+    c = ps("∀x ∃a {T(x,a)S(a*)}")
 
 
 # Example 18
