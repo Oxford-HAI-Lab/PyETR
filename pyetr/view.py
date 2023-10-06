@@ -4,6 +4,8 @@ from functools import reduce
 from itertools import permutations
 from typing import Optional, cast
 
+from pyetr.common_parsing import get_quantifiers
+
 from .atoms import PredicateAtom, equals_predicate
 from .atoms.terms import ArbitraryObject, FunctionalTerm, RealNumber, Term
 from .dependency import Dependency, DependencyRelation
@@ -340,6 +342,7 @@ class View:
             return "F"
         elif self.is_verum:
             return "T"
+
         if len(self.dependency_relation.dependencies) == 0:
             dep_string = ""
         else:
@@ -349,11 +352,13 @@ class View:
         else:
             issue_string = f" issues={self.issue_structure}"
 
-        # if all([i.is_null for i in self.weights.values()]):
-        #     weight_string = ""
-        # else:
-        #     weight_string = f" weights={self.weights}"
-        return f"{self.weights}^{self.supposition}{issue_string}{dep_string}"
+        quants = get_quantifiers(
+            self.dependency_relation.universals | self.dependency_relation.existentials,
+            self.dependency_relation,
+        )
+        quant_str = " ".join([i.to_string() for i in quants])
+        end_str = " " if len(quant_str) > 0 else ""
+        return f"{quant_str}{end_str}{self.weights}^{self.supposition}{issue_string}{dep_string}"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, View):

@@ -5,7 +5,7 @@ from typing import cast
 from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.term import FunctionalTerm
 
-from .inference import basic_step, default_inference_procedure
+from .inference import basic_step, default_decision, default_inference_procedure
 from .new_parsing import parse_string_to_view as ps
 from .view import View
 
@@ -122,6 +122,19 @@ class Suppose(BaseTest):
     @classmethod
     def test(cls, verbose: bool = False):
         result = cls.v[0].suppose(cls.v[1], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class DefaultDecision(BaseTest):
+    v: tuple[View]
+    cv: tuple[View, ...]
+    pr: tuple[View, ...]
+    c: View
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = default_decision(dq=cls.v[0], cv=cls.cv, pr=cls.pr)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
@@ -1453,6 +1466,76 @@ class e71(BaseExample):
         result = mid_result.query(cls.v[3], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c[1]):
             raise RuntimeError(f"Expected: {cls.c[1]} but received {mid_result}")
+
+
+class e74(BaseExample):
+    """
+    Example 74, p197, p231
+
+    (includes two background commitments)
+    """  # TODO: Note typo with brackets in book, p231
+
+    v = (
+        ps("Ej {D(j)H(j),H(j),P(j)}"),
+        ps("Ej {E(j)}"),
+        ps("Ax {0.85=* E(x)D(x), 0.15=* E(x)~D(x)} ^ {E(x)}"),
+        ps("Ax {0.1=* E(x)H(x), 0.9=* E(x)~H(x)} ^ {E(x)}"),
+    )
+    c: tuple[View, View] = (
+        ps(
+            "Ej {0.85**0.1=* E(j)D(j)H(j), 0.85**0.9=* E(j)D(j)~H(j), 0.15**0.1=* E(j)~D(j)H(j), 0.15**0.9=* E(j)~D(j)~H(j)}"
+        ),
+        ps("Ej {D(j)H(j)}"),
+    )
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = (
+            cls.v[1].update(cls.v[2], verbose=verbose).update(cls.v[3], verbose=verbose)
+        )
+        if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(
+                f"Expected mid result: {cls.c[0]} but received {mid_result}"
+            )
+
+        # Should use reorient once this exists
+        result = cls.v[0].update(mid_result, verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
+
+
+class e76(DefaultInference, BaseExample):
+    """
+    Example 76 (guns and guitars)
+    p199, p226
+
+    (P1) The gun fired and the guitar was out of tune, or else someone was in the attic
+    (P1.5, see p228) Guns who triggers are pulled fire
+    (P2) The trigger (of the gun) was pulled. Does it follow that the guitar was out of
+    tune?
+    """  # TODO: Note assuming exists i
+
+    v = (
+        ps("Ei Ej {Fired(i)Gun(i)Guitar(j)Outoftune(j)}"),
+        ps("Ax {Gun(x)Trigger(x)Fired(x)}^{Gun(x)Trigger(x)}"),
+        ps("Ei {Trigger(i)}"),
+    )
+    c: View = ps("Ei Ej {Fired(i)Gun(i)Guitar(j)Outoftune(j)Trigger(i)}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = (
+            cls.v[0].update(cls.v[1], verbose=verbose).update(cls.v[2], verbose=verbose)
+        )
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class e90(DefaultDecision, BaseExample):
+    v = (ps("{do(Buy(Video())),~do(Buy(Video()))}"),)
+    cv = (ps("Ax {Fun()}^{do(B(x))}"),)
+    pr = (ps("{1=+ 0} ^ {Fun()}"),)
+    c = ps("{do(Buy(Video()))}")
 
 
 class UniProduct(BaseExample):
