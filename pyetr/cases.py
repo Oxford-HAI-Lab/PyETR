@@ -1532,8 +1532,19 @@ class e76(DefaultInference, BaseExample):
 
 
 class e90(DefaultDecision, BaseExample):
+    """
+    Example 90, p249, p273
+
+    Imagine that you have been saving some extra money on the side to make some purchases,
+    and on your most recent visit to the video store you come across a special sale of a new
+    video. This video is one with your favourite actor or actress, and your favourite type of
+    movie (such as a comedy, drama, thriller etc.). This particular video that you are considering
+    is one you have been thinking about buying a long time. It is a available at a special sale price
+    of $14.99. What would you do in this situation?
+    """
+
     v = (ps("{do(Buy(Video())),~do(Buy(Video()))}"),)
-    cv = (ps("Ax {Fun()}^{do(B(x))}"),)
+    cv = (ps("Ax {Fun()}^{do(Buy(x))}"),)
     pr = (ps("{1=+ 0} ^ {Fun()}"),)
     c = ps("{do(Buy(Video()))}")
 
