@@ -1430,6 +1430,57 @@ class e66ii(e66i):
             raise RuntimeError(f"Expected: {out} but received {result}")
 
 
+class e67(BaseExample):
+    """
+    Example 67, p191, p220
+
+    Results of a recent survey of seventy-four chief executive officers indicate there
+    may be a link between childhood pet ownership and future career success. Fully 94%
+    of the CEOs, all of them employed within Fortune 500 companies, had possessed a dog,
+    a cat, or both, as youngsters.
+    """
+
+    v = (
+        ps("{94=* IsCEO()HadPet(), HadPet()}"),
+        ps("{HadPet()}"),
+        ps("Ax {x=* IsCEO()}"),
+    )
+    c = ps("{94=* IsCEO()}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = (
+            cls.v[0].suppose(cls.v[1], verbose=verbose).which(cls.v[2], verbose=verbose)
+        )
+        if not result == cls.c:
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class e70(BaseExample):
+    """
+    Example 70, p194, p221
+
+    P1 Pat has either the disease or a benign condition
+    P2 If she has the disease, then she will have a certain symptom.
+    P3 In fact, she has the symptom
+    """
+
+    v = (
+        ps("{Disease(), Benign()}"),
+        ps("{Disease()Symptom()}^{Disease()}"),
+        ps("{Symptom()}"),
+    )
+    c = ps("{Disease()}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = (
+            cls.v[0].update(cls.v[1], verbose=verbose).update(cls.v[2], verbose=verbose)
+        )
+        if not result == cls.c:
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
 class e71(BaseExample):
     """
     Example 71, and 78, page 212
@@ -1531,7 +1582,24 @@ class e76(DefaultInference, BaseExample):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
-class e90(DefaultDecision, BaseExample):
+class e88(DefaultInference, BaseExample):
+    """
+    Example 88, p233
+
+    P1: There is a 90% chance Superman can fly
+    P2: Clark is superman
+
+    C: There is a 90% chance Clark can fly
+    """  # TODO: Made this one up
+
+    v: tuple[View, View] = (
+        ps("Ax {90=* CanFly(x), 10=* ~CanFly(x)} ^ {IsSuperman(x)}"),
+        ps("{IsSuperman(Clark())}"),
+    )
+    c: View = ps("{90=* CanFly(Clark())}")
+
+
+class e90_condA(DefaultDecision, BaseExample):
     """
     Example 90, p249, p273
 
@@ -1541,12 +1609,82 @@ class e90(DefaultDecision, BaseExample):
     movie (such as a comedy, drama, thriller etc.). This particular video that you are considering
     is one you have been thinking about buying a long time. It is a available at a special sale price
     of $14.99. What would you do in this situation?
-    """
+    """  # TODO: Contradiction factor not show in book
 
     v = (ps("{do(Buy(Video())),~do(Buy(Video()))}"),)
     cv = (ps("Ax {Fun()}^{do(Buy(x))}"),)
     pr = (ps("{1=+ 0} ^ {Fun()}"),)
     c = ps("{do(Buy(Video()))}")
+
+
+class e90_condB(e90_condA):
+    v = (ps("Ea {do(Buy(Video())),do(Buy(a))}"),)
+    c = ps("Ea {do(Buy(Video())), do(Buy(a))}")
+
+
+class e92_base:
+    """
+    Example 92, p253, p274
+    Imagine that you serve on the jury of an only-child sole-custody case following a relatively
+    messy divorce. The facts of the case are compilicated by ambiguous economic, social, and
+    emotional considerations, and you decide to base your decision entirely on the following
+    few observations.
+
+    ParentA: average income, average health, average working hours, reasonable rapport with the
+    child, relatively social life.
+
+    ParentB: above-average income, very close relationship with the child, extremely active
+    social life, lots of work-related travel, minor health problems.
+
+    """  # TODO: Contradiction factor not show in book
+
+    cv = (
+        ps("Ax {Custody(x)} ^ {do(Award(x))}"),
+        ps("Ax {~Custody(x)} ^ {do(Deny(x))}"),
+        ps(
+            "{MedRapp(ParentA())MedTime(ParentA())HighRapp(ParentB())LowTime(ParentB())}"
+        ),
+    )
+    pr = (
+        ps("Ax {1=+ 0} ^ {Custody(x)MedRapp(x)}"),
+        ps("Ax {3=+ 0} ^ {Custody(x)HighRapp(x)}"),
+        ps("Ax {1=+ 0} ^ {Custody(x)MedTime(x)}"),
+        ps(
+            "Ax {1=+ 0} ^ {~Custody(x)MedTime(x)}"
+        ),  # TODO: Thís is inverse of above - typo?
+        ps("Ax {2=+ 0} ^ {~Custody(x)LowTime(x)}"),
+    )
+
+
+class e92_award(DefaultDecision, e92_base, BaseExample):
+    """
+    To which parent would you award sole custody of the child?
+    """
+
+    __doc__ = cast(str, __doc__) + cast(str, e92_base.__doc__)
+    v = (ps("{do(Award(ParentA())), do(Award(ParentB()))}"),)
+
+    c = ps("{do(Award(ParentB()))}")
+
+
+class e92_deny(DefaultDecision, e92_base, BaseExample):
+    """
+    To which parent would you deny sole custody of the child?
+    """
+
+    __doc__ = cast(str, __doc__) + cast(str, e92_award.__doc__)
+    v = (ps("{do(Deny(ParentA())), do(Deny(ParentB()))}"),)
+    c = ps("{do(Deny(ParentB()))}")
+
+
+# class e93_grp1(DefaultDecision, BaseExample):
+#     """
+#     Example 93, p255, p276
+
+#     The US is preparing for the outbreak of an unusual Asian disease, which
+#     is expected to kill 600 people. There are two possible treatments (A) and (B)
+#     with the following results:
+#     """ # TODO: Requires custom function
 
 
 class UniProduct(BaseExample):
