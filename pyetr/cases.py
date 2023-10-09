@@ -1445,15 +1445,65 @@ class e67(BaseExample):
         ps("{HadPet()}"),
         ps("Ax {x=* IsCEO()}"),
     )
-    c = ps("{94=* IsCEO()}")
+    c: View = ps("{94=* IsCEO()}")
 
     @classmethod
     def test(cls, verbose: bool = False):
         result = (
             cls.v[0].suppose(cls.v[1], verbose=verbose).which(cls.v[2], verbose=verbose)
         )
-        if not result == cls.c:
+        if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class e69_part1(BasicStep, BaseExample):
+    """
+    Example 69, p192, p218
+
+    The suspect's DNA matches the crime sample.
+
+    If the suspect is not guilty, then the probability of such a DNA match is 1 in
+    a million
+
+    Is the suspect likely to be guilty?
+    """
+
+    v = (
+        ps("{Match(Suspect())}"),
+        ps(
+            "{0.000001=* ~Guilty(Suspect())Match(Suspect()), ~Guilty(Suspect())~Match(Suspect())} ^ {~Guilty(Suspect())}"
+        ),
+    )
+    c = ps(
+        "{0.000001=* ~Guilty(Suspect())Match(Suspect()), Guilty(Suspect())~Match(Suspect())}"
+    )
+
+
+class e69_part2(BaseExample):
+    v = (
+        ps(
+            "{0.000001=* ~Guilty(Suspect())Match(Suspect()), Guilty(Suspect())~Match(Suspect())}"
+        ),
+        ps("{999999.999999=* 0}^{Guilty(Suspect())Match(Suspect())}"),
+        ps("Ax {x=* Guilty(Suspect())}"),
+    )
+    c: tuple[View, View] = (
+        ps(
+            "{0.000001=* ~Guilty(Suspect())Match(Suspect()), 999999.999999=* Guilt(Suspect())Match(Suspect())}"
+        ),
+        ps("{999999.999999=* Guilt(Suspect()), 0}"),
+    )
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = cls.v[0].inquire(cls.v[1], verbose=verbose)
+        if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(
+                f"Expected mid result: {cls.c[0]} but received {mid_result}"
+            )
+        result = mid_result.which(cls.v[2], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
 
 
 class e70(BaseExample):
@@ -1470,14 +1520,14 @@ class e70(BaseExample):
         ps("{Disease()Symptom()}^{Disease()}"),
         ps("{Symptom()}"),
     )
-    c = ps("{Disease()}")
+    c: View = ps("{Disease()}")
 
     @classmethod
     def test(cls, verbose: bool = False):
         result = (
             cls.v[0].update(cls.v[1], verbose=verbose).update(cls.v[2], verbose=verbose)
         )
-        if not result == cls.c:
+        if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
@@ -1516,7 +1566,49 @@ class e71(BaseExample):
 
         result = mid_result.query(cls.v[3], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c[1]):
-            raise RuntimeError(f"Expected: {cls.c[1]} but received {mid_result}")
+            raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
+
+
+class e72(BaseExample):
+    """
+    Example 72 & 80, p196, p213
+
+    There is a box in which there is at least a red marble or else there is a green
+    marble and there is a blue marble, but not all three marbles.
+
+    What is the probability of the following situation:
+
+    There is a red marble and a blue marble in the box?
+    """
+
+    v = (
+        ps("{B(g())B(b())~B(r()), B(r())~B(g()), B(r())~B(b())}"),
+        ps("{33.333333=* 0} ^ {B(g())B(b())~B(r())}"),
+        ps("{33.333333=* 0} ^ {B(r())~B(g())}"),
+        ps("{33.333333=* 0} ^ {B(r())~B(b())}"),
+        ps("{B(r())B(b())}"),
+    )
+    c: tuple[View, View] = (
+        ps(
+            "{33.333333=* B(g())B(b())~B(r()), 33.333333=* B(r())~B(g()), 33.333333=* B(r())~B(b())}"
+        ),
+        ps("{33.333333=* B(r())B(b()), 0}"),
+    )
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = (
+            cls.v[0]
+            .inquire(cls.v[1], verbose=verbose)
+            .inquire(cls.v[2], verbose=verbose)
+            .inquire(cls.v[3], verbose=verbose)
+        )
+        if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
+            raise RuntimeError(f"Expected: {cls.c[0]} but received {mid_result}")
+
+        result = mid_result.query(cls.v[4], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c[1]):
+            raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
 
 
 class e74(BaseExample):
@@ -1580,6 +1672,186 @@ class e76(DefaultInference, BaseExample):
         )
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class e81_base:
+    """
+    Example 81, p213
+
+    There is a box in which there is a yellow card, or a brown card, but not both
+
+    Given the preceding assertion, according to you, what is the probability of the following situation?
+    """
+
+
+class e81i(e81_base):
+    """
+    In the box there is at least a yellow card
+    """
+
+    __doc__ = cast(str, e81_base.__doc__) + cast(str, __doc__)
+    # TODO: Add test
+    # v = (
+    #     ps("{50=* Box(Yellow()),50=* Box(Brown())}"),
+    #     ps("{Box(Yellow())}")
+    # )
+    # c = ps("{50=* Box(Yellow())}")
+
+
+class e81ii(e81_base):
+    """
+    In the box there is a yellow card and a brown card
+    """
+
+    __doc__ = cast(str, e81_base.__doc__) + cast(str, __doc__)
+    # TODO: Add test
+
+
+class e81iii(e81_base):
+    """
+    In the box there is neither a yellow card nor a brown card
+    """
+
+    __doc__ = cast(str, e81_base.__doc__) + cast(str, __doc__)
+    # TODO: Add test
+
+
+class e82_base:
+    """
+    Example 82, p213
+
+    There is a box in which if there is a yellow card then there is a brown card.
+
+    Given the preceding assertion, according to you, what is the probability of the
+    following situation?
+    """
+
+
+class e82i(e82_base):
+    """
+    In the box there is at least a yellow card.
+    """
+
+    __doc__ = cast(str, e82_base.__doc__) + cast(str, __doc__)
+    # TODO: Add test
+
+
+class e82ii(e82_base):
+    """
+    In the box there is a yellow card and a brown card.
+    """
+
+    __doc__ = cast(str, e82_base.__doc__) + cast(str, __doc__)
+    # TODO: Add test
+
+
+class e82iii(e82_base):
+    """
+    In the box there is a yellow card and there is not a brown card.
+    """
+
+    __doc__ = cast(str, e82_base.__doc__) + cast(str, __doc__)
+    # TODO: Add test
+
+
+class e82iv(e82_base):
+    """
+    In the box there is neither a yellow card nor a brown card.
+    """
+
+    __doc__ = cast(str, e82_base.__doc__) + cast(str, __doc__)
+    # TODO: Add test
+
+
+class e83i:
+    """
+    Example 83, p214
+
+    There is a box in which there is at least a red marble, or else there is a green
+    marble and there is a blue marble, but not all three marbles.
+
+    What is the probability there is a red marble and blue in marble in the box?
+    """
+
+    # TODO: Add test
+
+
+class e83ii:
+    """
+    Example 83, p214
+
+    There is a box in which there is at least a red marble, or else there is a green
+    marble and there is a blue marble, but not all three marbles.
+
+    What is the probability there is a green marble and there is a blue marble?
+    """
+
+    # TODO: Add test
+
+
+class e84i:
+    """
+    Example 84, p215
+
+    There is a box in which there is a grey marble and either a white marble or
+    else a mauve marble but not all three marbles are in the box.
+
+    Given the preceding assertion, what is the probability of the following
+    situation?
+
+    In the box there is a grey marble and there is a mauve marble.
+    """
+
+    # TODO: Add test
+
+
+class e84ii:
+    """
+    Example 84, p215
+
+    There is a box in which there is a grey marble, or else a white marble, or
+    else a mauve marble, but no more than one marble.
+
+    Given the preceding assertion, what is the probability of the following
+    situation?
+
+    In the box there is a grey marble and there is a mauve marble.
+    """
+
+    # TODO: Add test
+
+
+class e85:
+    """
+    Example 85, p216
+
+    Easy partial probability inference
+
+    There is a box in which there is one and only one of these marbles: a
+    green marble, a blue marble, or a red marble. The probability that a green
+    marble is in the box is 0.6, and the probability that a blue marble is in
+    the box is 0.2.
+
+    What is the probability that a red marble is in the box?
+    """
+
+    # TODO: Add test
+
+
+class e86:
+    """
+    Example 86, p217
+
+    You have a hand of several cards with only limited information about it.
+
+    There is an ace and a queen or a kind and a jack or a ten.
+    The probability that there is an ace and a queen is 0.6
+    The probability that there is a king and a jack is 0.2
+
+    What is the probability that there is a ten?
+    """
+
+    # TODO: Add test
 
 
 class e88(DefaultInference, BaseExample):
@@ -1661,7 +1933,7 @@ class e92_award(DefaultDecision, e92_base, BaseExample):
     To which parent would you award sole custody of the child?
     """
 
-    __doc__ = cast(str, __doc__) + cast(str, e92_base.__doc__)
+    __doc__ = cast(str, e92_base.__doc__) + cast(str, __doc__)
     v = (ps("{do(Award(ParentA())), do(Award(ParentB()))}"),)
 
     c = ps("{do(Award(ParentB()))}")
@@ -1672,7 +1944,7 @@ class e92_deny(DefaultDecision, e92_base, BaseExample):
     To which parent would you deny sole custody of the child?
     """
 
-    __doc__ = cast(str, __doc__) + cast(str, e92_award.__doc__)
+    __doc__ = cast(str, e92_base.__doc__) + cast(str, __doc__)
     v = (ps("{do(Deny(ParentA())), do(Deny(ParentB()))}"),)
     c = ps("{do(Deny(ParentB()))}")
 
@@ -1720,6 +1992,3 @@ class QueryTest2(Query, BaseExample):
         ps("∃a ∀x {T(x,a)S(a*)}"),
     )
     c = ps("∀x ∃a {T(x,a)S(a*)}")
-
-
-# Example 18
