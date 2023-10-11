@@ -197,12 +197,15 @@ def gather_funcs(term: parsing.Term) -> list[Function]:
     if isinstance(term, parsing.Real):
         funcs.append(RealNumber(term.num))
     elif isinstance(term, parsing.Xbar):
+        funcs += gather_funcs(term.left)
+        funcs += gather_funcs(term.right)
         funcs.append(XBar)
     elif isinstance(term, parsing.Emphasis):
         funcs += gather_funcs(term.arg)
     elif isinstance(term, parsing.Summation):
         for arg in term.args:
             funcs += gather_funcs(arg)
+        funcs.append(Summation)
     elif isinstance(term, parsing.Function):
         funcs.append(Function(term.name, arity=len(term.args)))
     elif isinstance(term, Variable):

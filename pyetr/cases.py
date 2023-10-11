@@ -1854,7 +1854,7 @@ class e86:
     # TODO: Add test
 
 
-class e88(DefaultInference, BaseExample):
+class e88(BaseExample):
     """
     Example 88, p233
 
@@ -1862,13 +1862,22 @@ class e88(DefaultInference, BaseExample):
     P2: Clark is superman
 
     C: There is a 90% chance Clark can fly
-    """  # TODO: Made this one up
+    """
 
-    v: tuple[View, View] = (
-        ps("Ax {90=* CanFly(x), 10=* ~CanFly(x)} ^ {IsSuperman(x)}"),
-        ps("{IsSuperman(Clark())}"),
+    v: tuple[View, View, View] = (
+        ps("{90=* CanFly(Superman())}"),
+        ps("{==(Clark(), Superman())}"),
+        ps("{==(Clark(), Superman()*)}"),
     )
     c: View = ps("{90=* CanFly(Clark())}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = (
+            cls.v[0].update(cls.v[1], verbose=verbose).factor(cls.v[2], verbose=verbose)
+        )
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
 class e90_condA(DefaultDecision, BaseExample):
