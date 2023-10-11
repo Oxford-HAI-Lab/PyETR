@@ -1,26 +1,45 @@
 __all__ = ["Function", "RealNumber"]
 
 
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING, Callable, Optional, cast
+
+from .multiset import GenericMultiset
 
 if TYPE_CHECKING:
     from .abstract_term import AbstractFunctionalTerm
+    from .term import Term
+
+NumFunc = Callable[..., float]
+
+
+def apply_func(term: "AbstractFunctionalTerm", f: NumFunc) -> "AbstractFunctionalTerm":
+    if len(term.t) == 1 and isinstance(term.t[0], GenericMultiset):
+        sets: list[Term] = term.t[0]._items
+    else:
+        sets: list[Term] = list(term.t)
+    if len(sets) != 0 and all(
+        [hasattr(i, "f") and isinstance(getattr(i, "f"), RealNumber) for i in sets]
+    ):
+        sets_new = cast(list[RealNumber], [getattr(i, "f") for i in sets])
+        nums_to_add: list[float] = []
+        for num in sets_new:
+            nums_to_add.append(num.num)
+        calculated_term = f(*nums_to_add)
+        return type(term)(RealNumber(calculated_term), ())
+    else:
+        return term
 
 
 class Function:
     name: str
     arity: int
-    _func_caller: Optional[
-        Callable[["AbstractFunctionalTerm"], Optional["AbstractFunctionalTerm"]]
-    ]
+    _func_caller: Optional[NumFunc]
 
     def __init__(
         self,
         name: str,
         arity: int,
-        func_caller: Optional[
-            Callable[["AbstractFunctionalTerm"], Optional["AbstractFunctionalTerm"]]
-        ] = None,
+        func_caller: Optional[NumFunc] = None,
     ) -> None:
         if arity < 0:
             raise ValueError("arity must not be less than 0")
@@ -33,7 +52,7 @@ class Function:
     ) -> Optional["AbstractFunctionalTerm"]:
         if self._func_caller is None:
             return None
-        return self._func_caller(func_term)
+        return apply_func(func_term, self._func_caller)
 
     def __repr__(self) -> str:
         return f"Function({self.name}, {self.arity})"
@@ -70,3 +89,6 @@ class RealNumber(Function):
         if not isinstance(other, RealNumber):
             return False
         return self.name == other.name
+
+    def __repr__(self) -> str:
+        return f"RealNumber({self.name}, {self.arity})"

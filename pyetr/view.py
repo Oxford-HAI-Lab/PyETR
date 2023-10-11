@@ -237,7 +237,9 @@ class View:
         self._stage = stage
         self._supposition = supposition
         self._dependency_relation = dependency_relation
-        self._issue_structure = issue_structure
+        self._issue_structure = issue_structure.restriction(
+            stage.atoms | supposition.atoms
+        )
         if weights is None:
             self._weights = Weights.get_null_weights(stage)
         else:
