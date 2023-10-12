@@ -216,7 +216,9 @@ def gather_funcs(term: parsing.Term) -> list[Function]:
 
 
 def get_function_map(
-    stage: parsing.Stage, supposition: Optional[parsing.Supposition]
+    stage: parsing.Stage,
+    supposition: Optional[parsing.Supposition],
+    custom_functions: list[Function],
 ) -> dict[str, Function]:
     terms_to_scan: list[parsing.Term] = []
     for state in stage.states:
@@ -240,17 +242,20 @@ def get_function_map(
                     for a in atom.atoms:
                         terms_to_scan += a.terms
 
+    func_map: dict[str, Function] = {f.name: f for f in custom_functions}
     new_funcs: list[Function] = []
-
     for term in terms_to_scan:
         new_funcs += gather_funcs(term)
 
-    return {f.name: f for f in new_funcs}
+    for new_func in new_funcs:
+        if new_func.name not in func_map:
+            func_map[new_func.name] = new_func
+    return func_map
 
 
-def parse_pv(pv: parsing.ParserView) -> View:
+def parse_pv(pv: parsing.ParserView, custom_functions: list[Function]) -> View:
     variable_map, dep_rel = get_variable_map_and_dependencies(pv.quantifiers)
-    function_map = get_function_map(pv.stage, pv.supposition)
+    function_map = get_function_map(pv.stage, pv.supposition, custom_functions)
     w_stage, issues = parse_weighted_states(
         pv.stage.states, variable_map=variable_map, function_map=function_map
     )
