@@ -82,7 +82,7 @@ def parse_term(
             )
             new_args.append(new_arg)
             issues += new_issues
-        return FunctionalTerm(Summation, (Multiset(new_args),)), issues
+        return FunctionalTerm(Summation, Multiset(new_args)), issues
     else:
         raise ValueError(f"Invalid term {t}")
 

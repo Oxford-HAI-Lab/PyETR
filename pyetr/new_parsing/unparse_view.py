@@ -1,10 +1,11 @@
-from typing import Optional, cast
+from typing import cast
 
 import pyetr.new_parsing.parse_string as parsing
 from pyetr.atoms import Atom, DoAtom, OpenDoAtom, OpenPredicateAtom, PredicateAtom
 from pyetr.atoms.terms import (
     ArbitraryObject,
     FunctionalTerm,
+    Multiset,
     OpenFunctionalTerm,
     OpenTerm,
     QuestionMark,
@@ -13,8 +14,6 @@ from pyetr.atoms.terms import (
     Term,
     XBar,
 )
-from pyetr.atoms.terms.open_term import OpenMultiset
-from pyetr.atoms.terms.term import Multiset
 from pyetr.common_parsing import Variable, get_quantifiers
 from pyetr.issues import IssueStructure
 from pyetr.stateset import State, Supposition
@@ -22,22 +21,11 @@ from pyetr.view import View
 from pyetr.weight import Weight, Weights
 
 
-def unparse_multiset(
-    multiset: Multiset, open_multisets: Optional[list[tuple[Term, OpenMultiset]]] = None
-) -> list[parsing.Term | Variable]:
-    if open_multisets is None:
-        new_subterms: list[parsing.Term | Variable] = []
-        for i, subterm in enumerate(multiset):
-            new_subterms.append(unparse_term(subterm, []))
-        return new_subterms
-    else:
-        new_subterms: list[parsing.Term | Variable] = []
-        for i, subterm in enumerate(multiset):
-            rel_open_terms: list[tuple[Term, OpenTerm]] = []
-            for t, o in open_multisets:
-                rel_open_terms.append((t, o._items[i]))
-            new_subterms.append(unparse_term(subterm, rel_open_terms))
-        return new_subterms
+def unparse_multiset(multiset: Multiset[Term]) -> list[parsing.Term | Variable]:
+    new_subterms: list[parsing.Term | Variable] = []
+    for subterm in multiset:
+        new_subterms.append(unparse_term(subterm, []))
+    return new_subterms
 
 
 def unparse_term(
@@ -50,26 +38,20 @@ def unparse_term(
         return parsing.Emphasis([[unparse_term(term, remaining_terms)]])
     if isinstance(term, FunctionalTerm):
         # Insert term back in - if it matches, it's a term to pass
-        if len(term.t) == 1 and isinstance(term.t[0], Multiset):
-            multi = term.t[0]
-            open_multis: list[tuple[Term, OpenMultiset]] = []
-            for t, open_term in open_terms:
-                if isinstance(open_term, OpenMultiset):
-                    open_multis.append((t, open_term))
-            new_subterms = unparse_multiset(multiset=multi, open_multisets=open_multis)
-        else:
-            new_subterms: list[parsing.Term | Variable] = []
-            for i, subterm in enumerate(term.t):
-                rel_open_terms: list[tuple[Term, OpenTerm]] = []
-                for t, o in open_terms:
-                    assert isinstance(o, OpenFunctionalTerm)
-                    rel_open_terms.append((t, o.t[i]))
-                new_subterms.append(unparse_term(subterm, rel_open_terms))
+        new_subterms: list[parsing.Term | Variable] = []
+        for subterm in term.t:
+            rel_open_terms: list[tuple[Term, OpenTerm]] = []
+            for t, o in open_terms:
+                assert isinstance(o, OpenFunctionalTerm)
+                for o_subterm in o.t:
+                    if subterm == o_subterm(t):
+                        rel_open_terms.append((t, o_subterm))
+            new_subterms.append(unparse_term(subterm, rel_open_terms))
 
         if isinstance(term.f, RealNumber):
             return parsing.Real([term.f.num])
         elif term.f == XBar:
-            return parsing.Xbar([list(new_subterms)])
+            return parsing.Xbar([new_subterms])
         elif term.f == Summation:
             return parsing.Summation([[term.f.name, parsing.Comma([new_subterms])]])
         else:

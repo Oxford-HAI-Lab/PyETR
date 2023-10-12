@@ -1,13 +1,8 @@
-__all__ = ["Term", "ArbitraryObject", "FunctionalTerm", "Multiset"]
+__all__ = ["Term", "ArbitraryObject", "FunctionalTerm"]
 
 from abc import abstractmethod
 
-from .abstract_term import (
-    AbstractArbitraryObject,
-    AbstractFunctionalTerm,
-    AbstractMultiset,
-    AbstractTerm,
-)
+from .abstract_term import AbstractArbitraryObject, AbstractFunctionalTerm, AbstractTerm
 
 
 class Term(AbstractTerm):
@@ -61,7 +56,7 @@ class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
     def arb_objects(self) -> set[ArbitraryObject]:
         output_set = set()
         for term in self.t:
-            if isinstance(term, FunctionalTerm) or isinstance(term, Multiset):
+            if isinstance(term, FunctionalTerm):
                 output_set |= term.arb_objects
             elif isinstance(term, ArbitraryObject):
                 output_set.add(term)
@@ -82,8 +77,6 @@ class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
                     replacement = term.replace(replacements)
                 elif isinstance(term, ArbitraryObject):
                     replacement = term
-                elif isinstance(term, Multiset):
-                    replacement = term.replace(replacements)
                 else:
                     assert False
             new_terms.append(replacement)
@@ -102,34 +95,6 @@ class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
                 for term in self.t
             ]
             return FunctionalTerm(f=self.f, t=tuple(new_terms))
-
-
-class Multiset(AbstractMultiset[Term], Term):
-    @property
-    def arb_objects(self) -> set[ArbitraryObject]:
-        arb_objs = set()
-        for term in self:
-            arb_objs |= term.arb_objects
-        return arb_objs
-
-    def replace(self, replacements: dict["ArbitraryObject", "Term"]) -> "Multiset":
-        return Multiset(term.replace(replacements) for term in self)
-
-    def __add__(self, other: "Multiset") -> "Multiset":
-        return Multiset(self._items + other._items)
-
-    def replace_term(
-        self,
-        old_term: Term,
-        new_term: Term,
-    ) -> "Term":
-        if self == old_term:
-            return new_term
-        else:
-            new_terms = [
-                term.replace_term(old_term=old_term, new_term=new_term) for term in self
-            ]
-            return Multiset(new_terms)
 
 
 # Changed if clause in 4.2 to separate Arbitrary Objects from FunctionalTerm

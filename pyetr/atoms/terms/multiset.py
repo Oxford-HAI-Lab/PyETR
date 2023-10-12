@@ -3,7 +3,7 @@ from typing import Generic, Hashable, Iterable, TypeVar
 T = TypeVar("T", bound=Hashable)
 
 
-class GenericMultiset(Generic[T]):
+class Multiset(Generic[T]):
     _items: list[T]
 
     def __init__(self, items: Iterable[T]) -> None:
@@ -19,7 +19,7 @@ class GenericMultiset(Generic[T]):
         return f"⟪{','.join([repr(i) for i in self._items])}⟫"
 
     def __eq__(self, __value: object) -> bool:
-        if not isinstance(__value, GenericMultiset):
+        if not isinstance(__value, Multiset):
             return False
         return self._items == __value._items
 
@@ -32,3 +32,6 @@ class GenericMultiset(Generic[T]):
     @property
     def detailed(self):
         return f"<{type(self).__name__} items={self._items.__repr__()}>"
+
+    def __add__(self, other: "Multiset") -> "Multiset":
+        return Multiset(self._items + other._items)

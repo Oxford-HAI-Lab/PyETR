@@ -3,7 +3,7 @@ __all__ = ["Function", "RealNumber"]
 
 from typing import TYPE_CHECKING, Callable, Optional, cast
 
-from .multiset import GenericMultiset
+from .multiset import Multiset
 
 if TYPE_CHECKING:
     from .abstract_term import AbstractFunctionalTerm
@@ -13,12 +13,10 @@ NumFunc = Callable[..., float]
 
 
 def apply_func(term: "AbstractFunctionalTerm", f: NumFunc) -> "AbstractFunctionalTerm":
-    if len(term.t) == 1 and isinstance(term.t[0], GenericMultiset):
-        sets: list[Term] = term.t[0]._items
-    else:
-        sets: list[Term] = list(term.t)
-    if all([hasattr(i, "f") and isinstance(getattr(i, "f"), RealNumber) for i in sets]):
-        sets_new = cast(list[RealNumber], [getattr(i, "f") for i in sets])
+    if all(
+        [hasattr(i, "f") and isinstance(getattr(i, "f"), RealNumber) for i in term.t]
+    ):
+        sets_new = cast(list[RealNumber], [getattr(i, "f") for i in term.t])
         nums_to_add: list[float] = []
         for num in sets_new:
             nums_to_add.append(num.num)
@@ -30,16 +28,16 @@ def apply_func(term: "AbstractFunctionalTerm", f: NumFunc) -> "AbstractFunctiona
 
 class Function:
     name: str
-    arity: int
+    arity: Optional[int]
     _func_caller: Optional[NumFunc]
 
     def __init__(
         self,
         name: str,
-        arity: int,
+        arity: Optional[int],
         func_caller: Optional[NumFunc] = None,
     ) -> None:
-        if arity < 0:
+        if arity is not None and arity < 0:
             raise ValueError("arity must not be less than 0")
         self.name = name
         self.arity = arity

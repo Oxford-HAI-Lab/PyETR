@@ -1,6 +1,7 @@
-from pyetr.atoms.terms.term import FunctionalTerm, Multiset
+from pyetr.atoms.terms.term import FunctionalTerm
 
 from .function import Function
+from .multiset import Multiset
 
 
 def multi_func_new(i: float, j: float):
@@ -12,7 +13,7 @@ def sum_func_new(*x: float):
 
 
 XBar = Function("XBar", 2, func_caller=multi_func_new)
-Summation = Function("Summation", 1, func_caller=sum_func_new)
+Summation = Function("Summation", None, func_caller=sum_func_new)
 
 
 def multiset_product(m1: Multiset, m2: Multiset) -> Multiset:

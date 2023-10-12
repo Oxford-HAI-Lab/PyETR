@@ -42,6 +42,7 @@ def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
             rel_open_terms: list[tuple[Term, OpenTerm]] = []
             for t, o in open_terms:
                 assert isinstance(o, OpenFunctionalTerm)
+                assert isinstance(o.t, tuple)
                 rel_open_terms.append((t, o.t[i]))
             new_subterms.append(convert_term(subterm, rel_open_terms))
         return LogicPredicate(
