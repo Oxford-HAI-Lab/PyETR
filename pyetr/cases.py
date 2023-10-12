@@ -5,6 +5,7 @@ from typing import cast
 from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.term import FunctionalTerm
 
+from .func_library import log_func, power_func
 from .inference import basic_step, default_decision, default_inference_procedure
 from .new_parsing import parse_string_to_view as ps
 from .view import View
@@ -1950,14 +1951,32 @@ class e92_deny(DefaultDecision, e92_base, BaseExample):
     c = ps("{do(Deny(ParentB()))}")
 
 
-# class e93_grp1(DefaultDecision, BaseExample):
-#     """
-#     Example 93, p255, p276
+class e93_grp1(DefaultDecision, BaseExample):
+    """
+    Example 93, p255, p276
 
-#     The US is preparing for the outbreak of an unusual Asian disease, which
-#     is expected to kill 600 people. There are two possible treatments (A) and (B)
-#     with the following results:
-#     """ # TODO: Requires custom function
+    The US is preparing for the outbreak of an unusual Asian disease, which
+    is expected to kill 600 people. There are two possible treatments (A) and (B)
+    with the following results:
+
+    (Group 1) (A) 400 people die. (B) Nobody dies with 1/3 chance, 600 people die with 2/3 chance.
+    Which treatment would you choose?
+    """
+
+    v = (ps("{do(A()),do(B())}"),)
+    pr = (
+        ps(
+            "Ax {power(++(1, log(++(1, x))), -1)=+ 0} ^ {D(x)}",
+            custom_functions=[power_func, log_func],
+        ),
+        ps("Ax {++(1, log(++(1, x)))=+ 0} ^ {S(x)}", custom_functions=[log_func]),
+    )
+    cv = (
+        ps("{D(400)} ^ {do(A())}"),
+        ps("{0.33=* D(0.0), ~D(0.0)} ^ {do(B())}"),
+        ps("{0.67=* D(600), ~D(600)} ^ {do(B())}"),
+    )
+    c = ps("{do(A())}")
 
 
 class UniProduct(BaseExample):

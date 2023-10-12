@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+from pyetr.atoms.terms import Multiset
+
 from .abstract_term import AbstractArbitraryObject, AbstractFunctionalTerm, AbstractTerm
 from .term import ArbitraryObject, FunctionalTerm, Term
 
@@ -80,8 +82,13 @@ def get_open_equivalent(term: Term) -> OpenTerm:
     if isinstance(term, ArbitraryObject):
         return OpenArbitraryObject(term.name)
     elif isinstance(term, FunctionalTerm):
-        return OpenFunctionalTerm(
-            f=term.f, t=tuple([get_open_equivalent(i) for i in term.t])
-        )
+        if term.f.arity is None:
+            return OpenFunctionalTerm(
+                f=term.f, t=Multiset[OpenTerm]([get_open_equivalent(i) for i in term.t])
+            )
+        else:
+            return OpenFunctionalTerm(
+                f=term.f, t=tuple([get_open_equivalent(i) for i in term.t])
+            )
     else:
         assert False
