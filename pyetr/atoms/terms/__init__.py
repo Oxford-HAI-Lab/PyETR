@@ -3,7 +3,6 @@ __all__ = [
     "RealNumber",
     "OpenArbitraryObject",
     "OpenFunctionalTerm",
-    "OpenMultiset",
     "OpenTerm",
     "QuestionMark",
     "get_open_equivalent",
@@ -11,17 +10,17 @@ __all__ = [
     "XBar",
     "ArbitraryObject",
     "FunctionalTerm",
-    "Multiset",
     "Term",
+    "Multiset",
 ]
 from .function import Function, RealNumber
+from .multiset import Multiset
 from .open_term import (
     OpenArbitraryObject,
     OpenFunctionalTerm,
-    OpenMultiset,
     OpenTerm,
     QuestionMark,
     get_open_equivalent,
 )
 from .special_funcs import Summation, XBar
-from .term import ArbitraryObject, FunctionalTerm, Multiset, Term
+from .term import ArbitraryObject, FunctionalTerm, Term

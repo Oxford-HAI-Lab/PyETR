@@ -6,10 +6,12 @@ from .stateset import SetOfStates, State
 
 
 class Weight:
-    multiplicative: Multiset
-    additive: Multiset
+    multiplicative: Multiset[Term]
+    additive: Multiset[Term]
 
-    def __init__(self, multiplicative: Multiset, additive: Multiset) -> None:
+    def __init__(
+        self, multiplicative: Multiset[Term], additive: Multiset[Term]
+    ) -> None:
         self.multiplicative = multiplicative
         self.additive = additive
 
@@ -95,10 +97,12 @@ class Weight:
         new_term: Term,
     ) -> "Weight":
         return Weight(
-            multiplicative=self.multiplicative.replace_term(
-                old_term, new_term
-            ),  # type:ignore
-            additive=self.additive.replace_term(old_term, new_term),  # type:ignore
+            multiplicative=Multiset[Term](
+                [i.replace_term(old_term, new_term) for i in self.multiplicative]
+            ),
+            additive=Multiset[Term](
+                [i.replace_term(old_term, new_term) for i in self.additive]
+            ),
         )
 
 

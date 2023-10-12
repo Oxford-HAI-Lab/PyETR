@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
 from .function import Function
-from .multiset import GenericMultiset
+from .multiset import Multiset
 
 
 class AbstractTerm(ABC):
@@ -51,17 +51,25 @@ class AbstractArbitraryObject(AbstractTerm):
 
 class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
     f: Function
-    t: tuple[TermType, ...]
+    t: tuple[TermType, ...] | Multiset[TermType]
 
     def __init__(
         self,
         f: Function,
-        t: tuple[TermType, ...],
+        t: tuple[TermType, ...] | Multiset[TermType],
     ):
-        if len(t) != f.arity:
+        if f.arity is not None and len(t) != f.arity:
             raise ValueError(
                 f"{type(self).__name__} length {len(t)} did not match arity {f.arity}"
             )
+        if isinstance(t, Multiset) and f.arity is not None:
+            raise ValueError(
+                f"Multiset {t} provided to function with numeric arity {f.arity}"
+            )
+
+        if isinstance(t, tuple) and f.arity is None:
+            raise ValueError(f"tuple {t} provided to function with arity None")
+
         self.f = f
         self.t = t
         out = f(self)
@@ -87,7 +95,3 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
     @property
     def detailed(self) -> str:
         return f"<{type(self).__name__} f={self.f.detailed} t=({','.join(t.detailed for t in self.t)},)>"
-
-
-class AbstractMultiset(Generic[TermType], GenericMultiset[TermType], AbstractTerm):
-    pass

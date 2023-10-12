@@ -215,17 +215,17 @@ class SetOfStates(frozenset[State]):
             {delta for delta in self if any([gamma.issubset(delta) for gamma in other])}
         )
 
-        expr1 = Multiset(
+        expr1: Multiset[Term] = Multiset(
             [
-                FunctionalTerm(f=Summation, t=(weights[delta].multiplicative,))
+                FunctionalTerm(f=Summation, t=weights[delta].multiplicative)
                 for delta in Y
             ]
         )
-        expr1_sum = FunctionalTerm(f=Summation, t=(expr1,))
-        expr2 = Multiset(
-            [FunctionalTerm(f=Summation, t=(weights[delta].additive,)) for delta in Y]
+        expr1_sum = FunctionalTerm(f=Summation, t=expr1)
+        expr2: Multiset[Term] = Multiset(
+            [FunctionalTerm(f=Summation, t=weights[delta].additive) for delta in Y]
         )
-        expr2_sum = FunctionalTerm(f=Summation, t=(expr2,))
+        expr2_sum = FunctionalTerm(f=Summation, t=expr2)
         return FunctionalTerm(f=XBar, t=(expr1_sum, expr2_sum))
 
     def __repr__(self) -> str:

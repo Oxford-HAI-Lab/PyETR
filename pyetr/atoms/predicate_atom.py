@@ -3,7 +3,7 @@ __all__ = ["PredicateAtom"]
 
 from .abstract import Atom
 from .atom_likes import PredicateAtomLike
-from .terms import ArbitraryObject, FunctionalTerm, Multiset, Term
+from .terms import ArbitraryObject, FunctionalTerm, Term
 
 
 class PredicateAtom(PredicateAtomLike[Term], Atom):
@@ -11,7 +11,7 @@ class PredicateAtom(PredicateAtomLike[Term], Atom):
     def arb_objects(self) -> set[ArbitraryObject]:
         output_objs = set()
         for term in self.terms:
-            if isinstance(term, FunctionalTerm) or isinstance(term, Multiset):
+            if isinstance(term, FunctionalTerm):
                 output_objs |= term.arb_objects
             elif isinstance(term, ArbitraryObject):
                 output_objs.add(term)
