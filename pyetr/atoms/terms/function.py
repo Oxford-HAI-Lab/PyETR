@@ -17,9 +17,7 @@ def apply_func(term: "AbstractFunctionalTerm", f: NumFunc) -> "AbstractFunctiona
         sets: list[Term] = term.t[0]._items
     else:
         sets: list[Term] = list(term.t)
-    if len(sets) != 0 and all(
-        [hasattr(i, "f") and isinstance(getattr(i, "f"), RealNumber) for i in sets]
-    ):
+    if all([hasattr(i, "f") and isinstance(getattr(i, "f"), RealNumber) for i in sets]):
         sets_new = cast(list[RealNumber], [getattr(i, "f") for i in sets])
         nums_to_add: list[float] = []
         for num in sets_new:

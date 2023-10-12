@@ -1430,5 +1430,5 @@ class View:
             out = self
 
         if verbose:
-            print(f"WHQueryOutput: {out}")
+            print(f"WhichOutput: {out}")
         return out

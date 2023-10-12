@@ -1,3 +1,5 @@
+from pyetr.atoms.terms.special_funcs import multiset_product
+
 from .atoms.terms import ArbitraryObject, FunctionalTerm, Multiset, Term, XBar
 from .dependency import DependencyRelation
 from .stateset import SetOfStates, State
@@ -35,18 +37,7 @@ class Weight:
         )
 
     def __mul__(self, other: "Weight") -> "Weight":
-        if len(self.multiplicative) == 0:
-            v_cross_w = other.multiplicative
-        elif len(other.multiplicative) == 0:
-            v_cross_w = self.multiplicative
-        else:
-            v_cross_w = Multiset(
-                [
-                    FunctionalTerm(f=XBar, t=(s_i, t_j))
-                    for s_i in self.multiplicative
-                    for t_j in other.multiplicative
-                ]
-            )
+        v_cross_w = multiset_product(self.multiplicative, other.multiplicative)
         return Weight(multiplicative=v_cross_w, additive=self.additive + other.additive)
 
     def __repr__(self) -> str:
