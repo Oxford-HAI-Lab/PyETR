@@ -215,7 +215,6 @@ class SetOfStates(frozenset[State]):
             {delta for delta in self if any([gamma.issubset(delta) for gamma in other])}
         )
 
-        # TODO: Sum done recursively anyway?
         expr1 = Multiset(
             [
                 FunctionalTerm(f=Summation, t=(weights[delta].multiplicative,))

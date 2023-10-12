@@ -134,7 +134,7 @@ class DefaultDecision(BaseTest):
 
     @classmethod
     def test(cls, verbose: bool = False):
-        result = default_decision(dq=cls.v[0], cv=cls.cv, pr=cls.pr)
+        result = default_decision(dq=cls.v[0], cv=cls.cv, pr=cls.pr, verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
@@ -1296,51 +1296,43 @@ class e64i(BaseExample):
     What is the chance that he is in fact a sufferer?
     """
 
-    # TODO: Is this supposed to be default inference? Note incorrect depose
+    # TODO: Issues not in book - this isn't procedure in book, uses query instead of which
     # TODO: Note typo line 2 introduction of P
     v = (
-        ps("∀x {90=* S(x)T(x), S(x)~T(x)}^{S(x)}"),
-        ps("∀x {1=* ~S(x)T(x), ~S(x)~T(x)} ^ {~S(x)}"),
-        ps("{T(Smith())}"),
-        ps("∀x {x=* S(Smith())}"),
+        ps("∀x {90=* S(x*)T(x*), S(x)~T(x)}^{S(x)}"),
+        ps("∀x {1=* ~S(x)T(x), ~S(x)~T(x)} ^ {~S(x*)}"),
+        ps("{T(Smith()*)}"),
+        ps("{S(Smith())}"),
     )
-    c: View = ps("{90=* S(Smith()), 0}")
+    c: View = ps("{90=* S(Smith()*), 0}")
 
     @classmethod
     def test(cls, verbose: bool = False):
-        result = (
-            cls.v[0]
-            .depose(verbose=verbose)
-            .update(cls.v[1], verbose=verbose)
-            .update(cls.v[2], verbose=verbose)
-            .factor(View.get_falsum(), verbose=verbose)
-            .which(cls.v[3], verbose=verbose)
+        result = basic_step(v=cls.v[0:3], verbose=verbose).query(
+            cls.v[3], verbose=verbose
         )
+
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
 class e64ii(e64i):
     v = (
-        ps("∀x {90=* P(x)S(x)T(x), P(x)S(x)~T(x)}^{P(x)S(x)}"),
-        ps("∀x {1=* P(x)~S(x)T(x), P(x)~S(x)~T(x)} ^ {P(x)~S(x)}"),
-        ps("∀x {1=* P(x)S(x), P(x)~S(x)} ^ {P(x)}"),
-        ps("{P(Smith())T(Smith())}"),
-        ps("∀x {x=* S(Smith())}"),
+        ps("∀x {90=* P(x)S(x*)T(x*), P(x)S(x)~T(x)}^{P(x)S(x)}"),
+        ps("∀x {1=* P(x)~S(x)T(x), P(x)~S(x)~T(x)} ^ {P(x)~S(x*)}"),
+        ps("∀x {1=* P(x)S(x*), P(x)~S(x)} ^ {P(x)}"),
+        ps("{P(Smith())T(Smith()*)}"),
+        ps("{S(Smith())}"),
     )
-    c: View = ps("{90=* S(Smith()), 0}")
+    c: View = ps("{90=* S(Smith()*)}")
 
+    # TODO: Why no 0 here? Should there be a 0 in 2nd atom?
     @classmethod
     def test(cls, verbose: bool = False):
-        result = (
-            cls.v[0]
-            .depose(verbose=verbose)
-            .update(cls.v[1], verbose=verbose)
-            .update(cls.v[2], verbose=verbose)
-            .update(cls.v[3], verbose=verbose)
-            .factor(View.get_falsum(), verbose=verbose)
-            .which(cls.v[4], verbose=verbose)
+        result = basic_step(v=cls.v[0:4], verbose=verbose).query(
+            cls.v[4], verbose=verbose
         )
+
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
@@ -1399,14 +1391,14 @@ class e66i(BaseExample):
 
     v = (
         ps("{1=* D()T(), 1=* ~D()T(), 98=* ~D()}"),
-        ps("{D()P()}"),
+        ps("{D()T()}"),
     )
     c: View = ps("{}")
 
     @classmethod
     def test(cls, verbose: bool = False):
         result = cls.v[0].stage.equilibrium_answer_potential(
-            cls.v[1].stage, cls.v[1].weights
+            cls.v[1].stage, cls.v[0].weights
         )
         out = FunctionalTerm(f=RealNumber(num=1), t=())
         if not result == out:
@@ -1892,15 +1884,15 @@ class e90_condA(DefaultDecision, BaseExample):
     of $14.99. What would you do in this situation?
     """  # TODO: Contradiction factor not show in book
 
-    v = (ps("{do(Buy(Video())),~do(Buy(Video()))}"),)
-    cv = (ps("Ax {Fun()}^{do(Buy(x))}"),)
+    v = (ps("{do(Buy(Video()*)),~do(Buy(Video()))}"),)
+    cv = (ps("Ax {Fun()}^{do(Buy(x*))}"),)
     pr = (ps("{1=+ 0} ^ {Fun()}"),)
-    c = ps("{do(Buy(Video()))}")
+    c = ps("{do(Buy(Video()*))}")
 
 
 class e90_condB(e90_condA):
-    v = (ps("Ea {do(Buy(Video())),do(Buy(a))}"),)
-    c = ps("Ea {do(Buy(Video())), do(Buy(a))}")
+    v = (ps("Ea {do(Buy(Video()*)),do(Buy(a*))}"),)
+    c = ps("Ea {do(Buy(Video()*)), do(Buy(a*))}")
 
 
 class e92_base:

@@ -49,6 +49,7 @@ def unparse_term(
         ]
         return parsing.Emphasis([[unparse_term(term, remaining_terms)]])
     if isinstance(term, FunctionalTerm):
+        # Insert term back in - if it matches, it's a term to pass
         if len(term.t) == 1 and isinstance(term.t[0], Multiset):
             multi = term.t[0]
             open_multis: list[tuple[Term, OpenMultiset]] = []
