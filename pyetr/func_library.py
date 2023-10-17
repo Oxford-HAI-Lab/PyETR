@@ -18,7 +18,7 @@ power_func = Function(name="power", arity=2, func_caller=power)
 
 
 def log(x: float) -> float:
-    return math.log(x)
+    return math.log(x, 10)
 
 
 log_func = Function(name="log", arity=1, func_caller=log)

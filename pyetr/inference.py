@@ -1,17 +1,19 @@
-from typing import Iterable
+from typing import Iterable, Optional
 
 from pyetr.atoms.terms.function import RealNumber
+from pyetr.stateset import State
 
 from .view import View
 
 
 def basic_step(*, v: tuple[View, ...], verbose: bool = False) -> View:
     out = View.get_verum()
-    for i, view in enumerate(v):
-        if i == 0:
-            out = out.update(view.depose(verbose=verbose), verbose=verbose)
-        else:
-            out = out.update(view, verbose=verbose)
+
+    for view in v:
+        new_out = out.update(view, verbose=verbose)
+        if new_out == out:
+            new_out = out.update(view.depose(verbose=verbose), verbose=verbose)
+        out = new_out
     return out.factor(View.get_falsum(), verbose=verbose)
 
 
@@ -44,12 +46,18 @@ def default_procedure_what_is_prob(
 
 
 def default_decision(
-    dq: View, cv: Iterable[View], pr: Iterable[View], verbose: bool = False
+    dq: View,
+    cv: Iterable[View],
+    pr: Iterable[View],
+    verbose: bool = False,
+    absurd_states: Optional[list[State]] = None,
 ):
     result = dq
     for v in cv:
         result = result.update(v, verbose=verbose)
-    result.factor(View.get_falsum(), verbose=verbose)
+    result = result.factor(
+        View.get_falsum(), verbose=verbose, absurd_states=absurd_states
+    )
     for v in pr:
         result = result.update(v, verbose=verbose)
     return dq.answer(result, verbose=verbose)
