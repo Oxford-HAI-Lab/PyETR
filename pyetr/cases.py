@@ -1401,7 +1401,7 @@ class e66i(BaseExample):
         result = cls.v[0].stage.equilibrium_answer_potential(
             cls.v[1].stage, cls.v[0].weights
         )
-        out = FunctionalTerm(f=RealNumber(num=1), t=())
+        out = FunctionalTerm(f=RealNumber(num=1.0), t=())
         if not result == out:
             raise RuntimeError(f"Expected: {out} but received {result}")
 
@@ -1409,16 +1409,16 @@ class e66i(BaseExample):
 class e66ii(e66i):
     v = (
         ps("{1=* D()T(), 1=* ~D()T(), 98=* ~D()}"),
-        ps("{P()}"),
+        ps("{T()}"),
     )
     c: View = ps("{}")
 
     @classmethod
     def test(cls, verbose: bool = False):
         result = cls.v[0].stage.equilibrium_answer_potential(
-            cls.v[1].stage, cls.v[1].weights
+            cls.v[1].stage, cls.v[0].weights
         )
-        out = FunctionalTerm(f=RealNumber(num=2), t=())
+        out = FunctionalTerm(f=RealNumber(num=2.0), t=())
         if not result == out:
             raise RuntimeError(f"Expected: {out} but received {result}")
 
@@ -1434,11 +1434,11 @@ class e67(BaseExample):
     """
 
     v = (
-        ps("{94=* IsCEO()HadPet(), HadPet()}"),
+        ps("{94=* IsCEO()HadPet(), ~IsCEO()}"),
         ps("{HadPet()}"),
         ps("Ax {x=* IsCEO()}"),
     )
-    c: View = ps("{94=* IsCEO()}")
+    c: View = ps("{94=* IsCEO(), 0}")
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -1468,23 +1468,23 @@ class e69_part1(BasicStep, BaseExample):
         ),
     )
     c = ps(
-        "{0.000001=* ~Guilty(Suspect())Match(Suspect()), Guilty(Suspect())~Match(Suspect())}"
+        "{0.000001=* ~Guilty(Suspect())Match(Suspect()), Guilty(Suspect())Match(Suspect())}"
     )
 
 
 class e69_part2(BaseExample):
     v = (
         ps(
-            "{0.000001=* ~Guilty(Suspect())Match(Suspect()), Guilty(Suspect())~Match(Suspect())}"
+            "{0.000001=* ~Guilty(Suspect())Match(Suspect()), Guilty(Suspect())Match(Suspect())}"
         ),
         ps("{999999.999999=* 0}^{Guilty(Suspect())Match(Suspect())}"),
-        ps("Ax {x=* Guilty(Suspect())}"),
+        ps("{Guilty(Suspect())}"),
     )
     c: tuple[View, View] = (
         ps(
-            "{0.000001=* ~Guilty(Suspect())Match(Suspect()), 999999.999999=* Guilt(Suspect())Match(Suspect())}"
+            "{0.000001=* ~Guilty(Suspect())Match(Suspect()), 999999.999999=* Guilty(Suspect())Match(Suspect())}"
         ),
-        ps("{999999.999999=* Guilt(Suspect()), 0}"),
+        ps("{999999.999999=* Guilty(Suspect()), 0}"),
     )
 
     @classmethod
@@ -1494,7 +1494,7 @@ class e69_part2(BaseExample):
             raise RuntimeError(
                 f"Expected mid result: {cls.c[0]} but received {mid_result}"
             )
-        result = mid_result.which(cls.v[2], verbose=verbose)
+        result = mid_result.query(cls.v[2], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c[1]):
             raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
 
@@ -1612,16 +1612,16 @@ class e74(BaseExample):
     """  # TODO: Note typo with brackets in book, p231
 
     v = (
-        ps("Ej {D(j)H(j),H(j),P(j)}"),
-        ps("Ej {E(j)}"),
-        ps("Ax {0.85=* E(x)D(x), 0.15=* E(x)~D(x)} ^ {E(x)}"),
-        ps("Ax {0.1=* E(x)H(x), 0.9=* E(x)~H(x)} ^ {E(x)}"),
+        ps("{D(j())H(j()),H(j()),P(j())}"),
+        ps("{E(j()*)}"),
+        ps("Ax {0.85=* E(x)D(x), 0.15=* E(x)~D(x)} ^ {E(x*)}"),
+        ps("Ax {0.1=* E(x)H(x), 0.9=* E(x)~H(x)} ^ {E(x*)}"),
     )
     c: tuple[View, View] = (
         ps(
-            "Ej {0.85**0.1=* E(j)D(j)H(j), 0.85**0.9=* E(j)D(j)~H(j), 0.15**0.1=* E(j)~D(j)H(j), 0.15**0.9=* E(j)~D(j)~H(j)}"
+            "{0.85**0.1=* E(j()*)D(j())H(j()), 0.85**0.9=* E(j())D(j())~H(j()), 0.15**0.1=* E(j())~D(j())H(j()), 0.15**0.9=* E(j())~D(j())~H(j())}"
         ),
-        ps("Ej {D(j)H(j)}"),
+        ps("{D(j())H(j())}"),
     )
 
     @classmethod
@@ -1966,17 +1966,59 @@ class e93_grp1(DefaultDecision, BaseExample):
     v = (ps("{do(A()),do(B())}"),)
     pr = (
         ps(
-            "Ax {power(++(1, log(++(1, x))), -1)=+ 0} ^ {D(x)}",
+            "Ax {power(++(1, log(++(1, x))), -1)=+ 0} ^ {D(x*)}",
             custom_functions=[power_func, log_func],
         ),
-        ps("Ax {++(1, log(++(1, x)))=+ 0} ^ {S(x)}", custom_functions=[log_func]),
+        ps("Ax {++(1, log(++(1, x)))=+ 0} ^ {S(x*)}", custom_functions=[log_func]),
     )
     cv = (
-        ps("{D(400)} ^ {do(A())}"),
-        ps("{0.33=* D(0.0), ~D(0.0)} ^ {do(B())}"),
-        ps("{0.67=* D(600), ~D(600)} ^ {do(B())}"),
+        ps("{D(400*)} ^ {do(A())}"),
+        ps("{0.33=* D(0.0*), ~D(0.0)} ^ {do(B())}"),
+        ps("{0.67=* D(600*), ~D(600)} ^ {do(B())}"),
     )
-    c = ps("{do(A())}")
+    c = ps("{do(B())}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        absurd_view = ps("{D(0)D(600)}")
+        absurd_state = next(iter(absurd_view.stage))
+        result = default_decision(
+            dq=cls.v[0],
+            cv=cls.cv,
+            pr=cls.pr,
+            verbose=verbose,
+            absurd_states=[absurd_state],
+        )
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class AnswerPotential(BaseExample):
+    v = (
+        ps("{1.0=* 2.0=+ A()B() , 0.4=* B()C(), C()A()}"),
+        ps("{A()}"),
+        ps("{B()}"),
+        ps("{C()}"),
+    )
+    c = ps("{}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        out = cls.v[0].stage.equilibrium_answer_potential(
+            cls.v[1].stage, cls.v[0].weights
+        )
+        assert isinstance(out.f, RealNumber)
+        assert out.f.num == 2.0, f"{out.f.num} not equal to {2.0}"
+        out = cls.v[0].stage.equilibrium_answer_potential(
+            cls.v[2].stage, cls.v[0].weights
+        )
+        assert isinstance(out.f, RealNumber)
+        assert out.f.num == 2.4, f"{out.f.num} not equal to {2.4}"
+        out = cls.v[0].stage.equilibrium_answer_potential(
+            cls.v[3].stage, cls.v[0].weights
+        )
+        assert isinstance(out.f, RealNumber)
+        assert out.f.num == 0.4, f"{out.f.num} not equal to {0.4}"
 
 
 class UniProduct(BaseExample):

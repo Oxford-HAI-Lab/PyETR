@@ -1,6 +1,9 @@
 __all__ = ["State", "SetOfStates"]
 
+from functools import reduce
 from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
+
+from pyetr.atoms.terms.special_funcs import multiset_product
 
 from .atoms import Atom, PredicateAtom, equals_predicate
 from .atoms.terms import (
@@ -74,9 +77,12 @@ class State(frozenset[Atom]):
             {i.replace_term(old_term=old_term, new_term=new_term) for i in self}
         )
 
-    @property
-    def is_primitive_absurd(self) -> bool:
+    def is_primitive_absurd(self, absurd_states: Optional[list["State"]]) -> bool:
         state = self
+        if absurd_states is not None:
+            for absurd_state in absurd_states:
+                if absurd_state.issubset(state):
+                    return True
         # LNC
         for atom in state:
             if ~atom in state:
@@ -214,19 +220,16 @@ class SetOfStates(frozenset[State]):
         Y = SetOfStates(
             {delta for delta in self if any([gamma.issubset(delta) for gamma in other])}
         )
-
-        expr1: Multiset[Term] = Multiset(
+        expr1: Multiset[Term] = reduce(
+            lambda x, y: x + y,
             [
-                FunctionalTerm(f=Summation, t=weights[delta].multiplicative)
+                multiset_product(weights[delta].multiplicative, weights[delta].additive)
                 for delta in Y
-            ]
+            ],
+            Multiset[Term]([]),
         )
-        expr1_sum = FunctionalTerm(f=Summation, t=expr1)
-        expr2: Multiset[Term] = Multiset(
-            [FunctionalTerm(f=Summation, t=weights[delta].additive) for delta in Y]
-        )
-        expr2_sum = FunctionalTerm(f=Summation, t=expr2)
-        return FunctionalTerm(f=XBar, t=(expr1_sum, expr2_sum))
+
+        return FunctionalTerm(f=Summation, t=expr1)
 
     def __repr__(self) -> str:
         terms = ",".join([repr(i) for i in self])

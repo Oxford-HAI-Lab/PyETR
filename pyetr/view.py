@@ -624,7 +624,8 @@ class View:
                     SetOfStates({s}), other.weights
                 )
                 potentials.append((potential, s))
-
+            if verbose:
+                print(f"Potentials: {potentials}")
             if not all([isinstance(ft.f, RealNumber) for ft, _ in potentials]):
                 return self
             stage = SetOfStates(_arg_max(potentials))
@@ -647,7 +648,7 @@ class View:
             other, verbose=verbose
         )
         if verbose:
-            print(f"AnswerOutput: {self}")
+            print(f"AnswerOutput: {out}")
         return out
 
     def negation(self, verbose: bool = False) -> "View":
@@ -985,7 +986,12 @@ class View:
         else:
             return self
 
-    def factor(self, other: "View", verbose: bool = False) -> "View":
+    def factor(
+        self,
+        other: "View",
+        verbose: bool = False,
+        absurd_states: Optional[list[State]] = None,
+    ) -> "View":
         """
         Based on definition 4.39
         """
@@ -1057,7 +1063,9 @@ class View:
         if other.is_falsum:
             new_weights = self.weights
             new_stage = SetOfStates(
-                gamma for gamma in self.stage if not gamma.is_primitive_absurd
+                gamma
+                for gamma in self.stage
+                if not gamma.is_primitive_absurd(absurd_states)
             )
         elif identity_factor_condition():
             first_state = next(iter(other.stage))
@@ -1129,6 +1137,8 @@ class View:
         cond2 = len(other.stage.arb_objects & other.supposition.arb_objects) == 0
         if cond1 and cond2:
             # O case
+            if verbose:
+                print("Inquire, O case")
             arb_gen = ArbitraryObjectGenerator(
                 self.stage_supp_arb_objects | other.stage_supp_arb_objects
             )
@@ -1153,6 +1163,8 @@ class View:
         ) and other.dependency_relation == self.dependency_relation.restriction(
             self.stage_supp_arb_objects
         ):
+            if verbose:
+                print("Inquire, I case")
             # I case
             view2 = View.with_restriction(
                 stage=other.stage.negation(),
@@ -1163,6 +1175,8 @@ class View:
             )
             out = self.product(other.sum(view2)).factor(View.get_falsum())
         else:
+            if verbose:
+                print("Inquire, pass-through case")
             out = self
 
         if verbose:
