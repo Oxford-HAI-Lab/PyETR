@@ -1355,24 +1355,18 @@ class e65(BaseExample):
     """
 
     v = (
-        ps("∀x {0.3=* P(x)C(x), P(x)~C(x)}^{P(x)}"),
-        ps("∀x {50=* P(x)C(x)T(x),P(x)C(x)~T(x)}^{P(x)C(x)}"),
-        ps("∀x {3=* P(x)~C(x)T(x),P(x)~C(x)~T(x)}^{P(x)~C(x)}"),
-        ps("∃a {P(a)T(a)}"),
-        ps("∃a ∀x {x=* C(a)}"),  # TODO: Specifically has no dep
-    )
+        ps("∀x {0.3=* P(x*)C(x), P(x)~C(x)}^{P(x)}"),
+        ps("∀x {50=* P(x*)C(x)T(x),P(x)C(x)~T(x)}^{P(x)C(x)}"),
+        ps("∀x {3=* P(x*)~C(x)T(x),P(x)~C(x)~T(x)}^{P(x)~C(x)}"),
+        ps("∃a {P(a*)T(a)}"),
+        ps("∃a {C(a)}"),
+    )  # TODO: Existential or constant
     c: View = ps("∃a {15=* C(a), 0}")
 
     @classmethod
     def test(cls, verbose: bool = False):
-        result = (
-            cls.v[0]
-            .depose(verbose=verbose)
-            .update(cls.v[1], verbose=verbose)
-            .update(cls.v[2], verbose=verbose)
-            .update(cls.v[3], verbose=verbose)
-            .factor(View.get_falsum(), verbose=verbose)
-            .which(cls.v[4], verbose=verbose)
+        result = basic_step(v=cls.v[0:4], verbose=verbose).query(
+            cls.v[4], verbose=verbose
         )
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -1436,14 +1430,17 @@ class e67(BaseExample):
     v = (
         ps("{94=* IsCEO()HadPet(), ~IsCEO()}"),
         ps("{HadPet()}"),
-        ps("Ax {x=* IsCEO()}"),
+        ps("{IsCEO()}"),
     )
     c: View = ps("{94=* IsCEO(), 0}")
 
     @classmethod
     def test(cls, verbose: bool = False):
         result = (
-            cls.v[0].suppose(cls.v[1], verbose=verbose).which(cls.v[2], verbose=verbose)
+            cls.v[0]
+            .suppose(cls.v[1], verbose=verbose)
+            .depose()
+            .query(cls.v[2], verbose=verbose)
         )
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -1598,8 +1595,10 @@ class e72(BaseExample):
         )
         if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
             raise RuntimeError(f"Expected: {cls.c[0]} but received {mid_result}")
-
-        result = mid_result.query(cls.v[4], verbose=verbose)
+        # TODO: Added inquire step
+        result = mid_result.inquire(cls.v[4], verbose=verbose).query(
+            cls.v[4], verbose=verbose
+        )
         if not result.is_equivalent_under_arb_sub(cls.c[1]):
             raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
 
@@ -1640,7 +1639,7 @@ class e74(BaseExample):
             raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
 
 
-class e76(DefaultInference, BaseExample):
+class e76(BaseExample):
     """
     Example 76 (guns and guitars)
     p199, p226
@@ -1652,16 +1651,18 @@ class e76(DefaultInference, BaseExample):
     """  # TODO: Note assuming exists i
 
     v = (
-        ps("Ei Ej {Fired(i)Gun(i)Guitar(j)Outoftune(j)}"),
-        ps("Ax {Gun(x)Trigger(x)Fired(x)}^{Gun(x)Trigger(x)}"),
+        ps("Ei Ej Ea {Fired(i*)Gun(i)Guitar(j)Outoftune(j), A(a)}"),
+        ps("Ax {Gun(x)Trigger(x)Fired(x),0}^{Gun(x)Fired(x*)}"),
         ps("Ei {Trigger(i)}"),
     )
-    c: View = ps("Ei Ej {Fired(i)Gun(i)Guitar(j)Outoftune(j)Trigger(i)}")
+    c: View = ps("Ei Ej {Fired(i*)Gun(i)Guitar(j)Outoftune(j)Trigger(i)}")
 
     @classmethod
     def test(cls, verbose: bool = False):
         result = (
-            cls.v[0].update(cls.v[1], verbose=verbose).update(cls.v[2], verbose=verbose)
+            cls.v[0]
+            .update(cls.v[1], verbose=verbose)
+            .update(cls.v[2].update(cls.v[1], verbose=verbose), verbose=verbose)
         )
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -1909,24 +1910,21 @@ class e92_base:
 
     ParentB: above-average income, very close relationship with the child, extremely active
     social life, lots of work-related travel, minor health problems.
-
-    """  # TODO: Contradiction factor not show in book
+    """
 
     cv = (
-        ps("Ax {Custody(x)} ^ {do(Award(x))}"),
-        ps("Ax {~Custody(x)} ^ {do(Deny(x))}"),
+        ps("Ax {Custody(x*)} ^ {do(Award(x*))}"),
+        ps("Ax {~Custody(x*)} ^ {do(Deny(x*))}"),
         ps(
             "{MedRapp(ParentA())MedTime(ParentA())HighRapp(ParentB())LowTime(ParentB())}"
         ),
     )
     pr = (
-        ps("Ax {1=+ 0} ^ {Custody(x)MedRapp(x)}"),
-        ps("Ax {3=+ 0} ^ {Custody(x)HighRapp(x)}"),
-        ps("Ax {1=+ 0} ^ {Custody(x)MedTime(x)}"),
-        ps(
-            "Ax {1=+ 0} ^ {~Custody(x)MedTime(x)}"
-        ),  # TODO: Thís is inverse of above - typo?
-        ps("Ax {2=+ 0} ^ {~Custody(x)LowTime(x)}"),
+        ps("Ax {1=+ 0} ^ {Custody(x*)MedRapp(x)}"),
+        ps("Ax {3=+ 0} ^ {Custody(x*)HighRapp(x)}"),
+        ps("Ax {1=+ 0} ^ {Custody(x*)MedTime(x)}"),
+        ps("Ax {1=+ 0} ^ {~Custody(x*)MedTime(x)}"),
+        ps("Ax {2=+ 0} ^ {~Custody(x*)LowTime(x)}"),
     )
 
 
@@ -1936,9 +1934,9 @@ class e92_award(DefaultDecision, e92_base, BaseExample):
     """
 
     __doc__ = cast(str, e92_base.__doc__) + cast(str, __doc__)
-    v = (ps("{do(Award(ParentA())), do(Award(ParentB()))}"),)
+    v = (ps("{do(Award(ParentA()*)), do(Award(ParentB()*))}"),)
 
-    c = ps("{do(Award(ParentB()))}")
+    c = ps("{do(Award(ParentB()*))}")
 
 
 class e92_deny(DefaultDecision, e92_base, BaseExample):
@@ -1947,8 +1945,8 @@ class e92_deny(DefaultDecision, e92_base, BaseExample):
     """
 
     __doc__ = cast(str, e92_base.__doc__) + cast(str, __doc__)
-    v = (ps("{do(Deny(ParentA())), do(Deny(ParentB()))}"),)
-    c = ps("{do(Deny(ParentB()))}")
+    v = (ps("{do(Deny(ParentA()*)), do(Deny(ParentB()*))}"),)
+    c = ps("{do(Deny(ParentB()*))}")
 
 
 class e93_grp1(DefaultDecision, BaseExample):

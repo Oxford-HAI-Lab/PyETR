@@ -1,7 +1,12 @@
 from typing import Iterable, Optional
 
 from pyetr.atoms.terms.function import RealNumber
-from pyetr.stateset import State
+from pyetr.atoms.terms.multiset import Multiset
+from pyetr.atoms.terms.term import FunctionalTerm
+from pyetr.dependency import DependencyRelation
+from pyetr.issues import IssueStructure
+from pyetr.stateset import SetOfStates, State
+from pyetr.weight import Weight, Weights
 
 from .view import View
 
@@ -41,8 +46,44 @@ def default_procedure_what_is_prob(
     if isinstance(out.f, RealNumber) and out.f.num >= 0 and out.f.num <= 100:
         return g_prime_prime
     else:
-        raise NotImplementedError
-        # x = (100 - sum([s for s in ])
+        total: float = 0
+        gammas_with_empty: list[State] = []
+        for s, w in g_prime.weights.items():
+            if w.is_null:
+                gammas_with_empty.append(s)
+            for t in w.multiplicative:
+                if isinstance(t, FunctionalTerm) and isinstance(t.f, RealNumber):
+                    total += t.f.num
+
+        x = (100 - total) / len(gammas_with_empty)
+        term_x = FunctionalTerm(RealNumber(x), t=[])
+
+        res = g_prime
+        for gamma in gammas_with_empty:
+            res = res.inquire(
+                View.with_restriction(
+                    stage=SetOfStates([State([])]),
+                    supposition=SetOfStates([gamma]),
+                    dependency_relation=g_prime.dependency_relation,
+                    issue_structure=IssueStructure([]),
+                    weights=Weights(
+                        {
+                            State([]): Weight(
+                                additive=Multiset([]), multiplicative=Multiset([term_x])
+                            )
+                        }
+                    ),
+                ),
+                verbose=verbose,
+            )
+        g_prime_prime = res.query(prob_of, verbose=verbose)
+        out = g_prime_prime.stage.equilibrium_answer_potential(
+            prob_of.stage, prob_of.weights
+        )
+        if isinstance(out.f, RealNumber) and out.f.num >= 0 and out.f.num <= 100:
+            return g_prime_prime
+        else:
+            return View.get_falsum()
 
 
 def default_decision(
