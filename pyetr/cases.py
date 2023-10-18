@@ -6,7 +6,12 @@ from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.term import FunctionalTerm
 
 from .func_library import log_func, power_func
-from .inference import basic_step, default_decision, default_inference_procedure
+from .inference import (
+    basic_step,
+    default_decision,
+    default_inference_procedure,
+    default_procedure_what_is_prob,
+)
 from .new_parsing import parse_string_to_view as ps
 from .view import View
 
@@ -136,6 +141,20 @@ class DefaultDecision(BaseTest):
     @classmethod
     def test(cls, verbose: bool = False):
         result = default_decision(dq=cls.v[0], cv=cls.cv, pr=cls.pr, verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class WhatIsProb(BaseTest):
+    v: tuple[View, ...]
+    prob: View
+    c: View
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = default_procedure_what_is_prob(
+            cls.v, prob_of=cls.prob, verbose=verbose
+        )
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
@@ -1668,7 +1687,7 @@ class e76(BaseExample):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
-class e81_base:
+class e81_base(WhatIsProb):
     """
     Example 81, p213
 
@@ -1677,40 +1696,42 @@ class e81_base:
     Given the preceding assertion, according to you, what is the probability of the following situation?
     """
 
+    v = (ps("{50=* Box(Yellow()),50=* Box(Brown())}"),)
+    prob: View
+    c: View
 
-class e81i(e81_base):
+
+class e81i(e81_base, BaseExample):
     """
-    In the box there is at least a yellow card
+    In the box there is a yellow card
     """
 
     __doc__ = cast(str, e81_base.__doc__) + cast(str, __doc__)
-    # TODO: Add test
-    # v = (
-    #     ps("{50=* Box(Yellow()),50=* Box(Brown())}"),
-    #     ps("{Box(Yellow())}")
-    # )
-    # c = ps("{50=* Box(Yellow())}")
+    prob = ps("{Box(Yellow())}")
+    c = ps("{50=* Box(Yellow())}")
 
 
-class e81ii(e81_base):
+class e81ii(e81_base, BaseExample):
     """
     In the box there is a yellow card and a brown card
     """
 
     __doc__ = cast(str, e81_base.__doc__) + cast(str, __doc__)
-    # TODO: Add test
+    prob = ps("{Box(Brown())Box(Yellow())}")
+    c = ps("{0}")
 
 
-class e81iii(e81_base):
+class e81iii(e81_base, BaseExample):
     """
     In the box there is neither a yellow card nor a brown card
     """
 
     __doc__ = cast(str, e81_base.__doc__) + cast(str, __doc__)
-    # TODO: Add test
+    prob = ps("{~Box(Brown())~Box(Yellow())}")
+    c = ps("{0}")
 
 
-class e82_base:
+class e82_base(WhatIsProb):
     """
     Example 82, p213
 
@@ -1720,70 +1741,88 @@ class e82_base:
     following situation?
     """
 
+    v = (ps("{Box(Brown())Box(Yellow())}^{Box(Yellow())}"),)
 
-class e82i(e82_base):
+
+class e82i(e82_base, BaseExample):
     """
-    In the box there is at least a yellow card.
+    In the box there is a yellow card.
     """
 
     __doc__ = cast(str, e82_base.__doc__) + cast(str, __doc__)
-    # TODO: Add test
+    prob = ps("{Box(Yellow())}")
+    c = ps("{50=* Box(Yellow())}")
 
 
-class e82ii(e82_base):
+class e82ii(e82_base, BaseExample):
     """
     In the box there is a yellow card and a brown card.
     """
 
     __doc__ = cast(str, e82_base.__doc__) + cast(str, __doc__)
-    # TODO: Add test
+    prob = ps("{Box(Brown())Box(Yellow())}")
+    c = ps("{50=* Box(Brown())Box(Yellow())}")
 
 
-class e82iii(e82_base):
+class e82iii(e82_base, BaseExample):
     """
     In the box there is a yellow card and there is not a brown card.
     """
 
     __doc__ = cast(str, e82_base.__doc__) + cast(str, __doc__)
-    # TODO: Add test
+    prob = ps("{Box(Yellow())~Box(Brown())}")
+    c = ps("{0}")
 
 
-class e82iv(e82_base):
+class e82iv(e82_base, BaseExample):
     """
     In the box there is neither a yellow card nor a brown card.
     """
 
     __doc__ = cast(str, e82_base.__doc__) + cast(str, __doc__)
-    # TODO: Add test
+    prob = ps("{~Box(Brown())~Box(Yellow())}")
+    c = ps("{0}")
 
 
-class e83i:
+class e83_base(WhatIsProb):
     """
     Example 83, p214
 
-    There is a box in which there is at least a red marble, or else there is a green
+    There is a box in which there is a red marble, or else there is a green
     marble and there is a blue marble, but not all three marbles.
 
-    What is the probability there is a red marble and blue in marble in the box?
+    Given the preceding assertion, according to you, what is the probability of the
+    following situation?
     """
 
-    # TODO: Add test
+    v = (
+        ps(
+            "{33.3333=* Box(Red()), 33.3333=* Box(Green())Box(Blue()), 33.3333=* ~Box(Red())~Box(Green())~Box(Blue())}"
+        ),
+    )
 
 
-class e83ii:
+class e83i(e83_base, BaseExample):
     """
-    Example 83, p214
-
-    There is a box in which there is at least a red marble, or else there is a green
-    marble and there is a blue marble, but not all three marbles.
-
-    What is the probability there is a green marble and there is a blue marble?
+    There is a red marble and blue in marble in the box.
     """
 
-    # TODO: Add test
+    __doc__ = cast(str, e83_base.__doc__) + cast(str, __doc__)
+    prob = ps("{Box(Red())Box(Blue())}")
+    c = ps("{0}")
 
 
-class e84i:
+class e83ii(e83_base, BaseExample):
+    """
+    There is a green marble and there is a blue marble.
+    """
+
+    __doc__ = cast(str, e83_base.__doc__) + cast(str, __doc__)
+    prob = ps("{Box(Green())Box(Blue())}")
+    c = ps("{33.3333=* Box(Green())Box(Blue())}")
+
+
+class e84_base(WhatIsProb):
     """
     Example 84, p215
 
@@ -1792,30 +1831,48 @@ class e84i:
 
     Given the preceding assertion, what is the probability of the following
     situation?
+    """
 
+    v = (
+        ps(
+            "{33.3333=* Box(Grey())Box(White()), 33.3333=* Box(Grey())Box(Mauve()), 33.3333=* ~Box(Red())~Box(Green())~Box(Blue())}"
+        ),
+    )
+
+
+class e84i(e84_base, BaseExample):
+    """
     In the box there is a grey marble and there is a mauve marble.
     """
 
-    # TODO: Add test
+    __doc__ = cast(str, e84_base.__doc__) + cast(str, __doc__)
+    prob = ps("{Box(Grey())Box(Mauve())}")
+    c = ps("{50=* Box(Grey())Box(Mauve())}")
 
 
-class e84ii:
+class e84ii(e84_base, BaseExample):
     """
-    Example 84, p215
+    In the box there is a grey marble, or else a white marble, or else a mauve marble, but no more than one marble.
+    """
 
-    There is a box in which there is a grey marble, or else a white marble, or
-    else a mauve marble, but no more than one marble.
+    __doc__ = cast(str, e84_base.__doc__) + cast(str, __doc__)
+    prob = ps("{Box(Grey()),Box(White()),Box(Mauve())}")
+    c = ps(
+        "{50=* Box(Grey()),Box(White()),Box(Mauve())}"
+    )  # TODO: How to get prob for multiple ors?
 
-    Given the preceding assertion, what is the probability of the following
-    situation?
 
+class e84iii(e84_base, BaseExample):
+    """
     In the box there is a grey marble and there is a mauve marble.
     """
 
-    # TODO: Add test
+    __doc__ = cast(str, e84_base.__doc__) + cast(str, __doc__)
+    prob = ps("{Box(Grey())Box(Mauve())}")
+    c = ps("{50=* Box(Grey())Box(Mauve())}")
 
 
-class e85:
+class e85(WhatIsProb, BaseExample):
     """
     Example 85, p216
 
@@ -1829,23 +1886,43 @@ class e85:
     What is the probability that a red marble is in the box?
     """
 
-    # TODO: Add test
+    v = (
+        ps("{Box(Green()), Box(Blue()), Box(Red())}"),
+        ps(
+            "{60=* Box(Green())}^{Box(Green())}"
+        ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book. Also, where does if green come from??
+        ps(
+            "{20=* Box(Blue())}^{Box(Green())}"
+        ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book
+    )
+    prob = ps("{Box(Red())}")
+    c = ps("{20=* Box(Red()), 0}")
 
 
-class e86:
+class e86(WhatIsProb, BaseExample):
     """
     Example 86, p217
 
     You have a hand of several cards with only limited information about it.
 
-    There is an ace and a queen or a kind and a jack or a ten.
+    There is an ace and a queen or a king and a jack or a ten.
     The probability that there is an ace and a queen is 0.6
     The probability that there is a king and a jack is 0.2
 
     What is the probability that there is a ten?
     """
 
-    # TODO: Add test
+    v = (
+        ps("{A()Q(), K()J(), X()}"),
+        ps(
+            "{60=* A()Q()}^{A()Q()}"
+        ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book
+        ps(
+            "{20=* K()J()}^{K()J()}"
+        ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book
+    )
+    prob = ps("{X()}")
+    c = ps("{20=* X()}")
 
 
 class e88(BaseExample):

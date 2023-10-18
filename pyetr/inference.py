@@ -41,11 +41,16 @@ def default_procedure_what_is_prob(
     g_prime = basic_step(v=v, verbose=verbose)
     g_prime_prime = g_prime.query(prob_of, verbose=verbose)
     out = g_prime_prime.stage.equilibrium_answer_potential(
-        prob_of.stage, prob_of.weights
+        prob_of.stage,
+        g_prime_prime.weights,  # TODO: Adjusted weight extraction point based on test and previous use
     )
     if isinstance(out.f, RealNumber) and out.f.num >= 0 and out.f.num <= 100:
+        if verbose:
+            print(f"Case 1, value: {out.f.num}")
         return g_prime_prime
     else:
+        if verbose:
+            print("Case 2")
         total: float = 0
         gammas_with_empty: list[State] = []
         for s, w in g_prime.weights.items():
@@ -78,7 +83,8 @@ def default_procedure_what_is_prob(
             )
         g_prime_prime = res.query(prob_of, verbose=verbose)
         out = g_prime_prime.stage.equilibrium_answer_potential(
-            prob_of.stage, prob_of.weights
+            prob_of.stage,
+            g_prime_prime.weights,  # TODO: Adjusted weight extraction point based on test and previous use
         )
         if isinstance(out.f, RealNumber) and out.f.num >= 0 and out.f.num <= 100:
             return g_prime_prime
