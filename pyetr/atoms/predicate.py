@@ -31,4 +31,4 @@ class Predicate:
         return f"<Predicate name={self.name} arity={self.arity}>"
 
 
-equals_predicate = Predicate("=", 2)
+equals_predicate = Predicate("==", 2)

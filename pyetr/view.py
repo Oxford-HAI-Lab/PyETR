@@ -1061,6 +1061,8 @@ class View:
             return True
 
         if other.is_falsum:
+            if verbose:
+                print("Contradiction factor")
             new_weights = self.weights
             new_stage = SetOfStates(
                 gamma
@@ -1068,6 +1070,8 @@ class View:
                 if not gamma.is_primitive_absurd(absurd_states)
             )
         elif identity_factor_condition():
+            if verbose:
+                print("Identity factor")
             first_state = next(iter(other.stage))
             first_atom = next(iter(first_state))
             assert isinstance(first_atom, PredicateAtom)
@@ -1089,6 +1093,8 @@ class View:
             new_stage = expr1_states | SetOfStates(expr2_weights.keys())
             new_weights = expr1_weights + expr2_weights
         else:
+            if verbose:
+                print("Central case factor")
             new_weights = Weights({})
             for gamma in self.stage:
                 new_weights._adding(state_factor(state=gamma), self.weights[gamma])
