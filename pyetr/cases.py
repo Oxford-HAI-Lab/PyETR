@@ -574,6 +574,8 @@ class e22(BaseExample):
 
 class e23_with_inquire(BaseExample):
     """
+    Example 23, p88
+
     P1 Either Jane is kneeling by the fire and she is looking at the TV or else Mark is
     standing at the window and he is peering into the garden.
     P2 Jane is kneeling by the fire
@@ -613,7 +615,6 @@ class e23_without_inquire(BaseExample):
         ps("{L()K()}"),
     )
 
-    # TODO: Maybe add query or factor to remove K()
     @classmethod
     def test(cls, verbose: bool = False):
         mid_result = View.get_verum().update(cls.v[0], verbose=verbose)
@@ -631,13 +632,18 @@ class e23_without_inquire(BaseExample):
 
 class e24(BaseExample):
     """
-    Example 24
+    Example 24, p89
 
     P1 There is an ace
     C There is an ace or a queen
     """
 
-    v: tuple[View, View] = (ps("{a()}"), ps("{q()}"))
+    v: tuple[View, View, View, View] = (
+        ps("{a()}"),
+        ps("{q()}"),
+        ps("{~q()}"),
+        ps("{a(),q()}"),
+    )
     c: tuple[View, View] = (ps("{a()~q(),a()q()}"), ps("{a(),q()}"))
 
     @classmethod
@@ -649,8 +655,8 @@ class e24(BaseExample):
                 f"Expected mid result: {cls.c[0]} but received {result_1}"
             )
 
-        result_2 = result_1.factor(cls.v[1], verbose=verbose).factor(
-            cls.v[0], verbose=verbose
+        result_2 = result_1.factor(cls.v[2], verbose=verbose).query(
+            cls.v[3], verbose=verbose
         )
 
         if not result_2.is_equivalent_under_arb_sub(cls.c[1]):
@@ -756,9 +762,9 @@ class e26(BaseExample):
             raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
 
 
-class e28(DefaultInference, BaseExample):
+class e28(BasicStep, BaseExample):
     """
-    Example 28
+    Example 28, p96
 
     P1 Is there a tiger?
     P2 Supposing there is a tiger, there is orange fur.
@@ -767,11 +773,11 @@ class e28(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("{~Tiger(t()),Tiger(t())}"),
-        ps("{Orange(o())Tiger(t())}^{Tiger(t())}"),
-        ps("{Orange(o())}"),
+        ps("{~Tiger(),Tiger()}"),
+        ps("{Orange()Tiger()}^{Tiger()}"),
+        ps("{Orange()}"),
     )
-    c: View = ps("{Tiger(t())}")
+    c: View = ps("{Tiger()Orange()}")
 
 
 class e32_1(DefaultInference, BaseExample):
@@ -822,7 +828,7 @@ class e33(DefaultInference, BaseExample):
     c: View = ps("{R(r())}")
 
 
-class e40i(DefaultInference, BaseExample):
+class e40i(BaseExample):
     """
     Example 40
     (P0 Shapes at the bottom of the card are mutually exclusive)
@@ -840,6 +846,18 @@ class e40i(DefaultInference, BaseExample):
         ps("{TriangleB()}"),
     )
     c: View = View.get_falsum()
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = (
+            cls.v[0]
+            .update(cls.v[1].depose(verbose=verbose), verbose=verbose)
+            .update(cls.v[2], verbose=verbose)
+            .factor(View.get_falsum(), verbose=verbose)
+        )
+
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected result: {cls.c} but received {result}")
 
 
 class e40ii(BaseExample):
@@ -1253,7 +1271,7 @@ class e58_reversed(BasicStep, BaseExample):
 
 class e61(BasicStep, BaseExample):
     """
-    Example 61
+    Example 61, p166
     P1 All dogs bite some man
     P2 John is a man
 
@@ -1261,9 +1279,7 @@ class e61(BasicStep, BaseExample):
     """
 
     v: tuple[View, View] = (ps("∀x ∃a {~D(x),M(a*)D(x)B(x,a)}"), ps("{M(j()*)}"))
-    c: View = ps(
-        "∀x ∃a {M(j()*)M(a*)D(x)B(x,a),M(j()*)~D(x)}"
-    )  # TODO: Make example better?
+    c: View = ps("∀x ∃a {M(j()*)M(a*)D(x)B(x,a),M(j()*)~D(x)}")
 
 
 class e62(WHQuery, BaseExample):
@@ -1458,14 +1474,14 @@ class e67(BaseExample):
         result = (
             cls.v[0]
             .suppose(cls.v[1], verbose=verbose)
-            .depose()
+            .depose(verbose=verbose)
             .query(cls.v[2], verbose=verbose)
         )
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
-class e69_part1(BasicStep, BaseExample):
+class e69_part1(BaseExample):
     """
     Example 69, p192, p218
 
@@ -1483,9 +1499,20 @@ class e69_part1(BasicStep, BaseExample):
             "{0.000001=* ~Guilty(Suspect())Match(Suspect()), ~Guilty(Suspect())~Match(Suspect())} ^ {~Guilty(Suspect())}"
         ),
     )
-    c = ps(
+    c: View = ps(
         "{0.000001=* ~Guilty(Suspect())Match(Suspect()), Guilty(Suspect())Match(Suspect())}"
     )
+
+    # TODO: Switch to new basic step?
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = (
+            cls.v[0]
+            .update(cls.v[1].depose(verbose=verbose), verbose=verbose)
+            .factor(View.get_falsum(), verbose=verbose)
+        )
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
 class e69_part2(BaseExample):
@@ -1529,7 +1556,7 @@ class e70(BaseExample):
         ps("{Disease()Symptom()}^{Disease()}"),
         ps("{Symptom()}"),
     )
-    c: View = ps("{Disease()}")
+    c: View = ps("{Disease()Symptom()}")
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -1653,7 +1680,7 @@ class e74(BaseExample):
             )
 
         # Should use reorient once this exists
-        result = cls.v[0].update(mid_result, verbose=verbose)
+        result = cls.v[0].answer(mid_result, verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c[1]):
             raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
 
@@ -1661,7 +1688,7 @@ class e74(BaseExample):
 class e76(BaseExample):
     """
     Example 76 (guns and guitars)
-    p199, p226
+    p199, p226,  p229
 
     (P1) The gun fired and the guitar was out of tune, or else someone was in the attic
     (P1.5, see p228) Guns who triggers are pulled fire
@@ -1670,11 +1697,11 @@ class e76(BaseExample):
     """  # TODO: Note assuming exists i
 
     v = (
-        ps("Ei Ej Ea {Fired(i*)Gun(i)Guitar(j)Outoftune(j), A(a)}"),
+        ps("Ea {Fired(i()*)Gun(i())Guitar(j())Outoftune(j()), A(a)}"),
         ps("Ax {Gun(x)Trigger(x)Fired(x),0}^{Gun(x)Fired(x*)}"),
-        ps("Ei {Trigger(i)}"),
+        ps("{Trigger(i())}"),
     )
-    c: View = ps("Ei Ej {Fired(i*)Gun(i)Guitar(j)Outoftune(j)Trigger(i)}")
+    c: View = ps("{Fired(i()*)Gun(i())Guitar(j())Outoftune(j())Trigger(i())}")
 
     @classmethod
     def test(cls, verbose: bool = False):
@@ -1696,7 +1723,7 @@ class e81_base(WhatIsProb):
     Given the preceding assertion, according to you, what is the probability of the following situation?
     """
 
-    v = (ps("{50=* Box(Yellow()),50=* Box(Brown())}"),)
+    v = (ps("{Box(Yellow())~Box(Brown()), Box(Brown())~Box(Yellow())}"),)
     prob: View
     c: View
 
@@ -1890,7 +1917,7 @@ class e85(WhatIsProb, BaseExample):
         ps("{Box(Green()), Box(Blue()), Box(Red())}"),
         ps(
             "{60=* Box(Green())}^{Box(Green())}"
-        ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book. Also, where does if green come from??
+        ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book.
         ps(
             "{20=* Box(Blue())}^{Box(Green())}"
         ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book
@@ -1935,17 +1962,21 @@ class e88(BaseExample):
     C: There is a 90% chance Clark can fly
     """
 
-    v: tuple[View, View, View] = (
+    v: tuple[View, View, View, View] = (
         ps("{90=* CanFly(Superman())}"),
         ps("{==(Clark(), Superman())}"),
         ps("{==(Clark(), Superman()*)}"),
+        ps("{==(Clark(), Clark())}"),
     )
     c: View = ps("{90=* CanFly(Clark())}")
 
     @classmethod
     def test(cls, verbose: bool = False):
         result = (
-            cls.v[0].update(cls.v[1], verbose=verbose).factor(cls.v[2], verbose=verbose)
+            cls.v[0]
+            .update(cls.v[1], verbose=verbose)
+            .factor(cls.v[2], verbose=verbose)
+            .factor(cls.v[3], verbose=verbose)
         )
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -1961,7 +1992,7 @@ class e90_condA(DefaultDecision, BaseExample):
     movie (such as a comedy, drama, thriller etc.). This particular video that you are considering
     is one you have been thinking about buying a long time. It is a available at a special sale price
     of $14.99. What would you do in this situation?
-    """  # TODO: Contradiction factor not show in book
+    """
 
     v = (ps("{do(Buy(Video()*)),~do(Buy(Video()))}"),)
     cv = (ps("Ax {Fun()}^{do(Buy(x*))}"),)
@@ -2074,6 +2105,8 @@ class AnswerPotential(BaseExample):
         ps("{A()}"),
         ps("{B()}"),
         ps("{C()}"),
+        ps("{C()D()}"),
+        ps("{C()~B()}"),
     )
     c = ps("{}")
 
@@ -2094,6 +2127,18 @@ class AnswerPotential(BaseExample):
         )
         assert isinstance(out.f, RealNumber)
         assert out.f.num == 0.4, f"{out.f.num} not equal to {0.4}"
+
+        out = cls.v[0].stage.equilibrium_answer_potential(
+            cls.v[4].stage, cls.v[0].weights
+        )
+        assert isinstance(out.f, RealNumber)
+        assert out.f.num == 0.0, f"{out.f.num} not equal to {0.0}"
+
+        out = cls.v[0].stage.equilibrium_answer_potential(
+            cls.v[5].stage, cls.v[0].weights
+        )
+        assert isinstance(out.f, RealNumber)
+        assert out.f.num == 0.0, f"{out.f.num} not equal to {0.0}"
 
 
 class UniProduct(BaseExample):
