@@ -1,7 +1,6 @@
 import pytest
 
-from pyetr import parse_string_to_view
-from pyetr.parsing import parse_view_to_string
+from pyetr.parsing.fol_parser import parse_string_to_view, parse_view_to_string
 
 
 class TestFunction:

@@ -12,12 +12,12 @@ from pyetr.atoms.terms import (
     Term,
     get_open_equivalent,
 )
-from pyetr.common_parsing import (
+from pyetr.dependency import DependencyRelation, dependencies_from_sets
+from pyetr.issues import IssueStructure
+from pyetr.parsing.common import (
     get_variable_map_and_dependencies,
     merge_terms_with_opens,
 )
-from pyetr.dependency import DependencyRelation, dependencies_from_sets
-from pyetr.issues import IssueStructure
 from pyetr.stateset import SetOfStates, State
 from pyetr.view import View
 

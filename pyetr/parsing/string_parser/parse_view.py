@@ -1,6 +1,6 @@
 from typing import Optional, cast
 
-import pyetr.new_parsing.parse_string as parsing
+import pyetr.parsing.string_parser.parse_string as parsing
 from pyetr.atoms import Atom, OpenAtom, OpenPredicateAtom, Predicate, PredicateAtom
 from pyetr.atoms.doatom import DoAtom
 from pyetr.atoms.open_doatom import OpenDoAtom
@@ -16,13 +16,13 @@ from pyetr.atoms.terms import (
 )
 from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.special_funcs import Summation, XBar
-from pyetr.common_parsing import (
+from pyetr.issues import IssueStructure
+from pyetr.parsing.common import (
     Variable,
     get_variable_map_and_dependencies,
     merge_atoms_with_opens,
     merge_terms_with_opens,
 )
-from pyetr.issues import IssueStructure
 from pyetr.stateset import SetOfStates, State
 from pyetr.view import View
 from pyetr.weight import Weight, Weights

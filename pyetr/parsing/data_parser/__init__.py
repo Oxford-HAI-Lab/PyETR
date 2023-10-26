@@ -1,4 +1,4 @@
-import pyetr.data_parser.models as models
+import pyetr.parsing.data_parser.models as models
 from pyetr.view import View
 
 from .model_to_view import model_to_view

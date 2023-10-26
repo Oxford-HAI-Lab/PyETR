@@ -1,4 +1,4 @@
-from pyetr.parsing.parse_string import Item
+from .parse_string import Item
 
 
 def unparse_items(items: list[Item]) -> str:

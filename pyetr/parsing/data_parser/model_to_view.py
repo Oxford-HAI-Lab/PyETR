@@ -1,6 +1,6 @@
 from typing import cast, overload
 
-import pyetr.data_parser.models as models
+import pyetr.parsing.data_parser.models as models
 from pyetr.atoms.abstract import Atom, OpenAtom
 from pyetr.atoms.doatom import DoAtom
 from pyetr.atoms.open_doatom import OpenDoAtom

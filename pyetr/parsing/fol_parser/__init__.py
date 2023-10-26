@@ -1,7 +1,8 @@
 __all__ = ["parse_string_to_view", "parse_view_to_string"]
 
 
-from ..view import View
+from pyetr.view import View
+
 from .parse_item import parse_items
 from .parse_string import parse_string
 from .unparse_item import unparse_items

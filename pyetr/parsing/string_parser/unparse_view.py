@@ -1,6 +1,6 @@
 from typing import cast
 
-import pyetr.new_parsing.parse_string as parsing
+import pyetr.parsing.string_parser.parse_string as parsing
 from pyetr.atoms import Atom, DoAtom, OpenDoAtom, OpenPredicateAtom, PredicateAtom
 from pyetr.atoms.terms import (
     ArbitraryObject,
@@ -14,8 +14,8 @@ from pyetr.atoms.terms import (
     Term,
     XBar,
 )
-from pyetr.common_parsing import Variable, get_quantifiers
 from pyetr.issues import IssueStructure
+from pyetr.parsing.common import Variable, get_quantifiers
 from pyetr.stateset import State, Supposition
 from pyetr.view import View
 from pyetr.weight import Weight, Weights
