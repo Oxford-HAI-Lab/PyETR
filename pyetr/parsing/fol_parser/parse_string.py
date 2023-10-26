@@ -19,7 +19,7 @@ from typing import Any, ClassVar, Optional
 import pyparsing as pp
 from pyparsing import ParserElement
 
-from pyetr.common_parsing import Quantified, Variable
+from pyetr.parsing.common import Quantified, Variable
 
 ParserElement.enablePackrat()
 

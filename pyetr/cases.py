@@ -4,6 +4,7 @@ from typing import cast
 
 from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.term import FunctionalTerm
+from pyetr.parsing.string_parser import parse_string_to_view as ps
 
 from .func_library import log_func, power_func
 from .inference import (
@@ -12,7 +13,6 @@ from .inference import (
     default_inference_procedure,
     default_procedure_what_is_prob,
 )
-from .new_parsing import parse_string_to_view as ps
 from .view import View
 
 

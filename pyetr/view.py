@@ -4,7 +4,7 @@ from functools import reduce
 from itertools import permutations
 from typing import Optional, cast
 
-from pyetr.common_parsing import get_quantifiers
+from pyetr.parsing.common import get_quantifiers
 
 from .atoms import PredicateAtom, equals_predicate
 from .atoms.terms import ArbitraryObject, FunctionalTerm, RealNumber, Term

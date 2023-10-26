@@ -7,7 +7,7 @@ from typing import Optional
 import pyparsing as pp
 from pyparsing import ParserElement
 
-from pyetr.common_parsing import Quantified, Variable
+from pyetr.parsing.common import Quantified, Variable
 
 sys.setrecursionlimit(10000)
 

@@ -9,10 +9,10 @@ from pyetr.atoms.terms import (
     QuestionMark,
     Term,
 )
-from pyetr.common_parsing import get_quantifiers
 from pyetr.dependency import Dependency, DependencyRelation, dependencies_to_sets
 from pyetr.issues import IssueStructure
-from pyetr.parsing.parse_string import (
+from pyetr.parsing.common import get_quantifiers
+from pyetr.parsing.fol_parser.parse_string import (
     BoolAnd,
     BoolNot,
     BoolOr,
