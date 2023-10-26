@@ -4,7 +4,7 @@ from typing import cast
 
 from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.term import FunctionalTerm
-from pyetr.parsing.string_parser import parse_string_to_view as ps
+from pyetr.parsing.string_parser import string_to_view as ps
 
 from .func_library import log_func, power_func
 from .inference import (

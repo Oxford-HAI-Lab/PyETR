@@ -17,9 +17,9 @@ from functools import cache
 from typing import Any, ClassVar, Optional
 
 import pyparsing as pp
-from pyparsing import ParserElement
+from pyparsing import ParseException, ParserElement
 
-from pyetr.parsing.common import Quantified, Variable
+from pyetr.parsing.common import ParsingError, Quantified, Variable
 
 ParserElement.enablePackrat()
 
@@ -215,4 +215,8 @@ Item = AtomicItem | StatementItem
 
 def parse_string(input_string: str) -> list[Item]:
     expr = get_expr()
-    return expr.parse_string(input_string, parseAll=True).as_list()
+    try:
+        new_string = expr.parse_string(input_string, parseAll=True).as_list()
+    except ParseException as e:
+        raise ParsingError(e.msg)
+    return new_string
