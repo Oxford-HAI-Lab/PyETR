@@ -1,3 +1,4 @@
+from audioop import add
 from typing import cast, overload
 
 import pyetr.data_parser.models as models
@@ -11,6 +12,7 @@ from pyetr.atoms.terms.abstract_term import (
     AbstractFunctionalTerm,
     AbstractTerm,
 )
+from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.open_term import QuestionMark
 from pyetr.atoms.terms.term import FunctionalTerm, Term
 from pyetr.dependency import DependencyRelation
@@ -43,8 +45,12 @@ def term_to_model(
     t: AbstractTerm,
 ) -> models.ArbitraryObject | models.FunctionalTerm | models.QuestionMark:
     if isinstance(t, AbstractFunctionalTerm):
+        if isinstance(t.f, RealNumber):
+            new_f = models.RealNumber(num=t.f.num)
+        else:
+            new_f = models.Function(name=t.f.name, arity=t.f.arity)
         return models.FunctionalTerm(
-            function=models.Function(name=t.f.name, arity=t.f.arity),
+            function=new_f,
             terms=[term_to_model(term) for term in t.t],
         )
     elif isinstance(t, AbstractArbitraryObject):
@@ -91,12 +97,15 @@ def dependency_rel_to_model(dep_rel: DependencyRelation) -> models.DependencyRel
 def view_to_model(v: View) -> models.View:
     return models.View(
         stage=[[atom_to_model(atom) for atom in state] for state in v.stage],
-        supposition=[[atom_to_model(atom) for atom in state] for state in v.stage],
+        supposition=[
+            [atom_to_model(atom) for atom in state] for state in v.supposition
+        ],
         weights=[
             models.WeightPair(
                 state=[atom_to_model(atom) for atom in s],
                 weight=models.Weight(
-                    multiplicative=[term_to_model(i) for i in w.multiplicative]
+                    multiplicative=[term_to_model(i) for i in w.multiplicative],
+                    additive=[term_to_model(i) for i in w.additive],
                 ),
             )
             for s, w in v.weights.items()
