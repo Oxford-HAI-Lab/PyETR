@@ -399,7 +399,8 @@ def get_expr():
     )
     supposition = (
         (
-            pp.Suppress("{")
+            pp.Suppress("{}")
+            | pp.Suppress("{")
             + pp.Optional(pp.DelimitedList(verum | state, ","))
             + pp.Suppress("}")
         )
@@ -418,7 +419,8 @@ def get_expr():
     ).setParseAction(WeightedState)
     stage = (
         (
-            pp.Suppress("{")
+            pp.Suppress("{}")
+            | pp.Suppress("{")
             + pp.Optional(pp.DelimitedList(weighted_state, ","))
             + pp.Suppress("}")
         )
