@@ -108,12 +108,12 @@ class Implies:
         return f"<Implies left={self.left} right={self.right}>"
 
     def to_string(self) -> str:
-        return self.left.to_string() + "->" + self.right.to_string()
+        return self.left.to_string() + "→" + self.right.to_string()
 
 
-def equals(t):
+def equals_f(t):
     assert len(t[0]) == 2
-    return LogicPredicate([["=", t[0]]])
+    return LogicPredicate([["==", t[0]]])
 
 
 class Truth:
@@ -180,7 +180,9 @@ def get_expr():
     equals = pp.Suppress(pp.Char("="))
     emphasis = pp.Suppress(pp.Char("*"))
 
-    predicate_word = pp.Word(pp.alphas, pp.alphanums).setResultsName("predicate")
+    predicate_word = pp.Word(pp.alphas, pp.alphanums).setResultsName(
+        "predicate"
+    ) | pp.Literal("==")
     predicate_0 = pp.Group(predicate_word + pp.Suppress("()")).setParseAction(
         LogicPredicate
     )
@@ -195,7 +197,7 @@ def get_expr():
             (bool_not, 1, pp_right, BoolNot),
             (bool_and, 2, pp_left, BoolAnd),
             (bool_or, 2, pp_left, BoolOr),
-            (equals, 2, pp_left, equals),
+            (equals, 2, pp_left, equals_f),
             (implies, 2, pp_left, Implies),
             (comma, 2, pp_left, Comma),
         ],
