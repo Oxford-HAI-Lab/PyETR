@@ -1,4 +1,3 @@
-from audioop import add
 from typing import cast, overload
 
 import pyetr.parsing.data_parser.models as models

@@ -15,6 +15,7 @@ from pyetr.atoms.terms import (
 from pyetr.dependency import DependencyRelation, dependencies_from_sets
 from pyetr.issues import IssueStructure
 from pyetr.parsing.common import (
+    ParsingError,
     get_variable_map_and_dependencies,
     merge_terms_with_opens,
 )
@@ -53,6 +54,10 @@ def _parse_predicate(
 ) -> tuple[PredicateAtom, list[tuple[Term, OpenPredicateAtom]]]:
     def _parse_term(item: Item) -> tuple[Term, list[tuple[Term, OpenTerm]]]:
         if isinstance(item, Variable):
+            if item.name not in maps.variable_map:
+                raise ParsingError(
+                    f"Arbitrary object {item.name} not found in quantifiers"
+                )
             return maps.variable_map[item.name], []
         elif isinstance(item, LogicEmphasis):
             parsed_term, open_terms = _parse_term(item.arg)
@@ -148,16 +153,20 @@ def _parse_item_with_issue(
             return SetOfStates({State({atom})})
 
         elif isinstance(item, LogicEmphasis):
-            raise ValueError(f"Logic emphasis {item} found outside of logic predicate")
+            raise ParsingError(
+                f"Logic emphasis {item} found outside of logic predicate"
+            )
 
         elif isinstance(item, Variable):
-            raise ValueError(f"Variable {item} found outside of logic predicate")
+            raise ParsingError(f"Variable {item} found outside of logic predicate")
 
         elif isinstance(item, Implies):
-            raise ValueError(f"Implies statement {item} found at lower level than top")
+            raise ParsingError(
+                f"Implies statement {item} found at lower level than top"
+            )
 
         elif isinstance(item, Quantified):
-            raise ValueError(f"Quantified {item} found at lower level than top")
+            raise ParsingError(f"Quantified {item} found at lower level than top")
         else:
             assert False
 

@@ -207,6 +207,8 @@ def gather_funcs(term: parsing.Term) -> list[Function]:
             funcs += gather_funcs(arg)
         funcs.append(Summation)
     elif isinstance(term, parsing.Function):
+        for arg in term.args:
+            funcs += gather_funcs(arg)
         funcs.append(Function(term.name, arity=len(term.args)))
     elif isinstance(term, Variable):
         pass

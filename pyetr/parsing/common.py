@@ -14,6 +14,11 @@ Universal = ArbitraryObject
 Existential = ArbitraryObject
 
 
+class ParsingError(Exception):
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+
+
 class Variable:
     name: str
 
@@ -23,7 +28,7 @@ class Variable:
     def __repr__(self) -> str:
         return f"<Variable name={self.name}>"
 
-    def to_string(self) -> str:
+    def to_string(self, **kwargs) -> str:
         return self.name
 
 
@@ -46,8 +51,8 @@ class Quantified:
     def __repr__(self) -> str:
         return f"<Quantified variable={self.variable} quantifier={self.quantifier}>"
 
-    def to_string(self) -> str:
-        return self.quantifier + self.variable.to_string()
+    def to_string(self, **kwargs) -> str:
+        return self.quantifier + self.variable.to_string(**kwargs)
 
 
 def get_variable_map_and_dependencies(
