@@ -38,6 +38,7 @@ class Atom(BaseModel):
 
 class DoAtom(BaseModel):
     atoms: list[Atom]
+    polarity: bool
 
 
 class Weight(BaseModel):

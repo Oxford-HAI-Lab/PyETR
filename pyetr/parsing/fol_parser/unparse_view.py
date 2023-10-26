@@ -7,6 +7,7 @@ from pyetr.atoms.terms import (
     OpenFunctionalTerm,
     OpenTerm,
     QuestionMark,
+    RealNumber,
     Term,
 )
 from pyetr.dependency import Dependency, DependencyRelation, dependencies_to_sets
@@ -30,6 +31,11 @@ from pyetr.stateset import SetOfStates
 from pyetr.view import View
 
 
+class FOLNotSupportedError(Exception):
+    def __init__(self, msg: str) -> None:
+        super().__init__(msg)
+
+
 def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
     if any([isinstance(o, QuestionMark) for _, o in open_terms]):
         remaining_terms = [
@@ -45,6 +51,8 @@ def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
                 assert isinstance(o.t, tuple)
                 rel_open_terms.append((t, o.t[i]))
             new_subterms.append(convert_term(subterm, rel_open_terms))
+        if isinstance(term.f, RealNumber):
+            raise FOLNotSupportedError(f"Real Number {term.f} found")
         return LogicPredicate(
             [
                 [
@@ -102,13 +110,19 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
             if len(state) == 1:
                 # TODO: Fix for doatoms
                 atom = next(iter(state))
-                assert isinstance(atom, PredicateAtom)
+                if not isinstance(atom, PredicateAtom):
+                    raise FOLNotSupportedError(
+                        f"Non predicate atom: {atom}  found - FOL not supported"
+                    )
                 return convert_atom(atom, issue_structure, issue_atoms)
             else:
                 new_atoms: list[LogicPredicate | BoolNot] = []
                 for atom in state:
                     # TODO: Fix for doatoms
-                    assert isinstance(atom, PredicateAtom)
+                    if not isinstance(atom, PredicateAtom):
+                        raise FOLNotSupportedError(
+                            f"Non predicate atom: {atom}  found - FOL not supported"
+                        )
                     new_atoms.append(convert_atom(atom, issue_structure, issue_atoms))
                 return BoolAnd([new_atoms])
         else:
@@ -119,25 +133,29 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
                 elif len(state) == 1:
                     atom = next(iter(state))
                     # TODO: Fix for doatoms
-                    assert isinstance(atom, PredicateAtom)
+                    if not isinstance(atom, PredicateAtom):
+                        raise FOLNotSupportedError(
+                            f"Non predicate atom: {atom}  found - FOL not supported"
+                        )
                     new_ands.append(convert_atom(atom, issue_structure, issue_atoms))
                 else:
                     # TODO: Fix for doatoms
-                    new_ands.append(
-                        BoolAnd(
-                            [
-                                [
-                                    convert_atom(atom, issue_structure, issue_atoms)
-                                    for atom in state
-                                    if isinstance(atom, PredicateAtom)
-                                ]
-                            ]
+                    new_atoms = []
+                    for atom in state:
+                        if not isinstance(atom, PredicateAtom):
+                            raise FOLNotSupportedError(
+                                f"Non predicate atom: {atom}  found - FOL not supported"
+                            )
+                        new_atoms.append(
+                            convert_atom(atom, issue_structure, issue_atoms)
                         )
-                    )
+                    new_ands.append(BoolAnd([new_atoms]))
             return BoolOr([new_ands])
 
 
 def unparse_view(v: View) -> list[Item]:
+    if not all([w.is_null for w in v.weights.values()]):
+        raise FOLNotSupportedError(f"View: {v} contain weights")
     main_item: Item
     if v.supposition.is_verum:
         main_item = unparse_set_of_states(v.stage, v.issue_structure)

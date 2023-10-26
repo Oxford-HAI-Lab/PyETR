@@ -72,7 +72,8 @@ def atom_to_model(a: AbstractAtom) -> models.Atom | models.DoAtom:
         )
     elif isinstance(a, (DoAtom, OpenDoAtom)):
         return models.DoAtom(
-            atoms=cast(list[models.Atom], [atom_to_model(atom) for atom in a.atoms])
+            atoms=cast(list[models.Atom], [atom_to_model(atom) for atom in a.atoms]),
+            polarity=a.polarity,
         )
     else:
         assert False
