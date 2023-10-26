@@ -14,6 +14,10 @@ class Function(BaseModel):
     arity: Optional[int]
 
 
+class RealNumber(BaseModel):
+    num: float
+
+
 class ArbitraryObject(BaseModel):
     name: str
 
@@ -23,7 +27,7 @@ class QuestionMark(BaseModel):
 
 
 class FunctionalTerm(BaseModel):
-    function: Function
+    function: Function | RealNumber
     terms: "list[FunctionalTerm | ArbitraryObject | QuestionMark]"
 
 
@@ -38,6 +42,7 @@ class DoAtom(BaseModel):
 
 class Weight(BaseModel):
     multiplicative: list[FunctionalTerm | ArbitraryObject | QuestionMark]
+    additive: list[FunctionalTerm | ArbitraryObject | QuestionMark]
 
 
 class WeightPair(BaseModel):
