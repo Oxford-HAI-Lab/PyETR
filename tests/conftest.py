@@ -47,17 +47,13 @@ def replace_emphasis(input_string):
     )
 
 
+def replace_letters(s: str) -> str:
+    return s.replace(" ", "").replace("++", "σ").replace("∃", "E").replace("∀", "A")
+
+
 def length_identity_test(start: str, end: str) -> bool:
-    start = start.replace(" ", "")
-    end = end.replace(" ", "")
-    # First replace sums
-    start = start.replace("++", "σ")
-    end = end.replace("++", "σ")
-    # Then replace forall etc
-    start = start.replace("∃", "E")
-    start = start.replace("∀", "A")
-    end = end.replace("∃", "E")
-    end = end.replace("∀", "A")
+    start = replace_letters(start)
+    end = replace_letters(end)
     if len(start) == len(end) and sorted(start, key=hash) == sorted(end, key=hash):
         return True
 
