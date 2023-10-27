@@ -17,6 +17,11 @@ from .view import View
 
 
 class BaseExample(metaclass=ABCMeta):
+    """
+    The base class for all examples. It contains a series of views (v)
+    for operations and a conclusion (c).
+    """
+
     v: tuple[View, ...]
     c: View | tuple[View, ...]
 
@@ -42,6 +47,11 @@ class BaseExample(metaclass=ABCMeta):
 
 
 class BaseTest:
+    """
+    The base class for all test types. Test types are mixins the define a test
+    type, but not the associated views.
+    """
+
     v: tuple[View, ...]
     c: View
 
@@ -161,7 +171,7 @@ class WhatIsProb(BaseTest):
 
 class e1(DefaultInference, BaseExample):
     """
-    Example 1 (p. 61):
+    Example 1, p61:
 
     P1 Either Jane is kneeling by the fire and she is looking at the TV or else
     Mark is standing at the window and he is peering into the garden.
@@ -180,7 +190,7 @@ class e1(DefaultInference, BaseExample):
 
 class e2(DefaultInference, BaseExample):
     """
-    Example 2 (p. 62):
+    Example 2, p62:
 
     P1 There is at least an ace and a queen, or else at least a king and a ten.
     P2 There is a king.
@@ -196,7 +206,7 @@ class e2(DefaultInference, BaseExample):
 
 class e3(DefaultInference, BaseExample):
     """
-    Example 3 (p.63):
+    Example 3, p63:
 
     P1 There is at least an ace and a king or else there is at least a queen and
     a jack.
@@ -222,6 +232,10 @@ class samples:
 
 
 class e5ii(Product, BaseExample):
+    """
+    Example 5, p72, part ii
+    """
+
     v: tuple[View, View] = (
         ps("{" + f"{samples.delta},{samples.gamma}" + "}"),
         ps("{" + f"{samples.epsilon},{samples.theta}" + "}"),
@@ -232,6 +246,10 @@ class e5ii(Product, BaseExample):
 
 
 class e5iii(Product, BaseExample):
+    """
+    Example 5, p72, part iii
+    """
+
     v: tuple[View, View] = (
         ps("{" + f"{samples.gamma}, {samples.delta}" + "}"),
         View.get_falsum(),
@@ -240,6 +258,10 @@ class e5iii(Product, BaseExample):
 
 
 class e5iv(Product, BaseExample):
+    """
+    Example 5, p72, part iv
+    """
+
     v: tuple[View, View] = (
         ps("{" + f"{samples.gamma}, {samples.delta}" + "}"),
         View.get_verum(),
@@ -248,6 +270,10 @@ class e5iv(Product, BaseExample):
 
 
 class e5v(Product, BaseExample):
+    """
+    Example 5, p72, part v
+    """
+
     v: tuple[View, View] = (
         View.get_verum(),
         ps("{" + f"{samples.gamma}, {samples.delta}" + "}"),
@@ -293,7 +319,7 @@ class e8(DefaultInference, BaseExample):
 
 class e10(DefaultInference, BaseExample):
     """
-    Example 10 (p.76)
+    Example 10, p76
 
     P1 There is a king.
     P2 There is at least an ace and a queen, or else at least a king and a ten.
@@ -309,7 +335,7 @@ class e10(DefaultInference, BaseExample):
 
 class e11(BasicStep, BaseExample):
     """
-    Example 11 (p. 77)
+    Example 11, p77
 
     P1 Either John smokes or Mary smokes.
     P2 Supposing John smokes, John drinks.
@@ -327,7 +353,7 @@ class e11(BasicStep, BaseExample):
 
 class e12i(Negation, BaseExample):
     """
-    Example 12i (p. 78)
+    Example 12i, p78
 
     ItisnotthecasethatPorQorR
     """
@@ -338,7 +364,7 @@ class e12i(Negation, BaseExample):
 
 class e12ii(Negation, BaseExample):
     """
-    Example 12ii (p. 78)
+    Example 12ii, p78
 
     ItisnotthecasethatPandQandR
     """
@@ -349,7 +375,7 @@ class e12ii(Negation, BaseExample):
 
 class e12iii(Negation, BaseExample):
     """
-    Example 12iii (p. 79)
+    Example 12iii, p79
 
     It is not the case that, supposing S, ((P and Q) or R)
     """
@@ -360,7 +386,7 @@ class e12iii(Negation, BaseExample):
 
 class e13(DefaultInference, BaseExample):
     """
-    Example 13 (p. 80)
+    Example 13, p80
 
     P1 There is an ace and a king or a queen and a jack.
     P2 There isn't an ace.
@@ -376,7 +402,9 @@ class e13(DefaultInference, BaseExample):
 
 class e14_1(Factor, BaseExample):
     """
-    Example 14-1(p. 81) Factor examples
+    Example 14-1, p81
+
+    Factor examples
     """
 
     v: tuple[View, View] = (
@@ -388,7 +416,9 @@ class e14_1(Factor, BaseExample):
 
 class e14_2(Factor, BaseExample):
     """
-    Example 14-2(p. 81) Factor examples
+    Example 14-2, p81
+
+    Factor examples
     """
 
     v: tuple[View, View] = (
@@ -400,7 +430,9 @@ class e14_2(Factor, BaseExample):
 
 class e14_3(Factor, BaseExample):
     """
-    Example 14-3(p. 81) Factor examples
+    Example 14-3, p81
+
+    Factor examples
     """
 
     v: tuple[View, View] = (
@@ -412,7 +444,9 @@ class e14_3(Factor, BaseExample):
 
 class e14_6(Factor, BaseExample):
     """
-    Example 14-6(p. 81) Factor examples
+    Example 14-6, p81
+
+    Factor examples
     """
 
     v: tuple[View, View] = (
@@ -424,7 +458,9 @@ class e14_6(Factor, BaseExample):
 
 class e14_7(Factor, BaseExample):
     """
-    Example 14-7(p. 81) Factor examples
+    Example 14-7, p81
+
+    Factor examples
     """
 
     v: tuple[View, View] = (
@@ -436,7 +472,7 @@ class e14_7(Factor, BaseExample):
 
 class e15(DefaultInference, BaseExample):
     """
-    Example 15
+    Example 15, p82
 
     P1 There is an ace and a jack and a queen, or else there is an eight and a ten and a four, or else there is an ace.
     P2 There is an ace and a jack, and there is an eight and a ten.
@@ -454,7 +490,7 @@ class e15(DefaultInference, BaseExample):
 
 class e16(DefaultInference, BaseExample):
     """
-    Example 16
+    Example 16, p83
 
     P1 There is a ten and an eight and a four, or else there is a jack and a king and a queen, or else there is an ace.
     P2 There isn't a four.
@@ -471,7 +507,7 @@ class e16(DefaultInference, BaseExample):
 
 class e17(DefaultInference, BaseExample):
     """
-    Example 17
+    Example 17, p83
 
     P1 There is a king in the hand and there is not an ace in the hand, or else there is an ace in the hand and there is not a king in the hand.
     P2 There is a king in the hand.
@@ -487,7 +523,7 @@ class e17(DefaultInference, BaseExample):
 
 class e19(Suppose, BaseExample):
     """
-    Example 19, page 84
+    Example 19, p84
 
     Suppose test
     """
@@ -501,7 +537,7 @@ class e19(Suppose, BaseExample):
 
 class e20(DefaultInference, BaseExample):
     """
-    Example 20
+    Example 20, p85
 
     P1 Either there is a king in the hand or a queen in the hand.
     P2 On the supposition that there is a king, Mary wins.
@@ -519,7 +555,7 @@ class e20(DefaultInference, BaseExample):
 
 class e21(BaseExample):
     """
-    Example 21
+    Example 21, p86
     """
 
     v: tuple[View] = (ps("{" + f"{samples.delta}" + "}"),)
@@ -535,7 +571,7 @@ class e21(BaseExample):
 
 class e22(BaseExample):
     """
-    Example 22
+    Example 22, p87
 
     It is not the case that A and B and C
     """
@@ -574,7 +610,7 @@ class e22(BaseExample):
 
 class e23_with_inquire(BaseExample):
     """
-    Example 23, p88
+    Example 23, p88, with inquire step
 
     P1 Either Jane is kneeling by the fire and she is looking at the TV or else Mark is
     standing at the window and he is peering into the garden.
@@ -609,6 +645,16 @@ class e23_with_inquire(BaseExample):
 
 
 class e23_without_inquire(BaseExample):
+    """
+    Example 23, p88, without inquire step
+
+    P1 Either Jane is kneeling by the fire and she is looking at the TV or else Mark is
+    standing at the window and he is peering into the garden.
+    P2 Jane is kneeling by the fire
+
+    C Jane is looking at the TV
+    """
+
     v: tuple[View, View] = (ps("{L()K(),P()S()}"), ps("{K()}"))
     c: tuple[View, View] = (
         ps("{L()K(),P()S()}"),
@@ -665,7 +711,7 @@ class e24(BaseExample):
 
 class e25i(Query, BaseExample):
     """
-    Example 25i
+    Example 25i, p89
     """
 
     v: tuple[View, View] = (ps("{p()r(),p()q()}"), ps("{p()}"))
@@ -674,7 +720,7 @@ class e25i(Query, BaseExample):
 
 class e25ii(Query, BaseExample):
     """
-    Example 25ii
+    Example 25ii, p89
     """
 
     v: tuple[View, View] = (ps("{p()r(),p()q()}"), ps("{q()}"))
@@ -683,7 +729,7 @@ class e25ii(Query, BaseExample):
 
 class e25iii(Query, BaseExample):
     """
-    Example 25iii
+    Example 25iii, p89
     """
 
     v: tuple[View, View] = (
@@ -695,7 +741,7 @@ class e25iii(Query, BaseExample):
 
 class e25iv(Query, BaseExample):
     """
-    Example 25iv
+    Example 25iv, p89
     """
 
     v: tuple[View, View] = (
@@ -707,7 +753,7 @@ class e25iv(Query, BaseExample):
 
 class e25v(Query, BaseExample):
     """
-    Example 25v
+    Example 25v, p89
     """
 
     v: tuple[View, View] = (
@@ -719,7 +765,7 @@ class e25v(Query, BaseExample):
 
 class e25vi(Query, BaseExample):
     """
-    Example 25vi
+    Example 25vi, p89
     """
 
     v: tuple[View, View] = (
@@ -731,7 +777,7 @@ class e25vi(Query, BaseExample):
 
 class e26(BaseExample):
     """
-    Example 26
+    Example 26, p90
 
     P1 Either John plays and wins, or Mary plays, or Bill plays
     C Supposing John plays, John wins
@@ -782,7 +828,7 @@ class e28(BasicStep, BaseExample):
 
 class e32_1(DefaultInference, BaseExample):
     """
-    Example 32-1
+    Example 32-1, p107
 
     P1 If P then Q.
     P2 P
@@ -798,7 +844,7 @@ class e32_1(DefaultInference, BaseExample):
 
 class e32_2(DefaultInference, BaseExample):
     """
-    Example 32-2
+    Example 32-2, p107
 
     P1 P
     P2 If P then Q.
@@ -814,7 +860,7 @@ class e32_2(DefaultInference, BaseExample):
 
 class e33(DefaultInference, BaseExample):
     """
-    Example 33
+    Example 33, p108
 
     P1 If the card is red then the number is even.
     P2 The number is even.
@@ -830,7 +876,8 @@ class e33(DefaultInference, BaseExample):
 
 class e40i(BaseExample):
     """
-    Example 40
+    Example 40, p119
+
     (P0 Shapes at the bottom of the card are mutually exclusive)
     P1 If there is a circle at the top of the card, then there is a
     square on the bottom.
@@ -862,7 +909,15 @@ class e40i(BaseExample):
 
 class e40ii(BaseExample):
     """
-    p120: The reader diverges from the default procedure,
+    Example 40, p119-p120
+
+    (P0 Shapes at the bottom of the card are mutually exclusive)
+    P1 If there is a circle at the top of the card, then there is a
+    square on the bottom.
+    P2 There is a triangle on the bottom
+    C Falsum
+
+    The reader diverges from the default procedure,
     and deposes the conditional premise, and switches the premise
     order.
     """
@@ -891,7 +946,7 @@ class e40ii(BaseExample):
 
 class e41(DefaultInference, BaseExample):
     """
-    Example 41
+    Example 41, p121
 
     P1 P only if Q.
     P2 Not Q.
@@ -927,7 +982,7 @@ class e42(DefaultInference, BaseExample):
 
 class e44_1(DefaultInference, BaseExample):
     """
-    Example 44-1
+    Example 44-1, p123
 
     P1 The chair is saleable if and only if it is inelegant.
     P2 The chair is elegant if and only if it is stable.
@@ -945,7 +1000,7 @@ class e44_1(DefaultInference, BaseExample):
 
 class e45(BaseExample):
     """
-    Example 45
+    Example 45, p125
 
     It is possible that Steven is in Madrid and it is possible that Emma is in
     Berlin.
@@ -972,7 +1027,7 @@ class e45(BaseExample):
 
 class e46i(BaseExample):
     """
-    Example 46
+    Example 46, p126
 
     P1 Pat is here then Viv is here
     P2 Mo is here or else Pat is here, but not both
@@ -1009,7 +1064,9 @@ class e46i(BaseExample):
 
 class e46ii(Query, BaseExample):
     """
-    p126, if we had a view{VMR,VMS, T} and applied [{vm, 0}]Q we would get [{vm, 0}]
+    Example 46, part ii, p126
+
+    If we had a view{VMR,VMS, T} and applied [{vm, 0}]Q we would get [{vm, 0}]
     """
 
     v: tuple[View, View] = (
@@ -1021,6 +1078,8 @@ class e46ii(Query, BaseExample):
 
 class e47(DefaultInference, BaseExample):
     """
+    Example 47, p129
+
     P1: Some thermotogum stains gram-negative
     P2: Maritima is a thermotogum
 
@@ -1036,6 +1095,8 @@ class e47(DefaultInference, BaseExample):
 
 class e48(DefaultInference, BaseExample):
     """
+    Example 48, p130
+
     P1 Some dictyoglomus is thermophobic.
     P2 Turgidum is not a dictyoglomus.
     C Truth
@@ -1050,7 +1111,7 @@ class e48(DefaultInference, BaseExample):
 
 class e49(DefaultInference, BaseExample):
     """
-    Example 49
+    Example 49, p130
 
     P1 Either there is an ace in Mary's hand and some other player has a king,
     or else there is a queen in John's hand and some other player has a jack.
@@ -1066,6 +1127,17 @@ class e49(DefaultInference, BaseExample):
 
 
 class e50_part1(BaseExample):
+    """
+    Example 50, part1, p131
+
+    Jack is looking at Sally, but Sally is looking at George. Jack is married, but George is
+    not. Is the married person looking at an unmarried person?
+
+    (A) Yes
+    (B) No
+    (C) Cannot be determined
+    """
+
     v: tuple[View, View, View, View] = (
         ps("{L(j(),s())L(s(),g())}"),
         ps("{M(j()*)~M(g()*)}"),
@@ -1092,6 +1164,17 @@ class e50_part1(BaseExample):
 
 
 class e50_part2(BaseExample):
+    """
+    Example 50, part2, p131
+
+    Jack is looking at Sally, but Sally is looking at George. Jack is married, but George is
+    not. Is the married person looking at an unmarried person?
+
+    (A) Yes
+    (B) No
+    (C) Cannot be determined
+    """
+
     v: tuple[View, View, View, View] = (
         ps("{L(j(),s())L(s(),g())}"),
         ps("{M(j())~M(g())}"),
@@ -1127,6 +1210,8 @@ class e50_part2(BaseExample):
 
 class e51(BasicStep, BaseExample):
     """
+    Example 51, p131
+
     P1: Every archaeon has a nucleus
     P2: Halobacterium is an archeon
 
@@ -1142,7 +1227,7 @@ class e51(BasicStep, BaseExample):
 
 class e52(BasicStep, BaseExample):
     """
-    Example 52
+    Example 52, p132
 
     P1 All Fs G.
     P2 John Gs.
@@ -1158,7 +1243,7 @@ class e52(BasicStep, BaseExample):
 
 class e53(BaseExample):
     """
-    Example 53, page 132 & page 175
+    Example 53, p132 & p175
 
     P All A are B.
     C All B are A.
@@ -1185,7 +1270,7 @@ class e53(BaseExample):
 
 class e54(BasicStep, BaseExample):
     """
-    Example 54
+    Example 54, p133
 
     P1 Sharks attack bathers.
     P2 Whitey is a shark.
@@ -1218,6 +1303,8 @@ class e54(BasicStep, BaseExample):
 
 class e56_default_inference(DefaultInference, BaseExample):
     """
+    Example 56, p134
+
     P1: Every professor teaches some student
     P2: Every student reads some book
 
@@ -1239,7 +1326,7 @@ class e56_basic_step(BasicStep, e56_default_inference):
 
 class e57(BasicStep, BaseExample):
     """
-    Example 57
+    Example 57, p134
 
     P1 All B are A.
     P2 Some C are B.
@@ -1255,7 +1342,7 @@ class e57(BasicStep, BaseExample):
 
 class e58_reversed(BasicStep, BaseExample):
     """
-    Example 58 reversed
+    Example 58 reversed, based on p135
 
     P1 All C are B.
     P2 Some B are A.
@@ -1284,7 +1371,7 @@ class e61(BasicStep, BaseExample):
 
 class e62(WHQuery, BaseExample):
     """
-    Example 62, page 176
+    Example 62, p176
     """
 
     v = (
@@ -1296,7 +1383,7 @@ class e62(WHQuery, BaseExample):
 
 class e63(WHQuery, BaseExample):
     """
-    Example 63, page 176
+    Example 63, p176
     """
 
     v = (
@@ -1308,7 +1395,7 @@ class e63(WHQuery, BaseExample):
 
 class e63_modified(WHQuery, BaseExample):
     """
-    Example 63, page 176
+    Example 63, p176
     """
 
     v = (
@@ -1375,7 +1462,7 @@ class e64ii(e64i):
 
 class e65(BaseExample):
     """
-    Example 65 p190, p224
+    Example 65, p190, p224
 
     (Base-rate neglect with doctors and realistic disease) Imagine you conduct
     a screening using the hemoccult test in a certain region. For symptom-free
@@ -1569,7 +1656,7 @@ class e70(BaseExample):
 
 class e71(BaseExample):
     """
-    Example 71, and 78, page 212
+    Examples 71 & 78, p209, p212
 
     There is a box in which there is a yellow card or a brown card, but not both.
 
@@ -1687,8 +1774,7 @@ class e74(BaseExample):
 
 class e76(BaseExample):
     """
-    Example 76 (guns and guitars)
-    p199, p226,  p229
+    Example 76 (guns and guitars), p199, p226,  p229
 
     (P1) The gun fired and the guitar was out of tune, or else someone was in the attic
     (P1.5, see p228) Guns who triggers are pulled fire
