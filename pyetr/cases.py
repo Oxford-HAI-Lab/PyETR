@@ -1821,7 +1821,7 @@ class e81i(e81_base, BaseExample):
 
     __doc__ = cast(str, e81_base.__doc__) + cast(str, __doc__)
     prob = ps("{Box(Yellow())}")
-    c = ps("{50=* Box(Yellow())}")
+    c = ps("{50=* Box(Yellow()), 0}")
 
 
 class e81ii(e81_base, BaseExample):
@@ -1864,7 +1864,7 @@ class e82i(e82_base, BaseExample):
 
     __doc__ = cast(str, e82_base.__doc__) + cast(str, __doc__)
     prob = ps("{Box(Yellow())}")
-    c = ps("{50=* Box(Yellow())}")
+    c = ps("{50=* Box(Yellow()), 0}")
 
 
 class e82ii(e82_base, BaseExample):
@@ -1874,7 +1874,7 @@ class e82ii(e82_base, BaseExample):
 
     __doc__ = cast(str, e82_base.__doc__) + cast(str, __doc__)
     prob = ps("{Box(Brown())Box(Yellow())}")
-    c = ps("{50=* Box(Brown())Box(Yellow())}")
+    c = ps("{50=* Box(Brown())Box(Yellow()), 0}")
 
 
 class e82iii(e82_base, BaseExample):
@@ -1932,7 +1932,7 @@ class e83ii(e83_base, BaseExample):
 
     __doc__ = cast(str, e83_base.__doc__) + cast(str, __doc__)
     prob = ps("{Box(Green())Box(Blue())}")
-    c = ps("{33.3333=* Box(Green())Box(Blue())}")
+    c = ps("{33.3333=* Box(Green())Box(Blue()), 0}")
 
 
 class e84_base(WhatIsProb):
@@ -1948,7 +1948,7 @@ class e84_base(WhatIsProb):
 
     v = (
         ps(
-            "{33.3333=* Box(Grey())Box(White()), 33.3333=* Box(Grey())Box(Mauve()), 33.3333=* ~Box(Red())~Box(Green())~Box(Blue())}"
+            "{Box(Grey())Box(White())~Box(Mauve()),Box(Grey())Box(Mauve())~Box(White())}"
         ),
     )
 
@@ -1960,7 +1960,7 @@ class e84i(e84_base, BaseExample):
 
     __doc__ = cast(str, e84_base.__doc__) + cast(str, __doc__)
     prob = ps("{Box(Grey())Box(Mauve())}")
-    c = ps("{50=* Box(Grey())Box(Mauve())}")
+    c = ps("{50=* Box(Grey())Box(Mauve()), 0}")
 
 
 class e84ii(e84_base, BaseExample):
@@ -1969,10 +1969,10 @@ class e84ii(e84_base, BaseExample):
     """
 
     __doc__ = cast(str, e84_base.__doc__) + cast(str, __doc__)
-    prob = ps("{Box(Grey()),Box(White()),Box(Mauve())}")
-    c = ps(
-        "{50=* Box(Grey()),Box(White()),Box(Mauve())}"
-    )  # TODO: How to get prob for multiple ors?
+    prob = ps(
+        "{Box(Grey())~Box(White())~Box(Mauve()),Box(White())~Box(Grey())~Box(Mauve()),Box(Mauve())~Box(White())~Box(Grey())}"
+    )
+    c = ps("{0}")  # TODO: How to get prob for multiple ors?
 
 
 class e84iii(e84_base, BaseExample):
@@ -1982,7 +1982,7 @@ class e84iii(e84_base, BaseExample):
 
     __doc__ = cast(str, e84_base.__doc__) + cast(str, __doc__)
     prob = ps("{Box(Grey())Box(Mauve())}")
-    c = ps("{50=* Box(Grey())Box(Mauve())}")
+    c = ps("{50=* Box(Grey())Box(Mauve()), 0}")
 
 
 class e85(WhatIsProb, BaseExample):
@@ -2005,7 +2005,7 @@ class e85(WhatIsProb, BaseExample):
             "{60=* Box(Green())}^{Box(Green())}"
         ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book.
         ps(
-            "{20=* Box(Blue())}^{Box(Green())}"
+            "{20=* Box(Blue())}^{Box(Blue())}"
         ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book
     )
     prob = ps("{Box(Red())}")
@@ -2035,7 +2035,7 @@ class e86(WhatIsProb, BaseExample):
         ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book
     )
     prob = ps("{X()}")
-    c = ps("{20=* X()}")
+    c = ps("{20=* X(), 0}")
 
 
 class e88(BaseExample):

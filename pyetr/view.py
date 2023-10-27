@@ -511,7 +511,12 @@ class View:
 
     def _sum(self, view: "View", inherited_dependencies: DependencyRelation):
         """
-        Based on definition 4.28
+        Based on definition 5.14, p208
+
+        (Γ_f + Δ_g) = (Γ ∪ Δ)_h, where h(γ) = f(γ) + g(γ)
+        Γ^θ_fRI ⊕ᵀ Δ^{0}_gSJ = (Γ_f + Δ_g)^θ_(T⋈R)⋈(T⋈S),I∪J
+
+        This is where the subprocedure takes place.
         """
         if self.supposition != view.supposition:
             raise ValueError(
@@ -519,12 +524,16 @@ class View:
             )
 
         supposition = self.supposition
-        # Corresponds to line 1
+
+        # Γ ∪ Δ
         stage = self.stage | view.stage
+
+        # (T⋈R)⋈(T⋈S)
         dep_relation = inherited_dependencies.fusion(self.dependency_relation).fusion(
             inherited_dependencies.fusion(view.dependency_relation)
         )
 
+        # h(γ) = f(γ) + g(γ)
         new_weights: Weights = self.weights + view.weights
 
         return View.with_restriction(
@@ -539,7 +548,18 @@ class View:
         self, view: "View", inherited_dependencies: Optional[DependencyRelation] = None
     ) -> "View":
         """
-        Based on definition 4.28
+        Based on definition 5.14, p208
+
+        Γ^θ_fRI ⊕ᵀ Δ^{0}_gSJ
+
+        Args:
+            self (View): Γ^θ_fRI
+            view (View): Δ^{0}_gSJ
+            inherited_dependencies (Optional[DependencyRelation], optional): T. Defaults to an empty
+                dependency relation.
+
+        Returns:
+            View: The result of the sum calculation
         """
         if inherited_dependencies is None:
             # Corresponds to line 2
@@ -550,7 +570,17 @@ class View:
 
     def atomic_answer(self, other: "View", verbose: bool = False) -> "View":
         """
-        Based on definition A.67
+        Based on definition 5.12, p206
+
+        Γ^θ_fRI[Δ^{0}_gSJ]^𝓐A = argmax_γ∈Γ(Δ[{{p} : p ∈ γ}]^𝓐P)_f |^θ_RI
+
+        Args:
+            self (View): Γ^θ_fRI
+            other (View): Δ^{0}_gSJ
+            verbose (bool, optional): enables verbose mode
+
+        Returns:
+            View: The result of the atomic answer calculation
         """
         if verbose:
             print(f"AtomicAnswerInput: External: {self} Internal {other}")
@@ -572,9 +602,14 @@ class View:
 
             supposition = self.supposition
             potentials: list[tuple[int, State]] = []
-            for s in self.stage:
-                potential = SetOfStates({s}).atomic_answer_potential(other.stage)
-                potentials.append((potential, s))
+
+            # γ∈Γ
+            for gamma in self.stage:
+                # Δ[{{p} : p ∈ γ}]^𝓐P # TODO: Seems different? now fixed?
+                potential = other.stage.atomic_answer_potential(
+                    SetOfStates({State({p}) for p in gamma})
+                )
+                potentials.append((potential, gamma))
             stage = SetOfStates(_arg_max(potentials))
 
             out = View.with_restriction(
@@ -588,9 +623,19 @@ class View:
                 print(f"AtomicAnswerOutput: {out}")
             return out
 
-    def equibrium_answer(self, other: "View", verbose: bool = False) -> "View":
+    def equilibrium_answer(self, other: "View", verbose: bool = False) -> "View":
         """
-        Based on definition A.66
+        Based on definition 5.10, p205
+
+        Γ^θ_fRI[Δ^{0}_gSJ]^𝔼A
+
+        Args:
+            self (View): Γ^θ_fRI
+            other (View): Δ^{0}_gSJ
+            verbose (bool, optional): enables verbose mode
+
+        Returns:
+            View: The result of the equilibrium answer calculation
         """
         if verbose:
             print(f"EquilibriumAnswerInput: External: {self} Internal {other}")
@@ -619,11 +664,11 @@ class View:
 
             supposition = self.supposition
             potentials: list[tuple[FunctionalTerm, State]] = []
-            for s in self.stage:
+            for gamma in self.stage:
                 potential = other.stage.equilibrium_answer_potential(
-                    SetOfStates({s}), other.weights
+                    SetOfStates({State({p}) for p in gamma}), other.weights
                 )
-                potentials.append((potential, s))
+                potentials.append((potential, gamma))
             if verbose:
                 print(f"Potentials: {potentials}")
             if not all([isinstance(ft.f, RealNumber) for ft, _ in potentials]):
@@ -642,9 +687,22 @@ class View:
             return out
 
     def answer(self, other: "View", verbose: bool = False) -> "View":
+        """
+        Based on definition 5.13, p206
+
+        Γ^θ_fRI[Δ^{0}_gSJ]^A
+
+        Args:
+            self (View): Γ^θ_fRI
+            other (View): Δ^{0}_gSJ
+            verbose (bool, optional): enables verbose mode
+
+        Returns:
+            View: The result of the answer calculation
+        """
         if verbose:
             print(f"AnswerInput: External: {self} Internal {other}")
-        out = self.equibrium_answer(other, verbose=verbose).atomic_answer(
+        out = self.equilibrium_answer(other, verbose=verbose).atomic_answer(
             other, verbose=verbose
         )
         if verbose:
