@@ -50,15 +50,11 @@ def default_procedure_what_is_prob(
     g_prime = basic_step(v=v, verbose=verbose)
     if verbose:
         print(f"G prime: {g_prime}")
-    g_prime_prime = g_prime.query(prob_of, verbose=verbose)
-    out = g_prime_prime.stage.equilibrium_answer_potential(
-        prob_of.stage,
-        g_prime_prime.weights,  # TODO: Adjusted weight extraction point based on test and previous use
-    )
-    if isinstance(out.f, RealNumber) and out.f.num >= 0 and out.f.num <= 100:
+
+    if not any(w.is_null for w in g_prime.weights.values()):
         if verbose:
-            print(f"Case 1, value: {out.f.num}")
-        return g_prime_prime
+            print(f"Case 1")
+        return g_prime.query(prob_of, verbose=verbose)
     else:
         if verbose:
             print("Case 2")
