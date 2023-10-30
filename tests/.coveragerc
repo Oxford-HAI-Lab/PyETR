@@ -8,4 +8,5 @@ exclude_lines =
     raise RuntimeError
     raise TypeError
     assert False
+    raise ParsingError
 show_missing = True

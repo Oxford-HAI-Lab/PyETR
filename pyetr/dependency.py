@@ -57,7 +57,7 @@ class Dependency:
 
 def transitive_closure(
     D_initial: list[tuple[ArbitraryObject, ArbitraryObject]],
-    arb_objects: set[ArbitraryObject],
+    arb_objects: frozenset[ArbitraryObject],
 ) -> list[tuple[ArbitraryObject, ArbitraryObject]]:
     def D_next(
         D: list[tuple[ArbitraryObject, ArbitraryObject]]
@@ -111,19 +111,19 @@ def dependencies_to_sets(
 
 
 class DependencyRelation:
-    universals: set[Universal]
-    existentials: set[Existential]
+    universals: frozenset[Universal]
+    existentials: frozenset[Existential]
     dependencies: frozenset[Dependency]
 
     def __init__(
         self,
-        universals: set[Universal],
-        existentials: set[Existential],
-        dependencies: frozenset[Dependency],
+        universals: Iterable[Universal],
+        existentials: Iterable[Existential],
+        dependencies: Iterable[Dependency],
     ) -> None:
-        self.universals = universals
-        self.existentials = existentials
-        self.dependencies = dependencies
+        self.universals = frozenset(universals)
+        self.existentials = frozenset(existentials)
+        self.dependencies = frozenset(dependencies)
         self.validate()
         self._test_matroyshka()
 
@@ -329,7 +329,7 @@ class DependencyRelation:
         self,
         other: "DependencyRelation",
         new_pairs: list[tuple[ArbitraryObject, ArbitraryObject]],
-    ) -> set[Existential]:
+    ) -> frozenset[Existential]:
         new_out: list[ArbitraryObject] = []
         for e in self.existentials | other.existentials:
             pair_found = False
@@ -339,14 +339,14 @@ class DependencyRelation:
                     break
             if not pair_found:
                 new_out.append(e)
-        return set(new_out)
+        return frozenset(new_out)
 
     def U0(
         self,
         other: "DependencyRelation",
         new_pairs: list[tuple[ArbitraryObject, ArbitraryObject]],
-        e_0: set[Existential],
-    ) -> set[Universal]:
+        e_0: frozenset[Existential],
+    ) -> frozenset[Universal]:
         new_out: list[ArbitraryObject] = []
         for u in self.universals | other.universals:
             pair_found = False
@@ -356,7 +356,7 @@ class DependencyRelation:
                     break
             if not pair_found:
                 new_out.append(u)
-        return set(new_out)
+        return frozenset(new_out)
 
     @property
     def is_empty(self):
@@ -390,8 +390,8 @@ class DependencyRelation:
             a_r = self.universals | self.existentials
             a_s = other.universals | other.existentials
             return initial_relation.chain(
-                self.restriction(a_r.difference(e_0 | u_0)).fusion(
-                    other.restriction(a_s.difference(e_0 | u_0))
+                self.restriction(set(a_r.difference(e_0 | u_0))).fusion(
+                    other.restriction(set(a_s.difference(e_0 | u_0)))
                 )
             )
 

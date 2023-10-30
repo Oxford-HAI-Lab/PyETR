@@ -121,7 +121,7 @@ class Weights:
         return self._weights == other._weights
 
     def __hash__(self) -> int:
-        return hash(self._weights)
+        return hash(tuple([(k, v) for k, v in self._weights.items()]))
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
