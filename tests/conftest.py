@@ -33,7 +33,7 @@ class ExampleItem(pytest.Item):
         self.test_class = test_class
 
     def runtest(self):
-        self.test_class.test()
+        self.test_class.test(verbose=True)
 
     def reportinfo(self):
         return self.fspath, None, f"custom test: {self.test_class.__name__}"
@@ -84,6 +84,7 @@ class ParseTestItem(BaseParseItem):
     def runtest(self):
         vp = ViewParser()
         parsed_view = vp.from_str(self.view_string)
+        assert parsed_view.detailed
         string_recovered = vp.to_str(parsed_view, round_ints=False)
         alt_string = vp.to_str(parsed_view, round_ints=True)
         if (

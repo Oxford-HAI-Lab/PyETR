@@ -59,7 +59,7 @@ def substitution(
     stage: Stage,
     supposition: Supposition,
     issue_structure: IssueStructure,
-    weights: Optional[Weights],
+    weights: Weights,
 ) -> "View":
     """
     Based on definition 4.32
@@ -89,10 +89,6 @@ def substitution(
     new_dep_relation = dep_relation
     subs = arb_gen.redraw(Z())
     new_dep_relation = new_dep_relation.replace(subs)
-
-    if weights is None:
-        weights = Weights.get_null_weights(stage)
-
     new_weights = Weights({})
 
     for state in stage:
@@ -322,7 +318,9 @@ class View:
         else:
             new_weights = Weights(
                 {
-                    s: w.restriction(new_dep_rel.universals | new_dep_rel.existentials)
+                    s: w.restriction(
+                        set(new_dep_rel.universals | new_dep_rel.existentials)
+                    )
                     for s, w in weights.items()
                     if s in stage
                 }
@@ -355,7 +353,10 @@ class View:
             issue_string = f" issues={self.issue_structure}"
 
         quants = get_quantifiers(
-            self.dependency_relation.universals | self.dependency_relation.existentials,
+            set(
+                self.dependency_relation.universals
+                | self.dependency_relation.existentials
+            ),
             self.dependency_relation,
         )
         quant_str = " ".join([i.to_string() for i in quants])
@@ -1110,8 +1111,10 @@ class View:
                 return False
             if (
                 self.dependency_relation.restriction(
-                    other.dependency_relation.universals
-                    | other.dependency_relation.existentials
+                    set(
+                        other.dependency_relation.universals
+                        | other.dependency_relation.existentials
+                    )
                 )
                 != other.dependency_relation
             ):
