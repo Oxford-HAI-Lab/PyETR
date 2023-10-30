@@ -177,14 +177,20 @@ class SetOfStates(frozenset[State]):
 
     def negation(self):
         """
-        Definition 4.15 Negation of set of states
+        Based on Definition 4.15, p151
+
+        Negation of set of states # TODO: Note, adopting notation from C6, not C4
+
+        [Γ]ᶰ = {{p̄} : p ∈ γ₁} ⨂ ... ⨂ {{p̄} : p ∈ γₙ}
         """
         output = None
         for s in self:
             new_state_set_mut: set[State] = set()
             for atom in s:
+                # {p̄}
                 new_state = State({~atom})
                 new_state_set_mut.add(new_state)
+            # {{p̄} : p ∈ γₙ}
             new_state_set = SetOfStates(new_state_set_mut)
             if output is None:
                 output = new_state_set
