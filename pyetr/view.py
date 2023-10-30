@@ -15,14 +15,25 @@ from .tools import ArbitraryObjectGenerator, powerset
 from .weight import Weight, Weights
 
 
-def get_subset(
-    stage_external: SetOfStates, supposition_internal: SetOfStates
-) -> SetOfStates:
+def get_subset(big_gamma: SetOfStates, big_psi: SetOfStates) -> SetOfStates:
+    """
+    Produces the subset of states in big gamma and big psi that satisfy ψ⊆γ
+
+    {γ ∃γ ∈ Γ ∃ψ ∈ Ψ Ψ.ψ⊆γ}
+
+    Args:
+        big_gamma (SetOfStates): The states in the stage of the external (Γ)
+        big_psi (SetOfStates): The states in the supposition of the internal (Ψ)
+
+    Returns:
+        SetOfStates: The subset of states that satisfy this.
+    """
     out_set = set()
-    for state_stage_ext in stage_external:
-        for supp_state in supposition_internal:
-            if supp_state.issubset(state_stage_ext):
-                out_set.add(state_stage_ext)
+    for gamma in big_gamma:
+        for psi in big_psi:
+            # .ψ⊆γ
+            if psi.issubset(gamma):
+                out_set.add(gamma)
     return SetOfStates(out_set)
 
 
@@ -36,17 +47,22 @@ def stage_function_product(
 ) -> tuple[Stage, Weights]:
     """
     Definition 5.15, p208
+
+    Γ_f ⨂ Δ^{Ψ}_g = P + Σ_γ∈(Γ|P) Σ_δ∈Δ {f(γ) x g(δ)).(γ∪δ)}
+    where P = {f(γ).γ∈Γ |¬∃ψ ∈ Ψ.ψ⊆γ}
     """
-    stage_external, weights_external = stage_supposition_external
-    stage_internal, supposition_internal, weights_internal = stage_supposition_internal
+    big_gamma, f_gamma = stage_supposition_external
+    stage_internal, big_psi, g_delta = stage_supposition_internal
 
-    subset = get_subset(stage_external, supposition_internal)
-    not_subset = stage_external.difference(subset)
-    f_prime = weights_external.in_set_of_states(not_subset)
-    result_stage = not_subset | (subset * stage_internal)
+    gamma_new = get_subset(big_gamma, big_psi)
+    P = big_gamma.difference(gamma_new)
+    P_weights = f_gamma.in_set_of_states(P)
 
-    f = weights_external.in_set_of_states(subset)
-    final_weights = f_prime + (f * weights_internal)
+    # f(γ).(γ∪δ)
+    f_gamma_new = f_gamma.in_set_of_states(gamma_new)
+
+    result_stage = P | (gamma_new * stage_internal)
+    final_weights = P_weights + (f_gamma_new * g_delta)
 
     return result_stage, final_weights
 
@@ -211,6 +227,34 @@ def _some_gamma_doesnt_phi(
         ):
             return True
     return False
+
+
+def issue_matches(i: IssueStructure, j: IssueStructure) -> set[tuple[Term, Term]]:
+    """
+    Based on definition 4.8, p144
+
+    M_IJ = {<t_1,t_2> : ∃x(<t_1,x> ∈ I ∧ (<t_2,x> ∈ J ∨ <t_2,x̄> ∈ J)}
+
+    where for x = <P^k, <t_1,...,t_k>>, x̄ = <P̄^k, <t_1,...,t_k>>
+
+    Args:
+        i (IssueStructure): The issue structure I
+        j (IssueStructure): The issue structure J
+
+    Returns:
+        set[tuple[Term, Term]]: The set of term matches.
+    """
+    pairs: list[tuple[Term, Term]] = []
+    for t1, open_atom_self in i:
+        # <t_1,x> ∈ I
+        for t2, open_atom_other in j:
+            if (
+                open_atom_self == open_atom_other  # <t_2,x> ∈ J
+                or open_atom_self == ~open_atom_other  # <t_2,x̄> ∈ J
+            ):
+                pairs.append((t1, t2))
+
+    return set(pairs)
 
 
 class View:
@@ -464,28 +508,35 @@ class View:
                     return True
         return False
 
-    def issue_matches(self, other: "View") -> set[tuple[Term, Term]]:
-        pairs: list[tuple[Term, Term]] = []
-        for t1, open_atom_self in self.issue_structure:
-            for t2, open_atom_other in other.issue_structure:
-                if (
-                    open_atom_self == open_atom_other
-                    or open_atom_self == ~open_atom_other
-                ):
-                    pairs.append((t1, t2))
-
-        return set(pairs)
-
-    def _product(
-        self, view: "View", inherited_dependencies: DependencyRelation
+    def product(
+        self, view: "View", inherited_dependencies: Optional[DependencyRelation] = None
     ) -> "View":
         """
-        Based on definition 4.27
+        Based on definition 5.15, p208
+
+        Γ^θ_fRI ⨂ᵀ Δ^{Ψ}_gSJ = (Γ_f ⨂ Δ^{Ψ}_g)^θ_(T⋈R)⋈(T⋈S),I∪J
+
+        where Γ_f ⨂ Δ^{Ψ}_g = P + Σ_γ∈(Γ|P) Σ_δ∈Δ {f(γ) x g(δ)).(γ∪δ)}
+        and P = {f(γ).γ∈Γ |¬∃ψ ∈ Ψ.ψ⊆γ}
+
+        Args:
+            self (View): Γ^θ_fRI
+            view (View): Δ^{Ψ}_gSJ
+            inherited_dependencies (Optional[DependencyRelation], optional): T. Defaults to an empty
+                dependency relation.
+
+        Returns:
+            View: The result of the product calculation.
         """
-        # Corresponds to line 4
+        if inherited_dependencies is None:
+            inherited_dependencies = DependencyRelation(set(), set(), frozenset())
+
+        # Γ_f ⨂ Δ^{Ψ}_g
         stage, weights = stage_function_product(
             (self.stage, self.weights), (view.stage, view.supposition, view.weights)
         )
+
+        # (T⋈R)⋈(T⋈S)
         dep_relation = inherited_dependencies.fusion(self.dependency_relation).fusion(
             inherited_dependencies.fusion(view.dependency_relation)
         )
@@ -497,28 +548,28 @@ class View:
             weights=weights,
         )
 
-    def product(
+    def sum(
         self, view: "View", inherited_dependencies: Optional[DependencyRelation] = None
-    ) -> "View":
-        """
-        Based on definition 4.27
-        """
-        if inherited_dependencies is None:
-            # Corresponds to line 5
-            return self._product(view, DependencyRelation(set(), set(), frozenset()))
-        else:
-            # Corresponds to line 4
-            return self._product(view, inherited_dependencies)
-
-    def _sum(self, view: "View", inherited_dependencies: DependencyRelation):
+    ):
         """
         Based on definition 5.14, p208
 
-        (Γ_f + Δ_g) = (Γ ∪ Δ)_h, where h(γ) = f(γ) + g(γ)
         Γ^θ_fRI ⊕ᵀ Δ^{0}_gSJ = (Γ_f + Δ_g)^θ_(T⋈R)⋈(T⋈S),I∪J
 
-        This is where the subprocedure takes place.
+        where (Γ_f + Δ_g) = (Γ ∪ Δ)_h, where h(γ) = f(γ) + g(γ)
+
+        Args:
+            self (View): Γ^θ_fRI
+            view (View): Δ^{0}_gSJ
+            inherited_dependencies (Optional[DependencyRelation], optional): T. Defaults to an empty
+                dependency relation.
+
+        Returns:
+            View: The result of the sum calculation
         """
+        if inherited_dependencies is None:
+            # Corresponds to line 2
+            inherited_dependencies = DependencyRelation(set(), set(), frozenset())
         if self.supposition != view.supposition:
             raise ValueError(
                 f"Invalid sum on {self.supposition} and {view.supposition}"
@@ -544,30 +595,6 @@ class View:
             issue_structure=(self.issue_structure | view.issue_structure),
             weights=new_weights,
         )
-
-    def sum(
-        self, view: "View", inherited_dependencies: Optional[DependencyRelation] = None
-    ) -> "View":
-        """
-        Based on definition 5.14, p208
-
-        Γ^θ_fRI ⊕ᵀ Δ^{0}_gSJ
-
-        Args:
-            self (View): Γ^θ_fRI
-            view (View): Δ^{0}_gSJ
-            inherited_dependencies (Optional[DependencyRelation], optional): T. Defaults to an empty
-                dependency relation.
-
-        Returns:
-            View: The result of the sum calculation
-        """
-        if inherited_dependencies is None:
-            # Corresponds to line 2
-            return self._sum(view, DependencyRelation(set(), set(), frozenset()))
-        else:
-            # Corresponds to line 1
-            return self._sum(view, inherited_dependencies)
 
     def atomic_answer(self, other: "View", verbose: bool = False) -> "View":
         """
@@ -712,7 +739,16 @@ class View:
 
     def negation(self, verbose: bool = False) -> "View":
         """
-        Based on definition 4.31
+        Based on definition 5.16, p210
+
+        [Γ^Θ_fRI]ᶰ = (Θ ⨂ [Γ]ᶰ)^{0}_[R]ᶰ[I]ᶰ
+
+        Args:
+            self (View): Γ^Θ_fRI
+            verbose (bool, optional): enable verbose mode. Defaults to False.
+
+        Returns:
+            View: The negated view.
         """
         if verbose:
             print(f"NegationInput: {self}")
@@ -731,14 +767,22 @@ class View:
 
     def merge(self, view: "View", verbose: bool = False) -> "View":
         """
-        Based on Definition 4.33
+        Based on Definition 5.26, p221
+        Γ^Θ_fRI[Δ^Ψ_gSJ]ᴹ = ⊕^R⋈S_γ∈Γ {f(γ).γ}|^Θ_RI ⨂^R⋈S (⨂^R⋈S_<t,u> ) # TODO: Finish merge
+        Args:
+            self (View): Γ^Θ_fRI
+            view (View): Δ^Ψ_gSJ
+            verbose (bool, optional): enable verbose mode. Defaults to False.
+
+        Returns:
+            View: Returns the merged view.
         """
 
         def _m_prime(
             gamma: State,
         ) -> set[tuple[Term, Universal]]:
             out: set[tuple[Term, Universal]] = set()
-            for t, u in self.issue_matches(view):
+            for t, u in issue_matches(self.issue_structure, view.issue_structure):
                 if isinstance(
                     u, ArbitraryObject
                 ) and not view.dependency_relation.is_existential(u):
@@ -768,43 +812,32 @@ class View:
             views_for_sum: list[View] = []
             for gamma in self.stage:
                 m_prime = _m_prime(gamma)
-                if len(m_prime) == 0:
-                    views_for_sum.append(
-                        View.with_restriction(
-                            SetOfStates({gamma}),
-                            self.supposition,
-                            self.dependency_relation,
-                            self.issue_structure,
-                            self.weights,
-                        ).product(view, inherited_dependencies=r_fuse_s)
+                product_factors: list[View] = [
+                    View.with_restriction(
+                        SetOfStates({gamma}),
+                        self.supposition,
+                        self.dependency_relation,
+                        self.issue_structure,
+                        self.weights,
+                    ),
+                    view,
+                ] + [
+                    substitution(
+                        arb_gen=arb_gen,
+                        dep_relation=r_fuse_s,
+                        arb_obj=u,
+                        term=t,
+                        stage=view.stage,
+                        supposition=SetOfStates({State({})}),
+                        issue_structure=view.issue_structure,
+                        weights=view.weights,
                     )
-                else:
-                    product_factors: list[View] = [
-                        View.with_restriction(
-                            SetOfStates({gamma}),
-                            self.supposition,
-                            self.dependency_relation,
-                            self.issue_structure,
-                            self.weights,
-                        ),
-                        view,
-                    ] + [
-                        substitution(
-                            arb_gen=arb_gen,
-                            dep_relation=r_fuse_s,
-                            arb_obj=u,
-                            term=t,
-                            stage=view.stage,
-                            supposition=SetOfStates({State({})}),
-                            issue_structure=view.issue_structure,
-                            weights=view.weights,
-                        )
-                        for t, u in m_prime
-                    ]
+                    for t, u in m_prime
+                ]
 
-                    views_for_sum.append(
-                        reduce(lambda v1, v2: v1.product(v2, r_fuse_s), product_factors)
-                    )
+                views_for_sum.append(
+                    reduce(lambda v1, v2: v1.product(v2, r_fuse_s), product_factors)
+                )
             out = reduce(lambda v1, v2: v1.sum(v2, r_fuse_s), views_for_sum)
             if verbose:
                 print(f"MergeOutput: {out}")
@@ -857,7 +890,7 @@ class View:
 
         def _m_prime() -> set[tuple[Universal, FunctionalTerm | ArbitraryObject]]:
             output_set = set()
-            for u, t in self.issue_matches(view):
+            for u, t in issue_matches(self.issue_structure, view.issue_structure):
                 if isinstance(u, ArbitraryObject) and u in (
                     self.dependency_relation.universals - self.supposition.arb_objects
                 ):
@@ -953,7 +986,7 @@ class View:
 
         def _m_prime() -> set[tuple[Existential, FunctionalTerm | ArbitraryObject]]:
             output_set = set()
-            for e, t in self.issue_matches(view):
+            for e, t in issue_matches(self.issue_structure, view.issue_structure):
                 if isinstance(e, ArbitraryObject) and e in (
                     self.dependency_relation.existentials
                     - (self.supposition | view.stage).arb_objects
@@ -1059,7 +1092,7 @@ class View:
 
         def big_intersection(state: State) -> Optional[State]:
             out: list[State] = []
-            for t, a in self.issue_matches(other):
+            for t, a in issue_matches(self.issue_structure, other.issue_structure):
                 if isinstance(
                     a, ArbitraryObject
                 ) and not other.dependency_relation.is_existential(a):
@@ -1328,7 +1361,7 @@ class View:
         self, other: "View"
     ) -> set[tuple[FunctionalTerm | ArbitraryObject, ArbitraryObject]]:
         output_set = set()
-        for t, e in self.issue_matches(other):
+        for t, e in issue_matches(self.issue_structure, other.issue_structure):
             if isinstance(e, ArbitraryObject) and e in (
                 other.dependency_relation.existentials
                 - self.dependency_relation.existentials
