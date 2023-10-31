@@ -48,7 +48,7 @@ def stage_function_product(
     """
     Definition 5.15, p208
 
-    Γ_f ⨂ Δ^{Ψ}_g = P + Σ_γ∈(Γ|P) Σ_δ∈Δ {f(γ) x g(δ)).(γ∪δ)}
+    Γ_f ⨂ Δ^{Ψ}_g = P + Σ_γ∈(Γ＼P) Σ_δ∈Δ {f(γ) x g(δ)).(γ∪δ)}
     where P = {f(γ).γ∈Γ |¬∃ψ ∈ Ψ.ψ⊆γ}
     """
     big_gamma, f_gamma = stage_supposition_external
@@ -67,6 +67,26 @@ def stage_function_product(
     return result_stage, final_weights
 
 
+def Z(T: DependencyRelation, a: ArbitraryObject) -> set[ArbitraryObject]:
+    """
+    Based on definition A.43, p306 (TODO: Where in book?)
+
+    Z(T,a) = {u ∈ U_T : u ◁_T a} ∪ {e ∈ E_T : e ≲_T a} – {a}
+
+    Args:
+        T (DependencyRelation): T
+        a (ArbitraryObject): a
+
+    Returns:
+        set[ArbitraryObject]: The set of arbitrary objects resulting from Z
+    """
+    # {u ∈ U_T : u ◁_T a}
+    unis = set([uni for uni in T.universals if T.triangle(uni, a)])
+    # {e ∈ E_T : e ≲_T a}
+    exis = set([exi for exi in T.existentials if T.less_sim(exi, a)])
+    return (unis | exis) - {a}
+
+
 def substitution(
     arb_gen: ArbitraryObjectGenerator,
     dep_relation: DependencyRelation,
@@ -78,52 +98,59 @@ def substitution(
     weights: Weights,
 ) -> "View":
     """
-    Based on definition 4.32
+    Based on definition A.43, p306 (TODO: Where in book?)
+    Weight section based on definition 5.25, p221
+
+    # Note, in book it returns a tuple
+    Sub^T_<t,a> (Γ^Θ_I) = View(
+        stage = Γ[ν₁]_Z(T,a) [t/a],
+        supposition = Θ,
+        dep_rel = T ⋊ ([T]_Z(T,a)[t/a]),
+        issues = I[ν₁]_Z(T,a) [t/a],
+        weights = ? TODO: No expr found
+    )
+
+    Args:
+        arb_gen (ArbitraryObjectGenerator): The generator of arbitrary objects used for novelisation.
+        dep_relation (DependencyRelation): T, the dependency relation
+        arb_obj (ArbitraryObject): a
+        term (Term): t
+        stage (Stage): Γ
+        supposition (Supposition): Θ
+        issue_structure (IssueStructure): I
+        weights (Weights): f? TODO: What's this?
+
+    Returns:
+        View: The view with values substituted.
     """
-
-    def Z() -> set[ArbitraryObject]:
-        unis = set(
-            [
-                uni
-                for uni in dep_relation.universals
-                if dep_relation.triangle(uni, arb_obj)
-            ]
-        )
-        exis = set(
-            [
-                exi
-                for exi in dep_relation.existentials
-                if dep_relation.less_sim(exi, arb_obj)
-            ]
-        )
-        return (unis | exis) - {arb_obj}
-
     assert len(stage.arb_objects & supposition.arb_objects) == 0
 
-    old_T = dep_relation
+    subs = arb_gen.redraw(Z(T=dep_relation, a=arb_obj))
 
-    new_dep_relation = dep_relation
-    subs = arb_gen.redraw(Z())
-    new_dep_relation = new_dep_relation.replace(subs)
+    # T' = T ⋊ ([T]_Z(T,a)[t/a])
+    T_prime = dep_relation.chain(
+        dep_relation.replace(subs).restriction(set(subs.values()))
+    )
+
     new_weights = Weights({})
-
     for state in stage:
-        new_state = state.replace(cast(dict[ArbitraryObject, Term], subs))
-        new_state = new_state.replace({arb_obj: term})
-        new_weight = weights[state].replace(cast(dict[ArbitraryObject, Term], subs))
-        new_weight = new_weight.replace({arb_obj: term})
-
+        # Γ[ν₁]_Z(T,a) [t/a]
+        new_state = state.replace(cast(dict[ArbitraryObject, Term], subs)).replace(
+            {arb_obj: term}
+        )
+        new_weight = (
+            weights[state]
+            .replace(cast(dict[ArbitraryObject, Term], subs))
+            .replace({arb_obj: term})
+        )
         new_weights._adding(new_state, new_weight)
 
     new_stage = SetOfStates(new_weights.keys())
 
-    new_dep_relation = new_dep_relation.restriction(set(subs.values()))
-    T_prime = old_T.chain(new_dep_relation)
-
+    # I[ν₁]_Z(T,a) [t/a]
     new_issue_structure = issue_structure.replace(
         cast(dict[ArbitraryObject, Term], subs)
-    )
-    new_issue_structure = new_issue_structure.replace({arb_obj: term})
+    ).replace({arb_obj: term})
 
     # The following restriction is in the book but should not have been
     # T_prime = T_prime.restriction(new_stage.arb_objects | supposition.arb_objects)
@@ -472,10 +499,23 @@ class View:
 
     def is_equivalent_under_arb_sub(self, other: "View") -> bool:
         """
+        Checks to see if two views are equivalent when the arbitrary objects
+        are changed designation.
+
         Complexity is O((n!)^2*n) where n is average num of exi and unis
 
         For exis and unis above 9 or 10 (of each) this becomes an issue, below is fine
+
+        Args:
+            other (View): The view for comparison
+
+        Raises:
+            ValueError: Too many arbitrary objects for permutation computation.
+
+        Returns:
+            bool: True for is equivalent, False for is not.
         """
+
         self_uni = self.dependency_relation.universals
         self_exi = self.dependency_relation.existentials
         other_uni = other.dependency_relation.universals
@@ -516,7 +556,7 @@ class View:
 
         Γ^θ_fRI ⨂ᵀ Δ^{Ψ}_gSJ = (Γ_f ⨂ Δ^{Ψ}_g)^θ_(T⋈R)⋈(T⋈S),I∪J
 
-        where Γ_f ⨂ Δ^{Ψ}_g = P + Σ_γ∈(Γ|P) Σ_δ∈Δ {f(γ) x g(δ)).(γ∪δ)}
+        where Γ_f ⨂ Δ^{Ψ}_g = P + Σ_γ∈(Γ＼P) Σ_δ∈Δ {f(γ) x g(δ)).(γ∪δ)}
         and P = {f(γ).γ∈Γ |¬∃ψ ∈ Ψ.ψ⊆γ}
 
         Args:
@@ -768,7 +808,7 @@ class View:
     def merge(self, view: "View", verbose: bool = False) -> "View":
         """
         Based on Definition 5.26, p221
-        Γ^Θ_fRI[Δ^Ψ_gSJ]ᴹ = ⊕^R⋈S_γ∈Γ {f(γ).γ}|^Θ_RI ⨂^R⋈S (⨂^R⋈S_<t,u> ) # TODO: Finish merge
+        Γ^Θ_fRI[Δ^Ψ_gSJ]ᴹ = ⊕^R⋈S_γ∈Γ {f(γ).γ}|^Θ_RI ⨂^R⋈S Δ^Ψ_gSJ ⨂^R⋈S (⨂^R⋈S_<t,u>∈M'ij(γ) Sub^R⋈S_<t,u>(Δ^{0}_gSJ))
         Args:
             self (View): Γ^Θ_fRI
             view (View): Δ^Ψ_gSJ
@@ -781,15 +821,31 @@ class View:
         def _m_prime(
             gamma: State,
         ) -> set[tuple[Term, Universal]]:
+            """
+            M'ij(γ) = {<t,u> ∈ Mij : u ∈ U_s ∧ ∃ψ ∈ Ψ (ψ[t/u] ⊆ γ ∧ ψ⊈γ)}
+
+            Args:
+                gamma (State): γ
+
+            Returns:
+                set[tuple[Term, Universal]]: M'ij(γ)
+            """
             out: set[tuple[Term, Universal]] = set()
+            # <t,u> ∈ Mij
             for t, u in issue_matches(self.issue_structure, view.issue_structure):
+                # u ∈ U_s
                 if isinstance(
                     u, ArbitraryObject
                 ) and not view.dependency_relation.is_existential(u):
+                    # ∃ψ ∈ Ψ
                     psi_exists = False
                     for psi in view.supposition:
+                        # ψ[t/u]
                         new_psi = psi.replace({u: t})
-                        if new_psi.issubset(gamma) and len(psi.difference(gamma)) != 0:
+                        # (ψ[t/u] ⊆ γ ∧ ψ⊈γ)
+                        if new_psi.issubset(gamma) and not psi.issubset(
+                            gamma
+                        ):  # TODO: Changed to be the same as book? Is this correct?
                             psi_exists = True
                             break
                     if psi_exists:
@@ -819,8 +875,8 @@ class View:
                         self.dependency_relation,
                         self.issue_structure,
                         self.weights,
-                    ),
-                    view,
+                    ),  # γ∈Γ {f(γ).γ}|^Θ_RI
+                    view,  # Δ^Ψ_gSJ
                 ] + [
                     substitution(
                         arb_gen=arb_gen,
@@ -831,7 +887,7 @@ class View:
                         supposition=SetOfStates({State({})}),
                         issue_structure=view.issue_structure,
                         weights=view.weights,
-                    )
+                    )  # <t,u>∈M'ij Sub^R⋈S_<t,u>(Δ^{0}_gSJ)
                     for t, u in m_prime
                 ]
 

@@ -56,27 +56,19 @@ class Dependency:
 
 
 def transitive_closure(
-    D_initial: list[tuple[ArbitraryObject, ArbitraryObject]],
+    D_initial: set[tuple[ArbitraryObject, ArbitraryObject]],
     arb_objects: frozenset[ArbitraryObject],
-) -> list[tuple[ArbitraryObject, ArbitraryObject]]:
-    def D_next(
-        D: list[tuple[ArbitraryObject, ArbitraryObject]]
-    ) -> list[tuple[ArbitraryObject, ArbitraryObject]]:
-        D_i_plus_1: list[tuple[ArbitraryObject, ArbitraryObject]] = []
-        for x, y in D:
-            for z in arb_objects:
-                if (y, z) in D_initial:
-                    D_i_plus_1.append((x, z))
-        return D_i_plus_1 + D
+) -> set[tuple[ArbitraryObject, ArbitraryObject]]:
+    d_current = D_initial
 
-    d_current: list[tuple[ArbitraryObject, ArbitraryObject]] = D_initial
     while True:
-        D_next_set = D_next(d_current)
-        if set(D_next_set) == set(d_current):
-            break
+        D_next_set = {
+            (x, z) for x, y in d_current for z in arb_objects if (y, z) in d_current
+        }
+        D_next_set.update(d_current)
+        if D_next_set == d_current:
+            return d_current
         d_current = D_next_set
-
-    return d_current
 
 
 def dependency_exists(
@@ -91,6 +83,15 @@ def dependency_exists(
 def dependencies_from_sets(
     sets: Iterable[tuple[Universal, Iterable[Existential]]]
 ) -> frozenset[Dependency]:
+    """
+    Converts existential set form dependencies to standard form.
+
+    Args:
+        sets (Iterable[tuple[Universal, Iterable[Existential]]]): Existential set form dependencies
+
+    Returns:
+        frozenset[Dependency]: Standard form dependencies
+    """
     new_deps = set()
     for uni, exi_set in sets:
         for exi in exi_set:
@@ -101,6 +102,15 @@ def dependencies_from_sets(
 def dependencies_to_sets(
     dependencies: frozenset[Dependency],
 ) -> list[tuple[Universal, set[Existential]]]:
+    """
+    Converts dependencies to collected by existential set form.
+
+    Args:
+        dependencies (frozenset[Dependency]): The input dependencies
+
+    Returns:
+        list[tuple[Universal, set[Existential]]]: Dependencies in existential set form.
+    """
     new_sets: dict[str, tuple[Universal, set[Existential]]] = {}
     for d in dependencies:
         if d.universal.name in new_sets:
@@ -108,6 +118,27 @@ def dependencies_to_sets(
         else:
             new_sets[d.universal.name] = (d.universal, {d.existential})
     return list(new_sets.values())
+
+
+def cross(
+    universals: frozenset[Universal], existentials: frozenset[Existential]
+) -> frozenset[Dependency]:
+    """
+    E × U
+    Args:
+        universals (frozenset[Universal]): U
+        existentials (frozenset[Existential]): E
+
+    Returns:
+        frozenset[Dependency]: The dependency resulting from the cross.
+    """
+    return frozenset(
+        {
+            Dependency(universal=universal, existential=existential)
+            for existential in existentials
+            for universal in universals
+        }
+    )
 
 
 class DependencyRelation:
@@ -182,69 +213,94 @@ class DependencyRelation:
                 f"Existentials {self.universals | self.existentials} is not superset of dependency arb objects {self.dependency_arb_objects}"
             )
 
-    def chain(self, other: "DependencyRelation") -> "DependencyRelation":
-        universals = self.universals | other.universals
-        existentials = self.existentials | other.existentials
-
-        new_deps: set[Dependency] = set()
-        for existential in other.existentials:
-            for universal in self.universals:
-                new_deps.add(Dependency(universal=universal, existential=existential))
-
-        return DependencyRelation(
-            universals, existentials, self.dependencies | other.dependencies | new_deps
-        )
-
     def restriction(self, arb_objects: set[ArbitraryObject]) -> "DependencyRelation":
         """
-        Based on definition 4.24
+        Based on definition 4.24, p155
+
+        [R]_X = <U_R ∩ X, E_R ∩ X, D_R ∩ ((E_R ∩ X) × (U_R ∩ X))
+        Args:
+            arb_objects (set[ArbitraryObject]): X
+
+        Returns:
+            DependencyRelation: The new dependency relation
         """
+        # U_R ∩ X
         universals = self.universals & arb_objects
+        # E_R ∩ X
         existentials = self.existentials & arb_objects
-        new_deps = [
-            dep
-            for dep in self.dependencies
-            if dep.universal in arb_objects and dep.existential in arb_objects
-        ]
-        return DependencyRelation(
-            universals, existentials, dependencies=frozenset(new_deps)
+        # D_R ∩ ((E_R ∩ X) × (U_R ∩ X))
+        new_deps = self.dependencies & cross(
+            universals=universals, existentials=existentials
         )
 
-    def get_all_dep_partners_for_arb_obj(
-        self, arb_obj: ArbitraryObject
-    ) -> set[ArbitraryObject]:
-        out: set[ArbitraryObject] = set()
-        if self.is_existential(arb_obj):
-            for dep in self.dependencies:
-                if dep.existential == arb_obj:
-                    out.add(dep.universal)
-        else:
-            for dep in self.dependencies:
-                if dep.universal == arb_obj:
-                    out.add(dep.existential)
-        return out
+        return DependencyRelation(universals, existentials, dependencies=new_deps)
+
+    def related_universals(self, existential: Existential) -> set[Universal]:
+        """
+        Returns all universals related to an existential, by a dependency.
+
+        Args:
+            existential (Existential): The existential
+
+        Returns:
+            set[Universal]: The related universals.
+        """
+        assert self.is_existential(arb_object=existential)
+        return {
+            dep.universal for dep in self.dependencies if dep.existential == existential
+        }
+
+    def related_existentials(self, universal: Universal) -> set[Existential]:
+        """
+        Returns all existentials related to a universal, by a dependency.
+
+        Args:
+            universal (Universal): The universal
+
+        Returns:
+            set[Existential]: The related existentials.
+        """
+        assert not self.is_existential(arb_object=universal)
+        return {
+            dep.existential for dep in self.dependencies if dep.universal == universal
+        }
 
     def triangle(
         self, arb_object1: ArbitraryObject, arb_object2: ArbitraryObject
     ) -> bool:
-        arb_obj1_found = False
-        arb_obj2_found = False
-        for arb_obj in self.universals | self.existentials:
-            if arb_obj == arb_object1:
-                arb_obj1_found = True
-            if arb_obj == arb_object2:
-                arb_obj2_found = True
-        if not arb_obj1_found or not arb_obj2_found:
+        """
+        Based on Definition B.1.2, p315
+
+        a ◁_R b
+
+        Based on Lemma B.7
+        # TODO: Where do case 1 and 4 come from?
+
+        (ii), (b): u ◁_R u' iff ∃e ∈ E_R.<e,u> ∉ D_R ∧ <e,u'> ∈ D_R
+        (iii), (b): e ◁_R e' iff ∃u ∈ U_R.<e',u> ∉ D_R ∧ <e,u> ∈ D_R
+        Args:
+            arb_object1 (ArbitraryObject): a
+            arb_object2 (ArbitraryObject): b
+
+        Returns:
+            bool: The result of a ◁_R b
+        """
+        if (arb_object1 not in (self.universals | self.existentials)) or (
+            arb_object2 not in (self.universals | self.existentials)
+        ):
             return False
 
         if self.is_existential(arb_object1) and self.is_existential(arb_object2):
             # Case 1
+            # B.7, (iii), (b): e ◁_R e' iff ∃u ∈ U_R.<e',u> ∉ D_R ∧ <e,u> ∈ D_R
+
             # There is X that E (arb_obj1) depends on and that e prime (arb_obj2) does not depend on
-            unis_e_depends_on = self.get_all_dep_partners_for_arb_obj(arb_object1)
-            unis_e_prime_depends_on = self.get_all_dep_partners_for_arb_obj(arb_object2)
+            unis_e_depends_on = self.related_universals(arb_object1)
+            unis_e_prime_depends_on = self.related_universals(arb_object2)
             return len(unis_e_depends_on.difference(unis_e_prime_depends_on)) != 0
         elif self.is_existential(arb_object1) and not self.is_existential(arb_object2):
             # Case 2
+
             # There is a dependency of this structure
             return dependency_exists(
                 universal=arb_object2,
@@ -254,6 +310,7 @@ class DependencyRelation:
 
         elif not self.is_existential(arb_object1) and self.is_existential(arb_object2):
             # Case 3
+
             # There is not a dependency of this structure
             return not dependency_exists(
                 universal=arb_object1,
@@ -265,11 +322,11 @@ class DependencyRelation:
             arb_object2
         ):
             # Case 4
+            # B.7, (ii), (b): u ◁_R u' iff ∃e ∈ E_R.<e,u> ∉ D_R ∧ <e,u'> ∈ D_R
+
             # There is X that does depend on u prime (arb_obj2) and does not depend on u (arb_obj 1)
-            exis_depending_on_u = self.get_all_dep_partners_for_arb_obj(arb_object1)
-            exis_depending_on_u_prime = self.get_all_dep_partners_for_arb_obj(
-                arb_object2
-            )
+            exis_depending_on_u = self.related_existentials(arb_object1)
+            exis_depending_on_u_prime = self.related_existentials(arb_object2)
             return len(exis_depending_on_u_prime.difference(exis_depending_on_u)) != 0
         else:
             assert False
@@ -277,21 +334,35 @@ class DependencyRelation:
     def less_sim(
         self, arb_object1: ArbitraryObject, arb_object2: ArbitraryObject
     ) -> bool:
-        arb_obj1_found = False
-        arb_obj2_found = False
-        for arb_obj in self.universals | self.existentials:
-            if arb_obj == arb_object1:
-                arb_obj1_found = True
-            if arb_obj == arb_object2:
-                arb_obj2_found = True
-        if not arb_obj1_found or not arb_obj2_found:
+        """
+        Based on Definition B.1.2, p315
+
+        a ≲_R b
+
+        Based on Lemma B.7
+        # TODO: Where do case 1 and 4 come from?
+
+        (ii), (a): u ≲_R u' iff ∀e ∈ E_R.<e,u> ∈ D_R => <e,u'> ∈ D_R
+        (iii), (a): e ≲_R e' iff ∃u ∈ U_R.<e',u> ∈ D_R => <e,u> ∈ D_R
+        Args:
+            arb_object1 (ArbitraryObject): a
+            arb_object2 (ArbitraryObject): b
+
+        Returns:
+            bool: The result of a ◁_R b
+        """
+
+        if (arb_object1 not in (self.universals | self.existentials)) or (
+            arb_object2 not in (self.universals | self.existentials)
+        ):
             return False
 
         if self.is_existential(arb_object1) and self.is_existential(arb_object2):
             # Case 1
+            # (iii), (a): e ≲_R e' iff ∃u ∈ U_R.<e',u> ∈ D_R => <e,u> ∈ D_R
             # not(There is an X that E prime (arb_obj2) deps on and that e (arb_obj1)does not depend upon)
-            unis_e_depends_on = self.get_all_dep_partners_for_arb_obj(arb_object1)
-            unis_e_prime_depends_on = self.get_all_dep_partners_for_arb_obj(arb_object2)
+            unis_e_depends_on = self.related_universals(arb_object1)
+            unis_e_prime_depends_on = self.related_universals(arb_object2)
             return len(unis_e_prime_depends_on.difference(unis_e_depends_on)) == 0
 
         elif self.is_existential(arb_object1) and not self.is_existential(arb_object2):
@@ -316,23 +387,70 @@ class DependencyRelation:
             arb_object2
         ):
             # Case 4
+            # (ii), (a): u ≲_R u' iff ∀e ∈ E_R.<e,u> ∈ D_R => <e,u'> ∈ D_R
             # not(There is an X that depends on u (arb_obj 1) but does not depend on u_prime (arb_obj2))
-            exis_depending_on_u = self.get_all_dep_partners_for_arb_obj(arb_object1)
-            exis_depending_on_u_prime = self.get_all_dep_partners_for_arb_obj(
-                arb_object2
-            )
+            exis_depending_on_u = self.related_existentials(arb_object1)
+            exis_depending_on_u_prime = self.related_existentials(arb_object2)
             return len(exis_depending_on_u.difference(exis_depending_on_u_prime)) == 0
         else:
             assert False
 
+    @property
+    def is_empty(self) -> bool:
+        """
+        If the relation contains no arb objects, return true, else false
+
+        Returns:
+            bool: True if relation contains nothing.
+        """
+        if len(self.universals) == 0 and len(self.existentials) == 0:
+            assert len(self.dependencies) == 0
+            return True
+        else:
+            return False
+
+    def chain(self, other: "DependencyRelation") -> "DependencyRelation":
+        """
+        Based on Definition 4.26, p156
+
+        R ⋊ S = <U_R ∪ U_S, E_R ∪ E_S, D_R ∪ D_S ∪ E_S × U_R>
+        Args:
+            other (DependencyRelation): The DependencyRelation to be chained to.
+
+        Returns:
+            DependencyRelation: The resulting Dependency Relation.
+        """
+        # E_S × U_R
+        new_deps = cross(universals=self.universals, existentials=other.existentials)
+        return DependencyRelation(
+            self.universals | other.universals,  # U_R ∪ U_S
+            self.existentials | other.existentials,  # E_R ∪ E_S
+            self.dependencies | other.dependencies | new_deps,  # D_R ∪ D_S ∪ E_S × U_R
+        )
+
     def E0(
         self,
         other: "DependencyRelation",
-        new_pairs: list[tuple[ArbitraryObject, ArbitraryObject]],
+        new_pairs: set[tuple[ArbitraryObject, ArbitraryObject]],
     ) -> frozenset[Existential]:
+        """
+        Based on the Definition B.5, p317
+
+        E₀ = {e ∈ E_R ∪ E_S : ∀u ∈ U_R ∪ U_S.¬(e ◁ u)}
+
+        Args:
+            self (DependencyRelation): R
+            other (DependencyRelation): S
+            new_pairs (set[tuple[ArbitraryObject, ArbitraryObject]]): e ◁ u
+
+        Returns:
+            frozenset[Existential]: The set of existentials in E₀
+        """
         new_out: list[ArbitraryObject] = []
+        # e ∈ E_R ∪ E_S
         for e in self.existentials | other.existentials:
             pair_found = False
+            # ∀u ∈ U_R ∪ U_S.¬(e ◁ u)
             for u in self.universals | other.universals:
                 if (e, u) in new_pairs:
                     pair_found = True
@@ -344,13 +462,30 @@ class DependencyRelation:
     def U0(
         self,
         other: "DependencyRelation",
-        new_pairs: list[tuple[ArbitraryObject, ArbitraryObject]],
+        new_pairs: set[tuple[ArbitraryObject, ArbitraryObject]],
         e_0: frozenset[Existential],
     ) -> frozenset[Universal]:
+        """
+        Based on the Definition B.5, p317
+
+        U₀ = {u ∈ U_R ∪ U_S : ∀e ∈ E_R ∪ E_S＼E₀.(u ◁ e) -> (e ◁ u)}
+
+        Args:
+            self (DependencyRelation): R
+            other (DependencyRelation): S
+            new_pairs (set[tuple[ArbitraryObject, ArbitraryObject]]): e ◁ u
+            e_0 (frozenset[Existential]): E₀
+
+        Returns:
+            frozenset[Universal]: The set of existentials in U₀
+        """
         new_out: list[ArbitraryObject] = []
+        # u ∈ U_R ∪ U_S
         for u in self.universals | other.universals:
             pair_found = False
+            # ∀e ∈ (E_R ∪ E_S)＼E₀
             for e in (self.existentials | other.existentials).difference(e_0):
+                # .(u ◁ e) -> (e ◁ u)
                 if (u, e) in new_pairs and (e, u) not in new_pairs:
                     pair_found = True
                     break
@@ -358,19 +493,22 @@ class DependencyRelation:
                 new_out.append(u)
         return frozenset(new_out)
 
-    @property
-    def is_empty(self):
-        if len(self.universals) == 0 and len(self.existentials) == 0:
-            assert len(self.dependencies) == 0
-            return True
-        else:
-            return False
-
     def fusion(self, other: "DependencyRelation") -> "DependencyRelation":
+        """
+        Based on the Definition B.5, p317
+
+        R ⋈ S = <U₀, E₀, Ø> ⋊ ([R]_A(R)＼(E₀ ∪ U₀) ⋈ [S]_A(S)＼(E₀ ∪ U₀))
+
+        Args:
+            other (DependencyRelation): The DependencyRelation to be fused.
+
+        Returns:
+            DependencyRelation: the resulting DependencyRelation.
+        """
         if self.is_empty and other.is_empty:
             return self
         else:
-            pairs: list[tuple[ArbitraryObject, ArbitraryObject]] = []
+            pairs: set[tuple[ArbitraryObject, ArbitraryObject]] = set()
             arb_objects = (
                 self.existentials
                 | other.existentials
@@ -380,19 +518,26 @@ class DependencyRelation:
             for x in arb_objects:
                 for y in arb_objects:
                     if self.triangle(x, y) or other.triangle(x, y):
-                        pairs.append((x, y))
-            new_pairs = transitive_closure(pairs, arb_objects)
+                        pairs.add((x, y))
+            # e ◁ u
+            e_triangle_u = transitive_closure(pairs, arb_objects)
 
-            e_0 = self.E0(other, new_pairs)
-            u_0 = self.U0(other, new_pairs, e_0)
+            e_0 = self.E0(other, e_triangle_u)
+            u_0 = self.U0(other, e_triangle_u, e_0)
 
+            # <U₀, E₀, Ø>
             initial_relation = DependencyRelation(u_0, e_0, frozenset())
             a_r = self.universals | self.existentials
             a_s = other.universals | other.existentials
+
+            # A(R)＼(E₀ ∪ U₀)
+            expr1 = set(a_r.difference(e_0 | u_0))
+            # A(S)＼(E₀ ∪ U₀)
+            expr2 = set(a_s.difference(e_0 | u_0))
+
+            # <U₀, E₀, Ø> ⋊ ([R]_A(R)＼(E₀ ∪ U₀) ⋈ [S]_A(S)＼(E₀ ∪ U₀))
             return initial_relation.chain(
-                self.restriction(set(a_r.difference(e_0 | u_0))).fusion(
-                    other.restriction(set(a_s.difference(e_0 | u_0)))
-                )
+                self.restriction(expr1).fusion(other.restriction(expr2))
             )
 
     def __repr__(self) -> str:
@@ -436,21 +581,36 @@ class DependencyRelation:
 
     def negation(self) -> "DependencyRelation":
         """
-        Based on 4.31, Negation of a dependency relation
+        Based on 4.31, p159, Negation of a dependency relation
+
+        [R]ᶰ = <E_R, U_R, {<a,b> ∈ U_R × E_R : <b,a> ∉ D_R}
+
+        Returns:
+            DependencyRelation: The negated dependency relation.
         """
+        # TODO: In book U_R and E_R are wrong way round in cross?
         # Every new existential now depends on every new universal
         # Except those that the ancestor existential depended on the ancestor universal
 
-        new_deps: list[Dependency] = []
-        for exi in self.existentials:
-            for uni in self.universals:
-                ancestor_dep = Dependency(existential=exi, universal=uni)
-                if ancestor_dep not in self.dependencies:
-                    new_dep = Dependency(existential=uni, universal=exi)
-                    new_deps.append(new_dep)
+        # U_R × E_R TODO: (Flipped order intentionally here to match book)
+        ancestor_deps = cross(
+            universals=self.existentials, existentials=self.universals
+        )
 
+        # {<a,b> ∈ U_R × E_R : <b,a> ∉ D_R}
+        new_deps = frozenset(
+            {
+                ancestor_dep
+                for ancestor_dep in ancestor_deps
+                if Dependency(
+                    existential=ancestor_dep.universal,
+                    universal=ancestor_dep.existential,
+                )
+                not in self.dependencies
+            }
+        )
         return DependencyRelation(
             universals=self.existentials,
             existentials=self.universals,
-            dependencies=frozenset(new_deps),
+            dependencies=new_deps,
         )
