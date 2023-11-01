@@ -808,7 +808,7 @@ class View:
         """
         Based on Definition 5.26, p221
 
-        Γ^Θ_fRI[Δ^Ψ_gSJ]ᴹ = ⊕^R⋈S_γ∈Γ {f(γ).γ}|^Θ_RI ⨂^R⋈S Δ^Ψ_gSJ ⨂^R⋈S (⨂^R⋈S_<t,u>∈M'ij(γ) Sub^R⋈S_<t,u>(Δ^{0}_gSJ))
+        Γ^Θ_fRI[Δ^Ψ_gSJ]ᴹ = ⊕^R⋈S_γ∈Γ {f(γ).γ}|^Θ_RI ⨂^R⋈S Δ^Ψ_gSJ ⨂^R⋈S (⭙^R⋈S_<t,u>∈M'ij(γ) Sub^R⋈S_<t,u>(Δ^{0}_gSJ))
 
         Args:
             self (View): Γ^Θ_fRI
@@ -1052,7 +1052,7 @@ class View:
                 """
                 Based on Definition 5.34, p233
 
-                BIG_PRODUCT(γ) = ⊗_x∈N(γ,I,e) {{x}, {x̄}}
+                BIG_PRODUCT(γ) = ⭙_x∈N(γ,I,e) {{x}, {x̄}}
 
                 Args:
                     gamma (State): The input state
@@ -1194,6 +1194,7 @@ class View:
     def division(self, other: "View") -> "View":
         """
         Based on definition 4.38
+        # TODO: Is it needed? Skipping doc string for now
         """
         if division_presupposition(
             self_stage=self.stage,
@@ -1230,25 +1231,55 @@ class View:
         absurd_states: Optional[list[State]] = None,
     ) -> "View":
         """
-        Based on definition 4.39
+        Based on definition 5.17 p210 (contradiction)
+        Based on definition 5.35 p233 (identity)
+        Based on definition 5.32 p232 (central case)
+
+        Contradiction: Γ^Θ_fRI[⊥]ꟳ = {γ∈Γ : ¬∃κ ∈ 𝕂.κ ⊆ γ}^Θ_fRI
+        Identity: Γ^Θ_fRI[{w.It₁t₂}^{0}_gSJ]ꟳ = {γ ∈ Γ : It₁t₂ ∉ γ}_f + Σ_γ∈Γ s.t.It₁t₂∈γ {(f(γ)[t₁/t₂]).(γ[t₁/t₂])}^Θ_RI # TODO: What is this supposed to say? Is issue I or J? Where is g?
+        Central: Γ^Θ_fRI[Δ^Ψ_gSJ]ꟳ = Σ_γ∈Γ {f(γ).γ[Δ^Ψ]ꟳ}
+
+        # TODO: When its ready fill out identity
+
+        Args:
+            self (View): Γ^Θ_fRI
+            other (View): ⊥ | {w.It₁t₂}^{0}_gSJ | Δ^Ψ_gSJ
+            verbose (bool, optional): Enables verbose mode. Defaults to False.
+            absurd_states (Optional[list[State]], optional): Manual input of primitive absurd states. Defaults to None.
+
+        Returns:
+            View: The factored view.
         """
         if verbose:
             print(f"FactorInput: External: {self} Internal {other}")
 
         def big_intersection(state: State) -> Optional[State]:
+            """
+            ∩{γ⌀_Γ(Δ^Ψ[t/a]) : <t,a> ∈ Mij ∧ a ∈ U_S}
+
+            Args:
+                state (State): γ
+
+            Returns:
+                Optional[State]: If nothing inside intersection, returns None,
+                    else returns the resultant state of the intersection.
+            """
             out: list[State] = []
+            # <t,a> ∈ Mij
             for t, a in issue_matches(self.issue_structure, other.issue_structure):
+                # a ∈ U_S
                 if isinstance(
                     a, ArbitraryObject
                 ) and not other.dependency_relation.is_existential(a):
-                    replaced_stage = other.stage.replace({a: t})
-                    replaced_supposition = other.supposition.replace({a: t})
+                    # γ⌀_Γ(Δ^Ψ[t/a])
                     out.append(
                         state_division(
                             state=state,
                             self_stage=self.stage,
-                            other_stage=replaced_stage,
-                            other_supposition=replaced_supposition,
+                            other_stage=other.stage.replace({a: t}),  # Δ[t/a]
+                            other_supposition=other.supposition.replace(
+                                {a: t}
+                            ),  # Ψ[t/a]
                         )
                     )
             if len(out) == 0:
@@ -1256,23 +1287,39 @@ class View:
             else:
                 return reduce(lambda s1, s2: s1 & s2, out)
 
-        def state_factor(state: State) -> State:
+        def state_factor(gamma: State) -> State:
             """
-            Based on definition 4.39
+            Based on definition 4.39, p168
+
+            γ[Δ^Ψ] = (γ⌀_Γ Δ^Ψ) ∩ (BIG_INTERSECTION)
+
+            Args:
+                gamma (State): γ
+
+            Returns:
+                State: The factored state.
             """
+            # γ⌀_Γ Δ^Ψ
             gamma_prime = state_division(
-                state=state,
+                state=gamma,
                 self_stage=self.stage,
                 other_stage=other.stage,
                 other_supposition=other.supposition,
             )
-            expr = big_intersection(state)
+            expr = big_intersection(gamma)
             if expr is None:
                 return gamma_prime
             else:
                 return gamma_prime & expr
 
         def identity_factor_condition() -> bool:
+            """
+            It₁t₂ ∉ γ
+
+            TODO: What goes here?
+            Returns:
+                bool: True if identity factor should be used.
+            """
             if len(other.stage) != 1:
                 return False
             first_state = next(iter(other.stage))
@@ -1302,6 +1349,7 @@ class View:
         if other.is_falsum:
             if verbose:
                 print("Contradiction factor")
+            # {γ∈Γ : ¬∃κ ∈ 𝕂.κ ⊆ γ}^Θ_fRI
             new_weights = self.weights
             new_stage = SetOfStates(
                 gamma
@@ -1334,9 +1382,11 @@ class View:
         else:
             if verbose:
                 print("Central case factor")
+            # Σ_γ∈Γ {f(γ).γ[Δ^Ψ]ꟳ}
+
             new_weights = Weights({})
             for gamma in self.stage:
-                new_weights._adding(state_factor(state=gamma), self.weights[gamma])
+                new_weights._adding(state_factor(gamma=gamma), self.weights[gamma])
             new_stage = SetOfStates(new_weights.keys())
 
         out = View.with_restriction(
@@ -1352,19 +1402,29 @@ class View:
 
     def depose(self, verbose: bool = False) -> "View":
         """
-        Based on definition 4.45
+        Based on definition 5.23
+
+        Γ^Θ_fRI[]ᴰ = (Γ_f + [Θ]ᶰ)^{0}_R[I]ᶰ
+
+        Args:
+            verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+        Returns:
+            View: The deposed view.
         """
         if verbose:
             print(f"DeposeInput: {self}")
         verum = SetOfStates({State({})})
+        # [Θ]ᶰ
         sup_negation = self.supposition.negation()
+        # Γ_f + [Θ]ᶰ
         new_stage = self.stage | sup_negation
         new_weights = self.weights + Weights.get_null_weights(sup_negation)
         out = View.with_restriction(
             stage=new_stage,
             supposition=verum,
             dependency_relation=self.dependency_relation,
-            issue_structure=self.issue_structure.negation(),
+            issue_structure=self.issue_structure.negation(),  # [I]ᶰ
             weights=new_weights,
         )
         if verbose:
@@ -1373,20 +1433,41 @@ class View:
 
     def inquire(self, other: "View", *, verbose: bool = False) -> "View":
         """
-        Based on definition 4.43
+        Based on definition 5.18, p210
+
+        # TODO: Note typo in book in if statement - corrected here γ -> Γ
+        If A(Γ∪Θ) ∩ A(Δ∪Ψ) = ∅ and A(Δ) ∩ A(Ψ) = ∅
+            O Case: Γ^Θ_fRI[Δ^Ψ_gSJ]ᴵ = (Γ^Θ_fRI ⨂ (Δ^Ψ_gSJ ⊕ˢ({0}^Ψ_SJ ⨂ ([Δ^{0}_gSJ]ᶰ)^nov(A(Δ)))))[⊥]ꟳ
+
+        Else if A(Δ∪Ψ) ⊆ A(Γ∪Θ) and S = [R]_Γ∪Θ
+            I Case: Γ^Θ_fRI[Δ^Ψ_gSJ]ᴵ = (Γ^Θ_fRI ⨂ᴿ (Δ^Ψ_gSJ ⊕ᴿ ([Δ_g]ᶰ|^Ψ_SJ)))[⊥]ꟳ
+
+        Else:
+            Γ^Θ_fRI[Δ^Ψ_gSJ]ᴵ = Γ^Θ_fRI
+        Args:
+            self (View): Γ^Θ_fRI
+            other (View): Δ^Ψ_gSJ
+            verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+        Returns:
+            View: The resultant inquired view.
         """
         if verbose:
             print(f"InquireInput: External: {self} Internal {other}")
-
+        # A(Γ∪Θ) ∩ A(Δ∪Ψ) = ∅
         cond1 = len(self.stage_supp_arb_objects & other.stage_supp_arb_objects) == 0
+        # A(Δ) ∩ A(Ψ) = ∅
         cond2 = len(other.stage.arb_objects & other.supposition.arb_objects) == 0
         if cond1 and cond2:
             # O case
+            # (Γ^Θ_fRI ⨂ (Δ^Ψ_gSJ ⊕ˢ({0}^Ψ_SJ ⨂ ([Δ^{0}_gSJ]ᶰ)^nov(A(Δ)))))[⊥]ꟳ
+
             if verbose:
                 print("Inquire, O case")
             arb_gen = ArbitraryObjectGenerator(
                 self.stage_supp_arb_objects | other.stage_supp_arb_objects
             )
+            # {0}^Ψ_SJ
             v1 = View.with_restriction(
                 stage=SetOfStates({State({})}),
                 supposition=other.supposition,
@@ -1394,6 +1475,7 @@ class View:
                 issue_structure=other.issue_structure,
                 weights=None,
             )
+            # [Δ^{0}_gSJ]ᶰ TODO: Book suggests view negation, also where are the weights?
             v2 = View.with_restriction(
                 stage=other.stage.negation(),
                 supposition=SetOfStates({State({})}),
@@ -1401,16 +1483,26 @@ class View:
                 issue_structure=other.issue_structure.negation(),
                 weights=None,
             )
+            # (V2)^nov(A(Δ))
             v3 = arb_gen.novelise_all(v2)
-            out = self.product(other.sum(v1.product(v3))).factor(View.get_falsum())
-        elif other.stage_supp_arb_objects.issubset(
+
+            # (Γ^Θ_fRI ⨂ (Δ^Ψ_gSJ ⊕ˢ(V1 ⨂ V3)))[⊥]ꟳ
+            out = self.product(
+                other.sum(v1.product(v3), other.dependency_relation)
+            ).factor(View.get_falsum())
+        elif other.stage_supp_arb_objects.issubset(  # A(Δ∪Ψ) ⊆ A(Γ∪Θ)
             self.stage_supp_arb_objects
         ) and other.dependency_relation == self.dependency_relation.restriction(
-            self.stage_supp_arb_objects
+            self.stage_supp_arb_objects  # S = [R]_Γ∪Θ
         ):
+            # I case
+            # (Γ^Θ_fRI ⨂ᴿ (Δ^Ψ_gSJ ⊕ᴿ ([Δ_g]ᶰ|^Ψ_SJ)))[⊥]ꟳ
+
             if verbose:
                 print("Inquire, I case")
-            # I case
+
+            # [Δ_g]ᶰ|^Ψ_SJ
+            # TODO: Does not match?
             view2 = View.with_restriction(
                 stage=other.stage.negation(),
                 supposition=other.supposition,
@@ -1418,7 +1510,10 @@ class View:
                 issue_structure=other.issue_structure.negation(),
                 weights=None,
             )
-            out = self.product(other.sum(view2)).factor(View.get_falsum())
+            # (Γ^Θ_fRI ⨂ᴿ (Δ^Ψ_gSJ ⊕ᴿ VIEW2))[⊥]ꟳ
+            out = self.product(
+                other.sum(view2, self.dependency_relation), self.dependency_relation
+            ).factor(View.get_falsum())
         else:
             if verbose:
                 print("Inquire, pass-through case")
@@ -1430,7 +1525,16 @@ class View:
 
     def suppose(self, other: "View", *, verbose: bool = False) -> "View":
         """
-        Based on definition A.76
+        Based on definition 5.22, p219
+
+
+        Args:
+            self: (View):
+            other (View): _description_
+            verbose (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            View: _description_
         """
         if verbose:
             print(f"SupposeInput: External: {self} Internal {other}")
