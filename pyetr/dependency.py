@@ -3,7 +3,6 @@ __all__ = ["Dependency", "DependencyRelation"]
 from typing import Iterable
 
 from .atoms.terms import ArbitraryObject
-from .stateset import SetOfStates
 
 Universal = ArbitraryObject
 Existential = ArbitraryObject
@@ -69,15 +68,6 @@ def transitive_closure(
         if D_next_set == d_current:
             return d_current
         d_current = D_next_set
-
-
-def dependency_exists(
-    universal: Universal, existential: Existential, dependencies: frozenset[Dependency]
-) -> bool:
-    for dep in dependencies:
-        if dep.universal == universal and dep.existential == existential:
-            return True
-    return False
 
 
 def dependencies_from_sets(
@@ -155,10 +145,16 @@ class DependencyRelation:
         self.universals = frozenset(universals)
         self.existentials = frozenset(existentials)
         self.dependencies = frozenset(dependencies)
-        self.validate()
-        self._test_matroyshka()
+        self._validate()
+        self._test_matryoshka()
 
-    def _test_matroyshka(self):
+    def _test_matryoshka(self):
+        """
+        Based on the Matryoshka condition, p141
+
+        Raises:
+            ValueError: Raised if the dependencies fail the Matryoshka condition.
+        """
         existentials: list[frozenset[ArbitraryObject]] = [
             frozenset(e) for _, e in dependencies_to_sets(self.dependencies)
         ]
@@ -168,10 +164,73 @@ class DependencyRelation:
             for set2 in stack:
                 if not (set1.issubset(set2) or set2.issubset(set1)):
                     raise ValueError(
-                        f"Existential sets do not meet Matroyshka condition. \nSet1: {set1}\nSet2: {set2}"
+                        f"Existential sets do not meet Matryoshka condition. \nSet1: {set1}\nSet2: {set2}"
                     )
 
+    def __repr__(self) -> str:
+        if len(self.dependencies) == 0:
+            return "None"
+        else:
+            return "".join(
+                f"{u}" + "{" + ",".join(repr(e) for e in exis) + "}"
+                for u, exis in dependencies_to_sets(self.dependencies)
+            )
+
+    @property
+    def detailed(self):
+        return f"<DependencyRelation deps={[i.detailed for i in self.dependencies]} unis={self.universals} exis={self.existentials}>"
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, DependencyRelation):
+            return False
+        return (
+            self.dependencies == other.dependencies
+            and self.universals == other.universals
+            and self.existentials == other.existentials
+        )
+
+    def __hash__(self) -> int:
+        return hash((self.universals, self.existentials, self.dependencies))
+
+    def replace(
+        self, replacements: dict[ArbitraryObject, ArbitraryObject]
+    ) -> "DependencyRelation":
+        """
+        Replaces a series of arbitrary objects and makes a new dependency relation.
+
+        Args:
+            replacements (dict[ArbitraryObject, ArbitraryObject]): A dict of the replacements,
+                where the keys are the existing values and the values are the new values.
+
+        Returns:
+            DependencyRelation: The new dependency relation.
+        """
+
+        def replace_arb_object(x: ArbitraryObject) -> ArbitraryObject:
+            if x in replacements:
+                return replacements[x]
+            else:
+                return x
+
+        new_unis = {replace_arb_object(x) for x in self.universals}
+        new_exis = {replace_arb_object(x) for x in self.existentials}
+        new_deps = {d.replace(replacements) for d in self.dependencies}
+        return DependencyRelation(new_unis, new_exis, frozenset(new_deps))
+
     def is_existential(self, arb_object: ArbitraryObject) -> bool:
+        """
+        Returns true if an arbitrary object given is existential, based on the
+            dependency relation.
+
+        Args:
+            arb_object (ArbitraryObject): The arbitrary object to be determined.
+
+        Raises:
+            ValueError: The arbitrary object is not found in the dependency relation.
+
+        Returns:
+            bool: True if the arbitrary object is an existential.
+        """
         if arb_object in self.existentials:
             return True
         elif arb_object in self.universals:
@@ -184,6 +243,17 @@ class DependencyRelation:
     def validate_against_states(
         self, arb_objects: set[ArbitraryObject], pre_view: bool = False
     ):
+        """
+        Validates the dependency against the provided arb_objects
+
+        Args:
+            arb_objects (set[ArbitraryObject]): The set of arbitrary provided
+            pre_view (bool, optional): If the view under validation is a pre-view (Incomplete view, with
+                lower restrictions on validation). Defaults to False.
+
+        Raises:
+            ValueError: The arbitrary objects contained in the dependency relation do not match the arb objects provided.
+        """
         if pre_view:
             if not (self.universals | self.existentials).issuperset(arb_objects):
                 raise ValueError(
@@ -195,22 +265,23 @@ class DependencyRelation:
                     f"Universals with existentials: {self.universals | self.existentials} not the same as states {arb_objects}"
                 )
 
-    @property
-    def dependency_arb_objects(self) -> set[ArbitraryObject]:
-        arb_objs = set()
-        for dep in self.dependencies:
-            if dep.universal not in arb_objs:
-                arb_objs.add(dep.universal)
-            if dep.existential not in arb_objs:
-                arb_objs.add(dep.existential)
-        return arb_objs
+    def _validate(self):
+        """
+        Validates the dependency relation against itself, to ensure it's self consistent.
 
-    def validate(self):
-        if not (self.universals | self.existentials).issuperset(
-            self.dependency_arb_objects
-        ):
+        Raises:
+            ValueError: Invalid dependency relation.
+        """
+        dep_arb_objs = set()
+        for dep in self.dependencies:
+            if dep.universal not in dep_arb_objs:
+                dep_arb_objs.add(dep.universal)
+            if dep.existential not in dep_arb_objs:
+                dep_arb_objs.add(dep.existential)
+
+        if not (self.universals | self.existentials).issuperset(dep_arb_objs):
             raise ValueError(
-                f"Existentials {self.universals | self.existentials} is not superset of dependency arb objects {self.dependency_arb_objects}"
+                f"Existentials {self.universals | self.existentials} is not superset of dependency arb objects {dep_arb_objs}"
             )
 
     def restriction(self, arb_objects: set[ArbitraryObject]) -> "DependencyRelation":
@@ -302,20 +373,18 @@ class DependencyRelation:
             # Case 2
 
             # There is a dependency of this structure
-            return dependency_exists(
-                universal=arb_object2,
-                existential=arb_object1,
-                dependencies=self.dependencies,
+            return (
+                Dependency(existential=arb_object1, universal=arb_object2)
+                in self.dependencies
             )
 
         elif not self.is_existential(arb_object1) and self.is_existential(arb_object2):
             # Case 3
 
             # There is not a dependency of this structure
-            return not dependency_exists(
-                universal=arb_object1,
-                existential=arb_object2,
-                dependencies=self.dependencies,
+            return (
+                Dependency(existential=arb_object2, universal=arb_object1)
+                not in self.dependencies
             )
 
         elif not self.is_existential(arb_object1) and not self.is_existential(
@@ -368,19 +437,17 @@ class DependencyRelation:
         elif self.is_existential(arb_object1) and not self.is_existential(arb_object2):
             # Case 2
             # There is a dependency of this structure
-            return dependency_exists(
-                universal=arb_object2,
-                existential=arb_object1,
-                dependencies=self.dependencies,
+            return (
+                Dependency(existential=arb_object1, universal=arb_object2)
+                in self.dependencies
             )
 
         elif not self.is_existential(arb_object1) and self.is_existential(arb_object2):
             # Case 3
             # There is not a dependency of this structure
-            return not dependency_exists(
-                universal=arb_object1,
-                existential=arb_object2,
-                dependencies=self.dependencies,
+            return (
+                Dependency(existential=arb_object2, universal=arb_object1)
+                not in self.dependencies
             )
 
         elif not self.is_existential(arb_object1) and not self.is_existential(
@@ -508,13 +575,13 @@ class DependencyRelation:
         if self.is_empty and other.is_empty:
             return self
         else:
-            pairs: set[tuple[ArbitraryObject, ArbitraryObject]] = set()
             arb_objects = (
                 self.existentials
                 | other.existentials
                 | self.universals
                 | other.universals
             )
+            pairs: set[tuple[ArbitraryObject, ArbitraryObject]] = set()
             for x in arb_objects:
                 for y in arb_objects:
                     if self.triangle(x, y) or other.triangle(x, y):
@@ -539,45 +606,6 @@ class DependencyRelation:
             return initial_relation.chain(
                 self.restriction(expr1).fusion(other.restriction(expr2))
             )
-
-    def __repr__(self) -> str:
-        if len(self.dependencies) == 0:
-            return "None"
-        else:
-            return "".join(
-                f"{u}" + "{" + ",".join(repr(e) for e in exis) + "}"
-                for u, exis in dependencies_to_sets(self.dependencies)
-            )
-
-    @property
-    def detailed(self):
-        return f"<DependencyRelation deps={[i.detailed for i in self.dependencies]} unis={self.universals} exis={self.existentials}>"
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, DependencyRelation):
-            return False
-        return (
-            self.dependencies == other.dependencies
-            and self.universals == other.universals
-            and self.existentials == other.existentials
-        )
-
-    def __hash__(self) -> int:
-        return hash((self.universals, self.existentials, self.dependencies))
-
-    def replace(
-        self, replacements: dict[ArbitraryObject, ArbitraryObject]
-    ) -> "DependencyRelation":
-        def replace_arb_object(x: ArbitraryObject) -> ArbitraryObject:
-            if x in replacements:
-                return replacements[x]
-            else:
-                return x
-
-        new_unis = {replace_arb_object(x) for x in self.universals}
-        new_exis = {replace_arb_object(x) for x in self.existentials}
-        new_deps = {d.replace(replacements) for d in self.dependencies}
-        return DependencyRelation(new_unis, new_exis, frozenset(new_deps))
 
     def negation(self) -> "DependencyRelation":
         """
