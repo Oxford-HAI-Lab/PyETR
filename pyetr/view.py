@@ -730,7 +730,6 @@ class View:
                         new_states.append(state)
                 return new_states
 
-            supposition = self.supposition
             potentials: list[tuple[FunctionalTerm, State]] = []
             for gamma in self.stage:
                 potential = other.stage.equilibrium_answer_potential(
@@ -745,7 +744,7 @@ class View:
 
             out = View.with_restriction(
                 stage=stage,
-                supposition=supposition,
+                supposition=self.supposition,
                 dependency_relation=self.dependency_relation,
                 issue_structure=self.issue_structure,
                 weights=self.weights,
@@ -758,7 +757,7 @@ class View:
         """
         Based on definition 5.13, p206
 
-        Γ^θ_fRI[Δ^{0}_gSJ]^A
+        Γ^θ_fRI[Δ^{0}_gSJ]^A = Γ^θ_fRI[Δ^{0}_gSJ]^𝔼A[Δ^{0}_gSJ]^𝓐A
 
         Args:
             self (View): Γ^θ_fRI
@@ -808,7 +807,9 @@ class View:
     def merge(self, view: "View", verbose: bool = False) -> "View":
         """
         Based on Definition 5.26, p221
+
         Γ^Θ_fRI[Δ^Ψ_gSJ]ᴹ = ⊕^R⋈S_γ∈Γ {f(γ).γ}|^Θ_RI ⨂^R⋈S Δ^Ψ_gSJ ⨂^R⋈S (⨂^R⋈S_<t,u>∈M'ij(γ) Sub^R⋈S_<t,u>(Δ^{0}_gSJ))
+
         Args:
             self (View): Γ^Θ_fRI
             view (View): Δ^Ψ_gSJ
@@ -905,7 +906,17 @@ class View:
 
     def update(self, view: "View", verbose: bool = False) -> "View":
         """
-        Based on Definition 4.34
+        Based on Definition 4.34, p163
+
+        Γ^Θ_fRI[D]^↻ = Γ^Θ_fRI[D]ᵁ[D]ᴱ[D]ᴬ[D]ᴹ
+
+        Args:
+            self (View): Γ^Θ_fRI
+            view (View): D
+            verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+        Returns:
+            View: The updated view.
         """
         if verbose:
             print()
@@ -928,7 +939,8 @@ class View:
 
     def _uni_exi_condition(self, view: "View") -> bool:
         """
-        Translated from:
+        Based on Definition 5.28, p223
+
         A(Γ) ∩ A(Θ) = ∅ and (A(R) ∩ A(S) = ∅ or [R]Δ = S)
         """
         expr1 = len(self.stage.arb_objects & self.supposition.arb_objects) == 0
@@ -941,10 +953,22 @@ class View:
 
     def universal_product(self, view: "View", verbose: bool = False) -> "View":
         """
-        Based on Definition 4.35
+        Based on Definition 5.28, p223
+
+        Γ^Θ_fRI[D]ᵁ = {0}^Θ_RI ⨂^R⋈S (⨂^R⋈S_<t,u>∈M'ij Sub^R⋈S_<t,u> (Γ^{0}_fRI))
+
+        # TODO: Note swapping of t and u in M'ij, is this significant or typo?
         """
 
         def _m_prime() -> set[tuple[Universal, FunctionalTerm | ArbitraryObject]]:
+            """
+            Based on Definition 5.28, p223
+
+            M'ij = {<u,t> : <u,t> ∈ Mij ∧ U_R - A(Θ)}
+
+            Returns:
+                set[tuple[Universal, FunctionalTerm | ArbitraryObject]]: Returns the M'ij set.
+            """
             output_set = set()
             for u, t in issue_matches(self.issue_structure, view.issue_structure):
                 if isinstance(u, ArbitraryObject) and u in (
@@ -960,6 +984,7 @@ class View:
         )
 
         m_prime = _m_prime()
+        # M'ij ≠ Ø}
         if len(m_prime) == 0:
             if verbose:
                 print(f"UniProdOutput: {self}")
@@ -971,6 +996,7 @@ class View:
                 return self
             r_fuse_s = self.dependency_relation.fusion(view.dependency_relation)
             product_factors: list[View] = [
+                # {0}^Θ_RI
                 View.with_restriction(
                     stage=SetOfStates({State({})}),
                     supposition=self.supposition,
@@ -979,6 +1005,7 @@ class View:
                     weights=None,
                 )
             ] + [
+                # <t,u>∈M'ij Sub^R⋈S_<t,u> (Γ^{0}_fRI)
                 substitution(
                     arb_gen=arb_gen,
                     dep_relation=r_fuse_s,
@@ -1002,12 +1029,50 @@ class View:
 
     def existential_sum(self, view: "View", verbose: bool = False) -> "View":
         """
-        Based on Definition 4.37
+        Based on Definition 5.34, p233
+
+        Γ^Θ_fRI[Δ^{0}_gSJ]ᴱ = Γ^Θ_fRI ⊕^R⋈S (
+            ⊕^R⋈S_<e,t>∈M'ij Sub^R⋈S_<t,e> (BIG_UNION(e)^Θ_SJ)
+        )
         """
 
-        def _big_union(e: Existential) -> Weights:
+        def _big_union(e: Existential) -> tuple[Stage, Weights]:
+            """
+            Based on Definition 5.34, p233
+
+            BIG_UNION(e) = ∪_γ∈Γ,e∈A(γ) {γ}∪{{x∈γ : e∉A(x)} ∪ δ : δ ∈ BIG_PRODUCT(γ) ∧ δ⊈γ}
+            Args:
+                e (Existential): The existential input
+
+            Returns:
+                tuple[Stage, Weights]: The stage and associated weights
+            """
+
             def _big_product(gamma: State) -> SetOfStates:
-                def B(gamma: State, e: Existential) -> State:
+                """
+                Based on Definition 5.34, p233
+
+                BIG_PRODUCT(γ) = ⊗_x∈N(γ,I,e) {{x}, {x̄}}
+
+                Args:
+                    gamma (State): The input state
+
+                Returns:
+                    SetOfStates: The resulting set of states
+                """
+
+                def N(gamma: State, e: Existential) -> State:
+                    """
+                    N(γ,I,e) = {x[e/?] ∈ γ : <e,x> ∈ I}
+
+                    Args:
+                        gamma (State): _description_
+                        e (Existential): _description_
+
+                    Returns:
+                        State: _description_
+                    """
+                    # TODO: Think this need updating??? e is overloaded??
                     atoms = set()
                     for t, open_atom in self.issue_structure:
                         formed_atom = open_atom(t)
@@ -1018,40 +1083,61 @@ class View:
 
                 return reduce(
                     lambda s1, s2: s1 * s2,
-                    [SetOfStates({State({x}), State({~x})}) for x in B(gamma, e)],
+                    [SetOfStates({State({x}), State({~x})}) for x in N(gamma, e)],
                 )
 
+            # BIG_UNION(e) = ∪_γ∈Γ,e∈A(γ) {γ}∪{{x∈γ : e∉A(x)} ∪ δ : δ ∈ BIG_PRODUCT(γ) ∧ δ⊈γ}
             assert e in self.stage_supp_arb_objects
             final_sets: list[SetOfStates] = []
 
             new_weights: dict[State, Weight] = {}
+            # γ∈Γ
             for gamma in self.stage:
+                # e∈A(γ)
                 if e in gamma.arb_objects:
                     new_weights[gamma] = self.weights[gamma]
-                    proto_sets: set[State] = set()
+                    # {x∈γ : e∉A(x)}
                     x_set = State([x for x in gamma if e not in x.arb_objects])
-                    for delta in _big_product(gamma):
-                        if not delta.issubset(gamma):
-                            proto_sets.add(x_set.union(delta))
-                    final_sets.append(SetOfStates({gamma}) | SetOfStates(proto_sets))
+                    # {γ}∪{{x∈γ : e∉A(x)} ∪ δ : δ ∈ BIG_PRODUCT(γ) ∧ δ⊈γ}
+                    proto_sets: SetOfStates = SetOfStates(
+                        {
+                            x_set | delta
+                            for delta in _big_product(gamma)
+                            if not delta.issubset(gamma)
+                        }
+                    )
+                    final_sets.append(SetOfStates({gamma}) | proto_sets)
 
             output_set = reduce(lambda s1, s2: s1 | s2, final_sets)
+            output_weights = Weights(new_weights) + Weights.get_null_weights(output_set)
+            return SetOfStates(output_weights.keys()), output_weights
 
-            final_weights = Weights(new_weights) + Weights.get_null_weights(output_set)
-            return final_weights
+        def _m_prime() -> set[tuple[Existential, Term]]:
+            """
+            Based on Definition 5.34, p233
 
-        def _m_prime() -> set[tuple[Existential, FunctionalTerm | ArbitraryObject]]:
-            output_set = set()
+            M'ij = {<e,t> ∈ Mij : e ∈ E_R - A(Θ ∪ Δ) ∧ ¬∃(<e,x> ∈ D_R)}
+
+            Returns:
+                set[tuple[Existential, Term]]: The pairs of terms matching for M'ij
+            """
+            output_set: set[tuple[Existential, Term]] = set()
+            # <e,t> ∈ Mij
             for e, t in issue_matches(self.issue_structure, view.issue_structure):
-                if isinstance(e, ArbitraryObject) and e in (
-                    self.dependency_relation.existentials
-                    - (self.supposition | view.stage).arb_objects
-                ):
-                    if not any(
+                # e ∈ E_R - A(Θ ∪ Δ) ∧ ¬∃(<e,x> ∈ D_R)
+                if (
+                    isinstance(e, ArbitraryObject)
+                    and e
+                    in (
+                        self.dependency_relation.existentials
+                        - (self.supposition | view.stage).arb_objects
+                    )
+                    and not any(
                         d.existential == e
                         for d in self.dependency_relation.dependencies
-                    ):
-                        output_set.add((e, t))
+                    )
+                ):
+                    output_set.add((e, t))
             return output_set
 
         if verbose:
@@ -1063,6 +1149,7 @@ class View:
 
         if self._uni_exi_condition(view):
             m_prime = _m_prime()
+            # M'ij ≠ ∅
             if len(m_prime) == 0:
                 if verbose:
                     print(f"ExiSumOutput: {self}")
@@ -1072,12 +1159,12 @@ class View:
                     self.stage_supp_arb_objects | view.stage_supp_arb_objects
                 )
                 r_fuse_s = self.dependency_relation.fusion(view.dependency_relation)
-                # TODO: Is this the null weights?
                 to_sum: list["View"] = []
+                # <e,t>∈M'ij
                 for e, t in m_prime:
-                    weights = _big_union(e)
-                    stage = SetOfStates(weights.keys())
+                    stage, weights = _big_union(e)
                     to_sum.append(
+                        # Sub^R⋈S_<t,e> (BIG_UNION(e)^Θ_SJ)
                         substitution(
                             arb_gen=arb_gen,
                             dep_relation=r_fuse_s,
@@ -1089,10 +1176,12 @@ class View:
                             weights=weights,
                         )
                     )
+                # ⊕^R⋈S_<e,t>∈M'ij (...)
                 sum_result: View = reduce(
                     lambda v1, v2: v1.sum(v2, r_fuse_s),
                     to_sum,
                 )
+                # Γ^Θ_fRI ⊕^R⋈S (...)
                 out = self.sum(sum_result, r_fuse_s)
                 if verbose:
                     print(f"ExiSumOutput: {out}")
