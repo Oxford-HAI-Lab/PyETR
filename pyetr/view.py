@@ -173,11 +173,34 @@ def division_cond(delta: State, supposition: Supposition, stage: Stage):
     return False
 
 
-def division_presupposition(self_stage, other_stage, other_supposition):
-    return all(
-        division_cond(delta, supposition=other_supposition, stage=self_stage)
-        for delta in other_stage
-    )
+def division_presupposition(
+    self_stage: Stage, other_stage: Stage, other_supposition: Supposition
+) -> bool:
+    """
+    Based on definition 4.38, p168
+
+    ∀δ_∈Δ ∃ψ_∈Ψ ∃γ∈Γ (δ ⊆ γ ∧ ψ ⊆ γ)
+
+    Args:
+        self_stage (Stage): Γ
+        other_stage (Stage): Δ
+        other_supposition (Supposition): Ψ
+
+    Returns:
+        bool: True if the presupposition is satisified
+    """
+
+    def division_cond(delta):
+        """
+        ∃ψ_∈Ψ ∃γ∈Γ (δ ⊆ γ ∧ ψ ⊆ γ)
+        """
+        return any(
+            delta.issubset(gamma) and psi.issubset(gamma)
+            for psi in other_supposition
+            for gamma in self_stage
+        )
+
+    return all(division_cond(delta) for delta in other_stage)
 
 
 def state_division(
@@ -187,15 +210,35 @@ def state_division(
     other_supposition: Supposition,
 ) -> State:
     """
-    Based on definition 4.38
+    Based on definition 4.38, p168
+
+    If DIVISION_PRESUPPOSITION:
+
+        γ⌀_Γ Δ^Ψ = γ – ıδ(δ ∈ Δ ∧ δ ⊆ γ ∧ ∃ψ_∈Ψ (ψ ⊆ γ))
+    Else:
+        γ⌀_Γ Δ^Ψ = γ
+
+    Args:
+        state (State): γ
+        self_stage (Stage): Γ
+        other_stage (Stage): Δ
+        other_supposition (Supposition): Ψ
+
+    Returns:
+        State: The divided state.
     """
     if division_presupposition(
         self_stage=self_stage,
         other_stage=other_stage,
         other_supposition=other_supposition,
     ):
+        # γ – ıδ(δ ∈ Δ ∧ δ ⊆ γ ∧ ∃ψ_∈Ψ (ψ ⊆ γ))
+
+        # ıδ(δ ∈ Δ ∧ δ ⊆ γ ∧ ∃ψ_∈Ψ (ψ ⊆ γ))
         delta_that_meet_cond: list[State] = []
+        # δ ∈ Δ
         for delta in other_stage:
+            # δ ⊆ γ ∧ ∃ψ_∈Ψ (ψ ⊆ γ)
             if delta.issubset(state) and any(
                 psi.issubset(state) for psi in other_supposition
             ):
@@ -212,7 +255,7 @@ def state_division(
 def phi(
     gamma: State,
     delta: State,
-    m_prime: set[tuple[FunctionalTerm | ArbitraryObject, ArbitraryObject]],
+    m_prime: set[tuple[Term, ArbitraryObject]],
     other_supposition: Supposition,
     gamma_weight: Weight,
     delta_weight: Weight,
@@ -236,8 +279,19 @@ def phi(
 def _some_gamma_doesnt_phi(
     self: "View",
     other: "View",
-    m_prime: set[tuple[FunctionalTerm | ArbitraryObject, ArbitraryObject]],
-):
+    m_prime: set[tuple[Term, ArbitraryObject]],
+) -> bool:
+    """# TODO: Finish
+    ∃γ ∈ Γ.∀δ ∈ Δ.¬Φ(γ, δ)
+
+    Args:
+        self (View): Γ
+        other (View): _description_
+        m_prime (set[tuple[Term, ArbitraryObject]]): _description_
+
+    Returns:
+        _type_: _description_
+    """
     for gamma in self.stage:
         if all(
             [
@@ -611,9 +665,11 @@ class View:
             # Corresponds to line 2
             inherited_dependencies = DependencyRelation(set(), set(), frozenset())
         if self.supposition != view.supposition:
-            raise ValueError(
-                f"Invalid sum on {self.supposition} and {view.supposition}"
-            )
+            # TODO: Added this
+            return self
+            # raise ValueError(
+            #     f"Invalid sum on {self.supposition} and {view.supposition}"
+            # )
 
         supposition = self.supposition
 
@@ -841,10 +897,8 @@ class View:
                     # ∃ψ ∈ Ψ
                     psi_exists = False
                     for psi in view.supposition:
-                        # ψ[t/u]
-                        new_psi = psi.replace({u: t})
                         # (ψ[t/u] ⊆ γ ∧ ψ⊈γ)
-                        if new_psi.issubset(gamma) and not psi.issubset(
+                        if psi.replace({u: t}).issubset(gamma) and not psi.issubset(
                             gamma
                         ):  # TODO: Changed to be the same as book? Is this correct?
                             psi_exists = True
@@ -1527,23 +1581,36 @@ class View:
         """
         Based on definition 5.22, p219
 
+        If A(Γ∪Θ) ∩ A(Δ∪Ψ) = ∅ ∧ Δ^Ψ_gSJ = Δ^Ψ_SJ
+            O Case: Γ^Θ_fRI[Δ^Ψ_gSJ]ˢ = Γ^Θ'_[R⋈R'][I∪I'] [Δ^Ψ_gSJ]ᵁ[Δ^Ψ_gSJ]ᴱ[Δ^Ψ_gSJ]ᴬ[Δ^Ψ_gSJ]ᴹ
+
+            where: Θ'^{0}_f'R'I' = Θ^{0}_fRI ⨂ Nov(Δ^Ψ_g[S]ᶰJ []ᴰ)
+
+        Else if A(Δ) ⊆ A(Γ∪Θ), [R]_Δ = S, and Δ^Ψ_gSJ = Δ^Ψ_SJ and Ψ = {0}
+            I Case: Γ^Θ_fRI[Δ^{0}_gSJ]ˢ = Γ^(Θ⨂Δ)_fRI[Δ^{0}_gSJ]ᵁ[Δ^{0}_gSJ]ᴱ[Δ^{0}_gSJ]ᴬ[Δ^{0}_gSJ]ᴹ
+
+        Else:
+            Γ^Θ_fRI[Δ^Ψ_gSJ]ᴵ = Γ^Θ_fRI
 
         Args:
-            self: (View):
-            other (View): _description_
-            verbose (bool, optional): _description_. Defaults to False.
+            self: (View): Γ^Θ_fRI
+            other (View): Δ^Ψ_gSJ
+            verbose (bool, optional): Enables verbose mode. Defaults to False.
 
         Returns:
-            View: _description_
+            View: The resultant view.
         """
         if verbose:
             print(f"SupposeInput: External: {self} Internal {other}")
-
+        # TODO: What about Δ^Ψ_gSJ = Δ^Ψ_SJ?
+        # A(Γ∪Θ) ∩ A(Δ∪Ψ) = ∅ ∧ Δ^Ψ_gSJ = Δ^Ψ_SJ
         if len(self.stage_supp_arb_objects & other.stage_supp_arb_objects) == 0:
             # O case
             arb_gen = ArbitraryObjectGenerator(
                 self.stage_supp_arb_objects | other.stage_supp_arb_objects
             )
+            # Θ'^{0}_f'R'I' = Θ^{0}_fRI ⨂ Nov(Δ^Ψ_g[S]ᶰJ []ᴰ)
+            # TODO: note difference in book, here uses f - are we supposed to generate some weights?
             v_prime = View(
                 stage=self.supposition,
                 supposition=SetOfStates({State({})}),
@@ -1562,6 +1629,7 @@ class View:
                     ).depose(verbose=verbose)
                 )
             )
+            # Γ^Θ'_[R⋈R'][I∪I'] [Δ^Ψ_gSJ]ᵁ[Δ^Ψ_gSJ]ᴱ[Δ^Ψ_gSJ]ᴬ[Δ^Ψ_gSJ]ᴹ
             out = (
                 View(
                     stage=self.stage,
@@ -1577,6 +1645,8 @@ class View:
                 .answer(other, verbose=verbose)
                 .merge(other, verbose=verbose)
             )
+        # A(Δ) ⊆ A(Γ∪Θ), [R]_Δ = S, and Δ^Ψ_gSJ = Δ^Ψ_SJ and Ψ = {0}
+        # TODO: What about Δ^Ψ_gSJ = Δ^Ψ_SJ?
         elif (
             (other.stage.arb_objects.issubset(self.stage_supp_arb_objects))
             and (
@@ -1586,6 +1656,7 @@ class View:
             and other.supposition.is_verum
         ):
             # I case
+            # Γ^(Θ⨂Δ)_fRI[Δ^{0}_gSJ]ᵁ[Δ^{0}_gSJ]ᴱ[Δ^{0}_gSJ]ᴬ[Δ^{0}_gSJ]ᴹ
             out = (
                 View(
                     stage=self.stage,
@@ -1606,61 +1677,96 @@ class View:
             print(f"SupposeOutput: {out}")
         return out
 
-    def _query_m_prime(
-        self, other: "View"
-    ) -> set[tuple[FunctionalTerm | ArbitraryObject, ArbitraryObject]]:
-        output_set = set()
-        for t, e in issue_matches(self.issue_structure, other.issue_structure):
-            if isinstance(e, ArbitraryObject) and e in (
+    def _query_m_prime(self, other: "View") -> set[tuple[Term, ArbitraryObject]]:
+        """
+        Based on definition 5.19, p210
+
+        M'ij = {<t,e> ∈ Mij : e ∈ E_S＼E_R}
+        """
+        return {
+            (t, e)
+            for t, e in issue_matches(self.issue_structure, other.issue_structure)
+            if isinstance(e, ArbitraryObject)
+            and e
+            in (
                 other.dependency_relation.existentials
                 - self.dependency_relation.existentials
-            ):
-                output_set.add((t, e))
-        return output_set
+            )
+        }
 
     def query(self, other: "View", *, verbose: bool = False) -> "View":
         """
-        Based on definition 4.41
+        Based on definition 5.19, p210
+        If U_S ⊆ U_R:
+            Γ^Θ_fRI[Δ^Ψ_gSJ]ꟴ = H + Σ_γ∈Γ Σ_δ∈Δ_s.t.Φ(γ, δ) {w_(γ,δ).δ}^Θ_R⋈<U_R,E_S＼E_R,D_S'>,I∪J
+        Else:
+            Γ^Θ_fRI[Δ^Ψ_gSJ]ꟴ = Γ^Θ_fRI
         """
 
-        if verbose:
-            print(f"QueryInput: External: {self} Internal {other}")
+        def _Ds_prime(
+            m_prime: set[tuple[Term, ArbitraryObject]]
+        ) -> frozenset[Dependency]:
+            """
+            Based on definition 4.41, p172
 
-        if other.dependency_relation.universals.issubset(
-            self.dependency_relation.universals
-        ):
-            m_prime = self._query_m_prime(other)
+            D_S' = D₁ ∪ D₂ ∪ D₃ ∪ D₄ ∪ D₅ ∪ D₆
 
+            D₁ = [D_S]_A/E_R
+            D₂ = {<eₘ,u> : ∃m∃m' ∈ M'ij(eₘ = eₘ'  ∧ tₘ ≠ tₘ') ∧ u ∈ U_R}
+            D₃ = {<eₘ,u> : <tₘ,eₘ> ∈ M'ij ∧ u ∈ U_R(tₘ)}
+            D₄ = {<eₘ,u> : <tₘ,eₘ> ∈ M'ij ∧ e ∈ E_R(tₘ) ∧ <e,u> ∈ R}
+            D₅ = {<eₘ,u> : <tₘ,eₘ> ∈ M'ij ∧ u ∈ U_R ∧ ∀u'_∈U_R(D₃∪D₄) (u' ◁_R u)}
+            D₆ = {<e,u> : e,e' ∈ E_S – E_R ∧ e ≲_S e' ∧ (∀m,m' ∈ M'ij(eₘ = e' ∧ eₘ' = e') -> tₘ = tₘ') ∧ <e',u> ∈ D₁ ∪ D₂ ∪ D₃ ∪ D₄ ∪ D₅}
+
+            Args:
+                m_prime (set[tuple[Term, ArbitraryObject]]): M'ij
+
+            Returns:
+                frozenset[Dependency]: D_S'
+            """
+            # D₁ = [D_S]_A/E_R
             D1 = other.dependency_relation.restriction(
                 other.stage_supp_arb_objects - self.dependency_relation.existentials
             ).dependencies
 
-            exis_for_pairs = set()
-            for t, e in m_prime:
-                for t_prime, e_prime in m_prime:
-                    if (e == e_prime) and (t != t_prime):
-                        exis_for_pairs.add(e)
-            D2: set[Dependency] = set()
-            for u in self.dependency_relation.universals:
-                for exi in exis_for_pairs:
-                    D2.add(Dependency(existential=exi, universal=u))
+            # D₂ = {<eₘ,u> : ∃m∃m' ∈ M'ij(eₘ = eₘ'  ∧ tₘ ≠ tₘ') ∧ u ∈ U_R}
+            #
+            #    ∃m∃m' ∈ M'ij(eₘ = eₘ'  ∧ tₘ ≠ tₘ')
+            exis_for_pairs = {
+                e
+                for t, e in m_prime
+                for t_prime, e_prime in m_prime
+                if e == e_prime and t != t_prime
+            }
+            D2 = {
+                Dependency(existential=exi, universal=u)
+                for u in self.dependency_relation.universals
+                for exi in exis_for_pairs
+            }
 
-            D3: set[Dependency] = set()
-            for t, e in m_prime:
-                for u in t.arb_objects:
-                    if u in self.dependency_relation.universals:
-                        D3.add(Dependency(existential=e, universal=u))
+            # D₃ = {<eₘ,u> : <tₘ,eₘ> ∈ M'ij ∧ u ∈ U_R(tₘ)}
+            D3 = {
+                Dependency(existential=e_m, universal=u)
+                for t_m, e_m in m_prime
+                for u in t_m.arb_objects
+                if u in self.dependency_relation.universals
+            }
 
+            # D₄ = {<eₘ,u> : <tₘ,eₘ> ∈ M'ij ∧ e ∈ E_R(tₘ) ∧ <e,u> ∈ R}
             D4: set[Dependency] = set()
+            # <tₘ,eₘ> ∈ M'ij
             for t_m, e_m in m_prime:
+                # e ∈ E_R(tₘ)
                 for e in t_m.arb_objects:
-                    if e in self.dependency_relation.existentials:
+                    if self.dependency_relation.is_existential(e):
+                        # <e,u> ∈ R
                         for dep in self.dependency_relation.dependencies:
                             if e == dep.existential:
                                 D4.add(
                                     Dependency(existential=e_m, universal=dep.universal)
                                 )
 
+            # D₅ = {<eₘ,u> : <tₘ,eₘ> ∈ M'ij ∧ u ∈ U_R ∧ ∀u'_∈U_R(D₃∪D₄) (u' ◁_R u)}
             D5: set[Dependency] = set()
             D5_u_primes = {d.universal for d in D3 | D4}
             for _, e_m in m_prime:
@@ -1672,35 +1778,65 @@ class View:
                         ]
                     ):
                         D5.add(Dependency(existential=e_m, universal=u))
-
+            # DSF = D₁ ∪ D₂ ∪ D₃ ∪ D₄ ∪ D₅
             dep_so_far = D1 | D2 | D3 | D4 | D5
-
-            D6: set[Dependency] = set()
+            # DES = E_S – E_R
             D6_exi_set = (
                 other.dependency_relation.existentials
                 - self.dependency_relation.existentials
             )
+            # D₆ = {<e,u> : e,e' ∈ DES ∧ e ≲_S e' ∧ (∀m,m' ∈ M'ij(eₘ = e' ∧ eₘ' = e') -> tₘ = tₘ') ∧ <e',u> ∈ DSF}
+            D6: set[Dependency] = set()
+            # e,e' ∈ DES
             for e in D6_exi_set:
                 for e_prime in D6_exi_set:
+                    # e ≲_S e'
+                    # TODO: Is the second condition?: (∀m,m' ∈ M'ij(eₘ = e' ∧ eₘ' = e') -> tₘ = tₘ')
                     if other.dependency_relation.less_sim(e, e_prime) and (
                         len([e_m for _, e_m in m_prime if e_m == e_prime]) < 2
                     ):
+                        # <e',u> ∈ DSF
                         for dep in dep_so_far:
                             if dep.existential == e_prime:
                                 D6.add(
                                     Dependency(existential=e, universal=dep.universal)
                                 )
 
-            D_s_prime = dep_so_far | D6
+            return dep_so_far | D6
 
-            # Stage construction
+        def _H(m_prime: set[tuple[Term, ArbitraryObject]]) -> SetOfStates:
+            """
+            If ∃γ ∈ Γ.∀δ ∈ Δ.¬Φ(γ, δ):
+                H = {0}^Θ
+            Else:
+                H =
+            Returns:
+                SetOfStates: H
+            """
+            # ∃γ ∈ Γ.∀δ ∈ Δ.¬Φ(γ, δ)
             if _some_gamma_doesnt_phi(self, other, m_prime=m_prime):
-                s1 = SetOfStates({State({})})
+                return SetOfStates({State({})})
             else:
-                s1 = SetOfStates()
+                return SetOfStates()
+
+        if verbose:
+            print(f"QueryInput: External: {self} Internal {other}")
+        # U_S ⊆ U_R
+        if other.dependency_relation.universals.issubset(
+            self.dependency_relation.universals
+        ):
+            # H + Σ_γ∈Γ Σ_δ∈Δ_s.t.Φ(γ, δ) {w_(γ,δ).δ}^Θ_R⋈<U_R,E_S＼E_R,D_S'>,I∪J
+            m_prime = self._query_m_prime(other)
+            D_s_prime = _Ds_prime(m_prime)
+
+            H = _H(m_prime)
+
             s2_weights: Weights = Weights({})
+            # δ∈Δ
             for delta in other.stage:
+                # γ∈Γ
                 for gamma in self.stage:
+                    # Φ(γ, δ)
                     if phi(
                         gamma,
                         delta,
@@ -1709,15 +1845,21 @@ class View:
                         self.weights[gamma],
                         other.weights[delta],
                     ):
+                        # {w_(γ,δ).δ}
                         other_weight = other.weights[delta]
+                        # g(δ) = <<>>
                         if other_weight.is_null:
+                            # f(γ)
                             s2_weights._adding(delta, self.weights[gamma])
+                        # g(δ) ≠ <<>>
                         else:
+                            # g(δ)
                             s2_weights._adding(delta, other_weight)
 
             s2 = SetOfStates(s2_weights.keys())
-            new_stage = s1 | s2
-            new_weights = Weights.get_null_weights(s1) + s2_weights
+            new_stage = H | s2
+            new_weights = Weights.get_null_weights(H) + s2_weights
+            # R⋈<U_R,E_S＼E_R,D_S'>
             new_dep_rel = self.dependency_relation.fusion(
                 DependencyRelation(
                     self.dependency_relation.universals,
@@ -1731,7 +1873,7 @@ class View:
                 stage=new_stage,
                 supposition=self.supposition,
                 dependency_relation=new_dep_rel,
-                issue_structure=self.issue_structure | other.issue_structure,
+                issue_structure=self.issue_structure | other.issue_structure,  # I∪J
                 weights=new_weights,
             )
         else:
