@@ -11,8 +11,10 @@ pyparsing = "^3.1.0"
 pydantic = "^2.4.2"
 
 
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
+pytest-xdist = "^3.3.1"
 pytest-cov = "^4.1.0"
 pre-commit = "^3.3.3"
 autoflake = "^2.2.0"
