@@ -139,6 +139,40 @@ class ParseCompareViaFOL(BaseParseItem):
             pass
 
 
+class OperationTest(pytest.Item):
+    def __init__(self, *args, view_string1: str, view_string2: str, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.view_string1 = view_string1
+        self.view_string2 = view_string2
+
+    def reportinfo(self):
+        return (
+            self.fspath,
+            None,
+            f"ViewString1: {self.view_string1}, ViewString2: {self.view_string2}",
+        )
+
+    def runtest(self):
+        vp = ViewParser()
+        parsed_view1 = vp.from_str(self.view_string1)
+        parsed_view2 = vp.from_str(self.view_string1)
+
+        parsed_view1.product(parsed_view2)
+        parsed_view1.sum(parsed_view2)
+        parsed_view1.atomic_answer(parsed_view2)
+        parsed_view1.equilibrium_answer(parsed_view2)
+        parsed_view1.answer(parsed_view2)
+        parsed_view1.merge(parsed_view2)
+        parsed_view1.update(parsed_view2)
+        parsed_view1.universal_product(parsed_view2)
+        parsed_view1.existential_sum(parsed_view2)
+        parsed_view1.factor(parsed_view2)
+        parsed_view1.inquire(parsed_view2)
+        parsed_view1.suppose(parsed_view2)
+        parsed_view1.query(parsed_view2)
+        parsed_view1.which(parsed_view2)
+
+
 parse_test_set: list[type[BaseParseItem]] = [
     ParseTestItem,
     ParseCompareViaJson,
@@ -154,6 +188,11 @@ class ParseTestCollector(pytest.File):
         for test_set in parse_test_set:
             for item in json_file:
                 yield test_set.from_parent(parent=self, view_string=item, name=item)
+
+        # for item1 in json_file:
+        #     for item2 in json_file:
+        #         if item1 != item2:
+        #             yield OperationTest.from_parent(parent=self, view_string1=item1, view_string2=item2, name=item1+item2)
 
 
 def is_case_file(path: Path) -> bool:

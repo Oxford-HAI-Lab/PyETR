@@ -47,8 +47,8 @@ class PredicateAtom(PredicateAtomLike[Term], Atom):
         for term in self.terms:
             if old_term == term:
                 new_terms.append(new_term)
-            elif isinstance(term, ArbitraryObject):
-                new_terms.append(old_term)
+            else:
+                new_terms.append(term)
 
         return PredicateAtom(predicate=self.predicate, terms=tuple(new_terms))
 
