@@ -70,6 +70,16 @@ class State(frozenset[Atom]):
         return "{" + ",".join(i.detailed for i in self) + "}"
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "State":
+        """
+        Replaces a series of arbitrary objects with terms and makes a new states.
+
+        Args:
+            replacements (dict[ArbitraryObject, Term]): A dict of the replacements,
+                where the keys are the existing values and the values are the new values.
+
+        Returns:
+            State: The new states.
+        """
         return State([s.replace(replacements) for s in self])
 
     def replace_term(self, old_term: Term, new_term: Term) -> "State":
@@ -78,17 +88,31 @@ class State(frozenset[Atom]):
         )
 
     def is_primitive_absurd(self, absurd_states: Optional[list["State"]]) -> bool:
+        """
+        Based on definition 4.13, p147
+
+        ∀t,t'_∈T ∀p_∈𝓐 ∀x_∈𝓐₁
+
+        contain at least {p, p̄}, {≠tt}, {=tt',x[t/?],x̄[t'/?]}
+        Args:
+            absurd_states (Optional[list["State"]]): The custom absurd states.
+
+        Returns:
+            bool: True if the state is primitive absurd.
+        """
         state = self
         if absurd_states is not None:
             for absurd_state in absurd_states:
                 if absurd_state.issubset(state):
                     return True
         # LNC
+        # {p, p̄}
         for atom in state:
             if ~atom in state:
                 return True
 
         # Aristotle
+        # {≠tt}
         for atom in state:
             if (
                 isinstance(atom, PredicateAtom)
@@ -99,6 +123,7 @@ class State(frozenset[Atom]):
                     return True
 
         # Leibniz
+        # {=tt',x[t/?],x̄[t'/?]}
         for atom in state:
             if (
                 isinstance(atom, PredicateAtom)
@@ -205,6 +230,9 @@ class SetOfStates(frozenset[State]):
 
     @property
     def is_verum(self):
+        """
+        Returns true if the state is verum.
+        """
         if len(self) == 1:
             first_elem = next(iter(self))
             return len(first_elem) == 0
@@ -213,6 +241,9 @@ class SetOfStates(frozenset[State]):
 
     @property
     def is_falsum(self):
+        """
+        Returns true if the state is falsum.
+        """
         return len(self) == 0
 
     def atomic_answer_potential(self, other: "SetOfStates") -> int:
@@ -250,10 +281,26 @@ class SetOfStates(frozenset[State]):
         return "{" + ",".join(i.detailed for i in self) + "}"
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "SetOfStates":
+        """
+        Replaces a series of arbitrary objects with terms and makes a new set of states.
+
+        Args:
+            replacements (dict[ArbitraryObject, Term]): A dict of the replacements,
+                where the keys are the existing values and the values are the new values.
+
+        Returns:
+            SetOfStates: The new set of states.
+        """
         return SetOfStates([s.replace(replacements) for s in self])
 
     @property
     def atoms(self) -> set[Atom]:
+        """
+        Get the set of atoms in a state.
+
+        Returns:
+            set[Atom]: The atoms in a state.
+        """
         a = set()
         for state in self:
             a |= state.atoms

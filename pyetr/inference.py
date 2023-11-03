@@ -22,6 +22,18 @@ from .view import View
 
 
 def basic_step(v: tuple[View, ...], verbose: bool = False) -> View:
+    """
+    Based Definition 4.47 p179-180
+
+    G' = T[P₁]^↻[]ᴰ[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
+
+    Args:
+        v (tuple[View, ...]): (P₁,..., Pₙ)
+        verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+    Returns:
+        View: G'
+    """
     out = View.get_verum()
     for i, view in enumerate(v):
         if i == 0:
@@ -32,20 +44,48 @@ def basic_step(v: tuple[View, ...], verbose: bool = False) -> View:
 
 
 def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> View:
+    """
+    Based Definition 4.47 p179-180
+
+    G' = T[P₁]^↻[]ᴰ[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
+    G'' = G'[P₁[]ᴰ]ꟳ...[Pₙ]ꟳ
+
+    Args:
+        v (tuple[View, ...]): (P₁,..., Pₙ)
+        verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+    Returns:
+        View: G''
+    """  # TODO: Where is does x follow?
     g_prime = basic_step(v=v, verbose=verbose)
     for i, view in enumerate(v):
         if i == 0:
+            # G'[P₁[]ᴰ]ꟳ
             g_prime = g_prime.factor(view.depose(verbose=verbose), verbose=verbose)
         else:
+            # G'[Pₙ]ꟳ
             g_prime = g_prime.factor(view, verbose=verbose)
     return g_prime
 
 
 def default_procedure_what_is_prob(
     v: tuple[View, ...], prob_of: View, verbose: bool = False
-):
+) -> View:
     """
     Based on definition 5.20
+
+    G' = T[P₁]^↻[]ᴰ[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
+    G'' = G'[Δ^Ψ]ꟴ
+
+    If G''[Δ]^𝔼P # TODO: finish
+
+    Args:
+        v (tuple[View, ...]): (P₁,..., Pₙ)
+        prob_of (View): Δ^Ψ
+        verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+    Returns:
+        View: G''
     """
     g_prime = basic_step(v=v, verbose=verbose)
     if verbose:
