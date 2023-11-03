@@ -165,14 +165,6 @@ def substitution(
     )
 
 
-def division_cond(delta: State, supposition: Supposition, stage: Stage):
-    for psi in supposition:
-        for gamma in stage:
-            if delta.issubset(gamma) and psi.issubset(gamma):
-                return True
-    return False
-
-
 def division_presupposition(
     self_stage: Stage, other_stage: Stage, other_supposition: Supposition
 ) -> bool:
@@ -260,41 +252,73 @@ def phi(
     gamma_weight: Weight,
     delta_weight: Weight,
 ) -> bool:
-    for ms in powerset(m_prime):
-        m_prime_set = set(ms)
+    """
+    Based on definition 5.19, p211 and 5.33, p232
+
+    Φ(γ, δ) = ∃ψ_∈Ψ ∃n≥0 ∃<t₁,e₁>,...,<tₙ,eₙ>∈M'ij (∀i,j.e_i = e_j -> i=j) ∧ (ψ∪δ[t₁/e₁,...,tₙ/eₙ] ⊆ γ) ∧ (f(γ) = g(δ)[t₁/e₁,...] ∨ g(δ) =《》)
+
+    Args:
+        gamma (State): γ
+        delta (State): δ
+        m_prime (set[tuple[Term, ArbitraryObject]]): M'ij
+        other_supposition (Supposition): Ψ
+        gamma_weight (Weight): f(γ)
+        delta_weight (Weight): g(δ)
+
+    Returns:
+        bool: Φ(γ, δ)
+    """
+    # ∃n≥0
+    for m_prime_set in powerset(m_prime):
+        # ∃ψ_∈Ψ
         for psi in other_supposition:
+            # ∃<t₁,e₁>,...,<tₙ,eₙ>∈M'ij
             exis = [e for _, e in m_prime_set]
+            # (∀i,j.e_i = e_j -> i=j)
+            first_cond = len(exis) == len(set(exis))
+
+            # [t₁/e₁,...,tₙ/eₙ]
             replacements: dict[ArbitraryObject, Term] = {e: t for t, e in m_prime_set}
-            delta_rep = delta.replace(replacements)
-            x = psi | delta_rep
-            weight_condition = (
+            # δ[t₁/e₁,...,tₙ/eₙ]
+            delta_new = delta.replace(replacements)
+            # ψ∪δ[t₁/e₁,...,tₙ/eₙ]
+            x = psi | delta_new
+            # (ψ∪δ[t₁/e₁,...,tₙ/eₙ] ⊆ γ)
+            second_cond = x.issubset(gamma)
+
+            # (f(γ) = g(δ)[t₁/e₁,...] ∨ g(δ) =《》)
+            third_cond = (
                 delta_weight.is_null
                 or delta_weight.replace(replacements) == gamma_weight
             )
-            if x.issubset(gamma) and (len(exis) == len(set(exis))) and weight_condition:
+
+            if first_cond and second_cond and third_cond:
                 return True
     return False
 
 
-def _some_gamma_doesnt_phi(
-    self: "View",
-    other: "View",
-    m_prime: set[tuple[Term, ArbitraryObject]],
-) -> bool:
-    """# TODO: Finish
-    ∃γ ∈ Γ.∀δ ∈ Δ.¬Φ(γ, δ)
+def _H(
+    self: "View", other: "View", m_prime: set[tuple[Term, ArbitraryObject]]
+) -> SetOfStates:
+    """
+    If ∃γ ∈ Γ.∀δ ∈ Δ.¬Φ(γ, δ):
+        H = {0}
+    Else:
+        H = {}
 
     Args:
         self (View): Γ
-        other (View): _description_
-        m_prime (set[tuple[Term, ArbitraryObject]]): _description_
+        other (View): Δ
+        m_prime (set[tuple[Term, ArbitraryObject]]): M'ij
 
     Returns:
-        _type_: _description_
+        SetOfStates: H
     """
-    for gamma in self.stage:
-        if all(
+    # ∃γ ∈ Γ.∀δ ∈ Δ.¬Φ(γ, δ)
+    some_gamma_doesnt_phi = any(
+        all(
             [
+                # ¬Φ(γ, δ)
                 not phi(
                     gamma,
                     delta,
@@ -303,11 +327,15 @@ def _some_gamma_doesnt_phi(
                     self.weights[gamma],
                     other.weights[delta],
                 )
-                for delta in other.stage
+                for delta in other.stage  # ∀δ ∈ Δ
             ]
-        ):
-            return True
-    return False
+        )
+        for gamma in self.stage  # ∃γ ∈ Γ
+    )
+    if some_gamma_doesnt_phi:
+        return SetOfStates({State({})})
+    else:
+        return SetOfStates()
 
 
 def issue_matches(i: IssueStructure, j: IssueStructure) -> set[tuple[Term, Term]]:
@@ -1120,11 +1148,11 @@ class View:
                     N(γ,I,e) = {x[e/?] ∈ γ : <e,x> ∈ I}
 
                     Args:
-                        gamma (State): _description_
-                        e (Existential): _description_
+                        gamma (State): γ
+                        e (Existential): e
 
                     Returns:
-                        State: _description_
+                        State: N(γ,I,e)
                     """
                     # TODO: Think this need updating??? e is overloaded??
                     atoms = set()
@@ -1804,21 +1832,6 @@ class View:
 
             return dep_so_far | D6
 
-        def _H(m_prime: set[tuple[Term, ArbitraryObject]]) -> SetOfStates:
-            """
-            If ∃γ ∈ Γ.∀δ ∈ Δ.¬Φ(γ, δ):
-                H = {0}^Θ
-            Else:
-                H =
-            Returns:
-                SetOfStates: H
-            """
-            # ∃γ ∈ Γ.∀δ ∈ Δ.¬Φ(γ, δ)
-            if _some_gamma_doesnt_phi(self, other, m_prime=m_prime):
-                return SetOfStates({State({})})
-            else:
-                return SetOfStates()
-
         if verbose:
             print(f"QueryInput: External: {self} Internal {other}")
         # U_S ⊆ U_R
@@ -1829,7 +1842,7 @@ class View:
             m_prime = self._query_m_prime(other)
             D_s_prime = _Ds_prime(m_prime)
 
-            H = _H(m_prime)
+            H = _H(self, other, m_prime)
 
             s2_weights: Weights = Weights({})
             # δ∈Δ
@@ -1884,7 +1897,19 @@ class View:
 
     def which(self, other: "View", *, verbose: bool = False) -> "View":
         """
-        Based on definition 4.42
+        Based on definition 5.53, p232
+
+        Γ^Θ_fRI[Δ^Ψ_gSJ]ᵂ = H + Σ_γ∈Γ《ω.ξ : Ξ(γ,ω.ξ)》|^Θ_RI
+
+        Ξ(γ,ω.ξ) = ∃ψ_∈Ψ ∃δ_∈Δ ∃n≥0 ∃<t₁,e₁>,...,<tₙ,eₙ>∈M'ij (∀i,j.(e_i=e_j -> i=j)) ∧ (ξ∪ψ ⊆ γ ∧ ω.ξ = (g(δ).δ)[t₁/e₁,...,tₙ/eₙ])
+
+        Args:
+            self (View): Γ^Θ_fRI
+            other (View): Δ^Ψ_gSJ
+            verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+        Returns:
+            View: The resultant view.
         """
 
         if verbose:
@@ -1897,8 +1922,7 @@ class View:
 
             def xi_fka_psi(gamma: State) -> Weights:
                 weights: Weights = Weights({})
-                for x in powerset(m_prime):
-                    m_prime_set = set(x)
+                for m_prime_set in powerset(m_prime):
                     replacements: dict[ArbitraryObject, Term] = {
                         e_n: t_n for t_n, e_n in m_prime_set
                     }
@@ -1914,12 +1938,11 @@ class View:
                                     weights._adding(xi, w)
                 return weights
 
-            if _some_gamma_doesnt_phi(self, other, m_prime):
-                H = SetOfStates({State({})})
-            else:
-                H = SetOfStates()
+            # H
+            H = _H(self, other, m_prime)
 
             s2_weights: Weights = Weights({})
+            # Σ_γ∈Γ
             for gamma in self.stage:
                 s2_weights += xi_fka_psi(gamma)
 
