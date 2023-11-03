@@ -6,8 +6,10 @@ from .stateset import SetOfStates
 
 
 class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
-    # IssueStructure contains (is) a set of atoms where each has exactly one emphasis
-    # Atoms in the stage and supposition have 0 emphasis#
+    """
+    An IssueStructure is a set of <Term, OpenAtom> where each open atom
+    has exactly one question mark
+    """
 
     def __new__(
         cls, __iterable: Optional[Iterable[tuple[Term, OpenAtom]]] = None, /
@@ -15,7 +17,7 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
         if __iterable is None:
             return super().__new__(cls)
         else:
-            cls.validate(__iterable)
+            cls._validate(__iterable)
             return super().__new__(cls, __iterable)
 
     def copy(self) -> "IssueStructure":
@@ -53,7 +55,7 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
         )
 
     @classmethod
-    def validate(cls, __iterable: Iterable[tuple[Term, OpenAtom]]):
+    def _validate(cls, __iterable: Iterable[tuple[Term, OpenAtom]]):
         for _, o in __iterable:
             if o.question_count() != 1:
                 raise ValueError(
@@ -69,11 +71,30 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
                 )
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "IssueStructure":
+        """
+        Replaces one arbitrary object found in the dependency with another term from a mapping.
+
+        Args:
+            replacements (dict[ArbitraryObject, Term]): Mapping of replacements.
+
+        Returns:
+            IssueStructure: The issue structure with replacements made.
+        """
         return IssueStructure(
             {(t.replace(replacements), a.replace(replacements)) for t, a in self}
         )
 
     def negation(self) -> "IssueStructure":
+        """
+        Based on definition 4.31, p159
+
+        [I]ᶰ = I ∪ {<t,x̄> : <t,x> ∈ I}
+
+        Negates an Issue structure
+
+        Returns:
+            IssueStructure: _description_
+        """
         return self | IssueStructure((t, ~a) for t, a in self)
 
     @property

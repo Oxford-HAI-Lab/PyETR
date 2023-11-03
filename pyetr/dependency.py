@@ -43,6 +43,15 @@ class Dependency:
     def replace(
         self, replacements: dict[ArbitraryObject, ArbitraryObject]
     ) -> "Dependency":
+        """
+        Replaces one arbitrary object found in the dependency with another from a mapping.
+
+        Args:
+            replacements (dict[ArbitraryObject, ArbitraryObject]): Mapping of replacements.
+
+        Returns:
+            Dependency: The dependency with replacements made.
+        """
         if self.existential in replacements:
             new_exi = replacements[self.existential]
         else:
@@ -142,6 +151,15 @@ class DependencyRelation:
         existentials: Iterable[Existential],
         dependencies: Iterable[Dependency],
     ) -> None:
+        """
+        A dependency relation, containing information about the dependencies
+        and the nature of the arbitrary objects.
+
+        Args:
+            universals (Iterable[Universal]): The set of universals.
+            existentials (Iterable[Existential]): The set of existentials.
+            dependencies (Iterable[Dependency]): The set of dependencies.
+        """
         self.universals = frozenset(universals)
         self.existentials = frozenset(existentials)
         self.dependencies = frozenset(dependencies)

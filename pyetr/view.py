@@ -551,6 +551,15 @@ class View:
         return self.stage.arb_objects | self.supposition.arb_objects
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "View":
+        """
+        Replaces arbitrary objects found in the view with another term from a mapping.
+
+        Args:
+            replacements (dict[ArbitraryObject, Term]): Mapping of replacements.
+
+        Returns:
+            View: The view with replacements made.
+        """
         new_stage_set: set[State] = set()
         new_weights: Weights = Weights({})
         for state in self.stage:
