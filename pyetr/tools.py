@@ -95,6 +95,18 @@ from itertools import chain, combinations
 IterType = TypeVar("IterType")
 
 
-def powerset(iterable: Iterable[IterType]) -> list[tuple[IterType, ...]]:
+def powerset(iterable: Iterable[IterType]) -> list[set[IterType]]:
+    """
+    Return the powerset of the given iterable
+
+    Args:
+        iterable (Iterable[IterType]): The input iterable
+
+    Returns:
+        list[set[IterType]: The powersets of the iterable.
+    """
     s = list(iterable)
-    return list(chain.from_iterable(combinations(s, r) for r in range(len(s) + 1)))
+    return [
+        set(i)
+        for i in (chain.from_iterable(combinations(s, r) for r in range(len(s) + 1)))
+    ]
