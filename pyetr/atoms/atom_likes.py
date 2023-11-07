@@ -8,6 +8,11 @@ AtomType = TypeVar("AtomType", bound=AbstractAtom)
 
 
 class PredicateAtomLike(Generic[TermType]):
+    """
+    This "AtomLike" is a mixin for the predicate-like properties associated
+    with PredicateAtom and PredicateOpenAtom
+    """
+
     predicate: Predicate
     terms: tuple[TermType, ...]
 
@@ -45,6 +50,11 @@ class PredicateAtomLike(Generic[TermType]):
 
 
 class DoAtomLike(Generic[AtomType]):
+    """
+    This "AtomLike" is a mixin for the doatom-like properties associated
+    with DoAtom and OpenDoAtom
+    """
+
     atoms: list[AtomType]
     polarity: bool
 

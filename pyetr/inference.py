@@ -72,13 +72,23 @@ def default_procedure_what_is_prob(
     v: tuple[View, ...], prob_of: View, verbose: bool = False
 ) -> View:
     """
-    Based on definition 5.20
+    Based on definition 5.20, p212
 
     G' = T[P₁]^↻[]ᴰ[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
     G'' = G'[Δ^Ψ]ꟴ
 
-    If G''[Δ]^𝔼P # TODO: finish
+    If G''[Δ]^𝔼P ∈ [0,100]:
+        return G''
+    Else
+        x = (100 - (Σ_γ∈ΓΣ《α ∈ f(γ) : α ∈ ℝ》)) / #{γ∈Γ : f(γ) =《》}
 
+        where γ₁...γₙ is {γ ∈ Γ : f(γ) =《》}
+        G'' = G'[{《x》.0 }^{γ₁}]ᴵ...[{《x》.0 }^{γₙ}]ᴵ[Δ^Ψ]ꟴ
+
+        If G''[Δ]^𝔼P ∈ [0,100]:
+            return G''
+        Else:
+            return ⊥
     Args:
         v (tuple[View, ...]): (P₁,..., Pₙ)
         prob_of (View): Δ^Ψ
@@ -87,17 +97,22 @@ def default_procedure_what_is_prob(
     Returns:
         View: G''
     """
+    # G' = T[P₁]^↻[]ᴰ[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
     g_prime = basic_step(v=v, verbose=verbose)
     if verbose:
         print(f"G prime: {g_prime}")
 
+    # If G''[Δ]^𝔼P ∈ [0,100]: (condition changed from book)
     if not any(w.is_null for w in g_prime.weights.values()):
         if verbose:
             print(f"Case 1")
+        # G'' = G'[Δ^Ψ]ꟴ
         return g_prime.query(prob_of, verbose=verbose)
     else:
         if verbose:
             print("Case 2")
+
+        # (Σ_γ∈ΓΣ《α ∈ f(γ) : α ∈ ℝ》
         total: float = 0
         gammas_with_empty: list[State] = []
         for s, w in g_prime.weights.items():
@@ -107,11 +122,14 @@ def default_procedure_what_is_prob(
                 if isinstance(t, FunctionalTerm) and isinstance(t.f, RealNumber):
                     total += t.f.num
 
+        # x = (100 - (Σ_γ∈ΓΣ《α ∈ f(γ) : α ∈ ℝ》)) / #{γ∈Γ : f(γ) =《》}
         x = (100 - total) / len(gammas_with_empty)
         term_x = FunctionalTerm(RealNumber(x), t=[])
 
         res = g_prime
+        # G'' = G'[{《x》.0 }^{γ₁}]ᴵ...[{《x》.0 }^{γₙ}]ᴵ[Δ^Ψ]ꟴ
         for gamma in gammas_with_empty:
+            # ...[{《x》.0 }^{γₙ}]ᴵ
             res = res.inquire(
                 View.with_restriction(
                     stage=SetOfStates([State([])]),
@@ -128,11 +146,14 @@ def default_procedure_what_is_prob(
                 ),
                 verbose=verbose,
             )
+        # ...[Δ^Ψ]ꟴ
         g_prime_prime = res.query(prob_of, verbose=verbose)
+        # G''[Δ]^𝔼P
         out = g_prime_prime.stage.equilibrium_answer_potential(
             prob_of.stage,
             g_prime_prime.weights,  # TODO: Adjusted weight extraction point based on test and previous use
         )
+        # ... ∈ [0,100]
         if isinstance(out.f, RealNumber) and out.f.num >= 0 and out.f.num <= 100:
             return g_prime_prime
         else:
@@ -145,13 +166,31 @@ def default_decision(
     pr: Iterable[View],
     verbose: bool = False,
     absurd_states: Optional[list[State]] = None,
-):
+) -> View:
+    """
+    Based on Definition 6.7, p272
+
+    dq[dq[CV]^↻[⊥]ꟳ[PR]^↻]
+
+    Args:
+        dq (View): dq
+        cv (Iterable[View]): CV
+        pr (Iterable[View]): PR
+        verbose (bool, optional): Enable verbose mode. Defaults to False.
+        absurd_states (Optional[list[State]], optional): Any additional absurd states in the system. Defaults to None.
+
+    Returns:
+        View: The resultant view.
+    """
     result = dq
+    # dq[CV]^↻
     for v in cv:
         result = result.update(v, verbose=verbose)
+    # ...[⊥]ꟳ
     result = result.factor(
         View.get_falsum(), verbose=verbose, absurd_states=absurd_states
     )
+    # ...[PR]^↻
     for v in pr:
         result = result.update(v, verbose=verbose)
     return dq.answer(result, verbose=verbose)

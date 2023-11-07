@@ -3,16 +3,24 @@ __all__ = ["Function", "RealNumber"]
 
 from typing import TYPE_CHECKING, Callable, Optional, cast
 
-from .multiset import Multiset
-
 if TYPE_CHECKING:
     from .abstract_term import AbstractFunctionalTerm
-    from .term import Term
+
 
 NumFunc = Callable[..., float]
 
 
 def apply_func(term: "AbstractFunctionalTerm", f: NumFunc) -> "AbstractFunctionalTerm":
+    """
+    Applies a numeric function to an abstract functional term, producing a new functional term.
+
+    Args:
+        term (AbstractFunctionalTerm): The FunctionalTerm to apply the numeric function to.
+        f (NumFunc): A function that takes a number of numeric arguments and returns a float
+
+    Returns:
+        AbstractFunctionalTerm: The new FunctionalTerm
+    """
     if all(
         [hasattr(i, "f") and isinstance(getattr(i, "f"), RealNumber) for i in term.t]
     ):
@@ -27,6 +35,10 @@ def apply_func(term: "AbstractFunctionalTerm", f: NumFunc) -> "AbstractFunctiona
 
 
 class Function:
+    """
+    The function to be used in a functional term
+    """
+
     name: str
     arity: Optional[int]
     _func_caller: Optional[NumFunc]
@@ -37,6 +49,18 @@ class Function:
         arity: Optional[int],
         func_caller: Optional[NumFunc] = None,
     ) -> None:
+        """
+        Create a function
+
+        Args:
+            name (str): The name of the function
+            arity (Optional[int]): The arity of the function; how many arguments it receives.
+            func_caller (Optional[NumFunc], optional): A numerical function to convert received numeric terms.
+                If None is provided, no conversion will take place. Defaults to None.
+
+        Raises:
+            ValueError: Negative arity
+        """
         if arity is not None and arity < 0:
             raise ValueError("arity must not be less than 0")
         self.name = name
@@ -46,6 +70,14 @@ class Function:
     def __call__(
         self, func_term: "AbstractFunctionalTerm"
     ) -> Optional["AbstractFunctionalTerm"]:
+        """
+        Args:
+            func_term (AbstractFunctionalTerm): The Functional Term to be converted
+
+        Returns:
+            Optional["AbstractFunctionalTerm"]: The converted functional term, or None
+                if no conversion takes place.
+        """
         if self._func_caller is None:
             return None
         return apply_func(func_term, self._func_caller)
@@ -71,11 +103,21 @@ class Function:
 
 
 class RealNumber(Function):
+    """
+    A type of function used to express real numbers
+    """
+
     def __init__(self, num: float) -> None:
         super().__init__(str(num), 0)
 
     @property
     def num(self) -> float:
+        """
+        Get the number associated with the RealNumber class
+
+        Returns:
+            float: The number
+        """
         return float(self.name)
 
     def __hash__(self) -> int:

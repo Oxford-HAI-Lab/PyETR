@@ -6,6 +6,10 @@ from .multiset import Multiset
 
 
 class AbstractTerm(ABC):
+    """
+    The abstract base class for all terms.
+    """
+
     @abstractmethod
     def __eq__(self, other) -> bool:
         ...
@@ -28,9 +32,17 @@ TermType = TypeVar("TermType", bound=AbstractTerm)
 
 
 class AbstractArbitraryObject(AbstractTerm):
+    """
+    The abstract base class for all arbitrary objects.
+    """
+
     name: str
 
     def __init__(self, name: str):
+        """
+        Args:
+            name (str): The name of the arbitrary object.
+        """
         self.name = name
 
     def __eq__(self, other) -> bool:
@@ -50,6 +62,10 @@ class AbstractArbitraryObject(AbstractTerm):
 
 
 class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
+    """
+    The abstract base class for all functional terms.
+    """
+
     f: Function
     t: tuple[TermType, ...] | Multiset[TermType]
 
@@ -58,6 +74,14 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
         f: Function,
         t: Iterable[TermType],
     ):
+        """
+        Args:
+            f (Function): Function associated with this functional term.
+            t (Iterable[TermType]): The terms of the functional term.
+
+        Raises:
+            ValueError: Length of terms did not match function arity
+        """
         if f.arity is None:
             self.t = Multiset[TermType](t)
         else:

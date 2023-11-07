@@ -1,9 +1,19 @@
 class Predicate:
+    """
+    Represents the predicate object in the atom.
+    """
+
     name: str
     verifier: bool
     arity: int
 
     def __init__(self, name: str, arity: int, _verifier: bool = True) -> None:
+        """
+        Args:
+            name (str): The name of the predicate
+            arity (int): The number of arguments the predicate requires
+            _verifier (bool, optional): True if the predicate is not negated. Defaults to True.
+        """
         self.verifier = _verifier
         self.name = name
         self.arity = arity
