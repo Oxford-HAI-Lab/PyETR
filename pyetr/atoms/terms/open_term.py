@@ -79,6 +79,16 @@ class QuestionMark(OpenTerm):
 
 
 def get_open_equivalent(term: Term) -> OpenTerm:
+    """
+    Gets the open equivalent of a term replacing all terms with
+    their open counterparts.
+
+    Args:
+        term (Term): Input term
+
+    Returns:
+        OpenTerm: Output open term
+    """
     if isinstance(term, ArbitraryObject):
         return OpenArbitraryObject(term.name)
     elif isinstance(term, FunctionalTerm):

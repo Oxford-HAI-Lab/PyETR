@@ -9,6 +9,12 @@ class Term(AbstractTerm):
     @property
     @abstractmethod
     def arb_objects(self) -> set["ArbitraryObject"]:
+        """
+        The arbitrary objects in the term.
+
+        Returns:
+            set[ArbitraryObject]: The set of arbitrary objects
+        """
         ...
 
     @abstractmethod
@@ -16,6 +22,15 @@ class Term(AbstractTerm):
         self,
         replacements: dict["ArbitraryObject", "Term"],
     ) -> "Term":
+        """
+        Replaces one arbitrary object found in the term with another term from a mapping.
+
+        Args:
+            replacements (dict[ArbitraryObject, Term]): Mapping of replacements.
+
+        Returns:
+            Self: The term with replacements made.
+        """
         ...
 
     @abstractmethod
@@ -24,6 +39,16 @@ class Term(AbstractTerm):
         old_term: "Term",
         new_term: "Term",
     ) -> "Term":
+        """
+        Replaces a single term with a another single term.
+
+        Args:
+            old_term (Term): The term to be replaced
+            new_term (Term): The new term
+
+        Returns:
+            Self: The new instance of the atom
+        """
         ...
 
 

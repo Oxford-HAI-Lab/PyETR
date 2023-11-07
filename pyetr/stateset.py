@@ -20,6 +20,10 @@ if TYPE_CHECKING:
 
 
 class State(frozenset[Atom]):
+    """
+    A frozen set of atoms.
+    """
+
     def __new__(cls, __iterable: Optional[Iterable[Atom]] = None, /) -> "State":
         if __iterable is None:
             return super().__new__(cls)
@@ -55,6 +59,12 @@ class State(frozenset[Atom]):
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
+        """
+        The arbitrary objects in the state
+
+        Returns:
+            set[ArbitraryObject]: The set of arbitrary objects
+        """
         arb_objects: set[ArbitraryObject] = set()
         for atom in self:
             arb_objects |= atom.arb_objects
@@ -148,6 +158,10 @@ class State(frozenset[Atom]):
 
 
 class SetOfStates(frozenset[State]):
+    """
+    A frozen set of states.
+    """
+
     def __new__(cls, __iterable: Optional[Iterable[State]] = None, /) -> "SetOfStates":
         if __iterable is None:
             return super().__new__(cls)
@@ -183,6 +197,12 @@ class SetOfStates(frozenset[State]):
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
+        """
+        The arbitrary objects in the set of states
+
+        Returns:
+            set[ArbitraryObject]: The set of arbitrary objects
+        """
         arb_objects: set[ArbitraryObject] = set()
         for state in self:
             arb_objects |= state.arb_objects
@@ -190,15 +210,11 @@ class SetOfStates(frozenset[State]):
 
     def __mul__(self, other: "SetOfStates") -> "SetOfStates":
         """
-        Definition 4.14 Product of set of states
+        Definition 4.14 Product of set of states, p151
+
+        Γ ⨂ Δ = {γ∪δ : γ ∈ Γ, δ ∈ Δ}
         """
-
-        output: set[State] = set()
-        for state1 in self:
-            for state2 in other:
-                output.add(state1 | state2)
-
-        return SetOfStates(output)
+        return SetOfStates({state1 | state2 for state1 in self for state2 in other})
 
     def negation(self):
         """
@@ -256,11 +272,16 @@ class SetOfStates(frozenset[State]):
         self, other: "SetOfStates", weights: "Weights"
     ) -> FunctionalTerm:
         """
-        Based on definition A.67
+        Based on definition 5.8, p204
+
+        Δ_g[Γ]^𝔼P = σ(《σ(g(δ)) | δ ∈ Y》)
+        Y = {δ ∈ Δ | ∃γ ∈ Γ.γ ⊆ δ}
         """
+        # Y = {δ ∈ Δ | ∃γ ∈ Γ.γ ⊆ δ}
         Y = SetOfStates(
             {delta for delta in self if any([gamma.issubset(delta) for gamma in other])}
         )
+        # 《σ(g(δ)) | δ ∈ Y》
         expr1: Multiset[Term] = reduce(
             lambda x, y: x + y,
             [
@@ -269,7 +290,7 @@ class SetOfStates(frozenset[State]):
             ],
             Multiset[Term]([]),
         )
-
+        # σ(EXPR1)
         return FunctionalTerm(f=Summation, t=expr1)
 
     def __repr__(self) -> str:

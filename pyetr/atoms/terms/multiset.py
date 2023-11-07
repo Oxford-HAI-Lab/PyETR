@@ -4,6 +4,10 @@ T = TypeVar("T", bound=Hashable)
 
 
 class Multiset(Generic[T]):
+    """
+    A Generic Multiset of items
+    """
+
     _items: list[T]
 
     def __init__(self, items: Iterable[T]) -> None:
