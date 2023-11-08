@@ -16,6 +16,12 @@ Existential = ArbitraryObject
 
 class ParsingError(Exception):
     def __init__(self, message: str) -> None:
+        """
+        Error in the parsing process
+
+        Args:
+            message (str): Reason for error
+        """
         super().__init__(message)
 
 

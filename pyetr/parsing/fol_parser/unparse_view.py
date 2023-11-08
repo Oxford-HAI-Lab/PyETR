@@ -10,7 +10,6 @@ from pyetr.atoms.terms import (
     RealNumber,
     Term,
 )
-from pyetr.dependency import Dependency, DependencyRelation, dependencies_to_sets
 from pyetr.issues import IssueStructure
 from pyetr.parsing.common import get_quantifiers
 from pyetr.parsing.fol_parser.parse_string import (
@@ -154,6 +153,18 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
 
 
 def unparse_view(v: View) -> list[Item]:
+    """
+    Unparses a view back to a parser object representation
+
+    Args:
+        v (View): The input view
+
+    Raises:
+        FOLNotSupportedError: View not supported by fol parser
+
+    Returns:
+        list[Item]: The parser object representation
+    """
     if not all([w.is_null for w in v.weights.values()]):
         raise FOLNotSupportedError(f"View: {v} contain weights")
     main_item: Item

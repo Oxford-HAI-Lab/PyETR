@@ -28,6 +28,10 @@ pp_right = pp.opAssoc.RIGHT  # type:ignore
 
 
 class SingleOperand:
+    """
+    Base class used for single operand parser operations
+    """
+
     name: ClassVar[str]
     arg: "Item"
 
@@ -41,6 +45,10 @@ class SingleOperand:
 
 
 class BoolNot(SingleOperand):
+    """
+    Used for parsing "not" or ~
+    """
+
     name = "BoolNot"
 
     def to_string(self):
@@ -48,6 +56,10 @@ class BoolNot(SingleOperand):
 
 
 class LogicEmphasis(SingleOperand):
+    """
+    Used for parsing *
+    """
+
     name = "LogicEmphasis"
 
     def to_string(self):
@@ -55,6 +67,10 @@ class LogicEmphasis(SingleOperand):
 
 
 class MultiOperand:
+    """
+    Base class used for multi operand parser operations
+    """
+
     name: ClassVar[str]
     operands: list["Item"]
 
@@ -74,6 +90,10 @@ class MultiOperand:
 
 
 class BoolAnd(MultiOperand):
+    """
+    Used for parsing conjunctions.
+    """
+
     name = "BoolAnd"
 
     def to_string(self) -> str:
@@ -81,6 +101,10 @@ class BoolAnd(MultiOperand):
 
 
 class BoolOr(MultiOperand):
+    """
+    Used for parsing disjunctions.
+    """
+
     name = "BoolOr"
 
     def to_string(self) -> str:
@@ -88,6 +112,10 @@ class BoolOr(MultiOperand):
 
 
 class Comma(MultiOperand):
+    """
+    Used for comma separate arguments in functions.
+    """
+
     name = "Comma"
 
     def to_string(self) -> str:
@@ -95,6 +123,10 @@ class Comma(MultiOperand):
 
 
 class Implies:
+    """
+    Used for parsing a → b
+    """
+
     left: "Item"
     right: "Item"
 
@@ -117,6 +149,10 @@ def equals_f(t):
 
 
 class Truth:
+    """
+    Used for parsing ⊤
+    """
+
     def __init__(self, t: Optional[Any] = None) -> None:
         pass
 
@@ -128,6 +164,10 @@ class Truth:
 
 
 class Falsum:
+    """
+    Used for parsing ⊥
+    """
+
     def __init__(self, t) -> None:
         pass
 
@@ -139,6 +179,10 @@ class Falsum:
 
 
 class LogicPredicate:
+    """
+    The parser logic predicate.
+    """
+
     args: list["Item"]
     name: str
 
@@ -161,7 +205,13 @@ class LogicPredicate:
 
 
 @cache
-def get_expr():
+def get_expr() -> pp.Forward:
+    """
+    Generates the parsing expression
+
+    Returns:
+        Forward: the parsing expression
+    """
     expr = pp.Forward()
     variable = (
         pp.Word(pp.alphas, pp.alphanums)
@@ -216,6 +266,18 @@ Item = AtomicItem | StatementItem
 
 
 def parse_string(input_string: str) -> list[Item]:
+    """
+    Parses the input_string to a list of parsed items.
+
+    Args:
+        input_string (str): The input string
+
+    Raises:
+        ParsingError: Failed to parse
+
+    Returns:
+        list[Item]: The output list of items
+    """
     expr = get_expr()
     try:
         new_string = expr.parse_string(input_string, parseAll=True).as_list()

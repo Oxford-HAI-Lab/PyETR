@@ -10,9 +10,8 @@ from pyetr.atoms.terms import (
     OpenTerm,
     QuestionMark,
     Term,
-    get_open_equivalent,
 )
-from pyetr.dependency import DependencyRelation, dependencies_from_sets
+from pyetr.dependency import DependencyRelation
 from pyetr.issues import IssueStructure
 from pyetr.parsing.common import (
     ParsingError,
@@ -40,6 +39,11 @@ from .parse_string import (
 
 @dataclass
 class Maps:
+    """
+    A store for all the maps, which go from name of object
+    to object
+    """
+
     variable_map: dict[str, ArbitraryObject]
     predicate_map: dict[str, Predicate]
     function_map: dict[str, Function]
@@ -52,6 +56,18 @@ T = TypeVar("T")
 def _parse_predicate(
     predicate: LogicPredicate, maps: Maps
 ) -> tuple[PredicateAtom, list[tuple[Term, OpenPredicateAtom]]]:
+    """
+    Parse a logic predicate to a predicate atom
+
+    Args:
+        predicate (LogicPredicate): The predicate to convert
+        maps (Maps): The maps of object name to object.
+
+    Returns:
+        tuple[PredicateAtom, list[tuple[Term, OpenPredicateAtom]]]: The predicate atom,
+            and a list of its associated open atoms.
+    """
+
     def _parse_term(item: Item) -> tuple[Term, list[tuple[Term, OpenTerm]]]:
         if isinstance(item, Variable):
             if item.name not in maps.variable_map:
@@ -109,6 +125,18 @@ def _parse_predicate(
 def _parse_item_with_issue(
     item: Item, maps: Maps
 ) -> tuple[SetOfStates, list[tuple[Term, OpenPredicateAtom]]]:
+    """
+    Parses the items with the issues built in.
+
+    Args:
+        item (Item): Parsed Item
+        maps (Maps): The maps of object name to object.
+
+    Returns:
+        tuple[SetOfStates, list[tuple[Term, OpenPredicateAtom]]]: The resultant set of states,
+            and a list of the issues associated.
+    """
+
     def _parse_item(
         item: Item, maps: Maps, open_atoms: list[tuple[Term, OpenPredicateAtom]]
     ) -> SetOfStates:
@@ -178,8 +206,18 @@ def _parse_view(
     view_item: Item,
     dependency_relation: DependencyRelation,
     maps: Maps,
-    add_emphasis: bool,
 ) -> View:
+    """
+    Parses the view item and dep rel, with the maps
+
+    Args:
+        view_item (Item): The item representing the view
+        dependency_relation (DependencyRelation): The dependency relation fully formed
+        maps (Maps): The maps of object name to object.
+
+    Returns:
+        View: the parsed view
+    """
     if isinstance(view_item, Implies):
         supposition = view_item.left
         stage = view_item.right
@@ -212,6 +250,16 @@ Existential = ArbitraryObject
 def gather_atomic_item(
     item: AtomicItem, object_type: Literal["Function"] | Literal["Constant"]
 ) -> list[LogicPredicate]:
+    """
+    Gathers the items of a given object type found in an atom.
+
+    Args:
+        item (AtomicItem): The atomic item
+        object_type (Literal["Function"] | Literal["Constant"]): The type of object being gathered
+
+    Returns:
+        list[LogicPredicate]: The list of items that match the object type
+    """
     out = []
 
     if (
@@ -241,6 +289,17 @@ def gather_item(
     item: Item,
     object_type: Literal["Predicate"] | Literal["Function"] | Literal["Constant"],
 ) -> list[LogicPredicate]:
+    """
+    Gathers the items of a given object type found in an atom.
+
+    Args:
+        item (Item): The item
+        object_type (Literal["Predicate"] | Literal["Function"] | Literal["Constant"]): The type
+            of object being gathered
+
+    Returns:
+        list[LogicPredicate]: The list of items that match the object type
+    """
     out = []
 
     if object_type == "Predicate" and isinstance(item, LogicPredicate):
@@ -264,11 +323,21 @@ def gather_item(
 
 
 def build_maps(
-    item: Item,
+    view_item: Item,
 ) -> tuple[dict[str, Predicate], dict[str, Function], dict[str, Function]]:
-    logic_predicates = gather_item(item, "Predicate")
-    logic_functions = gather_item(item, "Function")
-    constants = gather_item(item, "Constant")
+    """
+    Builds the predicate, function and constant maps.
+
+    Args:
+        view_item (Item): The item containing the whole view.
+
+    Returns:
+        tuple[dict[str, Predicate], dict[str, Function], dict[str, Function]]: The various
+            maps in tuple form.
+    """
+    logic_predicates = gather_item(view_item, "Predicate")
+    logic_functions = gather_item(view_item, "Function")
+    constants = gather_item(view_item, "Constant")
 
     predicate_map: dict[str, Predicate] = {}
     for predicate in logic_predicates:
@@ -303,7 +372,16 @@ def build_maps(
     return predicate_map, function_map, constant_map
 
 
-def parse_items(expr: list[Item], add_emphasis: bool) -> View:
+def parse_items(expr: list[Item]) -> View:
+    """
+    Converts the items parsed from the string to a view.
+
+    Args:
+        expr (list[Item]): The list of items from the string.
+
+    Returns:
+        View: The parsed view.
+    """
     view_item = None
     quantifieds: list[Quantified] = []
     for item in expr:
@@ -318,4 +396,4 @@ def parse_items(expr: list[Item], add_emphasis: bool) -> View:
     variable_map, dep_relation = get_variable_map_and_dependencies(quantifieds)
     predicate_map, function_map, constant_map = build_maps(view_item)
     maps = Maps(variable_map, predicate_map, function_map, constant_map)
-    return _parse_view(view_item, dep_relation, maps, add_emphasis)
+    return _parse_view(view_item, dep_relation, maps)

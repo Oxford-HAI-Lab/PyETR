@@ -2,6 +2,10 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+"""
+This file contains a number of pydantic models that correspond to parts of a view
+"""
+
 
 class Predicate(BaseModel):
     name: str
