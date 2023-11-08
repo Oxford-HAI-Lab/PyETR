@@ -113,6 +113,14 @@ def model_to_open_atom(a: models.Atom | models.DoAtom) -> OpenAtom:
 
 
 def model_to_open_atom(a: models.Atom | models.DoAtom) -> OpenAtom:
+    """
+    Converts a pydantic form atom to view openatom
+    Args:
+        a (models.Atom | models.DoAtom): Pydantic model atom
+
+    Returns:
+        OpenAtom: View OpenAtom
+    """
     if isinstance(a, models.Atom):
         return OpenPredicateAtom(
             predicate=Predicate(
@@ -142,6 +150,15 @@ def model_to_atom(a: models.Atom | models.DoAtom) -> Atom:
 
 
 def model_to_atom(a: models.Atom | models.DoAtom) -> Atom:
+    """
+    Converts a pydantic form atom to view atom
+
+    Args:
+        a (models.Atom | models.DoAtom): Pydantic model atom
+
+    Returns:
+        Atom: View atom
+    """
     if isinstance(a, models.Atom):
         return PredicateAtom(
             predicate=Predicate(
@@ -167,6 +184,15 @@ def model_to_state(s: list[models.Atom | models.DoAtom]) -> State:
 
 
 def model_to_weight(w: models.Weight) -> Weight:
+    """
+    Converts from the pydantic weight model to the view form.
+
+    Args:
+        w (models.Weight): The pydantic weights model
+
+    Returns:
+        Weight: The weight in view form
+    """
     multi = Multiset[Term](
         [
             model_to_term(cast(models.FunctionalTerm | models.ArbitraryObject, t))
@@ -183,6 +209,15 @@ def model_to_weight(w: models.Weight) -> Weight:
 
 
 def model_to_view(v: models.View) -> View:
+    """
+    Converts pydantic model View to View
+
+    Args:
+        v (models.View): Pydantic model of views
+
+    Returns:
+        View: The output view object
+    """
     issues = IssueStructure(
         [
             (

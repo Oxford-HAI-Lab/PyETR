@@ -1,7 +1,7 @@
 from typing import cast, overload
 
 import pyetr.parsing.data_parser.models as models
-from pyetr.atoms.abstract import AbstractAtom, Atom
+from pyetr.atoms.abstract import AbstractAtom
 from pyetr.atoms.doatom import DoAtom
 from pyetr.atoms.open_doatom import OpenDoAtom
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
@@ -13,7 +13,6 @@ from pyetr.atoms.terms.abstract_term import (
 )
 from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.open_term import QuestionMark
-from pyetr.atoms.terms.term import FunctionalTerm, Term
 from pyetr.dependency import DependencyRelation
 from pyetr.view import View
 
@@ -43,6 +42,16 @@ def term_to_model(
 def term_to_model(
     t: AbstractTerm,
 ) -> models.ArbitraryObject | models.FunctionalTerm | models.QuestionMark:
+    """
+    Converts a term to pydantic model form
+
+    Args:
+        t (AbstractTerm): The term
+
+    Returns:
+        models.ArbitraryObject | models.FunctionalTerm | models.QuestionMark: The pydantic model
+            form of the term.
+    """
     if isinstance(t, AbstractFunctionalTerm):
         if isinstance(t.f, RealNumber):
             new_f = models.RealNumber(num=t.f.num)
@@ -61,6 +70,15 @@ def term_to_model(
 
 
 def atom_to_model(a: AbstractAtom) -> models.Atom | models.DoAtom:
+    """
+    Converts an atom to pydantic model form
+
+    Args:
+        a (AbstractAtom): An atom or open atom
+
+    Returns:
+        models.Atom | models.DoAtom: The pydantic model form of the atom.
+    """
     if isinstance(a, (PredicateAtom, OpenPredicateAtom)):
         return models.Atom(
             predicate=models.Predicate(
@@ -80,6 +98,15 @@ def atom_to_model(a: AbstractAtom) -> models.Atom | models.DoAtom:
 
 
 def dependency_rel_to_model(dep_rel: DependencyRelation) -> models.DependencyRelation:
+    """
+    Converts a dependency relation to pydantic model form.
+
+    Args:
+        dep_rel (DependencyRelation): The dependency relation.
+
+    Returns:
+        models.DependencyRelation: The pydantic model form of the dependency relation.
+    """
     universals = [term_to_model(i) for i in dep_rel.universals]
     existentials = [term_to_model(i) for i in dep_rel.existentials]
     dependencies = [
@@ -95,6 +122,15 @@ def dependency_rel_to_model(dep_rel: DependencyRelation) -> models.DependencyRel
 
 
 def view_to_model(v: View) -> models.View:
+    """
+    Converts a View to pydantic model form
+
+    Args:
+        v (View): View
+
+    Returns:
+        models.View: Pydantic model view
+    """
     return models.View(
         stage=[[atom_to_model(atom) for atom in state] for state in v.stage],
         supposition=[
