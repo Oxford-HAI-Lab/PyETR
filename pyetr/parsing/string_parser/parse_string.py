@@ -141,25 +141,8 @@ class Function(Term):
     name: str
 
     def __init__(self, t) -> None:
-        if len(t) == 1 and isinstance(t[0], str):
-            self.name = t[0]
-            self.args = []
-        else:
-            if len(t) == 2:
-                self.name = t[0]
-                if isinstance(t[1], Comma):
-                    self.args = t[1].args
-                else:
-                    self.args = [t[1]]
-            elif len(t) == 1:
-                items = t[0]
-                self.name = items[0]
-                if isinstance(items[1], Comma):
-                    self.args = items[1].args
-                else:
-                    self.args = [items[1]]
-            else:
-                assert False
+        self.name = t[0]
+        self.args = t[1:]
 
     def __repr__(self) -> str:
         return f"<Function name={self.name} args={self.args}>"
@@ -173,11 +156,7 @@ class Summation(Term):
     args: list["Term"]
 
     def __init__(self, t) -> None:
-        if len(t) == 1 and isinstance(t[0], str):
-            self.args = []
-        else:
-            items = t[0]
-            self.args = items[1].args
+        self.args = t[1:]
 
     def __repr__(self) -> str:
         return f"<Summation args={self.args}>"
@@ -323,12 +302,10 @@ class Stage:
 
 @cache
 def get_terms(variable: ParserElement) -> ParserElement:
-    function_word = (pp.Word(pp.alphas, pp.alphanums)).setResultsName("predicate")
+    term = pp.Forward()
 
-    function_0 = (function_word + pp.Suppress("()")).setParseAction(Function)
     emphasis = pp.Suppress(pp.Char("*"))
     xbar = pp.Suppress(pp.Literal("**") | pp.Literal("x̄"))
-    comma = pp.Suppress(",")
     real_word = (
         pp.Optional(pp.Literal("-"))
         + pp.Word(pp.nums)
@@ -336,19 +313,29 @@ def get_terms(variable: ParserElement) -> ParserElement:
     )
     reals = real_word.setResultsName("reals").setParseAction(Real)
     summation_word = pp.Literal("++") | pp.Literal("σ")
+    function = (
+        (pp.Word(pp.alphas, pp.alphanums))
+        + pp.Suppress("(")
+        + pp.Optional(pp.delimitedList(term))
+        + pp.Suppress(")")
+    ).setParseAction(Function)
+    summation = (
+        summation_word
+        + pp.Suppress("(")
+        + pp.Optional(pp.delimitedList(term))
+        + pp.Suppress(")")
+    ).setParseAction(Summation)
     terms = pp.infixNotation(
-        function_0 | reals | variable,
+        function | summation | reals | variable,
         [
-            (summation_word, 1, pp_right, Summation),
-            (function_word, 1, pp_right, Function),
             (xbar, 2, pp_left, Xbar),
             (emphasis, 1, pp_left, Emphasis),
-            (comma, 2, pp_left, Comma),
         ],
         lpar=pp.Suppress("("),
         rpar=pp.Suppress(")"),
     )
-    return pp.ZeroOrMore(terms)
+    term <<= terms
+    return pp.ZeroOrMore(term)
 
 
 @cache
@@ -369,7 +356,7 @@ def get_expr():
     quantified_expr = pp.Group(quantifier + variable).setParseAction(Quantified)
 
     do_word = pp.Literal("do")
-    predicate_word = (pp.Word(pp.alphanums) + ~do_word) | pp.Literal("==")
+    predicate_word = (pp.Word(pp.alphas, pp.alphanums) + ~do_word) | pp.Literal("==")
 
     terms = get_terms(variable).setResultsName("terms", listAllMatches=True)
 
@@ -377,7 +364,7 @@ def get_expr():
         pp.Optional("~")
         + predicate_word
         + pp.Suppress("(")
-        + terms
+        + pp.Optional(pp.delimitedList(terms))
         + pp.Suppress(")").setResultsName("atom", listAllMatches=True)
     ).setParseAction(Atom)
     doatom = (
