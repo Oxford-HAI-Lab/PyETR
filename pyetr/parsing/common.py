@@ -26,6 +26,10 @@ class ParsingError(Exception):
 
 
 class Variable:
+    """
+    Representation of a variable in parser form.
+    """
+
     name: str
 
     def __init__(self, t) -> None:
@@ -39,6 +43,10 @@ class Variable:
 
 
 class Quantified:
+    """
+    Represents a quantifier and variable pair in parser form.
+    """
+
     variable: Variable
     quantifier: str
 
@@ -64,6 +72,17 @@ class Quantified:
 def get_variable_map_and_dependencies(
     quantifieds: list[Quantified],
 ) -> tuple[dict[str, ArbitraryObject], DependencyRelation]:
+    """
+    Get the variable map and dependency relation based on a list of quantifiers.
+
+    Args:
+        quantifieds (list[Quantified]): A list of quantifier and variable pairs.
+
+    Returns:
+        tuple[dict[str, ArbitraryObject], DependencyRelation]: The tuple is formed of two parts:
+            dict[str, ArbitraryObject]: The variable map
+            DependencyRelation: The dependency relation.
+    """
     variable_map: dict[str, ArbitraryObject] = {}
     encountered_universals: list[tuple[Universal, set[Existential]]] = []
     existentials: set[Existential] = set()
@@ -82,7 +101,7 @@ def get_variable_map_and_dependencies(
         if quantified.variable.name not in variable_map:
             variable_map[quantified.variable.name] = arb_obj
         else:
-            raise ValueError(
+            raise ParsingError(
                 f"Variable {quantified.variable.name} appears twice in quantifiers"
             )
 
@@ -96,6 +115,18 @@ def get_variable_map_and_dependencies(
 def merge_terms_with_opens(
     terms: list[Term], open_term_sets: list[list[tuple[Term, OpenTerm]]]
 ) -> list[tuple[Term, list[OpenTerm]]]:
+    """
+    Combines a list of terms from inside an object, and combines them
+
+    Args:
+        terms (list[Term]): A list of terms inside an atom [A, B]
+        open_term_sets (list[list[tuple[Term, OpenTerm]]]): The open terms associated with
+        each as here: [[(A, openA1), (A, openA2)],[(B, openB1)]]
+
+    Returns:
+        list[tuple[Term, list[OpenTerm]]]: The merged form:
+            [(A, [openA1, B]), (A, [openA2, B]), (B, [A, openB1])]
+    """
     new_terms = [get_open_equivalent(t) for t in terms]
     new_terms_sets: list[tuple[Term, list[OpenTerm]]] = []
     for i, open_terms in enumerate(open_term_sets):
@@ -111,6 +142,19 @@ def merge_atoms_with_opens(
     atoms: list[PredicateAtom],
     open_atom_sets: list[list[tuple[Term, OpenPredicateAtom]]],
 ) -> list[tuple[Term, list[OpenPredicateAtom]]]:
+    """
+
+    Combines a list of atoms from inside an object, and combines them
+
+    Args:
+        atoms (list[PredicateAtom]): A list of atoms inside a doatom [A, B]
+        open_atom_sets (list[list[tuple[Term, OpenPredicateAtom]]]): The open atoms associated with
+        each as here: [[(A, openA1), (A, openA2)],[(B, openB1)]]
+
+    Returns:
+        list[tuple[Term, list[OpenPredicateAtom]]]: The merged form:
+            [(A, [openA1, B]), (A, [openA2, B]), (B, [A, openB1])]
+    """
     new_atoms = [get_open_atom_equivalent(a) for a in atoms]
     new_atoms_sets: list[tuple[Term, list[OpenPredicateAtom]]] = []
     for i, open_atoms in enumerate(open_atom_sets):
@@ -123,6 +167,10 @@ def merge_atoms_with_opens(
 
 
 class QuantList:
+    """
+    Simulates needed interface for parser
+    """
+
     variables: list[Variable]
     quantifier: str
 
@@ -134,6 +182,16 @@ class QuantList:
 def order_quantifieds(
     unordered_quantifieds: dict[str, Quantified], dependencies: frozenset[Dependency]
 ) -> list[Quantified]:
+    """
+    Order the quantifieds based on the dependencies
+
+    Args:
+        unordered_quantifieds (dict[str, Quantified]): a mapping from name to Quantified
+        dependencies (frozenset[Dependency]): The dependencies from the dependency relation
+
+    Returns:
+        list[Quantified]: An ordered list of quantified.
+    """
     # All unspecified exis get put to the front
     # The ordering is based on the right most having the least
     # restrictions, then moving left with more and more deps
@@ -168,17 +226,26 @@ def order_quantifieds(
     return final_out
 
 
-def get_quantifiers(
-    arb_objects: set[ArbitraryObject], dependency_relation: DependencyRelation
-) -> list[Quantified]:
+def get_quantifiers(dependency_relation: DependencyRelation) -> list[Quantified]:
+    """
+    Gets the list of quantifieds based on the dependency relation
+
+    Args:
+        dependency_relation (DependencyRelation): The dependency relation.
+
+    Returns:
+        list[Quantified]: The ordered quantifiers.
+    """
     unordered_quantifieds: dict[str, Quantified] = {}
-    for arb_object in arb_objects:
-        if arb_object.name not in unordered_quantifieds:
-            if dependency_relation.is_existential(arb_object):
-                quant = "∃"
-            else:
-                quant = "∀"
-            unordered_quantifieds[arb_object.name] = Quantified(
-                [QuantList([Variable([arb_object.name])], quantifier=quant)]
+    for exi in dependency_relation.existentials:
+        if exi.name not in unordered_quantifieds:
+            unordered_quantifieds[exi.name] = Quantified(
+                [QuantList([Variable([exi.name])], quantifier="∃")]
             )
+    for uni in dependency_relation.universals:
+        if uni.name not in unordered_quantifieds:
+            unordered_quantifieds[uni.name] = Quantified(
+                [QuantList([Variable([uni.name])], quantifier="∀")]
+            )
+
     return order_quantifieds(unordered_quantifieds, dependency_relation.dependencies)

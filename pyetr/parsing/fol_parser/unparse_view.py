@@ -205,7 +205,4 @@ def unparse_view(v: View) -> list[Item]:
         stage = unparse_set_of_states(v.stage, v.issue_structure)
         supposition = unparse_set_of_states(v.supposition, v.issue_structure)
         main_item = Implies([[supposition, stage]])
-    all_arb = v.stage.arb_objects | v.supposition.arb_objects
-    output: list[Quantified] = get_quantifiers(all_arb, v.dependency_relation)
-
-    return [*output, main_item]
+    return [*get_quantifiers(v.dependency_relation), main_item]
