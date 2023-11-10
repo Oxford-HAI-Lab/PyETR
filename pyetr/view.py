@@ -506,10 +506,6 @@ class View:
             issue_string = f" issues={self.issue_structure}"
 
         quants = get_quantifiers(
-            set(
-                self.dependency_relation.universals
-                | self.dependency_relation.existentials
-            ),
             self.dependency_relation,
         )
         quant_str = " ".join([i.to_string() for i in quants])

@@ -244,9 +244,6 @@ def unparse_view(v: View) -> parsing.ParserView:
         parsing.ParserView: The parsing form of the view.
     """
     quantifiers = get_quantifiers(
-        arb_objects=v.stage.arb_objects
-        | v.supposition.arb_objects
-        | v.weights.arb_objects,
         dependency_relation=v.dependency_relation,
     )
     stage = unparse_stage(v.weights, v.issue_structure)
