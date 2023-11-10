@@ -33,6 +33,17 @@ def parse_term(
     variable_map: dict[str, ArbitraryObject],
     function_map: dict[str, Function],
 ) -> tuple[Term, list[tuple[Term, OpenTerm]]]:
+    """
+    Convert parser representation term to view term.
+
+    Args:
+        t (parsing.Term): The term
+        variable_map (dict[str, ArbitraryObject]): The map from variable name to variable.
+        function_map (dict[str, Function]): The map from function name to function.
+
+    Returns:
+        tuple[Term, list[tuple[Term, OpenTerm]]]: Tuple of terms and open terms associated.
+    """
     if isinstance(t, Variable):
         return variable_map[t.name], []
     elif isinstance(t, parsing.Emphasis):
@@ -92,6 +103,18 @@ def parse_predicate_atom(
     variable_map: dict[str, ArbitraryObject],
     function_map: dict[str, Function],
 ) -> tuple[PredicateAtom, list[tuple[Term, OpenPredicateAtom]]]:
+    """
+    Parse the parser atom to predicate atom form.
+
+    Args:
+        atom (parsing.Atom): Parser atom representation
+        variable_map (dict[str, ArbitraryObject]): The map from variable name to variable.
+        function_map (dict[str, Function]): The map from function name to function.
+
+    Returns:
+        tuple[PredicateAtom, list[tuple[Term, OpenPredicateAtom]]]: The parsed predicate atom
+            and associated open atoms.
+    """
     terms: list[Term] = []
     open_term_sets: list[list[tuple[Term, OpenTerm]]] = []
     for item in atom.terms:
@@ -118,6 +141,18 @@ def parse_do_atom(
     variable_map: dict[str, ArbitraryObject],
     function_map: dict[str, Function],
 ) -> tuple[DoAtom, list[tuple[Term, OpenDoAtom]]]:
+    """
+    Converts the parser do atom to DoAtom form.
+
+    Args:
+        atom (parsing.DoAtom): The Parser do atom
+        variable_map (dict[str, ArbitraryObject]): The map from variable name to variable.
+        function_map (dict[str, Function]): The map from function name to function.
+
+    Returns:
+        tuple[DoAtom, list[tuple[Term, OpenDoAtom]]]: The parsed do atom and its associated open
+            terms.
+    """
     atoms: list[PredicateAtom] = []
     open_atom_sets: list[list[tuple[Term, OpenPredicateAtom]]] = []
     for a in atom.atoms:
@@ -142,6 +177,19 @@ def parse_state(
     variable_map: dict[str, ArbitraryObject],
     function_map: dict[str, Function],
 ) -> tuple[State, list[tuple[Term, OpenAtom]]]:
+    """
+    Parses the state from the parsing representation to the state and associated
+    open atoms.
+
+    Args:
+        s (parsing.State): The parsing representation of the state.
+        variable_map (dict[str, ArbitraryObject]): The map from variable name to variable.
+        function_map (dict[str, Function]): The map from function name to function.
+
+    Returns:
+        tuple[State, list[tuple[Term, OpenAtom]]]: The parsed state and its associated open
+            terms.
+    """
     issues: list[tuple[Term, OpenAtom]] = []
     new_atoms: list[Atom] = []
     for atom in s.atoms:
@@ -163,6 +211,18 @@ def parse_weighted_states(
     variable_map: dict[str, ArbitraryObject],
     function_map: dict[str, Function],
 ) -> tuple[dict[State, Weight], list[tuple[Term, OpenAtom]]]:
+    """
+    Parses the weighted state from the parsing representation to the weights and associated
+    open atoms.
+
+    Args:
+        w_states (list[parsing.WeightedState]): _description_
+        variable_map (dict[str, ArbitraryObject]): _description_
+        function_map (dict[str, Function]): _description_
+
+    Returns:
+        tuple[dict[State, Weight], list[tuple[Term, OpenAtom]]]: _description_
+    """
     weights: dict[State, Weight] = {}
     issues: list[tuple[Term, OpenAtom]] = []
     for state in w_states:
@@ -193,6 +253,15 @@ def parse_weighted_states(
 
 
 def gather_funcs(term: parsing.Term) -> list[Function]:
+    """
+    Gathers the functions present in a term.
+
+    Args:
+        term (parsing.Term): The term to gather functions from
+
+    Returns:
+        list[Function]: The functions in the term.
+    """
     funcs: list[Function] = []
     if isinstance(term, parsing.Real):
         funcs.append(RealNumber(term.num))
@@ -222,6 +291,17 @@ def get_function_map(
     supposition: Optional[parsing.Supposition],
     custom_functions: list[Function],
 ) -> dict[str, Function]:
+    """
+    Get the function map from name to object.
+
+    Args:
+        stage (parsing.Stage): The parser representation of the stage
+        supposition (Optional[parsing.Supposition]):  The parser representation of the supposition, if there is one
+        custom_functions (list[Function]): Additional "override" functions.
+
+    Returns:
+        dict[str, Function]: The map between function name and object.
+    """
     terms_to_scan: list[parsing.Term] = []
     for state in stage.states:
         if state.additive is not None:
@@ -256,6 +336,16 @@ def get_function_map(
 
 
 def parse_pv(pv: parsing.ParserView, custom_functions: list[Function]) -> View:
+    """
+    Parses the view from parser representation to view representation.
+
+    Args:
+        pv (parsing.ParserView): The parser representation of a view.
+        custom_functions (list[Function]): A list of custom functions to use in the view.
+
+    Returns:
+        View: The parsed view.
+    """
     variable_map, dep_rel = get_variable_map_and_dependencies(pv.quantifiers)
     function_map = get_function_map(pv.stage, pv.supposition, custom_functions)
     w_stage, issues = parse_weighted_states(

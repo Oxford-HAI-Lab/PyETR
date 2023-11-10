@@ -1,5 +1,3 @@
-from typing import Self
-
 from .abstract import Atom
 from .atom_likes import DoAtomLike
 from .predicate_atom import PredicateAtom
@@ -17,7 +15,7 @@ class DoAtom(DoAtomLike[PredicateAtom], Atom):
             output_objs |= atom.arb_objects
         return output_objs
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> Self:
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "DoAtom":
         return DoAtom({atom.replace(replacements) for atom in self.atoms})
 
     def replace_term(

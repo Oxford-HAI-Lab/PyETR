@@ -1,5 +1,3 @@
-from typing import Self
-
 from pyetr.atoms.terms.open_term import get_open_equivalent
 
 from .abstract import OpenAtom
@@ -20,11 +18,11 @@ class OpenPredicateAtom(PredicateAtomLike[OpenTerm], OpenAtom):
             question_count += term.question_count()
         return question_count
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> Self:
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenPredicateAtom":
         new_terms = tuple([term.replace(replacements) for term in self.terms])
         return OpenPredicateAtom(predicate=self.predicate, terms=new_terms)
 
-    def __invert__(self) -> Self:
+    def __invert__(self) -> "OpenPredicateAtom":
         return OpenPredicateAtom(~self.predicate, self.terms)
 
 

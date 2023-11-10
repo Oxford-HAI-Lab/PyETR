@@ -1,5 +1,3 @@
-from typing import Self
-
 from .abstract import OpenAtom
 from .atom_likes import DoAtomLike
 from .doatom import DoAtom
@@ -8,10 +6,10 @@ from .terms import ArbitraryObject, Term
 
 
 class OpenDoAtom(DoAtomLike[OpenPredicateAtom], OpenAtom):
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> Self:
+    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenDoAtom":
         return OpenDoAtom({atom.replace(replacements) for atom in self.atoms})
 
-    def __invert__(self) -> Self:
+    def __invert__(self) -> "OpenDoAtom":
         return OpenDoAtom(self.atoms, not self.polarity)
 
     def __call__(self, term: Term) -> DoAtom:
