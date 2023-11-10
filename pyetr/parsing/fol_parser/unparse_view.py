@@ -31,11 +31,26 @@ from pyetr.view import View
 
 
 class FOLNotSupportedError(Exception):
+    """
+    Used for errors where the first order logic parser does not support a view.
+    """
+
     def __init__(self, msg: str) -> None:
         super().__init__(msg)
 
 
 def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
+    """
+    Used to convert a term and list of open terms back into an item.
+
+    Args:
+        term (Term): The term to convert.
+        open_terms (list[tuple[Term, OpenTerm]]): The list of open terms relevant to
+            the term.
+
+    Returns:
+        Item: The term in item form.
+    """
     if any([isinstance(o, QuestionMark) for _, o in open_terms]):
         remaining_terms = [
             (t, o) for t, o in open_terms if not isinstance(o, QuestionMark)
@@ -67,9 +82,29 @@ def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
         raise ValueError(f"Invalid term {term} provided")
 
 
-def _convert_atom(
-    atom: PredicateAtom, open_atoms: list[tuple[Term, OpenPredicateAtom]]
-):
+def convert_atom(
+    atom: PredicateAtom,
+    issue_structure: IssueStructure,
+    issue_atoms: list[PredicateAtom],
+) -> LogicPredicate | BoolNot:
+    """
+    Converts predicate atom and related issues into Item
+
+    Args:
+        atom (PredicateAtom): The predicate atom to convert.
+        issue_structure (IssueStructure): The issue structure
+        issue_atoms (list[PredicateAtom]): The relevant issue atoms
+
+    Returns:
+        LogicPredicate | BoolNot: The converted atom
+    """
+    open_atoms: list[tuple[Term, OpenPredicateAtom]] = []
+    for i, (term, open_atom) in enumerate(issue_structure):
+        issue_atom = issue_atoms[i]
+        if issue_atom == atom:
+            assert isinstance(open_atom, OpenPredicateAtom)
+            open_atoms.append((term, open_atom))
+
     new_terms: list[Item] = []
     for i, term in enumerate(atom.terms):
         open_terms = [(t, o.terms[i]) for t, o in open_atoms]
@@ -81,21 +116,17 @@ def _convert_atom(
         return BoolNot([[inner]])
 
 
-def convert_atom(
-    atom: PredicateAtom,
-    issue_structure: IssueStructure,
-    issue_atoms: list[PredicateAtom],
-):
-    open_atoms: list[tuple[Term, OpenPredicateAtom]] = []
-    for i, (term, open_atom) in enumerate(issue_structure):
-        issue_atom = issue_atoms[i]
-        if issue_atom == atom:
-            assert isinstance(open_atom, OpenPredicateAtom)
-            open_atoms.append((term, open_atom))
-    return _convert_atom(atom, open_atoms)
-
-
 def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> Item:
+    """
+    Unparses a set of states and issue structure into item form
+
+    Args:
+        s (SetOfStates): A set of states to unparse
+        issue_structure (IssueStructure): The issue structure
+
+    Returns:
+        Item: The unparsed item.
+    """
     if s.is_falsum:
         return Falsum([])
     elif s.is_verum:

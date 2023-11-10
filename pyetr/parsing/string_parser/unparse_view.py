@@ -21,16 +21,20 @@ from pyetr.view import View
 from pyetr.weight import Weight, Weights
 
 
-def unparse_multiset(multiset: Multiset[Term]) -> list[parsing.Term | Variable]:
-    new_subterms: list[parsing.Term | Variable] = []
-    for subterm in multiset:
-        new_subterms.append(unparse_term(subterm, []))
-    return new_subterms
-
-
 def unparse_term(
     term: Term, open_terms: list[tuple[Term, OpenTerm]]
 ) -> parsing.Term | Variable:
+    """
+    Converts a term and associated open terms to a parsing term.
+
+    Args:
+        term (Term): A view term
+        open_terms (list[tuple[Term, OpenTerm]]): The term's associated
+            open terms.
+
+    Returns:
+        parsing.Term | Variable: The parsing term.
+    """
     if any([isinstance(o, QuestionMark) for _, o in open_terms]):
         remaining_terms = [
             (t, o) for t, o in open_terms if not isinstance(o, QuestionMark)
@@ -65,17 +69,38 @@ def unparse_term(
         raise ValueError(f"Invalid term {term} provided")
 
 
+def unparse_multiset(multiset: Multiset[Term]) -> list[parsing.Term | Variable]:
+    """
+    Converts a multiset of terms to a list of parsing terms.
+
+    Args:
+        multiset (Multiset[Term]): A multiset of terms
+
+    Returns:
+        list[parsing.Term | Variable]: A list of parsing terms
+    """
+    return [unparse_term(subterm, []) for subterm in multiset]
+
+
 def unparse_predicate_atom(
     predicate_atom: PredicateAtom, open_atoms: list[tuple[Term, OpenPredicateAtom]]
 ) -> parsing.Atom:
-    new_terms: list[parsing.Term | Variable] = []
-    for i, term in enumerate(predicate_atom.terms):
-        open_terms = [(t, o.terms[i]) for t, o in open_atoms]
-        new_terms.append(unparse_term(term, open_terms))
-    if predicate_atom.predicate.verifier:
-        items = []
-    else:
-        items = ["~"]
+    """
+    Converts a predicate atom to parsing atom form.
+
+    Args:
+        predicate_atom (PredicateAtom): The atom to be parsed
+        open_atoms (list[tuple[Term, OpenPredicateAtom]]): The associated open atoms.
+
+    Returns:
+        parsing.Atom: The atom in parsing form.
+    """
+    new_terms: list[parsing.Term | Variable] = [
+        unparse_term(term, [(t, o.terms[i]) for t, o in open_atoms])
+        for i, term in enumerate(predicate_atom.terms)
+    ]
+    items = [] if predicate_atom.predicate.verifier else ["~"]
+
     items.append(predicate_atom.predicate.name)
     return parsing.Atom(items + new_terms)
 
@@ -83,14 +108,22 @@ def unparse_predicate_atom(
 def unparse_do_atom(
     do_atom: DoAtom, open_do_atoms: list[tuple[Term, OpenDoAtom]]
 ) -> parsing.DoAtom:
-    new_atoms: list[parsing.Atom] = []
-    for i, atom in enumerate(do_atom.atoms):
-        open_atoms = [(t, list(o.atoms)[i]) for t, o in open_do_atoms]
-        new_atoms.append(unparse_predicate_atom(atom, open_atoms))
-    if do_atom.polarity:
-        items = []
-    else:
-        items = ["~"]
+    """
+    Converts a do atom to parsing atom form.
+
+    Args:
+        do_atom (DoAtom): The do atom to convert
+        open_do_atoms (list[tuple[Term, OpenDoAtom]]): The associated open
+            do atoms.
+
+    Returns:
+        parsing.DoAtom: The parsing do atom.
+    """
+    new_atoms: list[parsing.Atom] = [
+        unparse_predicate_atom(atom, [(t, list(o.atoms)[i]) for t, o in open_do_atoms])
+        for i, atom in enumerate(do_atom.atoms)
+    ]
+    items = [] if do_atom.polarity else ["~"]
 
     return parsing.DoAtom(items + new_atoms)
 
@@ -98,6 +131,16 @@ def unparse_do_atom(
 def unparse_atom(
     atom: Atom, issue_structure: IssueStructure
 ) -> parsing.Atom | parsing.DoAtom:
+    """
+    Converts an atom to the parsing form.
+
+    Args:
+        atom (Atom): The atom to convert
+        issue_structure (IssueStructure): The issue structure of the view.
+
+    Returns:
+        parsing.Atom | parsing.DoAtom: The atom in parsing form.
+    """
     open_atoms = [
         (term, open_atom)
         for term, open_atom in issue_structure
@@ -114,12 +157,33 @@ def unparse_atom(
 
 
 def unparse_state(state: State, issue_structure: IssueStructure) -> parsing.State:
+    """
+    Converts a state to parsing form.
+
+    Args:
+        state (State): The state to convert.
+        issue_structure (IssueStructure): The issue structure of the view.
+
+    Returns:
+        parsing.State: The parsing form of the state.
+    """
     return parsing.State([unparse_atom(atom, issue_structure) for atom in state])
 
 
 def unparse_weighted_state(
     state: State, weight: Weight, issue_structure: IssueStructure
 ) -> parsing.WeightedState:
+    """
+    Converts a state and weight to weighted state parsing form.
+
+    Args:
+        state (State): The state to convert.
+        weight (Weight): The weight to convert.
+        issue_structure (IssueStructure): The issue structure of the view.
+
+    Returns:
+        parsing.WeightedState: The weighted state parsing form.
+    """
     items: list[
         parsing.State | parsing.AdditiveWeight | parsing.MultiplicativeWeight
     ] = [unparse_state(state, issue_structure)]
@@ -133,6 +197,16 @@ def unparse_weighted_state(
 
 
 def unparse_stage(weights: Weights, issue_structure: IssueStructure) -> parsing.Stage:
+    """
+    Converts the stage in weights form to parsing form.
+
+    Args:
+        weights (Weights): The weighted stage.
+        issue_structure (IssueStructure): The issue structure of the view.
+
+    Returns:
+        parsing.Stage: The stage in parsing form.
+    """
     return parsing.Stage(
         [
             unparse_weighted_state(state, weight, issue_structure)
@@ -144,12 +218,31 @@ def unparse_stage(weights: Weights, issue_structure: IssueStructure) -> parsing.
 def unparse_supposition(
     supposition: Supposition, issue_structure: IssueStructure
 ) -> parsing.Supposition:
+    """
+    Converts the supposition to parsing form.
+
+    Args:
+        supposition (Supposition): The supposition of the view.
+        issue_structure (IssueStructure): The issue structure for the view.
+
+    Returns:
+        parsing.Supposition: The supposition in parsing form.
+    """
     return parsing.Supposition(
         [unparse_state(state, issue_structure=issue_structure) for state in supposition]
     )
 
 
 def unparse_view(v: View) -> parsing.ParserView:
+    """
+    Convert the view to parsing form.
+
+    Args:
+        v (View): The input view.
+
+    Returns:
+        parsing.ParserView: The parsing form of the view.
+    """
     quantifiers = get_quantifiers(
         arb_objects=v.stage.arb_objects
         | v.supposition.arb_objects

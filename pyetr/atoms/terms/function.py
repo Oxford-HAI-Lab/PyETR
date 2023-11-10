@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Callable, Optional, cast
 if TYPE_CHECKING:
     from .abstract_term import AbstractFunctionalTerm
 
+from inspect import signature
 
 NumFunc = Callable[..., float]
 
@@ -81,6 +82,23 @@ class Function:
         if self._func_caller is None:
             return None
         return apply_func(func_term, self._func_caller)
+
+    @classmethod
+    def numeric(cls, func_caller: NumFunc) -> "Function":
+        """
+        Creates a function purely based on a python function.
+
+        Args:
+            func_caller (NumFunc): The python function.
+
+        Returns:
+            Function: The output function.
+        """
+        return cls(
+            name=func_caller.__name__,
+            arity=len(signature(func_caller).parameters),
+            func_caller=func_caller,
+        )
 
     def __repr__(self) -> str:
         return f"Function({self.name}, {self.arity})"

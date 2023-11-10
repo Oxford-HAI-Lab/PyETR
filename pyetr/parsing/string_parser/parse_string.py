@@ -19,6 +19,10 @@ pp_right = pp.opAssoc.RIGHT  # type:ignore
 
 
 class Atom:
+    """
+    The parser representation of an atom.
+    """
+
     predicate_name: str
     terms: list["Term"]
     verifier: bool
@@ -32,10 +36,6 @@ class Atom:
             self.verifier = True
             self.predicate_name = t[0]
             self.terms = list(t[1:])
-        if len(self.terms) == 1:
-            first_term = self.terms[0]
-            if isinstance(first_term, Comma):
-                self.terms = list(first_term.args)
 
     def __repr__(self) -> str:
         return f"<Atom name={self.predicate_name} terms={self.terms} verifier={self.verifier}>"
@@ -50,6 +50,10 @@ class Atom:
 
 
 class DoAtom:
+    """
+    The parser representation of an doatom.
+    """
+
     atoms: list[Atom]
 
     def __init__(self, t) -> None:
@@ -76,6 +80,10 @@ class DoAtom:
 
 
 class State:
+    """
+    The parser representation of a state.
+    """
+
     atoms: list[Atom | DoAtom]
 
     def __init__(self, t) -> None:
@@ -92,6 +100,10 @@ class State:
 
 
 class Truth:
+    """
+    The parser representation of truth.
+    """
+
     def __init__(self, t) -> None:
         pass
 
@@ -103,6 +115,10 @@ class Truth:
 
 
 class Supposition:
+    """
+    The parser representation of the supposition.
+    """
+
     states: list[State]
 
     def __init__(self, t) -> None:
@@ -117,26 +133,23 @@ class Supposition:
 
 
 class Term(ABC):
+    """
+    The base class for all terms
+    """
+
     @abstractmethod
     def to_string(self, **kwargs) -> str:
+        """
+        Converts the class to the string representation
+        """
         ...
 
 
-class Comma:
-    args: list["Term"]
-
-    def __init__(self, t) -> None:
-        assert len(t) == 1
-        self.args = t[0]
-
-    def __repr__(self) -> str:
-        return f"<Comma args={self.args}>"
-
-    def to_string(self, **kwargs):
-        return ",".join([o.to_string(**kwargs) for o in self.args])
-
-
 class Function(Term):
+    """
+    The parser representation of a function.
+    """
+
     args: list[Term]
     name: str
 
@@ -153,6 +166,10 @@ class Function(Term):
 
 
 class Summation(Term):
+    """
+    The parser representation of a summation.
+    """
+
     args: list["Term"]
 
     def __init__(self, t) -> None:
@@ -167,6 +184,10 @@ class Summation(Term):
 
 
 class Emphasis(Term):
+    """
+    The parser representation of emphasis (atoms at issue).
+    """
+
     arg: "Term"
 
     def __init__(self, t) -> None:
@@ -182,6 +203,10 @@ class Emphasis(Term):
 
 
 class Xbar(Term):
+    """
+    The parser representation of xbar.
+    """
+
     left: Term
     right: Term
 
@@ -202,7 +227,17 @@ ctx = decimal.Context()
 ctx.prec = 20
 
 
-def convert_float_to_dec(f, round_ints):
+def convert_float_to_dec(f: float, round_ints: bool) -> str | int:
+    """
+    Converts a float to decimal form.
+
+    Args:
+        f (float): The float to convert
+        round_ints (bool): Whether to round integers or not
+
+    Returns:
+        str | int: The converted form
+    """
     if round_ints:
         if round(f) == f:
             return round(f)
@@ -213,6 +248,10 @@ def convert_float_to_dec(f, round_ints):
 
 
 class Real(Term):
+    """
+    The parser representation of a real number.
+    """
+
     num: float
 
     def __init__(self, t) -> None:
@@ -226,6 +265,10 @@ class Real(Term):
 
 
 class Weight:
+    """
+    The base class of a weight.
+    """
+
     multiset: list["Term"]
 
     def __init__(self, t) -> None:
@@ -233,6 +276,10 @@ class Weight:
 
 
 class AdditiveWeight(Weight):
+    """
+    The parser representation of an additive weight.
+    """
+
     def to_string(self, **kwargs):
         return f"{'|'.join([i.to_string(**kwargs) for i in self.multiset])}=+"
 
@@ -241,6 +288,10 @@ class AdditiveWeight(Weight):
 
 
 class MultiplicativeWeight(Weight):
+    """
+    The parser representation of an multiplicative weight.
+    """
+
     def to_string(self, **kwargs):
         return f"{'|'.join([i.to_string(**kwargs) for i in self.multiset])}=*"
 
@@ -249,6 +300,10 @@ class MultiplicativeWeight(Weight):
 
 
 class WeightedState:
+    """
+    The parser representation of a weight and state combined.
+    """
+
     additive: Optional[AdditiveWeight]
     multiplicative: Optional[MultiplicativeWeight]
     state: State
@@ -287,6 +342,10 @@ class WeightedState:
 
 
 class Stage:
+    """
+    The parser representation of a stage.
+    """
+
     states: list[WeightedState]
 
     def __init__(self, t) -> None:
@@ -302,6 +361,15 @@ class Stage:
 
 @cache
 def get_terms(variable: ParserElement) -> ParserElement:
+    """
+    Returns the parser expression for terms.
+
+    Args:
+        variable (ParserElement): The parser expression for a variable.
+
+    Returns:
+        ParserElement: The parser expression for terms
+    """
     term = pp.Forward()
 
     emphasis = pp.Suppress(pp.Char("*"))
@@ -339,7 +407,13 @@ def get_terms(variable: ParserElement) -> ParserElement:
 
 
 @cache
-def get_expr():
+def get_expr() -> pp.Forward:
+    """
+    Generates the parsing expression
+
+    Returns:
+        Forward: the parsing expression
+    """
     expr = pp.Forward()
 
     new_alphanums = pp.alphanums.replace("A", "").replace("E", "")
@@ -425,6 +499,10 @@ def get_expr():
 
 @dataclass
 class ParserView:
+    """
+    The parser representation of a view.
+    """
+
     quantifiers: list[Quantified]
     stage: Stage
     supposition: Optional[Supposition]
@@ -444,6 +522,18 @@ class ParserView:
 
 
 def parse_string(input_string: str) -> ParserView:
+    """
+    Converts an input string to the parser view representation.
+
+    Args:
+        input_string (str): The input string.
+
+    Raises:
+        ParsingError: Issue during parsing.
+
+    Returns:
+        ParserView: The Parser view representation.
+    """
     expr = get_expr()
     try:
         out = expr.parse_string(input_string, parseAll=True).as_list()
