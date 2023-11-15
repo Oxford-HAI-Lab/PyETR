@@ -132,7 +132,7 @@ def substitution(
         dep_relation.replace(subs).restriction(set(subs.values()))
     )
 
-    new_weights = Weights({})
+    new_weights = Weights()
     for state in stage:
         # Γ[ν₁]_Z(T,a) [t/a]
         new_state = state.replace(cast(dict[ArbitraryObject, Term], subs)).replace(
@@ -557,7 +557,7 @@ class View:
             View: The view with replacements made.
         """
         new_stage_set: set[State] = set()
-        new_weights: Weights = Weights({})
+        new_weights: Weights = Weights()
         for state in self.stage:
             new_state = state.replace(replacements)
             new_stage_set.add(new_state)
@@ -1288,7 +1288,7 @@ class View:
             other_stage=other.stage,
             other_supposition=other.supposition,
         ):
-            new_weights: Weights = Weights({})
+            new_weights: Weights = Weights()
             for gamma in self.stage:
                 new_state = state_division(
                     state=gamma,
@@ -1456,7 +1456,7 @@ class View:
             )
             expr1_weights = self.weights.in_set_of_states(expr1_states)
 
-            expr2_weights: Weights = Weights({})
+            expr2_weights: Weights = Weights()
             for gamma in self.stage:
                 if first_atom in gamma:
                     gamma_prime = gamma.replace_term(t2, t1)
@@ -1471,7 +1471,7 @@ class View:
                 print("Central case factor")
             # Σ_γ∈Γ {f(γ).γ[Δ^Ψ]ꟳ}
 
-            new_weights = Weights({})
+            new_weights = Weights()
             for gamma in self.stage:
                 new_weights._adding(state_factor(gamma=gamma), self.weights[gamma])
             new_stage = SetOfStates(new_weights.keys())
@@ -1646,7 +1646,7 @@ class View:
             # TODO: note difference in book, here uses f - are we supposed to generate some weights?
             v_prime = View(
                 stage=self.supposition,
-                supposition=SetOfStates({State({})}),
+                supposition=SetOfStates({State()}),
                 dependency_relation=self.dependency_relation,
                 issue_structure=self.issue_structure,
                 weights=None,
@@ -1849,7 +1849,7 @@ class View:
 
             H = _H(self, other, m_prime)
 
-            s2_weights: Weights = Weights({})
+            s2_weights: Weights = Weights()
             # δ∈Δ
             for delta in other.stage:
                 # γ∈Γ
@@ -1926,7 +1926,7 @@ class View:
             m_prime = self._query_m_prime(other)
 
             def xi_fka_psi(gamma: State) -> Weights:
-                weights: Weights = Weights({})
+                weights: Weights = Weights()
                 for m_prime_set in powerset(m_prime):
                     replacements: dict[ArbitraryObject, Term] = {
                         e_n: t_n for t_n, e_n in m_prime_set
@@ -1946,7 +1946,7 @@ class View:
             # H
             H = _H(self, other, m_prime)
 
-            s2_weights: Weights = Weights({})
+            s2_weights: Weights = Weights()
             # Σ_γ∈Γ
             for gamma in self.stage:
                 s2_weights += xi_fka_psi(gamma)

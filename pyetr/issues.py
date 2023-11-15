@@ -93,7 +93,7 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
         Negates an Issue structure
 
         Returns:
-            IssueStructure: _description_
+            IssueStructure: The new issue structure
         """
         return self | IssueStructure((t, ~a) for t, a in self)
 

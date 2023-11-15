@@ -1,6 +1,8 @@
+from typing import Optional
+
 from pyetr.atoms.terms.special_funcs import multiset_product
 
-from .atoms.terms import ArbitraryObject, FunctionalTerm, Multiset, Term, XBar
+from .atoms.terms import ArbitraryObject, Multiset, Term
 from .dependency import DependencyRelation
 from .stateset import SetOfStates, State
 
@@ -10,8 +12,15 @@ class Weight:
     additive: Multiset[Term]
 
     def __init__(
-        self, multiplicative: Multiset[Term], additive: Multiset[Term]
+        self,
+        multiplicative: Optional[Multiset[Term]] = None,
+        additive: Optional[Multiset[Term]] = None,
     ) -> None:
+        if multiplicative is None:
+            multiplicative = Multiset[Term]([])
+        if additive is None:
+            additive = Multiset[Term]([])
+
         self.multiplicative = multiplicative
         self.additive = additive
 
@@ -27,6 +36,12 @@ class Weight:
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
+        """
+        The arbitrary objects in the set of states
+
+        Returns:
+            set[ArbitraryObject]: The set of arbitrary objects
+        """
         arbs = set()
         for multiset in self.multiplicative + self.additive:
             arbs |= multiset.arb_objects
@@ -57,10 +72,6 @@ class Weight:
     def detailed(self):
         return f"<Weight multi={self.multiplicative.detailed} add={self.additive.detailed}>"
 
-    @classmethod
-    def get_null_weight(cls):
-        return cls(multiplicative=Multiset([]), additive=Multiset([]))
-
     def validate_against_dep_rel(self, dependency_relation: DependencyRelation):
         if not self.arb_objects.issubset(
             dependency_relation.universals | dependency_relation.existentials
@@ -80,10 +91,25 @@ class Weight:
         )
 
     @property
-    def is_null(self):
+    def is_null(self) -> bool:
+        """
+        Return true if the weight is empty
+
+        Returns:
+            bool: True if the weight is empty.
+        """
         return len(self.multiplicative) == 0 and len(self.additive) == 0
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "Weight":
+        """
+        Replaces a series of arbitrary objects with terms and makes a new weight.
+        Args:
+            replacements (dict[ArbitraryObject, Term]): A dict of the replacements,
+                where the keys are the existing values and the values are the new values.
+
+        Returns:
+            Weight: The new weight
+        """
         return Weight(
             multiplicative=Multiset(
                 [i.replace(replacements) for i in self.multiplicative]
@@ -109,7 +135,9 @@ class Weight:
 class Weights:
     _weights: dict[State, Weight]
 
-    def __init__(self, weights_dict: dict[State, Weight]) -> None:
+    def __init__(self, weights_dict: Optional[dict[State, Weight]] = None) -> None:
+        if weights_dict is None:
+            weights_dict = {}
         self._weights = weights_dict
 
     def __iter__(self):
@@ -125,6 +153,12 @@ class Weights:
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
+        """
+        The arbitrary objects in the set of states
+
+        Returns:
+            set[ArbitraryObject]: The set of arbitrary objects
+        """
         arbs = set()
         for weight in self.values():
             arbs |= weight.arb_objects
@@ -172,22 +206,38 @@ class Weights:
         return item in self._weights
 
     def __mul__(self, other: "Weights") -> "Weights":
-        new_weights: dict[State, Weight] = {}
+        new_weights: Weights = Weights()
         for state1, weight1 in self._weights.items():
             for state2, weight2 in other._weights.items():
-                new_state = state1 | state2
-                new_weight = weight1 * weight2
-                if new_state in new_weights:
-                    new_weights[new_state] += new_weight
-                else:
-                    new_weights[new_state] = new_weight
-        return Weights(new_weights)
+                new_weights._adding(state1 | state2, weight1 * weight2)
+        return new_weights
 
     @classmethod
     def get_null_weights(cls, states: SetOfStates) -> "Weights":
-        return cls({state: Weight.get_null_weight() for state in states})
+        """
+        Get the null weights for the states provided
+
+        Args:
+            states (SetOfStates): The set of states
+
+        Returns:
+            Weights: The null weights associated
+        """
+        return cls({state: Weight() for state in states})
 
     def in_set_of_states(self, set_of_states: SetOfStates) -> "Weights":
+        """
+        The subset of the weights that reflects the states in the set of
+        states provided
+
+        Args:
+            set_of_states (SetOfStates): The set of states to get the weights
+                for.
+
+        Returns:
+            Weights: The new subset weights.
+        """
+        assert set_of_states.issubset(SetOfStates(self.keys()))
         return Weights({k: v for k, v in self.items() if k in set_of_states})
 
     def __repr__(self) -> str:
