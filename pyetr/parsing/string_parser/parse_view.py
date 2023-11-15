@@ -210,18 +210,18 @@ def parse_weighted_states(
     w_states: list[parsing.WeightedState],
     variable_map: dict[str, ArbitraryObject],
     function_map: dict[str, Function],
-) -> tuple[dict[State, Weight], list[tuple[Term, OpenAtom]]]:
+) -> tuple[Weights, list[tuple[Term, OpenAtom]]]:
     """
     Parses the weighted state from the parsing representation to the weights and associated
     open atoms.
 
     Args:
-        w_states (list[parsing.WeightedState]): _description_
-        variable_map (dict[str, ArbitraryObject]): _description_
-        function_map (dict[str, Function]): _description_
+        w_states (list[parsing.WeightedState]): The weighted states.
+        variable_map (dict[str, ArbitraryObject]): The map from variable name to variable.
+        function_map (dict[str, Function]): The map from function name to function.
 
     Returns:
-        tuple[dict[State, Weight], list[tuple[Term, OpenAtom]]]: _description_
+        tuple[Weights, list[tuple[Term, OpenAtom]]]: The weighted state in parsed form.
     """
     weights: dict[State, Weight] = {}
     issues: list[tuple[Term, OpenAtom]] = []
@@ -249,7 +249,7 @@ def parse_weighted_states(
             multiplicative = Multiset([])
         weight = Weight(multiplicative=multiplicative, additive=additive)
         weights[parsed_state] = weight
-    return weights, issues
+    return Weights(weights), issues
 
 
 def gather_funcs(term: parsing.Term) -> list[Function]:
@@ -348,7 +348,7 @@ def parse_pv(pv: parsing.ParserView, custom_functions: list[Function]) -> View:
     """
     variable_map, dep_rel = get_variable_map_and_dependencies(pv.quantifiers)
     function_map = get_function_map(pv.stage, pv.supposition, custom_functions)
-    w_stage, issues = parse_weighted_states(
+    weights, issues = parse_weighted_states(
         pv.stage.states, variable_map=variable_map, function_map=function_map
     )
     if pv.supposition is not None:
@@ -362,8 +362,7 @@ def parse_pv(pv: parsing.ParserView, custom_functions: list[Function]) -> View:
         supp = SetOfStates(supp_states)
     else:
         supp = SetOfStates([State([])])
-    stage = SetOfStates(w_stage.keys())
-    weights = Weights(w_stage)
+    stage = SetOfStates(weights.keys())
     return View(
         stage=stage,
         supposition=supp,
