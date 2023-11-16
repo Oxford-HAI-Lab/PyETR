@@ -26,7 +26,11 @@ def model_to_function(f: models.Function | models.RealNumber) -> Function:
     if isinstance(f, models.RealNumber):
         return RealNumber(num=f.num)
     else:
-        return Function(name=f.name, arity=f.arity)
+        if f.func_caller is None:
+            new_func_caller = None
+        else:
+            new_func_caller = f.func_caller.to_func()
+        return Function(name=f.name, arity=f.arity, func_caller=new_func_caller)
 
 
 @overload

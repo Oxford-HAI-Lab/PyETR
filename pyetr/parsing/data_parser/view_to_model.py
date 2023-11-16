@@ -56,7 +56,13 @@ def term_to_model(
         if isinstance(t.f, RealNumber):
             new_f = models.RealNumber(num=t.f.num)
         else:
-            new_f = models.Function(name=t.f.name, arity=t.f.arity)
+            if t.f._func_caller is None:
+                new_func = None
+            else:
+                new_func = models.FuncCaller.from_func(t.f._func_caller)
+            new_f = models.Function(
+                name=t.f.name, arity=t.f.arity, func_caller=new_func
+            )
         return models.FunctionalTerm(
             function=new_f,
             terms=[term_to_model(term) for term in t.t],

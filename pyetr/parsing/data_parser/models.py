@@ -1,4 +1,7 @@
-from typing import Optional
+import base64
+import marshal
+import types
+from typing import Callable, Optional
 
 from pydantic import BaseModel
 
@@ -13,9 +16,28 @@ class Predicate(BaseModel):
     verifier: bool
 
 
+class FuncCaller(BaseModel):
+    code: str
+    name: str
+
+    @classmethod
+    def from_func(cls, func: Callable):
+        if not callable(func):
+            raise ValueError("Input must be a callable function")
+        return cls(
+            code=base64.b64encode(marshal.dumps(func.__code__)).decode("utf-8"),
+            name=func.__name__,
+        )
+
+    def to_func(self) -> Callable:
+        code = marshal.loads(base64.b64decode(self.code.encode("utf-8")))
+        return types.FunctionType(code, globals(), self.name)
+
+
 class Function(BaseModel):
     name: str
     arity: Optional[int]
+    func_caller: Optional[FuncCaller] = None
 
 
 class RealNumber(BaseModel):

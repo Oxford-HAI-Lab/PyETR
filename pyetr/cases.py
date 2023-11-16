@@ -6,7 +6,7 @@ from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.term import FunctionalTerm
 from pyetr.parsing.string_parser import string_to_view as ps
 
-from .func_library import log_func, power_func
+from .func_library import log, power
 from .inference import (
     basic_step,
     default_decision,
@@ -2159,9 +2159,9 @@ class e93_grp1(DefaultDecision, BaseExample):
     pr = (
         ps(
             "Ax {power(++(1, log(++(1, x))), -1)=+ 0} ^ {D(x*)}",
-            custom_functions=[power_func, log_func],
+            custom_functions=[power, log],
         ),
-        ps("Ax {++(1, log(++(1, x)))=+ 0} ^ {S(x*)}", custom_functions=[log_func]),
+        ps("Ax {++(1, log(++(1, x)))=+ 0} ^ {S(x*)}", custom_functions=[log]),
     )
     cv = (
         ps("{D(400*)} ^ {do(A())}"),
