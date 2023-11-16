@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Callable, Optional, cast
 if TYPE_CHECKING:
     from .abstract_term import AbstractFunctionalTerm
 
-from inspect import signature
+from inspect import getsource, signature
 
 NumFunc = Callable[..., float]
 
@@ -110,14 +110,41 @@ class Function:
     def __eq__(self, other) -> bool:
         if not isinstance(other, Function):
             return False
+        if self._func_caller is not None:
+            func_caller1 = getsource(self._func_caller)
+        else:
+            func_caller1 = None
+
+        if other._func_caller is not None:
+            func_caller2 = getsource(other._func_caller)
+        else:
+            func_caller2 = None
+
         if self.name == other.name and not (self.arity == other.arity):
             raise ValueError(
                 f"Equality on two functions of same name {self.name}, {other.name}, different arity {self.arity}, {other.arity}"
             )
-        return self.name == other.name and self.arity == other.arity
+        if (
+            self.name == other.name
+            and self.arity == other.arity
+            and not (func_caller1 == func_caller2)
+        ):
+            raise ValueError(
+                f"Equality on two functions of same name {self.name}, {other.name}, arity, but not func caller: {func_caller1}, {func_caller2}"
+            )
+        return (
+            self.name == other.name
+            and self.arity == other.arity
+            and func_caller1 == func_caller2
+        )
 
     def __hash__(self) -> int:
-        return hash(self.name) + hash(self.arity)
+        if self._func_caller is not None:
+            func_caller1 = getsource(self._func_caller)
+        else:
+            func_caller1 = None
+
+        return hash(self.name) + hash(self.arity) + hash(func_caller1)
 
 
 class RealNumber(Function):

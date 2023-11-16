@@ -323,13 +323,14 @@ def gather_item(
 
 
 def build_maps(
-    view_item: Item,
+    view_item: Item, custom_functions: list[Function]
 ) -> tuple[dict[str, Predicate], dict[str, Function], dict[str, Function]]:
     """
     Builds the predicate, function and constant maps.
 
     Args:
         view_item (Item): The item containing the whole view.
+        custom_functions (list[Function]): A list of custom functions to use in the view.
 
     Returns:
         tuple[dict[str, Predicate], dict[str, Function], dict[str, Function]]: The various
@@ -352,7 +353,7 @@ def build_maps(
                     f"Parsing predicate {predicate} has different arity than existing {predicate_map[predicate.name]}"
                 )
 
-    function_map: dict[str, Function] = {}
+    function_map: dict[str, Function] = {f.name: f for f in custom_functions}
     for function in logic_functions:
         if function.name not in function_map:
             function_map[function.name] = Function(
@@ -372,12 +373,13 @@ def build_maps(
     return predicate_map, function_map, constant_map
 
 
-def parse_items(expr: list[Item]) -> View:
+def parse_items(expr: list[Item], custom_functions: list[Function]) -> View:
     """
     Converts the items parsed from the string to a view.
 
     Args:
         expr (list[Item]): The list of items from the string.
+        custom_functions (list[Function]): A list of custom functions to use in the view.
 
     Returns:
         View: The parsed view.
@@ -394,6 +396,6 @@ def parse_items(expr: list[Item]) -> View:
         raise ValueError(f"Main section not found")
 
     variable_map, dep_relation = get_variable_map_and_dependencies(quantifieds)
-    predicate_map, function_map, constant_map = build_maps(view_item)
+    predicate_map, function_map, constant_map = build_maps(view_item, custom_functions)
     maps = Maps(variable_map, predicate_map, function_map, constant_map)
     return _parse_view(view_item, dep_relation, maps)

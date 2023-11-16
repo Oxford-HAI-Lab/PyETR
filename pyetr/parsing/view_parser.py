@@ -1,4 +1,4 @@
-from pyetr.atoms.terms.function import Function
+from pyetr.atoms.terms.function import Function, NumFunc
 from pyetr.parsing.fol_parser import fol_to_view, view_to_fol
 from pyetr.view import View
 
@@ -38,13 +38,15 @@ class ViewParser:
         return view_to_json(v)
 
     @staticmethod
-    def from_str(s: str, custom_functions: list[Function] | None = None) -> View:
+    def from_str(
+        s: str, custom_functions: list[NumFunc | Function] | None = None
+    ) -> View:
         """
         Parses from view string form to view form.
 
         Args:
             s (str): view string
-            custom_functions (list[Function] | None, optional): Custom functions used in the
+            custom_functions (list[NumFunc | Function] | None, optional): Custom functions used in the
                 string. It assumes the name of the function is that used in the string. Useful
                 for using func callers. Defaults to None.
 
@@ -67,16 +69,20 @@ class ViewParser:
         return view_to_string(v, **string_conversion_args)
 
     @staticmethod
-    def from_fol(s: str) -> View:
+    def from_fol(
+        s: str, custom_functions: list[NumFunc | Function] | None = None
+    ) -> View:
         """
         Parses from first order logic string form to View form.
         Args:
             s (str): A first order logic string
-
+            custom_functions (list[NumFunc | Function] | None, optional): Custom functions used in the
+                string. It assumes the name of the function is that used in the string. Useful
+                for using func callers. Defaults to None.
         Returns:
             View: The parsed view
         """
-        return fol_to_view(s)
+        return fol_to_view(s, custom_functions=custom_functions)
 
     @staticmethod
     def to_fol(v: View) -> str:

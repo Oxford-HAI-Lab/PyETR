@@ -1,8 +1,10 @@
 from copy import copy
+from typing import Iterable
 
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom, get_open_atom_equivalent
 from pyetr.atoms.predicate_atom import PredicateAtom
 from pyetr.atoms.terms import ArbitraryObject, OpenTerm, Term, get_open_equivalent
+from pyetr.atoms.terms.function import Function, NumFunc
 from pyetr.dependency import (
     Dependency,
     DependencyRelation,
@@ -249,3 +251,13 @@ def get_quantifiers(dependency_relation: DependencyRelation) -> list[Quantified]
             )
 
     return order_quantifieds(unordered_quantifieds, dependency_relation.dependencies)
+
+
+def funcs_converter(f_iter: Iterable[Function | NumFunc]) -> list[Function]:
+    output: list[Function] = []
+    for f in f_iter:
+        if isinstance(f, Function):
+            output.append(f)
+        else:
+            output.append(Function.numeric(f))
+    return output
