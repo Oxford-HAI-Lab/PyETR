@@ -22,7 +22,6 @@ from pyetr.parsing.fol_parser.parse_string import (
     Item,
     LogicEmphasis,
     LogicPredicate,
-    Quantified,
     Truth,
     Variable,
 )

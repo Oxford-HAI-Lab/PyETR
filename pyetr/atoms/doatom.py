@@ -10,7 +10,7 @@ class DoAtom(DoAtomLike[PredicateAtom], Atom):
 
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
-        output_objs = set()
+        output_objs: set[ArbitraryObject] = set()
         for atom in self.atoms:
             output_objs |= atom.arb_objects
         return output_objs

@@ -193,10 +193,9 @@ def _parse_item_with_issue(
                 f"Implies statement {item} found at lower level than top"
             )
 
-        elif isinstance(item, Quantified):
-            raise ParsingError(f"Quantified {item} found at lower level than top")
         else:
-            assert False
+            assert isinstance(item, Quantified)
+            raise ParsingError(f"Quantified {item} found at lower level than top")
 
     open_atoms: list[tuple[Term, OpenPredicateAtom]] = []
     return _parse_item(item, maps, open_atoms), open_atoms
@@ -260,7 +259,7 @@ def gather_atomic_item(
     Returns:
         list[LogicPredicate]: The list of items that match the object type
     """
-    out = []
+    out: list[LogicPredicate] = []
 
     if (
         object_type == "Constant"
@@ -300,7 +299,7 @@ def gather_item(
     Returns:
         list[LogicPredicate]: The list of items that match the object type
     """
-    out = []
+    out: list[LogicPredicate] = []
 
     if object_type == "Predicate" and isinstance(item, LogicPredicate):
         out.append(item)

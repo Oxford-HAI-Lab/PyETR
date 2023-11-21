@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Any
 
 from pyetr.atoms.terms import Multiset
 
@@ -52,7 +53,7 @@ class OpenFunctionalTerm(AbstractFunctionalTerm[OpenTerm], OpenTerm):
 
 
 class QuestionMark(OpenTerm):
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, QuestionMark):
             return True
         else:

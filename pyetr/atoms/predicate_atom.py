@@ -9,7 +9,7 @@ from .terms import ArbitraryObject, FunctionalTerm, Term
 class PredicateAtom(PredicateAtomLike[Term], Atom):
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
-        output_objs = set()
+        output_objs: set[ArbitraryObject] = set()
         for term in self.terms:
             if isinstance(term, FunctionalTerm):
                 output_objs |= term.arb_objects
@@ -23,7 +23,7 @@ class PredicateAtom(PredicateAtomLike[Term], Atom):
         return PredicateAtom(~self.predicate, self.terms)
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "PredicateAtom":
-        new_terms = []
+        new_terms: list[Term] = []
         for term in self.terms:
             if term in replacements:
                 assert not isinstance(term, FunctionalTerm)
@@ -43,7 +43,7 @@ class PredicateAtom(PredicateAtomLike[Term], Atom):
         old_term: Term,
         new_term: Term,
     ) -> "PredicateAtom":
-        new_terms = []
+        new_terms: list[Term] = []
         for term in self.terms:
             if old_term == term:
                 new_terms.append(new_term)

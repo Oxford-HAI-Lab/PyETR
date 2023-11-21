@@ -3,6 +3,8 @@ __all__ = ["Function", "RealNumber"]
 
 from typing import TYPE_CHECKING, Callable, Optional, cast
 
+from pyetr.atoms.terms.abstract_term import TermType
+
 if TYPE_CHECKING:
     from .abstract_term import AbstractFunctionalTerm
 
@@ -11,16 +13,18 @@ from inspect import getsource, signature
 NumFunc = Callable[..., float]
 
 
-def apply_func(term: "AbstractFunctionalTerm", f: NumFunc) -> "AbstractFunctionalTerm":
+def apply_func(
+    term: "AbstractFunctionalTerm[TermType]", f: NumFunc
+) -> "AbstractFunctionalTerm[TermType]":
     """
     Applies a numeric function to an abstract functional term, producing a new functional term.
 
     Args:
-        term (AbstractFunctionalTerm): The FunctionalTerm to apply the numeric function to.
+        term (AbstractFunctionalTerm[TermType]): The FunctionalTerm to apply the numeric function to.
         f (NumFunc): A function that takes a number of numeric arguments and returns a float
 
     Returns:
-        AbstractFunctionalTerm: The new FunctionalTerm
+        AbstractFunctionalTerm[TermType]: The new FunctionalTerm
     """
     if all(
         [hasattr(i, "f") and isinstance(getattr(i, "f"), RealNumber) for i in term.t]
@@ -69,8 +73,8 @@ class Function:
         self._func_caller = func_caller
 
     def __call__(
-        self, func_term: "AbstractFunctionalTerm"
-    ) -> Optional["AbstractFunctionalTerm"]:
+        self, func_term: "AbstractFunctionalTerm[TermType]"
+    ) -> Optional["AbstractFunctionalTerm[TermType]"]:
         """
         Args:
             func_term (AbstractFunctionalTerm): The Functional Term to be converted
@@ -107,7 +111,7 @@ class Function:
     def detailed(self) -> str:
         return repr(self)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Function):
             return False
         if self._func_caller is not None:
@@ -168,7 +172,7 @@ class RealNumber(Function):
     def __hash__(self) -> int:
         return hash(self.name) + hash(self.arity) + hash("num")
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, RealNumber):
             return False
         return self.name == other.name

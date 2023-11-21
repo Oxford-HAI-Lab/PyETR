@@ -1,9 +1,11 @@
 import base64
 import marshal
 import types
-from typing import Callable, Optional
+from typing import Optional
 
 from pydantic import BaseModel
+
+from pyetr.atoms.terms.function import NumFunc
 
 """
 This file contains a number of pydantic models that correspond to parts of a view
@@ -21,7 +23,7 @@ class FuncCaller(BaseModel):
     name: str
 
     @classmethod
-    def from_func(cls, func: Callable):
+    def from_func(cls, func: NumFunc):
         if not callable(func):
             raise ValueError("Input must be a callable function")
         return cls(
@@ -29,7 +31,7 @@ class FuncCaller(BaseModel):
             name=func.__name__,
         )
 
-    def to_func(self) -> Callable:
+    def to_func(self) -> NumFunc:
         code = marshal.loads(base64.b64decode(self.code.encode("utf-8")))
         return types.FunctionType(code, globals(), self.name)
 
