@@ -37,5 +37,5 @@ class Multiset(Generic[T]):
     def detailed(self):
         return f"<{type(self).__name__} items={self._items.__repr__()}>"
 
-    def __add__(self, other: "Multiset") -> "Multiset":
+    def __add__(self, other: "Multiset[T]") -> "Multiset[T]":
         return Multiset(self._items + other._items)

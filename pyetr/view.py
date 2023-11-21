@@ -28,7 +28,7 @@ def get_subset(big_gamma: SetOfStates, big_psi: SetOfStates) -> SetOfStates:
     Returns:
         SetOfStates: The subset of states that satisfy this.
     """
-    out_set = set()
+    out_set: set[State] = set()
     for gamma in big_gamma:
         for psi in big_psi:
             # .ψ⊆γ
