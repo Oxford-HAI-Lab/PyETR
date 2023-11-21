@@ -91,7 +91,7 @@ def dependencies_from_sets(
     Returns:
         frozenset[Dependency]: Standard form dependencies
     """
-    new_deps = set()
+    new_deps: set[Dependency] = set()
     for uni, exi_set in sets:
         for exi in exi_set:
             new_deps.add(Dependency(existential=exi, universal=uni))
@@ -198,7 +198,7 @@ class DependencyRelation:
     def detailed(self):
         return f"<DependencyRelation deps={[i.detailed for i in self.dependencies]} unis={self.universals} exis={self.existentials}>"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, DependencyRelation):
             return False
         return (
@@ -278,7 +278,7 @@ class DependencyRelation:
                     f"Universals with existentials: {self.universals | self.existentials} not superset of states {arb_objects}"
                 )
         else:
-            if arb_objects != self.universals | self.existentials:
+            if frozenset(arb_objects) != self.universals | self.existentials:
                 raise ValueError(
                     f"Universals with existentials: {self.universals | self.existentials} not the same as states {arb_objects}"
                 )
@@ -290,7 +290,7 @@ class DependencyRelation:
         Raises:
             ValueError: Invalid dependency relation.
         """
-        dep_arb_objs = set()
+        dep_arb_objs: set[ArbitraryObject] = set()
         for dep in self.dependencies:
             if dep.universal not in dep_arb_objs:
                 dep_arb_objs.add(dep.universal)

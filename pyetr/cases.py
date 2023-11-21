@@ -23,19 +23,17 @@ class BaseExample(metaclass=ABCMeta):
     """
 
     v: tuple[View, ...]
-    c: View | tuple[View, ...]
 
     def __init_subclass__(cls) -> None:
         if not hasattr(cls, "v"):
             raise TypeError("Example must have attribute v")
         if not hasattr(cls, "c"):
             raise TypeError("Example must have attribute c")
-        v = getattr(cls, "v")
+        v: tuple[View, ...] = getattr(cls, "v")
         assert isinstance(v, tuple)
         for i in v:
             assert isinstance(i, View)
-        v = cast(tuple[View, ...], v)
-        c = getattr(cls, "c")
+        c: View | tuple[View, ...] = getattr(cls, "c")
         assert isinstance(c, View) or (
             isinstance(c, tuple) and all(isinstance(x, View) for x in c)
         )

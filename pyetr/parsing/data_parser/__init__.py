@@ -2,8 +2,6 @@ __all__ = ["view_to_json", "json_to_view"]
 
 
 import pyetr.parsing.data_parser.models as models
-from pyetr.atoms.terms.function import Function, NumFunc
-from pyetr.parsing.common import funcs_converter
 from pyetr.view import View
 
 from .model_to_view import model_to_view

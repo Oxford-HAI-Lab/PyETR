@@ -11,7 +11,7 @@ class AbstractTerm(ABC):
     """
 
     @abstractmethod
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         ...
 
     @abstractmethod
@@ -45,7 +45,7 @@ class AbstractArbitraryObject(AbstractTerm):
         """
         self.name = name
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return False
         return self.name == other.name
@@ -93,12 +93,12 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
 
         self.f = f
 
-        out = f(self)
+        out: "AbstractFunctionalTerm[TermType] | None" = f(self)
         if out is not None:
             self.f = out.f
             self.t = out.t
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return False
         return self.f == other.f and self.t == other.t

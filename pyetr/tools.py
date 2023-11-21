@@ -57,7 +57,7 @@ class _AlphabetGenerator(_BaseNameGen):
 
     @staticmethod
     def _get_next_letter(s: str):
-        if not s.islower:
+        if not s.islower():
             raise ValueError("Input must be lowercase")
         if len(s) == 0:
             return "a"

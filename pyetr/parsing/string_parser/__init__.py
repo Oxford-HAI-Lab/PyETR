@@ -1,6 +1,6 @@
 __all__ = ["string_to_view", "view_to_string"]
 
-from typing import Optional
+from typing import Any, Optional
 
 from pyetr.atoms.terms import Function
 from pyetr.atoms.terms.function import NumFunc
@@ -32,7 +32,7 @@ def string_to_view(
     return parse_pv(ps(s), funcs_converter(custom_functions))
 
 
-def view_to_string(v: View, **string_conversion_kwargs) -> str:
+def view_to_string(v: View, **string_conversion_kwargs: Any) -> str:
     """
     Parses from View form to view string form
 

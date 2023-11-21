@@ -35,7 +35,7 @@ class SingleOperand:
     name: ClassVar[str]
     arg: "Item"
 
-    def __init__(self, t) -> None:
+    def __init__(self, t: list[list["Item"]]) -> None:
         assert len(t) == 1
         assert len(t[0]) == 1
         self.arg = t[0][0]
@@ -51,7 +51,7 @@ class BoolNot(SingleOperand):
 
     name = "BoolNot"
 
-    def to_string(self):
+    def to_string(self) -> str:
         return "~" + self.arg.to_string()
 
 
@@ -62,7 +62,7 @@ class LogicEmphasis(SingleOperand):
 
     name = "LogicEmphasis"
 
-    def to_string(self):
+    def to_string(self) -> str:
         return self.arg.to_string() + "*"
 
 
@@ -186,7 +186,7 @@ class LogicPredicate:
     args: list["Item"]
     name: str
 
-    def __init__(self, t) -> None:
+    def __init__(self, t: list[list["str | Item"]]) -> None:
         self.name = t[0][0]
         if len(t[0]) > 1:
             other = t[0][1]
@@ -239,9 +239,9 @@ def get_expr() -> pp.Forward:
     truth = pp.Char("⊤").setParseAction(Truth)
     falsum = pp.Char("⊥").setParseAction(Falsum)
     comma = pp.Suppress(",")
-    nested_and = pp.infixNotation(
+    nested_and = pp.infix_notation(
         predicate_0 | variable | truth | falsum,
-        [
+        op_list=[
             (predicate_word, 1, pp_right, LogicPredicate),
             (emphasis, 1, pp_left, LogicEmphasis),
             (bool_not, 1, pp_right, BoolNot),
@@ -280,7 +280,9 @@ def parse_string(input_string: str) -> list[Item]:
     """
     expr = get_expr()
     try:
-        new_string = expr.parse_string(input_string, parseAll=True).as_list()
+        new_string: list[Item] = expr.parse_string(
+            input_string, parseAll=True
+        ).as_list()  # type:ignore reportUnknownMemberType
     except ParseException as e:
         raise ParsingError(e.msg)
     return new_string

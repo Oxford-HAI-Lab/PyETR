@@ -79,7 +79,7 @@ class ArbitraryObject(AbstractArbitraryObject, Term):
 class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
     @property
     def arb_objects(self) -> set[ArbitraryObject]:
-        output_set = set()
+        output_set: set[ArbitraryObject] = set()
         for term in self.t:
             if isinstance(term, FunctionalTerm):
                 output_set |= term.arb_objects
@@ -93,7 +93,7 @@ class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
         self,
         replacements: dict[ArbitraryObject, Term],
     ) -> "FunctionalTerm":
-        new_terms = []
+        new_terms: list[Term] = []
         for term in self.t:
             if term in replacements:
                 replacement = replacements[term]

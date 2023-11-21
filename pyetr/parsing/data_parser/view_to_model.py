@@ -10,6 +10,7 @@ from pyetr.atoms.terms.abstract_term import (
     AbstractArbitraryObject,
     AbstractFunctionalTerm,
     AbstractTerm,
+    TermType,
 )
 from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.open_term import QuestionMark
@@ -18,7 +19,7 @@ from pyetr.view import View
 
 
 @overload
-def term_to_model(t: AbstractFunctionalTerm) -> models.FunctionalTerm:
+def term_to_model(t: AbstractFunctionalTerm[TermType]) -> models.FunctionalTerm:
     ...
 
 
