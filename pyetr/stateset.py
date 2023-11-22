@@ -210,7 +210,8 @@ class SetOfStates(frozenset[State]):
 
     def __mul__(self, other: "SetOfStates") -> "SetOfStates":
         """
-        Definition 4.14 Product of set of states, p151
+        Definition 4.14 Product of set of states, p151 # TODO: Note differs from book usage, this is for
+            first order logic parser in book.
 
         Γ ⨂ Δ = {γ∪δ : γ ∈ Γ, δ ∈ Δ}
         """
@@ -220,7 +221,8 @@ class SetOfStates(frozenset[State]):
         """
         Based on Definition 4.15, p151
 
-        Negation of set of states # TODO: Note, adopting notation from C6, not C4
+        Negation of set of states # TODO: Note differs from book usage, this is for
+            first order logic parser in book.
 
         [Γ]ᶰ = {{p̄} : p ∈ γ₁} ⨂ ... ⨂ {{p̄} : p ∈ γₙ}
         """
