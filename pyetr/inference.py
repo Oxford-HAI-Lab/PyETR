@@ -25,7 +25,7 @@ def basic_step(v: tuple[View, ...], verbose: bool = False) -> View:
     """
     Based Definition 4.47 p179-180
 
-    G' = T[P₁]^↻[]ᴰ[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
+    G' = T[P₁[]ᴰ]^↻[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
 
     Args:
         v (tuple[View, ...]): (P₁,..., Pₙ)
@@ -47,7 +47,7 @@ def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> V
     """
     Based Definition 4.47 p179-180
 
-    G' = T[P₁]^↻[]ᴰ[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
+    G' = T[P₁[]ᴰ]^↻[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
     G'' = G'[P₁[]ᴰ]ꟳ...[Pₙ]ꟳ
 
     Args:
@@ -56,7 +56,7 @@ def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> V
 
     Returns:
         View: G''
-    """  # TODO: Where is does x follow?
+    """  # Inference: Where is does x follow?
     g_prime = basic_step(v=v, verbose=verbose)
     for i, view in enumerate(v):
         if i == 0:
@@ -65,6 +65,7 @@ def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> V
         else:
             # G'[Pₙ]ꟳ
             g_prime = g_prime.factor(view, verbose=verbose)
+            # Inference: Where are (2) and (3)?
     return g_prime
 
 
@@ -151,7 +152,7 @@ def default_procedure_what_is_prob(
         # G''[Δ]^𝔼P
         out = g_prime_prime.stage.equilibrium_answer_potential(
             prob_of.stage,
-            g_prime_prime.weights,  # TODO: Adjusted weight extraction point based on test and previous use
+            g_prime_prime.weights,
         )
         # ... ∈ [0,100]
         if isinstance(out.f, RealNumber) and out.f.num >= 0 and out.f.num <= 100:
