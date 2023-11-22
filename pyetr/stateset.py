@@ -6,14 +6,7 @@ from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 from pyetr.atoms.terms.special_funcs import multiset_product
 
 from .atoms import Atom, PredicateAtom, equals_predicate
-from .atoms.terms import (
-    ArbitraryObject,
-    FunctionalTerm,
-    Multiset,
-    Summation,
-    Term,
-    XBar,
-)
+from .atoms.terms import ArbitraryObject, FunctionalTerm, Multiset, Summation, Term
 
 if TYPE_CHECKING:
     from pyetr.weight import Weights
@@ -151,7 +144,7 @@ class State(frozenset[Atom]):
 
     @property
     def atoms(self) -> set[Atom]:
-        a = set()
+        a: set[Atom] = set()
         for atom in self:
             a.add(atom)
         return a
@@ -324,7 +317,7 @@ class SetOfStates(frozenset[State]):
         Returns:
             set[Atom]: The atoms in a state.
         """
-        a = set()
+        a: set[Atom] = set()
         for state in self:
             a |= state.atoms
         return a

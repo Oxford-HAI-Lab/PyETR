@@ -53,8 +53,8 @@ class TestArbitraryObject:
 
 
 class TestFunctionalTerm:
-    def test_valid(self, func, arb_obj):
-        t = FunctionalTerm(func, (arb_obj,))
+    def test_valid(self, func: Function, arb_obj: ArbitraryObject):
+        t = FunctionalTerm(func, [arb_obj])
         assert (
             t.detailed
             == "<FunctionalTerm f=Function(func, 1) t=(<ArbitraryObject name=x1>,)>"
