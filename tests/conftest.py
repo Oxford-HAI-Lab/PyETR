@@ -1,6 +1,7 @@
 import json
 import re
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -28,7 +29,7 @@ class ExampleCollector(pytest.File):
 
 
 class ExampleItem(pytest.Item):
-    def __init__(self, *args, test_class: type[BaseExample], **kwargs):
+    def __init__(self, *args: Any, test_class: type[BaseExample], **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.test_class = test_class
 
@@ -224,5 +225,5 @@ def arb_obj():
 
 
 @pytest.fixture
-def term(func, arb_obj):
+def term(func: Function, arb_obj: ArbitraryObject):
     return FunctionalTerm(func, (arb_obj,))

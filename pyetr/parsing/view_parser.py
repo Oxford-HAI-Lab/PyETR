@@ -1,3 +1,5 @@
+from typing import Any
+
 from pyetr.atoms.terms.function import Function, NumFunc
 from pyetr.parsing.fol_parser import fol_to_view, view_to_fol
 from pyetr.view import View
@@ -56,7 +58,7 @@ class ViewParser:
         return string_to_view(s, custom_functions)
 
     @staticmethod
-    def to_str(v: View, **string_conversion_args) -> str:
+    def to_str(v: View, **string_conversion_args: Any) -> str:
         """
         Parses from View form to view string form
 

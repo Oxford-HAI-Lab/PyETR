@@ -1,8 +1,5 @@
-import pytest
-
 from pyetr.func_library import log, power
 from pyetr.parsing.fol_parser import fol_to_view, view_to_fol
-from pyetr.parsing.string_parser import string_to_view
 from pyetr.parsing.view_parser import ViewParser
 
 

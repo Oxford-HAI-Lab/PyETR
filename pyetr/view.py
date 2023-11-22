@@ -2,8 +2,9 @@ __all__ = ["View"]
 
 from functools import reduce
 from itertools import permutations
-from typing import Optional, cast
+from typing import Callable, Optional, cast
 
+from pyetr.atoms.abstract import Atom
 from pyetr.parsing.common import get_quantifiers
 
 from .atoms import PredicateAtom, equals_predicate
@@ -143,7 +144,7 @@ def substitution(
             .replace(cast(dict[ArbitraryObject, Term], subs))
             .replace({arb_obj: term})
         )
-        new_weights._adding(new_state, new_weight)
+        new_weights.adding(new_state, new_weight)
 
     new_stage = SetOfStates(new_weights.keys())
 
@@ -182,7 +183,7 @@ def division_presupposition(
         bool: True if the presupposition is satisified
     """
 
-    def division_cond(delta):
+    def division_cond(delta: State) -> bool:
         """
         ∃ψ_∈Ψ ∃γ∈Γ (δ ⊆ γ ∧ ψ ⊆ γ)
         """
@@ -381,7 +382,7 @@ class View:
         issue_structure: IssueStructure,
         weights: Optional[Weights],
         *,
-        is_pre_view=False,
+        is_pre_view: bool = False,
     ) -> None:
         self._stage = stage
         self._supposition = supposition
@@ -563,7 +564,7 @@ class View:
             new_stage_set.add(new_state)
             current_weight = self.weights[state]
             new_weight = current_weight.replace(replacements)
-            new_weights._adding(new_state, new_weight)
+            new_weights.adding(new_state, new_weight)
 
         new_stage = SetOfStates(new_stage_set)
 
@@ -806,13 +807,13 @@ class View:
                 if len(ps) == 0:
                     return []
 
-                nums = []
+                nums: list[float] = []
                 for p, _ in ps:
                     assert isinstance(p.f, RealNumber)
                     nums.append(p.f.num)
                 max_potential = max(nums)
 
-                new_states = []
+                new_states: list[State] = []
                 for p, state in ps:
                     assert isinstance(p.f, RealNumber)
                     if p.f.num == max_potential:
@@ -1047,16 +1048,16 @@ class View:
         # TODO: Note swapping of t and u in M'ij, is this significant or typo?
         """
 
-        def _m_prime() -> set[tuple[Universal, FunctionalTerm | ArbitraryObject]]:
+        def _m_prime() -> set[tuple[Universal, Term]]:
             """
             Based on Definition 5.28, p223
 
             M'ij = {<u,t> : <u,t> ∈ Mij ∧ U_R - A(Θ)}
 
             Returns:
-                set[tuple[Universal, FunctionalTerm | ArbitraryObject]]: Returns the M'ij set.
+                set[tuple[Universal, Term]]: Returns the M'ij set.
             """
-            output_set = set()
+            output_set: set[tuple[Universal, Term]] = set()
             for u, t in issue_matches(self.issue_structure, view.issue_structure):
                 if isinstance(u, ArbitraryObject) and u in (
                     self.dependency_relation.universals - self.supposition.arb_objects
@@ -1160,7 +1161,7 @@ class View:
                         State: N(γ,I,e)
                     """
                     # TODO: Think this need updating??? e is overloaded??
-                    atoms = set()
+                    atoms: set[Atom] = set()
                     for t, open_atom in self.issue_structure:
                         formed_atom = open_atom(t)
                         for atom in gamma:
@@ -1168,8 +1169,11 @@ class View:
                                 atoms.add(atom)
                     return State(atoms)
 
+                mul: Callable[[SetOfStates, SetOfStates], SetOfStates] = (
+                    lambda s1, s2: s1 * s2
+                )
                 return reduce(
-                    lambda s1, s2: s1 * s2,
+                    mul,
                     [SetOfStates({State({x}), State({~x})}) for x in N(gamma, e)],
                 )
 
@@ -1297,7 +1301,7 @@ class View:
                     other_supposition=other.supposition,
                 )
                 new_weight = self.weights[gamma]
-                new_weights._adding(new_state, new_weight)
+                new_weights.adding(new_state, new_weight)
 
             new_stage = SetOfStates(new_weights.keys())
 
@@ -1460,7 +1464,7 @@ class View:
             for gamma in self.stage:
                 if first_atom in gamma:
                     gamma_prime = gamma.replace_term(t2, t1)
-                    expr2_weights._adding(
+                    expr2_weights.adding(
                         gamma_prime, self.weights[gamma].replace_term(t2, t1)
                     )
 
@@ -1473,7 +1477,7 @@ class View:
 
             new_weights = Weights()
             for gamma in self.stage:
-                new_weights._adding(state_factor(gamma=gamma), self.weights[gamma])
+                new_weights.adding(state_factor(gamma=gamma), self.weights[gamma])
             new_stage = SetOfStates(new_weights.keys())
 
         out = View.with_restriction(
@@ -1868,11 +1872,11 @@ class View:
                         # g(δ) = <<>>
                         if other_weight.is_null:
                             # f(γ)
-                            s2_weights._adding(delta, self.weights[gamma])
+                            s2_weights.adding(delta, self.weights[gamma])
                         # g(δ) ≠ <<>>
                         else:
                             # g(δ)
-                            s2_weights._adding(delta, other_weight)
+                            s2_weights.adding(delta, other_weight)
 
             s2 = SetOfStates(s2_weights.keys())
             new_stage = H | s2
@@ -1940,7 +1944,7 @@ class View:
                                     # TODO: This is not exactly what's in the book, because here we count
                                     # each w.xi possibly multiple times, whereas the book (a little ambiguously,
                                     # but interpreted strictly) collapses the multiplicities to 1.
-                                    weights._adding(xi, w)
+                                    weights.adding(xi, w)
                 return weights
 
             # H

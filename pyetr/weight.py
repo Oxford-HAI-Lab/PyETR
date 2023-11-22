@@ -42,7 +42,7 @@ class Weight:
         Returns:
             set[ArbitraryObject]: The set of arbitrary objects
         """
-        arbs = set()
+        arbs: set[ArbitraryObject] = set()
         for multiset in self.multiplicative + self.additive:
             arbs |= multiset.arb_objects
         return arbs
@@ -159,7 +159,7 @@ class Weights:
         Returns:
             set[ArbitraryObject]: The set of arbitrary objects
         """
-        arbs = set()
+        arbs: set[ArbitraryObject] = set()
         for weight in self.values():
             arbs |= weight.arb_objects
         return arbs
@@ -187,7 +187,7 @@ class Weights:
             raise ValueError(f"{self} and {item}")
         return self._weights[item]
 
-    def _adding(self, state: State, weight: Weight):
+    def adding(self, state: State, weight: Weight):
         if state in self:
             self._weights[state] += weight
         else:
@@ -209,7 +209,7 @@ class Weights:
         new_weights: Weights = Weights()
         for state1, weight1 in self._weights.items():
             for state2, weight2 in other._weights.items():
-                new_weights._adding(state1 | state2, weight1 * weight2)
+                new_weights.adding(state1 | state2, weight1 * weight2)
         return new_weights
 
     @classmethod

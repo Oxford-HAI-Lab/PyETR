@@ -1,6 +1,3 @@
-import pytest
-
-from pyetr import ArbitraryObject, Function, FunctionalTerm
 from pyetr.view import View
 
 
