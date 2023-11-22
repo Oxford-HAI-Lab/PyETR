@@ -35,7 +35,7 @@ class SingleOperand:
     name: ClassVar[str]
     arg: "Item"
 
-    def __init__(self, t: list[list["Item"]]) -> None:
+    def __init__(self, t: Any) -> None:
         assert len(t) == 1
         assert len(t[0]) == 1
         self.arg = t[0][0]
@@ -186,7 +186,7 @@ class LogicPredicate:
     args: list["Item"]
     name: str
 
-    def __init__(self, t: list[list[Any]]) -> None:
+    def __init__(self, t: Any) -> None:
         self.name = t[0][0]
         if len(t[0]) > 1:
             other = t[0][1]

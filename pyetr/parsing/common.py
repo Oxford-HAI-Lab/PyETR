@@ -34,7 +34,7 @@ class Variable:
 
     name: str
 
-    def __init__(self, t: list[str] | tuple[str]) -> None:
+    def __init__(self, t: Any) -> None:
         self.name = t[0]
 
     def __repr__(self) -> str:
