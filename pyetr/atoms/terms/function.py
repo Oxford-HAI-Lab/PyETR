@@ -3,10 +3,8 @@ __all__ = ["Function", "RealNumber"]
 
 from typing import TYPE_CHECKING, Callable, Optional, cast
 
-from pyetr.atoms.terms.abstract_term import TermType
-
 if TYPE_CHECKING:
-    from .abstract_term import AbstractFunctionalTerm
+    from .abstract_term import AbstractFunctionalTerm, TermType
 
 from inspect import getsource, signature
 

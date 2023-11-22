@@ -57,10 +57,10 @@ class _AlphabetGenerator(_BaseNameGen):
 
     @staticmethod
     def _get_next_letter(s: str):
-        if not s.islower():
-            raise ValueError("Input must be lowercase")
         if len(s) == 0:
             return "a"
+        if not s.islower():
+            raise ValueError(f"Input must be lowercase")
         code = ord(s[-1])
         rest = s[0:-1]
         next_code = code + 1
@@ -84,7 +84,7 @@ class ArbitraryObjectGenerator:
         self,
         existing_arb_objs: set[ArbitraryObject],
         *,
-        scheme: NameScheme = NameScheme.alphabet
+        scheme: NameScheme = NameScheme.alphabet,
     ) -> None:
         """
         A generator for arbitrary objects that based on the naming scheme provided, generates
