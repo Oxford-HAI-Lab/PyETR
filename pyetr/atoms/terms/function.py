@@ -44,7 +44,7 @@ class Function:
 
     name: str
     arity: Optional[int]
-    _func_caller: Optional[NumFunc]
+    func_caller: Optional[NumFunc]
 
     def __init__(
         self,
@@ -68,7 +68,7 @@ class Function:
             raise ValueError("arity must not be less than 0")
         self.name = name
         self.arity = arity
-        self._func_caller = func_caller
+        self.func_caller = func_caller
 
     def __call__(
         self, func_term: "AbstractFunctionalTerm[TermType]"
@@ -81,9 +81,9 @@ class Function:
             Optional["AbstractFunctionalTerm"]: The converted functional term, or None
                 if no conversion takes place.
         """
-        if self._func_caller is None:
+        if self.func_caller is None:
             return None
-        return apply_func(func_term, self._func_caller)
+        return apply_func(func_term, self.func_caller)
 
     @classmethod
     def numeric(cls, func_caller: NumFunc) -> "Function":
@@ -112,13 +112,13 @@ class Function:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Function):
             return False
-        if self._func_caller is not None:
-            func_caller1 = getsource(self._func_caller)
+        if self.func_caller is not None:
+            func_caller1 = getsource(self.func_caller)
         else:
             func_caller1 = None
 
-        if other._func_caller is not None:
-            func_caller2 = getsource(other._func_caller)
+        if other.func_caller is not None:
+            func_caller2 = getsource(other.func_caller)
         else:
             func_caller2 = None
 
@@ -141,8 +141,8 @@ class Function:
         )
 
     def __hash__(self) -> int:
-        if self._func_caller is not None:
-            func_caller1 = getsource(self._func_caller)
+        if self.func_caller is not None:
+            func_caller1 = getsource(self.func_caller)
         else:
             func_caller1 = None
 

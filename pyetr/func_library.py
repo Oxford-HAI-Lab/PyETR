@@ -1,7 +1,5 @@
 import math
 
-from pyetr.atoms.terms import Function
-
 
 def div(x: float, y: float) -> float:
     return x / y

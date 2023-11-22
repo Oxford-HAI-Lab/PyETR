@@ -3,7 +3,7 @@ import sys
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import cache
-from typing import Optional
+from typing import Any, Optional
 
 import pyparsing as pp
 from pyparsing import ParseException, ParserElement
@@ -40,7 +40,7 @@ class Atom:
     def __repr__(self) -> str:
         return f"<Atom name={self.predicate_name} terms={self.terms} verifier={self.verifier}>"
 
-    def to_string(self, **kwargs):
+    def to_string(self, **kwargs: Any):
         if self.verifier:
             not_str = ""
         else:
@@ -70,7 +70,7 @@ class DoAtom:
     def __repr__(self) -> str:
         return f"<DoAtom atoms={self.atoms}> polarity={self.polarity}>"
 
-    def to_string(self, **kwargs):
+    def to_string(self, **kwargs: Any):
         if self.polarity:
             not_str = ""
         else:
@@ -92,7 +92,7 @@ class State:
     def __repr__(self) -> str:
         return f"<State atoms={self.atoms}>"
 
-    def to_string(self, **kwargs) -> str:
+    def to_string(self, **kwargs: Any) -> str:
         if len(self.atoms) == 0:
             return "0"
         else:
@@ -110,7 +110,7 @@ class Truth:
     def __repr__(self) -> str:
         return f"<Truth>"
 
-    def to_string(self, **kwargs) -> str:
+    def to_string(self, **kwargs: Any) -> str:
         return "0"
 
 
@@ -127,7 +127,7 @@ class Supposition:
     def __repr__(self) -> str:
         return f"<Supposition states={self.states}>"
 
-    def to_string(self, **kwargs) -> str:
+    def to_string(self, **kwargs: Any) -> str:
         out = ",".join([s.to_string(**kwargs) for s in self.states])
         return "{" + f"{out}" + "}"
 
@@ -138,7 +138,7 @@ class Term(ABC):
     """
 
     @abstractmethod
-    def to_string(self, **kwargs) -> str:
+    def to_string(self, **kwargs: Any) -> str:
         """
         Converts the class to the string representation
         """
@@ -160,7 +160,7 @@ class Function(Term):
     def __repr__(self) -> str:
         return f"<Function name={self.name} args={self.args}>"
 
-    def to_string(self, **kwargs):
+    def to_string(self, **kwargs: Any):
         out = ",".join([o.to_string(**kwargs) for o in self.args])
         return f"{self.name}({out})"
 
@@ -178,7 +178,7 @@ class Summation(Term):
     def __repr__(self) -> str:
         return f"<Summation args={self.args}>"
 
-    def to_string(self, **kwargs):
+    def to_string(self, **kwargs: Any):
         out = ",".join([o.to_string(**kwargs) for o in self.args])
         return f"σ({out})"
 
@@ -198,7 +198,7 @@ class Emphasis(Term):
     def __repr__(self) -> str:
         return f"<Emphasis arg={self.arg}>"
 
-    def to_string(self, **kwargs):
+    def to_string(self, **kwargs: Any):
         return f"{self.arg.to_string(**kwargs)}*"
 
 
@@ -219,7 +219,7 @@ class Xbar(Term):
     def __repr__(self) -> str:
         return f"<Xbar left={self.left} right={self.right}>"
 
-    def to_string(self, **kwargs):
+    def to_string(self, **kwargs: Any):
         return f"{self.left.to_string(**kwargs)}**{self.right.to_string(**kwargs)}"
 
 
@@ -257,7 +257,7 @@ class Real(Term):
     def __init__(self, t) -> None:
         self.num = float("".join([str(i) for i in t]))
 
-    def to_string(self, *, round_ints: bool = False, **kwargs):
+    def to_string(self, *, round_ints: bool = False, **kwargs: Any):
         return f"{convert_float_to_dec(self.num, round_ints)}"
 
     def __repr__(self) -> str:
@@ -280,7 +280,7 @@ class AdditiveWeight(Weight):
     The parser representation of an additive weight.
     """
 
-    def to_string(self, **kwargs):
+    def to_string(self, **kwargs: Any):
         return f"{'|'.join([i.to_string(**kwargs) for i in self.multiset])}=+"
 
     def __repr__(self) -> str:
@@ -292,7 +292,7 @@ class MultiplicativeWeight(Weight):
     The parser representation of an multiplicative weight.
     """
 
-    def to_string(self, **kwargs):
+    def to_string(self, **kwargs: Any):
         return f"{'|'.join([i.to_string(**kwargs) for i in self.multiset])}=*"
 
     def __repr__(self) -> str:
@@ -325,7 +325,7 @@ class WeightedState:
         assert state is not None
         self.state = state
 
-    def to_string(self, **kwargs):
+    def to_string(self, **kwargs: Any):
         if self.additive:
             add_str = self.additive.to_string(**kwargs) + " "
         else:
@@ -354,7 +354,7 @@ class Stage:
     def __repr__(self) -> str:
         return f"<Stage states={self.states}>"
 
-    def to_string(self, **kwargs) -> str:
+    def to_string(self, **kwargs: Any) -> str:
         out = ",".join([s.to_string(**kwargs) for s in self.states])
         return "{" + f"{out}" + "}"
 
@@ -507,7 +507,7 @@ class ParserView:
     stage: Stage
     supposition: Optional[Supposition]
 
-    def to_string(self, **kwargs) -> str:
+    def to_string(self, **kwargs: Any) -> str:
         if len(self.quantifiers) == 0:
             quant_str = ""
         else:

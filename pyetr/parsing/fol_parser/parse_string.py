@@ -186,7 +186,7 @@ class LogicPredicate:
     args: list["Item"]
     name: str
 
-    def __init__(self, t: list[list["str | Item"]]) -> None:
+    def __init__(self, t: list[list[Any]]) -> None:
         self.name = t[0][0]
         if len(t[0]) > 1:
             other = t[0][1]

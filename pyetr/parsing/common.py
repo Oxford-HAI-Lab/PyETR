@@ -1,5 +1,5 @@
 from copy import copy
-from typing import Iterable
+from typing import Any, Iterable
 
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom, get_open_atom_equivalent
 from pyetr.atoms.predicate_atom import PredicateAtom
@@ -34,13 +34,13 @@ class Variable:
 
     name: str
 
-    def __init__(self, t) -> None:
+    def __init__(self, t: list[str] | tuple[str]) -> None:
         self.name = t[0]
 
     def __repr__(self) -> str:
         return f"<Variable name={self.name}>"
 
-    def to_string(self, **kwargs) -> str:
+    def to_string(self, **kwargs: Any) -> str:
         return self.name
 
 
@@ -52,7 +52,7 @@ class Quantified:
     variable: Variable
     quantifier: str
 
-    def __init__(self, t) -> None:
+    def __init__(self, t: Any) -> None:
         variables = t[0].variables
         assert len(variables) == 1
         quantifier = t[0].quantifier
@@ -67,7 +67,7 @@ class Quantified:
     def __repr__(self) -> str:
         return f"<Quantified variable={self.variable} quantifier={self.quantifier}>"
 
-    def to_string(self, **kwargs) -> str:
+    def to_string(self, **kwargs: Any) -> str:
         return self.quantifier + self.variable.to_string(**kwargs)
 
 

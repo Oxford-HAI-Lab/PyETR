@@ -3,7 +3,6 @@ from typing import Iterable, Optional
 from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.multiset import Multiset
 from pyetr.atoms.terms.term import FunctionalTerm
-from pyetr.dependency import DependencyRelation
 from pyetr.issues import IssueStructure
 from pyetr.stateset import SetOfStates, State
 from pyetr.weight import Weight, Weights

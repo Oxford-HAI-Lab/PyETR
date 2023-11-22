@@ -1,4 +1,4 @@
-from typing import Generic, Hashable, Iterable, TypeVar
+from typing import Generic, Hashable, Iterable, TypeVar, cast
 
 T = TypeVar("T", bound=Hashable)
 
@@ -16,16 +16,14 @@ class Multiset(Generic[T]):
     def __iter__(self):
         return iter(self._items)
 
-    def __next__(self):
-        return next(self)
-
     def __repr__(self) -> str:
         return f"⟪{','.join([repr(i) for i in self._items])}⟫"
 
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, Multiset):
             return False
-        return self._items == __value._items
+        else:
+            return self._items == cast(Multiset[T], __value)._items
 
     def __hash__(self) -> int:
         return hash(type(self).__name__) + hash(tuple(self._items))
