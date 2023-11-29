@@ -232,9 +232,9 @@ class SetOfStates(frozenset[State]):
                 output = new_state_set
             else:
                 output = output * new_state_set
-        # TODO: Made this up to fix bug - is negation of falsum truth?
+
         if output is None and self.is_falsum:
-            return self
+            return SetOfStates({State()})
         assert output is not None
 
         return output

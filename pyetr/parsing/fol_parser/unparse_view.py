@@ -137,7 +137,6 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
             state = next(iter(s))
             assert len(state) > 0
             if len(state) == 1:
-                # TODO: Fix for doatoms
                 atom = next(iter(state))
                 if not isinstance(atom, PredicateAtom):
                     raise FOLNotSupportedError(
@@ -147,7 +146,6 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
             else:
                 new_atoms: list[LogicPredicate | BoolNot] = []
                 for atom in state:
-                    # TODO: Fix for doatoms
                     if not isinstance(atom, PredicateAtom):
                         raise FOLNotSupportedError(
                             f"Non predicate atom: {atom}  found - FOL not supported"
@@ -161,14 +159,12 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
                     new_ands.append(Truth([]))
                 elif len(state) == 1:
                     atom = next(iter(state))
-                    # TODO: Fix for doatoms
                     if not isinstance(atom, PredicateAtom):
                         raise FOLNotSupportedError(
                             f"Non predicate atom: {atom}  found - FOL not supported"
                         )
                     new_ands.append(convert_atom(atom, issue_structure, issue_atoms))
                 else:
-                    # TODO: Fix for doatoms
                     new_atoms = []
                     for atom in state:
                         if not isinstance(atom, PredicateAtom):

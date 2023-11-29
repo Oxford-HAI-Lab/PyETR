@@ -120,7 +120,7 @@ def dependencies_to_sets(
 
 
 def cross(
-    universals: frozenset[Universal], existentials: frozenset[Existential]
+    *, existentials: frozenset[Existential], universals: frozenset[Universal]
 ) -> frozenset[Dependency]:
     """
     E × U
@@ -133,7 +133,7 @@ def cross(
     """
     return frozenset(
         {
-            Dependency(universal=universal, existential=existential)
+            Dependency(existential=existential, universal=universal)
             for existential in existentials
             for universal in universals
         }
@@ -363,8 +363,8 @@ class DependencyRelation:
         a ◁_R b
 
         Based on Lemma B.7
-        # TODO: Where do case 1 and 4 come from?
-
+        (i) e ◁_R u iff <e,u> ∈ D_R
+        (i) u ◁_R e iff ¬(e ◁_R u) iff ¬(<e,u> ∈ D_R)
         (ii), (b): u ◁_R u' iff ∃e ∈ E_R.<e,u> ∉ D_R ∧ <e,u'> ∈ D_R
         (iii), (b): e ◁_R e' iff ∃u ∈ U_R.<e',u> ∉ D_R ∧ <e,u> ∈ D_R
         Args:
@@ -390,6 +390,7 @@ class DependencyRelation:
         elif self.is_existential(arb_object1) and not self.is_existential(arb_object2):
             # Case 2
 
+            # (i) e ◁_R u iff <e,u> ∈ D_R
             # There is a dependency of this structure
             return (
                 Dependency(existential=arb_object1, universal=arb_object2)
@@ -398,7 +399,7 @@ class DependencyRelation:
 
         elif not self.is_existential(arb_object1) and self.is_existential(arb_object2):
             # Case 3
-
+            # (i) u ◁_R e iff ¬(e ◁_R u) iff ¬(<e,u> ∈ D_R)
             # There is not a dependency of this structure
             return (
                 Dependency(existential=arb_object2, universal=arb_object1)
@@ -427,8 +428,8 @@ class DependencyRelation:
         a ≲_R b
 
         Based on Lemma B.7
-        # TODO: Where do case 1 and 4 come from?
-
+        (i) e ≲_R u iff <e,u> ∈ D_R
+        (i) u ≲_R e iff ¬(e ≲_R u) iff ¬(<e,u> ∈ D_R)
         (ii), (a): u ≲_R u' iff ∀e ∈ E_R.<e,u> ∈ D_R => <e,u'> ∈ D_R
         (iii), (a): e ≲_R e' iff ∃u ∈ U_R.<e',u> ∈ D_R => <e,u> ∈ D_R
         Args:
@@ -454,6 +455,8 @@ class DependencyRelation:
 
         elif self.is_existential(arb_object1) and not self.is_existential(arb_object2):
             # Case 2
+
+            # (i) e ≲_R u iff <e,u> ∈ D_R
             # There is a dependency of this structure
             return (
                 Dependency(existential=arb_object1, universal=arb_object2)
@@ -462,6 +465,8 @@ class DependencyRelation:
 
         elif not self.is_existential(arb_object1) and self.is_existential(arb_object2):
             # Case 3
+
+            # (i) u ≲_R e iff ¬(e ≲_R u) iff ¬(<e,u> ∈ D_R)
             # There is not a dependency of this structure
             return (
                 Dependency(existential=arb_object2, universal=arb_object1)
@@ -634,11 +639,9 @@ class DependencyRelation:
         Returns:
             DependencyRelation: The negated dependency relation.
         """
-        # TODO: In book U_R and E_R are wrong way round in cross?
         # Every new existential now depends on every new universal
         # Except those that the ancestor existential depended on the ancestor universal
 
-        # U_R × E_R TODO: (Flipped order intentionally here to match book)
         ancestor_deps = cross(
             universals=self.existentials, existentials=self.universals
         )

@@ -188,6 +188,8 @@ class Weights:
         return self._weights[item]
 
     def adding(self, state: State, weight: Weight):
+        # This is to build up a weights dictionary, by adding a weighted state
+        # (formed of a state and a weight) one at a time.
         if state in self:
             self._weights[state] += weight
         else:
@@ -204,6 +206,10 @@ class Weights:
 
     def __contains__(self, item: object) -> bool:
         return item in self._weights
+
+    @property
+    def is_null_weights(self) -> bool:
+        return all(w.is_null for w in self.values())
 
     def __mul__(self, other: "Weights") -> "Weights":
         new_weights: Weights = Weights()

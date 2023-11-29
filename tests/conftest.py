@@ -8,6 +8,7 @@ import pytest
 import pyetr.cases
 from pyetr import ArbitraryObject, Function, FunctionalTerm
 from pyetr.cases import BaseExample
+from pyetr.exceptions import OperationUndefinedError
 from pyetr.parsing.fol_parser.unparse_view import FOLNotSupportedError
 from pyetr.parsing.view_parser import ViewParser
 
@@ -159,7 +160,10 @@ class OperationTest(pytest.Item):
         parsed_view2 = vp.from_str(self.view_string1)
 
         parsed_view1.product(parsed_view2)
-        parsed_view1.sum(parsed_view2)
+        try:
+            parsed_view1.sum(parsed_view2)
+        except OperationUndefinedError:
+            pass
         parsed_view1.atomic_answer(parsed_view2)
         parsed_view1.equilibrium_answer(parsed_view2)
         parsed_view1.answer(parsed_view2)
@@ -189,11 +193,16 @@ class ParseTestCollector(pytest.File):
         for test_set in parse_test_set:
             for item in json_file:
                 yield test_set.from_parent(parent=self, view_string=item, name=item)
-
-        # for item1 in json_file:
-        #     for item2 in json_file:
-        #         if item1 != item2:
-        #             yield OperationTest.from_parent(parent=self, view_string1=item1, view_string2=item2, name=item1+item2)
+        if self.config.option.viewops:
+            for item1 in json_file:
+                for item2 in json_file:
+                    if item1 != item2:
+                        yield OperationTest.from_parent(
+                            parent=self,
+                            view_string1=item1,
+                            view_string2=item2,
+                            name=item1 + item2,
+                        )
 
 
 def is_case_file(path: Path) -> bool:
@@ -227,3 +236,12 @@ def arb_obj():
 @pytest.fixture
 def term(func: Function, arb_obj: ArbitraryObject):
     return FunctionalTerm(func, (arb_obj,))
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--viewops",
+        dest="viewops",
+        action="store_true",
+        help="Include view op tests?",
+    )
