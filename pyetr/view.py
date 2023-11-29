@@ -5,6 +5,9 @@ from itertools import permutations
 from typing import Callable, Optional, cast
 
 from pyetr.atoms.abstract import Atom
+from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
+from pyetr.atoms.terms.open_term import QuestionMark
+from pyetr.exceptions import OperationUndefinedError
 from pyetr.parsing.common import get_quantifiers
 
 from .atoms import PredicateAtom, equals_predicate
@@ -70,7 +73,7 @@ def stage_function_product(
 
 def Z(T: DependencyRelation, a: ArbitraryObject) -> set[ArbitraryObject]:
     """
-    Based on definition A.43, p306 (TODO: Where in book?)
+    Based on definition A.43, p306
 
     Z(T,a) = {u ∈ U_T : u ◁_T a} ∪ {e ∈ E_T : e ≲_T a} – {a}
 
@@ -99,16 +102,16 @@ def substitution(
     weights: Weights,
 ) -> "View":
     """
-    Based on definition A.43, p306 (TODO: Where in book?)
+    Based on definition A.43, p306
     Weight section based on definition 5.25, p221
 
     # Note, in book it returns a tuple
-    Sub^T_<t,a> (Γ^Θ_I) = View(
+    Sub^T_<t,a> (Γ_f^Θ_I) = View(
         stage = Γ[ν₁]_Z(T,a) [t/a],
         supposition = Θ,
         dep_rel = T ⋊ ([T]_Z(T,a)[t/a]),
         issues = I[ν₁]_Z(T,a) [t/a],
-        weights = ? TODO: No expr found
+        weights = f[ν₁]_Z(T,a) [t/a],
     )
 
     Args:
@@ -119,7 +122,7 @@ def substitution(
         stage (Stage): Γ
         supposition (Supposition): Θ
         issue_structure (IssueStructure): I
-        weights (Weights): f? TODO: What's this?
+        weights (Weights): f
 
     Returns:
         View: The view with values substituted.
@@ -139,6 +142,7 @@ def substitution(
         new_state = state.replace(cast(dict[ArbitraryObject, Term], subs)).replace(
             {arb_obj: term}
         )
+        # f[ν₁]_Z(T,a) [t/a]
         new_weight = (
             weights[state]
             .replace(cast(dict[ArbitraryObject, Term], subs))
@@ -207,9 +211,9 @@ def state_division(
 
     If DIVISION_PRESUPPOSITION:
 
-        γ⌀_Γ Δ^Ψ = γ – ıδ(δ ∈ Δ ∧ δ ⊆ γ ∧ ∃ψ_∈Ψ (ψ ⊆ γ))
+        γ⊘_Γ Δ^Ψ = γ – ıδ(δ ∈ Δ ∧ δ ⊆ γ ∧ ∃ψ_∈Ψ (ψ ⊆ γ))
     Else:
-        γ⌀_Γ Δ^Ψ = γ
+        γ⊘_Γ Δ^Ψ = γ
 
     Args:
         state (State): γ
@@ -699,11 +703,9 @@ class View:
             # Corresponds to line 2
             inherited_dependencies = DependencyRelation(set(), set(), frozenset())
         if self.supposition != view.supposition:
-            # TODO: Added this
-            return self
-            # raise ValueError(
-            #     f"Invalid sum on {self.supposition} and {view.supposition}"
-            # )
+            raise OperationUndefinedError(
+                f"Invalid sum on {self.supposition} and {view.supposition}"
+            )
 
         supposition = self.supposition
 
@@ -763,7 +765,7 @@ class View:
 
             # γ∈Γ
             for gamma in self.stage:
-                # Δ[{{p} : p ∈ γ}]^𝓐P # TODO: Seems different? now fixed?
+                # Δ[{{p} : p ∈ γ}]^𝓐P
                 potential = other.stage.atomic_answer_potential(
                     SetOfStates({State({p}) for p in gamma})
                 )
@@ -934,7 +936,7 @@ class View:
                         # (ψ[t/u] ⊆ γ ∧ ψ⊈γ)
                         if psi.replace({u: t}).issubset(gamma) and not psi.issubset(
                             gamma
-                        ):  # TODO: Changed to be the same as book? Is this correct?
+                        ):
                             psi_exists = True
                             break
                     if psi_exists:
@@ -1043,9 +1045,7 @@ class View:
         """
         Based on Definition 5.28, p223
 
-        Γ^Θ_fRI[D]ᵁ = {0}^Θ_RI ⨂^R⋈S (⨂^R⋈S_<t,u>∈M'ij Sub^R⋈S_<t,u> (Γ^{0}_fRI))
-
-        # TODO: Note swapping of t and u in M'ij, is this significant or typo?
+        Γ^Θ_fRI[D]ᵁ = {0}^Θ_RI ⨂^R⋈S (⨂^R⋈S_<u,t>∈M'ij Sub^R⋈S_<t,u> (Γ^{0}_fRI))
         """
 
         def _m_prime() -> set[tuple[Universal, Term]]:
@@ -1093,7 +1093,7 @@ class View:
                     weights=None,
                 )
             ] + [
-                # <t,u>∈M'ij Sub^R⋈S_<t,u> (Γ^{0}_fRI)
+                # <u,t>∈M'ij Sub^R⋈S_<t,u> (Γ^{0}_fRI)
                 substitution(
                     arb_gen=arb_gen,
                     dep_relation=r_fuse_s,
@@ -1149,23 +1149,21 @@ class View:
                     SetOfStates: The resulting set of states
                 """
 
-                def N(gamma: State, e: Existential) -> State:
+                def N(gamma: State) -> State:
                     """
                     N(γ,I,e) = {x[e/?] ∈ γ : <e,x> ∈ I}
 
                     Args:
                         gamma (State): γ
-                        e (Existential): e
 
                     Returns:
                         State: N(γ,I,e)
                     """
-                    # TODO: Think this need updating??? e is overloaded??
                     atoms: set[Atom] = set()
                     for t, open_atom in self.issue_structure:
                         formed_atom = open_atom(t)
                         for atom in gamma:
-                            if formed_atom == atom:
+                            if formed_atom == atom and t == e:
                                 atoms.add(atom)
                     return State(atoms)
 
@@ -1174,7 +1172,7 @@ class View:
                 )
                 return reduce(
                     mul,
-                    [SetOfStates({State({x}), State({~x})}) for x in N(gamma, e)],
+                    [SetOfStates({State({x}), State({~x})}) for x in N(gamma)],
                 )
 
             # BIG_UNION(e) = ∪_γ∈Γ,e∈A(γ) {γ}∪{{x∈γ : e∉A(x)} ∪ δ : δ ∈ BIG_PRODUCT(γ) ∧ δ⊈γ}
@@ -1284,16 +1282,31 @@ class View:
 
     def division(self, other: "View") -> "View":
         """
-        Based on definition 4.38
-        # TODO: Is it needed? Skipping doc string for now
+        Based on definition 4.38, p168
+
+        If ∀δ_∈Δ ∃ψ_∈Ψ ∃γ∈Γ (δ ⊆ γ ∧ ψ ⊆ γ):
+
+        Γ^Θ_RI ⊘ Δ^Ψ_SJ = {γ ⊘_Γ Δ^Ψ : γ∈Γ}^Θ_[R][I]
+
+        Args:
+            self (View): Γ^Θ_fRI
+            view (View): Δ^Ψ_SJ
+            verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+        Returns:
+            View: The divided view.
         """
+        # ∀δ_∈Δ ∃ψ_∈Ψ ∃γ∈Γ (δ ⊆ γ ∧ ψ ⊆ γ)
         if division_presupposition(
             self_stage=self.stage,
             other_stage=other.stage,
             other_supposition=other.supposition,
         ):
+            # {γ ⊘_Γ Δ^Ψ : γ∈Γ}^Θ_[R][I]
             new_weights: Weights = Weights()
+            # γ∈Γ
             for gamma in self.stage:
+                # γ ⊘_Γ Δ^Ψ
                 new_state = state_division(
                     state=gamma,
                     self_stage=self.stage,
@@ -1327,14 +1340,12 @@ class View:
         Based on definition 5.32 p232 (central case)
 
         Contradiction: Γ^Θ_fRI[⊥]ꟳ = {γ∈Γ : ¬∃κ ∈ 𝕂.κ ⊆ γ}^Θ_fRI
-        Identity: Γ^Θ_fRI[{w.It₁t₂}^{0}_gSJ]ꟳ = {γ ∈ Γ : It₁t₂ ∉ γ}_f + Σ_γ∈Γ s.t.It₁t₂∈γ {(f(γ)[t₁/t₂]).(γ[t₁/t₂])}^Θ_RI # TODO: What is this supposed to say? Is issue I or J? Where is g?
+        Identity: Γ^Θ_fRI[{w.t₁==t₂}^{0}_gSJ]ꟳ = {γ ∈ Γ : t₁==t₂ ∉ γ}_f + Σ_γ∈Γ s.t.t₁==t₂∈γ {(f(γ)[t₁/t₂]).(γ[t₁/t₂])}^Θ_RI
         Central: Γ^Θ_fRI[Δ^Ψ_gSJ]ꟳ = Σ_γ∈Γ {f(γ).γ[Δ^Ψ]ꟳ}
-
-        # TODO: When its ready fill out identity
 
         Args:
             self (View): Γ^Θ_fRI
-            other (View): ⊥ | {w.It₁t₂}^{0}_gSJ | Δ^Ψ_gSJ
+            other (View): ⊥ | {w.t₁==t₂}^{0}_gSJ | Δ^Ψ_gSJ
             verbose (bool, optional): Enables verbose mode. Defaults to False.
             absurd_states (Optional[list[State]], optional): Manual input of primitive absurd states. Defaults to None.
 
@@ -1405,9 +1416,8 @@ class View:
 
         def identity_factor_condition() -> bool:
             """
-            It₁t₂ ∉ γ
+            For J = {<==(?, t₂)>} or <==(?, t₁)>}
 
-            TODO: What goes here?
             Returns:
                 bool: True if identity factor should be used.
             """
@@ -1422,6 +1432,13 @@ class View:
             if first_atom.predicate != equals_predicate:
                 return False
             if len(other.issue_structure) != 1:
+                return False
+            _, open_atom = next(iter(other.issue_structure))
+            assert isinstance(open_atom, OpenPredicateAtom)
+            assert len(open_atom.terms) == 2
+            if not isinstance(open_atom.terms[0], QuestionMark) and not isinstance(
+                open_atom.terms[1], QuestionMark
+            ):
                 return False
             if not other.supposition.is_verum:
                 return False
@@ -1450,16 +1467,20 @@ class View:
         elif identity_factor_condition():
             if verbose:
                 print("Identity factor")
+            # {γ ∈ Γ : t₁==t₂ ∉ γ}_f + Σ_γ∈Γ s.t.t₁==t₂∈γ {(f(γ)[t₁/t₂]).(γ[t₁/t₂])}^Θ_RI
             first_state = next(iter(other.stage))
             first_atom = next(iter(first_state))
             assert isinstance(first_atom, PredicateAtom)
             assert len(first_atom.terms) == 2
             t1, t2 = first_atom.terms
+
+            # EXPR1 = {γ ∈ Γ : t₁==t₂ ∉ γ}_f
             expr1_states = SetOfStates(
                 {gamma for gamma in self.stage if first_atom not in gamma}
             )
             expr1_weights = self.weights.in_set_of_states(expr1_states)
 
+            # EXPR2 = Σ_γ∈Γ s.t.t₁==t₂∈γ {(f(γ)[t₁/t₂]).(γ[t₁/t₂])}^Θ_RI
             expr2_weights: Weights = Weights()
             for gamma in self.stage:
                 if first_atom in gamma:
@@ -1467,7 +1488,7 @@ class View:
                     expr2_weights.adding(
                         gamma_prime, self.weights[gamma].replace_term(t2, t1)
                     )
-
+            # EXPR1 + EXPR2
             new_stage = expr1_states | SetOfStates(expr2_weights.keys())
             new_weights = expr1_weights + expr2_weights
         else:
@@ -1526,7 +1547,7 @@ class View:
         """
         Based on definition 5.18, p210
 
-        # TODO: Note typo in book in if statement - corrected here γ -> Γ
+
         If A(Γ∪Θ) ∩ A(Δ∪Ψ) = ∅ and A(Δ) ∩ A(Ψ) = ∅
             O Case: Γ^Θ_fRI[Δ^Ψ_gSJ]ᴵ = (Γ^Θ_fRI ⨂ (Δ^Ψ_gSJ ⊕ˢ({0}^Ψ_SJ ⨂ ([Δ^{0}_gSJ]ᶰ)^nov(A(Δ)))))[⊥]ꟳ
 
@@ -1566,14 +1587,14 @@ class View:
                 issue_structure=other.issue_structure,
                 weights=None,
             )
-            # [Δ^{0}_gSJ]ᶰ TODO: Book suggests view negation, also where are the weights?
+            # [Δ^{0}_gSJ]ᶰ
             v2 = View.with_restriction(
-                stage=other.stage.negation(),
+                stage=other.stage,
                 supposition=SetOfStates({State({})}),
-                dependency_relation=other.dependency_relation.negation(),
-                issue_structure=other.issue_structure.negation(),
+                dependency_relation=other.dependency_relation,
+                issue_structure=other.issue_structure,
                 weights=None,
-            )
+            ).negation()
             # (V2)^nov(A(Δ))
             v3 = arb_gen.novelise_all(v2)
 
@@ -1592,8 +1613,9 @@ class View:
             if verbose:
                 print("Inquire, I case")
 
-            # [Δ_g]ᶰ|^Ψ_SJ
-            # TODO: Does not match?
+            # [Δ_g]ᶰ|^Ψ_SJᶰ
+            # NOTE: The book does not feature the J negation, but we now think it
+            # should be negated.
             view2 = View.with_restriction(
                 stage=other.stage.negation(),
                 supposition=other.supposition,
@@ -1621,7 +1643,7 @@ class View:
         If A(Γ∪Θ) ∩ A(Δ∪Ψ) = ∅ ∧ Δ^Ψ_gSJ = Δ^Ψ_SJ
             O Case: Γ^Θ_fRI[Δ^Ψ_gSJ]ˢ = Γ^Θ'_[R⋈R'][I∪I'] [Δ^Ψ_gSJ]ᵁ[Δ^Ψ_gSJ]ᴱ[Δ^Ψ_gSJ]ᴬ[Δ^Ψ_gSJ]ᴹ
 
-            where: Θ'^{0}_f'R'I' = Θ^{0}_fRI ⨂ Nov(Δ^Ψ_g[S]ᶰJ []ᴰ)
+            where: Θ'^{0}_R'I' = Θ^{0}_RI ⨂ Nov(Δ^Ψ_[S]ᶰJ []ᴰ)
 
         Else if A(Δ) ⊆ A(Γ∪Θ), [R]_Δ = S, and Δ^Ψ_gSJ = Δ^Ψ_SJ and Ψ = {0}
             I Case: Γ^Θ_fRI[Δ^{0}_gSJ]ˢ = Γ^(Θ⨂Δ)_fRI[Δ^{0}_gSJ]ᵁ[Δ^{0}_gSJ]ᴱ[Δ^{0}_gSJ]ᴬ[Δ^{0}_gSJ]ᴹ
@@ -1639,15 +1661,17 @@ class View:
         """
         if verbose:
             print(f"SupposeInput: External: {self} Internal {other}")
-        # TODO: What about Δ^Ψ_gSJ = Δ^Ψ_SJ?
         # A(Γ∪Θ) ∩ A(Δ∪Ψ) = ∅ ∧ Δ^Ψ_gSJ = Δ^Ψ_SJ
-        if len(self.stage_supp_arb_objects & other.stage_supp_arb_objects) == 0:
+        if (
+            len(self.stage_supp_arb_objects & other.stage_supp_arb_objects) == 0
+            and other.weights.is_null_weights
+        ):
             # O case
             arb_gen = ArbitraryObjectGenerator(
                 self.stage_supp_arb_objects | other.stage_supp_arb_objects
             )
-            # Θ'^{0}_f'R'I' = Θ^{0}_fRI ⨂ Nov(Δ^Ψ_g[S]ᶰJ []ᴰ)
-            # TODO: note difference in book, here uses f - are we supposed to generate some weights?
+            # Θ'^{0}_R'I' = Θ^{0}_RI ⨂ Nov(Δ^Ψ_[S]ᶰJ []ᴰ)
+            # NOTE: Difference in book, appearance of f' is redundant
             v_prime = View(
                 stage=self.supposition,
                 supposition=SetOfStates({State()}),
@@ -1662,7 +1686,7 @@ class View:
                         supposition=other.supposition,
                         dependency_relation=other.dependency_relation.negation(),
                         issue_structure=other.issue_structure,
-                        weights=other.weights,
+                        weights=None,
                     ).depose(verbose=verbose)
                 )
             )
@@ -1683,7 +1707,6 @@ class View:
                 .merge(other, verbose=verbose)
             )
         # A(Δ) ⊆ A(Γ∪Θ), [R]_Δ = S, and Δ^Ψ_gSJ = Δ^Ψ_SJ and Ψ = {0}
-        # TODO: What about Δ^Ψ_gSJ = Δ^Ψ_SJ?
         elif (
             (other.stage.arb_objects.issubset(self.stage_supp_arb_objects))
             and (
@@ -1691,6 +1714,7 @@ class View:
                 == other.dependency_relation
             )
             and other.supposition.is_verum
+            and other.weights.is_null_weights
         ):
             # I case
             # Γ^(Θ⨂Δ)_fRI[Δ^{0}_gSJ]ᵁ[Δ^{0}_gSJ]ᴱ[Δ^{0}_gSJ]ᴬ[Δ^{0}_gSJ]ᴹ
@@ -1828,7 +1852,9 @@ class View:
             for e in D6_exi_set:
                 for e_prime in D6_exi_set:
                     # e ≲_S e'
-                    # TODO: Is the second condition?: (∀m,m' ∈ M'ij(eₘ = e' ∧ eₘ' = e') -> tₘ = tₘ')
+                    # NOTE: This appears different but is the same. Both require that e participates in at most one
+                    # issue match.
+                    # (∀m,m' ∈ M'ij(eₘ = e' ∧ eₘ' = e') -> tₘ = tₘ')
                     if other.dependency_relation.less_sim(e, e_prime) and (
                         len([e_m for _, e_m in m_prime if e_m == e_prime]) < 2
                     ):
@@ -1906,7 +1932,7 @@ class View:
 
     def which(self, other: "View", *, verbose: bool = False) -> "View":
         """
-        Based on definition 5.53, p232
+        Based on definition 5.33, p232
 
         Γ^Θ_fRI[Δ^Ψ_gSJ]ᵂ = H + Σ_γ∈Γ《ω.ξ : Ξ(γ,ω.ξ)》|^Θ_RI
 
@@ -1929,7 +1955,17 @@ class View:
         ):
             m_prime = self._query_m_prime(other)
 
-            def xi_fka_psi(gamma: State) -> Weights:
+            def new_weights_induced_by_gamma(gamma: State) -> Weights:
+                """
+                The multiset of w.ξ that match the predicate Ξ of γ. w.ξ, except we count the multiplicities
+                    slightly differently by doing a multiset map over M'ij, Δ and Ψ.
+
+                Args:
+                    gamma (State): γ
+
+                Returns:
+                    Weights:《ω.ξ : Ξ(γ,ω.ξ)》
+                """
                 weights: Weights = Weights()
                 for m_prime_set in powerset(m_prime):
                     replacements: dict[ArbitraryObject, Term] = {
@@ -1941,7 +1977,7 @@ class View:
                                 xi = delta.replace(replacements)
                                 if (xi | p).issubset(gamma):
                                     w = other.weights[delta].replace(replacements)
-                                    # TODO: This is not exactly what's in the book, because here we count
+                                    # NOTE: This is not exactly what's in the book, because here we count
                                     # each w.xi possibly multiple times, whereas the book (a little ambiguously,
                                     # but interpreted strictly) collapses the multiplicities to 1.
                                     weights.adding(xi, w)
@@ -1953,7 +1989,7 @@ class View:
             s2_weights: Weights = Weights()
             # Σ_γ∈Γ
             for gamma in self.stage:
-                s2_weights += xi_fka_psi(gamma)
+                s2_weights += new_weights_induced_by_gamma(gamma)
 
             new_weights = Weights.get_null_weights(H) + s2_weights
             out = View.with_restriction(

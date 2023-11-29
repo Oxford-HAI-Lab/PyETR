@@ -1417,8 +1417,6 @@ class e64i(BaseExample):
     What is the chance that he is in fact a sufferer?
     """
 
-    # TODO: Issues not in book - this isn't procedure in book, uses query instead of which
-    # TODO: Note typo line 2 introduction of P
     v = (
         ps("∀x {90=* S(x*)T(x*), S(x)~T(x)}^{S(x)}"),
         ps("∀x {1=* ~S(x)T(x), ~S(x)~T(x)} ^ {~S(x*)}"),
@@ -1447,7 +1445,6 @@ class e64ii(e64i):
     )
     c: View = ps("{90=* S(Smith()*)}")
 
-    # TODO: Why no 0 here? Should there be a 0 in 2nd atom?
     @classmethod
     def test(cls, verbose: bool = False):
         result = basic_step(v=cls.v[0:4], verbose=verbose).query(
@@ -1480,7 +1477,7 @@ class e65(BaseExample):
         ps("∀x {3=* P(x*)~C(x)T(x),P(x)~C(x)~T(x)}^{P(x)~C(x)}"),
         ps("∃a {P(a*)T(a)}"),
         ps("∃a {C(a)}"),
-    )  # TODO: Existential or constant
+    )
     c: View = ps("∃a {15=* C(a), 0}")
 
     @classmethod
@@ -1501,7 +1498,7 @@ class e66i(BaseExample):
     1. One of the disease psylicrapitis, and he is likely to be positive.
     2. Of those who do not have the disease, 1 will also test positive.
 
-    How many of those who test positive do have the disease? Out of ? # TODO: Why this ?
+    How many of those who test positive do have the disease? Out of ?
     """
 
     v = (
@@ -1663,7 +1660,6 @@ class e71(BaseExample):
     In the box there is a yellow card and there is not a brown card
     """
 
-    # TODO: Note typo on 212, By~Bb -> By~By
     v = (
         ps("{B(yellow())~B(brown()), ~B(yellow())B(brown())}"),
         ps("{50=* 0}^{B(yellow())~B(brown())}"),
@@ -1726,10 +1722,7 @@ class e72(BaseExample):
         )
         if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
             raise RuntimeError(f"Expected: {cls.c[0]} but received {mid_result}")
-        # TODO: Added inquire step
-        result = mid_result.inquire(cls.v[4], verbose=verbose).query(
-            cls.v[4], verbose=verbose
-        )
+        result = mid_result.query(cls.v[4], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c[1]):
             raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
 
@@ -1739,7 +1732,7 @@ class e74(BaseExample):
     Example 74, p197, p231
 
     (includes two background commitments)
-    """  # TODO: Note typo with brackets in book, p231
+    """
 
     v = (
         ps("{D(j())H(j()),H(j()),P(j())}"),
@@ -1778,10 +1771,10 @@ class e76(BaseExample):
     (P1.5, see p228) Guns who triggers are pulled fire
     (P2) The trigger (of the gun) was pulled. Does it follow that the guitar was out of
     tune?
-    """  # TODO: Note assuming exists i
+    """
 
     v = (
-        ps("Ea {Fired(i()*)Gun(i())Guitar(j())Outoftune(j()), A(a)}"),
+        ps("{Fired(i()*)Gun(i())Guitar(j())Outoftune(j()), Attic(a())}"),
         ps("Ax {Gun(x)Trigger(x)Fired(x),0}^{Gun(x)Fired(x*)}"),
         ps("{Trigger(i())}"),
     )
@@ -1933,7 +1926,7 @@ class e83ii(e83_base, BaseExample):
     c = ps("{33.3333=* Box(Green())Box(Blue()), 0}")
 
 
-class e84_base(WhatIsProb):
+class e84i(WhatIsProb, BaseExample):
     """
     Example 84, p215
 
@@ -1942,6 +1935,8 @@ class e84_base(WhatIsProb):
 
     Given the preceding assertion, what is the probability of the following
     situation?
+
+    In the box there is a grey marble and there is a mauve marble.
     """
 
     v = (
@@ -1949,38 +1944,30 @@ class e84_base(WhatIsProb):
             "{Box(Grey())Box(White())~Box(Mauve()),Box(Grey())Box(Mauve())~Box(White())}"
         ),
     )
-
-
-class e84i(e84_base, BaseExample):
-    """
-    In the box there is a grey marble and there is a mauve marble.
-    """
-
-    __doc__ = cast(str, e84_base.__doc__) + cast(str, __doc__)
     prob = ps("{Box(Grey())Box(Mauve())}")
     c = ps("{50=* Box(Grey())Box(Mauve()), 0}")
 
 
-class e84ii(e84_base, BaseExample):
+class e84ii(WhatIsProb, BaseExample):
     """
-    In the box there is a grey marble, or else a white marble, or else a mauve marble, but no more than one marble.
+    Example 84, p215
+
+    There is a box in which there is a grey marble, or else a white marble, or else a mauve marble, but no more than one marble.
+
+    Given the preceding assertion, what is the probability of the following
+    situation?
+
+    In the box there is a grey marble and there is a mauve marble.
     """
 
-    __doc__ = cast(str, e84_base.__doc__) + cast(str, __doc__)
-    prob = ps(
-        "{Box(Grey())~Box(White())~Box(Mauve()),Box(White())~Box(Grey())~Box(Mauve()),Box(Mauve())~Box(White())~Box(Grey())}"
+    # TODO: Look at default reasoning procedure for what is prob questions
+    v = (
+        ps(
+            "{Box(Grey())~Box(White())~Box(Mauve()),Box(White())~Box(Grey())~Box(Mauve()),Box(Mauve())~Box(White())~Box(Grey())}"
+        ),
     )
-    c = ps("{0}")  # TODO: How to get prob for multiple ors?
-
-
-class e84iii(e84_base, BaseExample):
-    """
-    In the box there is a grey marble and there is a mauve marble.
-    """
-
-    __doc__ = cast(str, e84_base.__doc__) + cast(str, __doc__)
     prob = ps("{Box(Grey())Box(Mauve())}")
-    c = ps("{50=* Box(Grey())Box(Mauve()), 0}")
+    c = ps("{0=* Box(Grey())Box(Mauve()), 0}")
 
 
 class e85(WhatIsProb, BaseExample):
@@ -1999,12 +1986,8 @@ class e85(WhatIsProb, BaseExample):
 
     v = (
         ps("{Box(Green()), Box(Blue()), Box(Red())}"),
-        ps(
-            "{60=* Box(Green())}^{Box(Green())}"
-        ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book.
-        ps(
-            "{20=* Box(Blue())}^{Box(Blue())}"
-        ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book
+        ps("{60=* Box(Green())}^{Box(Green())}"),
+        ps("{20=* Box(Blue())}^{Box(Blue())}"),
     )
     prob = ps("{Box(Red())}")
     c = ps("{20=* Box(Red()), 0}")
@@ -2025,12 +2008,8 @@ class e86(WhatIsProb, BaseExample):
 
     v = (
         ps("{A()Q(), K()J(), X()}"),
-        ps(
-            "{60=* A()Q()}^{A()Q()}"
-        ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book
-        ps(
-            "{20=* K()J()}^{K()J()}"
-        ),  # TODO: Probs are assumed to be out of 100 in default reasoning - not in book
+        ps("{60=* A()Q()}^{A()Q()}"),
+        ps("{20=* K()J()}^{K()J()}"),
     )
     prob = ps("{X()}")
     c = ps("{20=* X(), 0}")
@@ -2179,6 +2158,17 @@ class e93_grp1(DefaultDecision, BaseExample):
             verbose=verbose,
             absurd_states=[absurd_state],
         )
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class new_e1(BaseExample):
+    v = (ps("Ax Ea Ay {P(x,a)Q(a,y)}"), ps("Eb Az {P(b,z)}"))
+    c = ps("Eb Ax Az Ea Ay {P(x,a)P(b,z)Q(a,y)}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].update(cls.v[1])
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
