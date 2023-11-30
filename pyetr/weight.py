@@ -31,7 +31,7 @@ class Weight:
             self.additive == other.additive
         )
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # pragma: not covered
         return hash((self.multiplicative, self.additive))
 
     @property
@@ -139,9 +139,6 @@ class Weights:
         if weights_dict is None:
             weights_dict = {}
         self._weights = weights_dict
-
-    def __iter__(self):
-        return iter(self._weights)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Weights):

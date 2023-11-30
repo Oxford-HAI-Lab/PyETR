@@ -20,34 +20,38 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
             cls._validate(__iterable)
             return super().__new__(cls, __iterable)
 
-    def copy(self) -> "IssueStructure":
+    def copy(self) -> "IssueStructure":  # pragma: not covered
         return IssueStructure(super().copy())
 
-    def difference(self, *s: Iterable[object]) -> "IssueStructure":
+    def difference(
+        self, *s: Iterable[object]
+    ) -> "IssueStructure":  # pragma: not covered
         return IssueStructure(super().difference(*s))
 
-    def intersection(self, *s: Iterable[object]) -> "IssueStructure":
+    def intersection(
+        self, *s: Iterable[object]
+    ) -> "IssueStructure":  # pragma: not covered
         return IssueStructure(super().intersection(*s))
 
     def symmetric_difference(
         self, __s: Iterable[tuple[Term, OpenAtom]]
-    ) -> "IssueStructure":
+    ) -> "IssueStructure":  # pragma: not covered
         return IssueStructure(super().symmetric_difference(__s))
 
     def union(self, *s: Iterable[tuple[Term, OpenAtom]]) -> "IssueStructure":
-        return IssueStructure(super().union(*s))
+        return IssueStructure(super().union(*s))  # pragma: not covered
 
     def __and__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
-        return IssueStructure(super().__and__(__value))
+        return IssueStructure(super().__and__(__value))  # pragma: not covered
 
     def __or__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
-        return IssueStructure(super().__or__(__value))
+        return IssueStructure(super().__or__(__value))  # pragma: not covered
 
     def __sub__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
-        return IssueStructure(super().__sub__(__value))
+        return IssueStructure(super().__sub__(__value))  # pragma: not covered
 
     def __xor__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
-        return IssueStructure(super().__xor__(__value))
+        return IssueStructure(super().__xor__(__value))  # pragma: not covered
 
     def restriction(self, atoms: set[Atom]) -> "IssueStructure":
         return IssueStructure(

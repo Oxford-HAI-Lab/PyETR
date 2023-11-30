@@ -73,7 +73,7 @@ def transitive_closure(
         D_next_set = {
             (x, z) for x, y in d_current for z in arb_objects if (y, z) in d_current
         }
-        D_next_set.update(d_current)
+        D_next_set |= d_current
         if D_next_set == d_current:
             return d_current
         d_current = D_next_set
@@ -463,9 +463,12 @@ class DependencyRelation:
                 in self.dependencies
             )
 
-        elif not self.is_existential(arb_object1) and self.is_existential(arb_object2):
+        elif not self.is_existential(arb_object1) and self.is_existential(
+            arb_object2
+        ):  # pragma: not covered
             # Case 3
 
+            # Not actually used but here for completeness
             # (i) u ≲_R e iff ¬(e ≲_R u) iff ¬(<e,u> ∈ D_R)
             # There is not a dependency of this structure
             return (
@@ -475,8 +478,10 @@ class DependencyRelation:
 
         elif not self.is_existential(arb_object1) and not self.is_existential(
             arb_object2
-        ):
+        ):  # pragma: not covered
             # Case 4
+
+            # Not actually used but here for completeness
             # (ii), (a): u ≲_R u' iff ∀e ∈ E_R.<e,u> ∈ D_R => <e,u'> ∈ D_R
             # not(There is an X that depends on u (arb_obj 1) but does not depend on u_prime (arb_obj2))
             exis_depending_on_u = self.related_existentials(arb_object1)

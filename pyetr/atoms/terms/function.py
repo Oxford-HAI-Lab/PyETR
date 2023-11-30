@@ -3,7 +3,7 @@ __all__ = ["Function", "RealNumber"]
 
 from typing import TYPE_CHECKING, Callable, Optional, cast
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: not covered
     from .abstract_term import AbstractFunctionalTerm, TermType
 
 from inspect import getsource, signature

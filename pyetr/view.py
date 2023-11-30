@@ -1280,7 +1280,7 @@ class View:
                 print(f"ExiSumOutput: {self}")
             return self
 
-    def division(self, other: "View") -> "View":
+    def division(self, other: "View") -> "View":  # pragma: not covered
         """
         Based on definition 4.38, p168
 
@@ -1605,7 +1605,7 @@ class View:
         elif other.stage_supp_arb_objects.issubset(  # A(Δ∪Ψ) ⊆ A(Γ∪Θ)
             self.stage_supp_arb_objects
         ) and other.dependency_relation == self.dependency_relation.restriction(
-            self.stage_supp_arb_objects  # S = [R]_Γ∪Θ
+            other.stage_supp_arb_objects  # S = [R]_Δ∪Ψ
         ):
             # I case
             # (Γ^Θ_fRI ⨂ᴿ (Δ^Ψ_gSJ ⊕ᴿ ([Δ_g]ᶰ|^Ψ_SJ)))[⊥]ꟳ

@@ -202,7 +202,8 @@ def order_quantifieds(
     univs_used: list[str] = []
     dep_sets = dependencies_to_sets(dependencies)
     sorted_universals: list[tuple[int, ArbitraryObject, set[ArbitraryObject]]] = sorted(
-        [(len(exi_set), uni, exi_set) for uni, exi_set in dep_sets]
+        [(len(exi_set), uni, exi_set) for uni, exi_set in dep_sets],
+        key=lambda tup: tup[0],
     )
     final_out: list[Quantified] = []
     for _, uni, exi_set in sorted_universals:

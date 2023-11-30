@@ -1,15 +1,57 @@
 __all__ = ["State", "SetOfStates"]
 
+from copy import copy
 from functools import reduce
 from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
+from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
+from pyetr.atoms.terms.open_term import (
+    OpenFunctionalTerm,
+    OpenTerm,
+    QuestionMark,
+    get_open_equivalent,
+)
 from pyetr.atoms.terms.special_funcs import multiset_product
 
 from .atoms import Atom, PredicateAtom, equals_predicate
 from .atoms.terms import ArbitraryObject, FunctionalTerm, Multiset, Summation, Term
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: not covered
     from pyetr.weight import Weights
+
+
+def _get_open_terms(term: Term, search_term: Term) -> list[OpenTerm]:
+    if term == search_term:
+        return [QuestionMark()]
+    else:
+        if isinstance(term, FunctionalTerm):
+            template_new_subterms = [get_open_equivalent(i) for i in term.t]
+            new_open_terms: list[OpenTerm] = []
+            for j, subterm in enumerate(term.t):
+                open_t = _get_open_terms(subterm, search_term)
+                for new_subt in open_t:
+                    new_subterms = copy(template_new_subterms)
+                    new_subterms[j] = new_subt
+                    new_open_terms.append(OpenFunctionalTerm(f=term.f, t=new_subterms))
+            return new_open_terms
+        elif isinstance(term, ArbitraryObject):
+            return []
+        else:
+            assert False
+
+
+def get_opens(atom: PredicateAtom, search_term: Term) -> list[OpenPredicateAtom]:
+    template_new_terms = [get_open_equivalent(i) for i in atom.terms]
+    new_open_atoms: list[OpenPredicateAtom] = []
+    for i, t in enumerate(atom.terms):
+        open_t = _get_open_terms(t, search_term)
+        for new_t in open_t:
+            new_terms = copy(template_new_terms)
+            new_terms[i] = new_t
+            new_open_atoms.append(
+                OpenPredicateAtom(predicate=atom.predicate, terms=tuple(new_terms))
+            )
+    return new_open_atoms
 
 
 class State(frozenset[Atom]):
@@ -23,22 +65,24 @@ class State(frozenset[Atom]):
         else:
             return super().__new__(cls, __iterable)
 
-    def copy(self) -> "State":
+    def copy(self) -> "State":  # pragma: not covered
         return State(super().copy())
 
-    def difference(self, *s: Iterable[object]) -> "State":
+    def difference(self, *s: Iterable[object]) -> "State":  # pragma: not covered
         return State(super().difference(*s))
 
-    def intersection(self, *s: Iterable[object]) -> "State":
+    def intersection(self, *s: Iterable[object]) -> "State":  # pragma: not covered
         return State(super().intersection(*s))
 
-    def symmetric_difference(self, __s: Iterable[Atom]) -> "State":
+    def symmetric_difference(
+        self, __s: Iterable[Atom]
+    ) -> "State":  # pragma: not covered
         return State(super().symmetric_difference(__s))
 
-    def union(self, *s: Iterable[Atom]) -> "State":
+    def union(self, *s: Iterable[Atom]) -> "State":  # pragma: not covered
         return State(super().union(*s))
 
-    def __and__(self, __value: AbstractSet[Atom]) -> "State":
+    def __and__(self, __value: AbstractSet[Atom]) -> "State":  # pragma: not covered
         return State(super().__and__(__value))
 
     def __or__(self, __value: AbstractSet[Atom]) -> "State":
@@ -47,7 +91,7 @@ class State(frozenset[Atom]):
     def __sub__(self, __value: AbstractSet[Atom]) -> "State":
         return State(super().__sub__(__value))
 
-    def __xor__(self, __value: AbstractSet[Atom]) -> "State":
+    def __xor__(self, __value: AbstractSet[Atom]) -> "State":  # pragma: not covered
         return State(super().__xor__(__value))
 
     @property
@@ -117,10 +161,8 @@ class State(frozenset[Atom]):
         # Aristotle
         # {≠tt}
         for atom in state:
-            if (
-                isinstance(atom, PredicateAtom)
-                and (atom.predicate == equals_predicate)
-                and (not atom.predicate.verifier)
+            if isinstance(atom, PredicateAtom) and (
+                atom.predicate == ~equals_predicate
             ):
                 if atom.terms[0] == atom.terms[1]:
                     return True
@@ -128,17 +170,13 @@ class State(frozenset[Atom]):
         # Leibniz
         # {=tt',x[t/?],x̄[t'/?]}
         for atom in state:
-            if (
-                isinstance(atom, PredicateAtom)
-                and (atom.predicate == equals_predicate)
-                and atom.predicate.verifier
-            ):
+            if isinstance(atom, PredicateAtom) and (atom.predicate == equals_predicate):
                 t = atom.terms[0]
                 t_prime = atom.terms[1]
                 for x in state:
                     if isinstance(x, PredicateAtom) and t in x.terms:
-                        new_x = ~x.replace_low_level(old_term=t, new_term=t_prime)
-                        if new_x in state:
+                        new_atoms = set([~o(t_prime) for o in get_opens(x, t)])
+                        if any((atom in state) for atom in new_atoms):
                             return True
         return False
 
@@ -161,31 +199,41 @@ class SetOfStates(frozenset[State]):
         else:
             return super().__new__(cls, __iterable)
 
-    def copy(self) -> "SetOfStates":
+    def copy(self) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().copy())
 
     def difference(self, *s: Iterable[object]) -> "SetOfStates":
         return SetOfStates(super().difference(*s))
 
-    def intersection(self, *s: Iterable[object]) -> "SetOfStates":
+    def intersection(
+        self, *s: Iterable[object]
+    ) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().intersection(*s))
 
-    def symmetric_difference(self, __s: Iterable[State]) -> "SetOfStates":
+    def symmetric_difference(
+        self, __s: Iterable[State]
+    ) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().symmetric_difference(__s))
 
-    def union(self, *s: Iterable[State]) -> "SetOfStates":
+    def union(self, *s: Iterable[State]) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().union(*s))
 
-    def __and__(self, __value: AbstractSet[State]) -> "SetOfStates":
+    def __and__(
+        self, __value: AbstractSet[State]
+    ) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().__and__(__value))
 
     def __or__(self, __value: AbstractSet[State]) -> "SetOfStates":
         return SetOfStates(super().__or__(__value))
 
-    def __sub__(self, __value: AbstractSet[State]) -> "SetOfStates":
+    def __sub__(
+        self, __value: AbstractSet[State]
+    ) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().__sub__(__value))
 
-    def __xor__(self, __value: AbstractSet[State]) -> "SetOfStates":
+    def __xor__(
+        self, __value: AbstractSet[State]
+    ) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().__xor__(__value))
 
     @property
@@ -203,8 +251,10 @@ class SetOfStates(frozenset[State]):
 
     def __mul__(self, other: "SetOfStates") -> "SetOfStates":
         """
-        Definition 4.14 Product of set of states, p151 # TODO: Note differs from book usage, this is for
-            first order logic parser in book.
+        Definition 4.14 Product of set of states, p151
+
+        NOTE: This is also produced from definition 4.27, p157, if you combine lines
+            1 and 2.
 
         Γ ⨂ Δ = {γ∪δ : γ ∈ Γ, δ ∈ Δ}
         """
@@ -212,12 +262,11 @@ class SetOfStates(frozenset[State]):
 
     def negation(self):
         """
-        Based on Definition 4.15, p151
+        Based on Definition 4.31, p159
 
-        Negation of set of states # TODO: Note differs from book usage, this is for
-            first order logic parser in book.
+        Negation of set of states
 
-        [Γ]ᶰ = {{p̄} : p ∈ γ₁} ⨂ ... ⨂ {{p̄} : p ∈ γₙ}
+        [Γ]ᶰ = ⭙_γ∈Γ {{p̄} : p ∈ γ}
         """
         output = None
         for s in self:
@@ -226,7 +275,7 @@ class SetOfStates(frozenset[State]):
                 # {p̄}
                 new_state = State({~atom})
                 new_state_set_mut.add(new_state)
-            # {{p̄} : p ∈ γₙ}
+            # {{p̄} : p ∈ γ}
             new_state_set = SetOfStates(new_state_set_mut)
             if output is None:
                 output = new_state_set

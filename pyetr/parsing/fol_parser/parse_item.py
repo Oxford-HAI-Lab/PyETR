@@ -180,20 +180,20 @@ def _parse_item_with_issue(
                 open_atoms.append(o_atom)
             return SetOfStates({State({atom})})
 
-        elif isinstance(item, LogicEmphasis):
+        elif isinstance(item, LogicEmphasis):  # pragma: not covered
             raise ParsingError(
                 f"Logic emphasis {item} found outside of logic predicate"
             )
 
-        elif isinstance(item, Variable):
+        elif isinstance(item, Variable):  # pragma: not covered
             raise ParsingError(f"Variable {item} found outside of logic predicate")
 
-        elif isinstance(item, Implies):
+        elif isinstance(item, Implies):  # pragma: not covered
             raise ParsingError(
                 f"Implies statement {item} found at lower level than top"
             )
 
-        else:
+        else:  # pragma: not covered
             assert isinstance(item, Quantified)
             raise ParsingError(f"Quantified {item} found at lower level than top")
 
