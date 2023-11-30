@@ -5,7 +5,7 @@ from abc import ABCMeta, abstractmethod
 from enum import Enum
 from typing import TYPE_CHECKING, Iterable, TypeVar
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: not covered
     from .view import View
 
 from itertools import chain, combinations
@@ -30,9 +30,6 @@ class _BaseNameGen(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self, arb_objs: set[ArbitraryObject]) -> None:
         super().__init__()
-
-    def __iter__(self):
-        return self
 
     @abstractmethod
     def __next__(self) -> str:

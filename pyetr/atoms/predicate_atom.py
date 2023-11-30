@@ -38,20 +38,6 @@ class PredicateAtom(PredicateAtomLike[Term], Atom):
             new_terms.append(replacement)
         return PredicateAtom(predicate=self.predicate, terms=tuple(new_terms))
 
-    def replace_low_level(
-        self,
-        old_term: Term,
-        new_term: Term,
-    ) -> "PredicateAtom":
-        new_terms: list[Term] = []
-        for term in self.terms:
-            if old_term == term:
-                new_terms.append(new_term)
-            else:
-                new_terms.append(term)
-
-        return PredicateAtom(predicate=self.predicate, terms=tuple(new_terms))
-
     def replace_term(
         self,
         old_term: Term,

@@ -120,7 +120,17 @@ class Query(BaseTest):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
-class WHQuery(BaseTest):
+class UniversalProduct(BaseTest):
+    v: tuple[View, View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].universal_product(cls.v[1], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class Which(BaseTest):
     v: tuple[View, View]
 
     @classmethod
@@ -136,6 +146,26 @@ class Suppose(BaseTest):
     @classmethod
     def test(cls, verbose: bool = False):
         result = cls.v[0].suppose(cls.v[1], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class Inquire(BaseTest):
+    v: tuple[View, View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].inquire(cls.v[1], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class Merge(BaseTest):
+    v: tuple[View, View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].merge(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
@@ -1206,6 +1236,37 @@ class e50_part2(BaseExample):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
+class e50_part2_arbs(BaseExample):
+    """
+    Duplicate of e50, uses arb objects, some changes
+    """
+
+    v: tuple[View, View, View] = (
+        ps("∃j ∃s ∃g {M(j)~M(g)L(j,s)L(s,g)}"),
+        ps("∃s {M(s)}"),
+        ps("∃b ∃a {M(a*)L(a,b)~M(b*)}"),
+    )
+    g1: View = ps("∃j ∃s ∃g {M(j)L(s,g)L(j,s)~M(g)M(s),M(j)L(s,g)L(j,s)~M(g)~M(s)}")
+    g2: View = ps(
+        "∃j ∃s ∃g {M(j*)L(s,g)L(j,s)~M(g*)M(s),M(j*)L(s,g)L(j,s)~M(g*)~M(s*)}"
+    )
+
+    c: View = ps("∃b ∃a {M(a*)L(a,b)~M(b*)}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        mid_result = cls.v[0].inquire(cls.v[1], verbose=verbose)
+        if not mid_result.is_equivalent_under_arb_sub(cls.g1):
+            raise RuntimeError(
+                f"Expected mid result: {cls.g1} but received {mid_result}"
+            )
+
+        # Should use reorient once this exists
+        result = cls.g2.query(cls.v[2], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
 class e51(BasicStep, BaseExample):
     """
     Example 51, p131
@@ -1367,7 +1428,7 @@ class e61(BasicStep, BaseExample):
     c: View = ps("∀x ∃a {M(j()*)M(a*)D(x)B(x,a),M(j()*)~D(x)}")
 
 
-class e62(WHQuery, BaseExample):
+class e62(Which, BaseExample):
     """
     Example 62, p176
     """
@@ -1379,7 +1440,7 @@ class e62(WHQuery, BaseExample):
     c = ps("{0,S(j()*),S(m()*)}")
 
 
-class e63(WHQuery, BaseExample):
+class e63(Which, BaseExample):
     """
     Example 63, p176
     """
@@ -1391,7 +1452,7 @@ class e63(WHQuery, BaseExample):
     c = ps("{D(n()*)}")
 
 
-class e63_modified(WHQuery, BaseExample):
+class e63_modified(Which, BaseExample):
     """
     Example 63, p176
     """
@@ -2173,6 +2234,71 @@ class new_e1(BaseExample):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
+class new_e2(BaseExample):
+    v = (ps("Ea Ax {P(a)Q(x*)}"), ps("Ax Eb {Q(x*)R(b)}^{Q(x*)}"))
+    c = ps("Ea Ax Eb {P(a)Q(x*)R(b)}")
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].dependency_relation.fusion(cls.v[1].dependency_relation)
+        if result != cls.c.dependency_relation:
+            raise RuntimeError(
+                f"Expected: {cls.c.dependency_relation.detailed} but received {result.detailed}"
+            )
+
+
+class new_e3_base:
+    v = (ps("Ea Ax {P(a)Q(x*)}"), ps("Ax Eb {Q(x*)R(b)}^{Q(x*)}"))
+    c = ps("Ea Ax {P(a)Q(x*)}")
+
+
+class else_inquire(new_e3_base, Inquire, BaseExample):
+    pass
+
+
+class else_merge(new_e3_base, Merge, BaseExample):
+    pass
+
+
+class else_suppose(new_e3_base, Suppose, BaseExample):
+    pass
+
+
+class else_uni_prod(new_e3_base, UniversalProduct, BaseExample):
+    pass
+
+
+class new_e4_base:
+    v = (ps("Ea Ax {P(a)Q(x*)}"), ps("Ay Ea {Q(y*)R(a)}^{Q(y*)}"))
+    c = ps("Ea Ax {P(a)Q(x*)}")
+
+
+class else_query(new_e4_base, Query, BaseExample):
+    pass
+
+
+class else_which(new_e4_base, Which, BaseExample):
+    pass
+
+
+class new_e5(Query, BaseExample):
+    v = (
+        ps("Ax Ay Ea Eb Az Ec {Q(x*)P(y)P(a*)P(b)P(z)P(c)}"),
+        ps("Ed Ee Ef {P(d*)Q(e*)Q(f*)}"),
+    )
+    c = ps("∃e ∃d ∃f {P(d*)Q(f*)Q(e*)}")
+
+
+class new_e6_leibnitz(Factor, BaseExample):
+    v = (ps("Ea Eb {P(f(a), a)~P(f(b), a)==(a,b)}"), ps("{}"))
+    c = ps("{}")
+
+
+class new_e7_aristotle(Factor, BaseExample):
+    v = (ps("Ea {~==(a,a)}"), ps("{}"))
+    c = ps("{}")
+
+
 class AnswerPotential(BaseExample):
     v = (
         ps("{1.0=* 2.0=+ A()B() , 0.4=* B()C(), C()A()}"),
@@ -2215,15 +2341,9 @@ class AnswerPotential(BaseExample):
         assert out.f.num == 0.0, f"{out.f.num} not equal to {0.0}"
 
 
-class UniProduct(BaseExample):
+class UniProduct(UniversalProduct, BaseExample):
     v = (ps("∀x ∃a {P(x)E(x,a),~P(x*)}"), ps("{P(j()*)}"))
     c: View = ps("∃a {~P(j()*),P(j())E(j(),a)}")
-
-    @classmethod
-    def test(cls, verbose: bool = False):
-        result = cls.v[0].universal_product(cls.v[1], verbose=verbose)
-        if not result.is_equivalent_under_arb_sub(cls.c):
-            raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
 class QueryTest(Query, BaseExample):
