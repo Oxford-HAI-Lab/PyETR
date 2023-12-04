@@ -442,7 +442,7 @@ class DependencyRelation:
 
         if (arb_object1 not in (self.universals | self.existentials)) or (
             arb_object2 not in (self.universals | self.existentials)
-        ):
+        ):  # pragma: not covered
             return False
 
         if self.is_existential(arb_object1) and self.is_existential(arb_object2):

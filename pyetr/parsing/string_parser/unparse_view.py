@@ -63,8 +63,6 @@ def unparse_term(
 
     elif isinstance(term, ArbitraryObject):
         return Variable([term.name])
-    elif isinstance(term, Multiset):
-        assert False
     else:
         raise ValueError(f"Invalid term {term} provided")
 
