@@ -16,7 +16,6 @@ from pyetr.parsing.fol_parser.parse_string import (
     BoolAnd,
     BoolNot,
     BoolOr,
-    Comma,
     Falsum,
     Implies,
     Item,
@@ -70,7 +69,7 @@ def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
             [
                 [
                     term.f.name,
-                    Comma([new_subterms]),
+                    *new_subterms,
                 ]
             ]
         )
@@ -108,7 +107,7 @@ def convert_atom(
     for i, term in enumerate(atom.terms):
         open_terms = [(t, o.terms[i]) for t, o in open_atoms]
         new_terms.append(convert_term(term, open_terms))
-    inner = LogicPredicate([[atom.predicate.name, Comma([new_terms])]])
+    inner = LogicPredicate([[atom.predicate.name, *new_terms]])
     if atom.predicate.verifier:
         return inner
     else:

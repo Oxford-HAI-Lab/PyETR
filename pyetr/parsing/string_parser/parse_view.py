@@ -18,6 +18,7 @@ from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.special_funcs import Summation, XBar
 from pyetr.issues import IssueStructure
 from pyetr.parsing.common import (
+    ParsingError,
     Variable,
     get_variable_map_and_dependencies,
     merge_atoms_with_opens,
@@ -45,6 +46,10 @@ def parse_term(
         tuple[Term, list[tuple[Term, OpenTerm]]]: Tuple of terms and open terms associated.
     """
     if isinstance(t, Variable):
+        if t.name not in variable_map:
+            raise ParsingError(
+                f"Arb object {t.name} not found in quantifiers {list(variable_map.keys())}"
+            )
         return variable_map[t.name], []
     elif isinstance(t, parsing.Emphasis):
         parsed_term, open_terms = parse_term(
