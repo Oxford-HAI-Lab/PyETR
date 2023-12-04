@@ -1,14 +1,15 @@
 __all__ = ["BaseExample"]
 from abc import ABCMeta, abstractmethod
+from pyclbr import Function
 from typing import cast
 
 import pytest
 
-from pyetr.atoms.terms.function import RealNumber
+from pyetr.atoms.terms.function import Function, RealNumber
 from pyetr.atoms.terms.term import FunctionalTerm
 from pyetr.parsing.string_parser import string_to_view as ps
 
-from .func_library import log, power
+from .func_library import div, log, power
 from .inference import (
     basic_step,
     default_decision,
@@ -1974,7 +1975,8 @@ class e83_base(WhatIsProb):
 
     v = (
         ps(
-            "{33.3333=* Box(Red()), 33.3333=* Box(Green())Box(Blue()), 33.3333=* ~Box(Red())~Box(Green())~Box(Blue())}"
+            "{divide(100,3)=* Box(Red()), divide(100,3)=* Box(Green())Box(Blue()), divide(100,3)=* ~Box(Red())~Box(Green())~Box(Blue())}",
+            custom_functions=[Function(name="divide", arity=2, func_caller=div)],
         ),
     )
 
@@ -1996,7 +1998,10 @@ class e83ii(e83_base, BaseExample):
 
     __doc__ = cast(str, e83_base.__doc__) + cast(str, __doc__)
     prob = ps("{Box(Green())Box(Blue())}")
-    c = ps("{33.3333=* Box(Green())Box(Blue()), 0}")
+    c = ps(
+        "{divide(100,3)=* Box(Green())Box(Blue()), 0}",
+        custom_functions=[Function(name="divide", arity=2, func_caller=div)],
+    )
 
 
 class e84i(WhatIsProb, BaseExample):

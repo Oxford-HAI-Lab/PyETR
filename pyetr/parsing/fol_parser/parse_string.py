@@ -81,12 +81,9 @@ class MultiOperand:
     def __repr__(self) -> str:
         return f"<{self.name} operands={self.operands}>"
 
-    def _operand_string(self, operand: str, with_brackets: bool) -> str:
+    def _operand_string(self, operand: str) -> str:
         inner = operand.join([o.to_string() for o in self.operands])
-        if with_brackets:
-            return "(" + inner + ")"
-        else:
-            return inner
+        return "(" + inner + ")"
 
 
 class BoolAnd(MultiOperand):
@@ -97,7 +94,7 @@ class BoolAnd(MultiOperand):
     name = "BoolAnd"
 
     def to_string(self) -> str:
-        return self._operand_string(" ∧ ", with_brackets=True)
+        return self._operand_string(" ∧ ")
 
 
 class BoolOr(MultiOperand):
@@ -108,18 +105,7 @@ class BoolOr(MultiOperand):
     name = "BoolOr"
 
     def to_string(self) -> str:
-        return self._operand_string(" ∨ ", with_brackets=True)
-
-
-class Comma(MultiOperand):
-    """
-    Used for comma separate arguments in functions.
-    """
-
-    name = "Comma"
-
-    def to_string(self) -> str:
-        return self._operand_string(",", with_brackets=False)
+        return self._operand_string(" ∨ ")
 
 
 class Implies:
@@ -141,11 +127,6 @@ class Implies:
 
     def to_string(self) -> str:
         return self.left.to_string() + "→" + self.right.to_string()
-
-
-def equals_f(t):
-    assert len(t[0]) == 2
-    return LogicPredicate([["==", t[0]]])
 
 
 class Truth:
@@ -187,15 +168,12 @@ class LogicPredicate:
     name: str
 
     def __init__(self, t: Any) -> None:
-        self.name = t[0][0]
-        if len(t[0]) > 1:
-            other = t[0][1]
-            if isinstance(other, Comma):
-                self.args = t[0][1].operands
-            else:
-                self.args = [t[0][1]]
+        if isinstance(t[0], str):
+            self.name = t[0]
+            self.args = t[1:]
         else:
-            self.args = []
+            self.name = t[0][0]
+            self.args = t[0][1:]
 
     def __repr__(self) -> str:
         return f"<LogicPredicate args={self.args} name={self.name}>"
@@ -230,30 +208,34 @@ def get_expr() -> pp.Forward:
     equals = pp.Suppress(pp.Char("="))
     emphasis = pp.Suppress(pp.Char("*"))
 
+    term = pp.Forward()
+
     predicate_word = pp.Word(pp.alphas, pp.alphanums).setResultsName(
         "predicate"
     ) | pp.Literal("==")
-    predicate_0 = pp.Group(predicate_word + pp.Suppress("()")).setParseAction(
-        LogicPredicate
-    )
+    predicate = (
+        predicate_word
+        + pp.Suppress("(")
+        + pp.Optional(pp.delimitedList(term))
+        + pp.Suppress(")")
+    ).setParseAction(LogicPredicate)
+
     truth = pp.Char("⊤").setParseAction(Truth)
     falsum = pp.Char("⊥").setParseAction(Falsum)
-    comma = pp.Suppress(",")
     nested_and = pp.infix_notation(
-        predicate_0 | variable | truth | falsum,
+        predicate | variable | truth | falsum,
         op_list=[
             (predicate_word, 1, pp_right, LogicPredicate),
             (emphasis, 1, pp_left, LogicEmphasis),
             (bool_not, 1, pp_right, BoolNot),
             (bool_and, 2, pp_left, BoolAnd),
             (bool_or, 2, pp_left, BoolOr),
-            (equals, 2, pp_left, equals_f),
             (implies, 2, pp_left, Implies),
-            (comma, 2, pp_left, Comma),
         ],
         lpar=pp.Suppress("("),
         rpar=pp.Suppress(")"),
     )
+    term <<= nested_and
     expr <<= pp.ZeroOrMore(quantified_expr) + nested_and
     return expr
 

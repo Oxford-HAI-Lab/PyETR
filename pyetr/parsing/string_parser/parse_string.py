@@ -99,21 +99,6 @@ class State:
             return "".join([a.to_string(**kwargs) for a in self.atoms])
 
 
-class Truth:
-    """
-    The parser representation of truth.
-    """
-
-    def __init__(self, t) -> None:
-        pass
-
-    def __repr__(self) -> str:
-        return f"<Truth>"
-
-    def to_string(self, **kwargs: Any) -> str:
-        return "0"
-
-
 class Supposition:
     """
     The parser representation of the supposition.
