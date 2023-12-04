@@ -153,6 +153,8 @@ def default_procedure_what_is_prob(
             prob_of.stage,
             g_prime_prime.weights,
         )
+        if verbose:
+            print(f"EquilibriumAnswerOut: {out}")
         # ... ∈ [0,100]
         if isinstance(out.f, RealNumber) and out.f.num >= 0 and out.f.num <= 100:
             return g_prime_prime

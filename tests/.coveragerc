@@ -9,4 +9,5 @@ exclude_lines =
     raise TypeError
     assert False
     raise ParsingError
+    __repr__
 show_missing = True

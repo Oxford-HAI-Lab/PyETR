@@ -2,6 +2,8 @@ __all__ = ["BaseExample"]
 from abc import ABCMeta, abstractmethod
 from typing import cast
 
+import pytest
+
 from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.term import FunctionalTerm
 from pyetr.parsing.string_parser import string_to_view as ps
@@ -116,6 +118,16 @@ class Query(BaseTest):
     @classmethod
     def test(cls, verbose: bool = False):
         result = cls.v[0].query(cls.v[1], verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class Update(BaseTest):
+    v: tuple[View, View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].update(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
@@ -2229,7 +2241,7 @@ class new_e1(BaseExample):
 
     @classmethod
     def test(cls, verbose: bool = False):
-        result = cls.v[0].update(cls.v[1])
+        result = cls.v[0].update(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
@@ -2297,6 +2309,111 @@ class new_e6_leibnitz(Factor, BaseExample):
 class new_e7_aristotle(Factor, BaseExample):
     v = (ps("Ea {~==(a,a)}"), ps("{}"))
     c = ps("{}")
+
+
+class new_e8(Update, BaseExample):
+    v = (ps("{t()=+ A()}"), ps("{u()=* A()}"))
+    c = ps("{u()=* t()=+ A()}")
+
+
+class new_e9(DefaultInference, BaseExample):
+    v = (ps("Ax {P(x*)}"), ps("{P(j()*)}"))
+    c = ps("{0}")
+
+
+class new_e10(Query, BaseExample):
+    v = (ps("Ax {f(x)=* A(x*)}"), ps("Ee {f(e)=* A(e*)}"))
+    c = ps("Ee {f(e)=* A(e*)}")
+
+
+class new_e11(Query, BaseExample):
+    v = (ps("{f(12)=* A(12*)}"), ps("Ee {f(e)=* A(e*)}"))
+    c = ps("Ee {f(e)=* A(e*)}")
+
+
+class new_e12(Inquire, BaseExample):
+    v = (ps("{A()}"), ps("{}"))
+    c = ps("{A()}")
+
+
+class new_e13(WhatIsProb, BaseExample):
+    v = (ps("{f(12)=* A(12*), B()}"),)
+    prob = ps("Ee {A(e*)}")
+    c = ps("{}")
+
+
+class new_e14(Update, BaseExample):
+    v = (ps("Ax Ey {A(f(x*))B(g(x*,y))}"), ps("{A(f(j()*))}"))
+    c = ps("Ey {A(f(j()*))B(g(j()*, y))}")
+
+
+class new_e15(Factor, BaseExample):
+    v = (
+        ps("Ek {==(Clark(),Superman())Defeats(k, Superman())}"),
+        ps("{==(Clark()*,Superman())}"),
+    )
+    c = ps("Ek {Defeats(k,Clark())==(Clark(),Clark())}")
+
+
+class new_e16(Factor, BaseExample):
+    v = (ps("Ek Ex {==(Clark(),x)Defeats(k,x)}"), ps("Ex {==(Clark()*,x)}"))
+    c = ps("Ek {Defeats(k,Clark())==(Clark(),Clark())}")
+
+
+class new_e17(Factor, BaseExample):
+    v = (ps("Ek Ex {==(Clark(),x)do(Defeats(k,x))}"), ps("Ex {==(Clark()*,x)}"))
+    c = ps("Ek {do(Defeats(k,Clark()))==(Clark(),Clark())}")
+
+
+class new_e18(Update, BaseExample):
+    v = (ps("{m()=* A()}"), ps("{n()=* B()}"))
+    c = ps("{m() ** n()=* A() B()}")
+
+
+class new_e19_first_atom_do_atom(Factor, BaseExample):
+    v = (ps("Ek {==(Clark(),Superman())Defeats(k, Superman())}"), ps("{do(A())}"))
+    c = ps("Ek {==(Clark(),Superman())Defeats(k, Superman())}")
+
+
+class new_e20_nested_issue_in_pred(Factor, BaseExample):
+    v = (
+        ps("Ek {==(Clark(),Superman())Defeats(k, Superman())}"),
+        ps("{==(Clark(),f(Superman()*))}"),
+    )
+    c = ps("Ek {==(Clark(),Superman())Defeats(k, Superman())}")
+
+
+class new_e21_supp_is_something(Factor, BaseExample):
+    v = (
+        ps("Ek {==(Clark(),Superman())Defeats(k, Superman())}"),
+        ps("{==(Clark()*,Superman())}^{}"),
+    )
+    c = ps("Ek {==(Clark(),Superman())Defeats(k, Superman())}")
+
+
+class new_e22_restrict_dep_rel_is_not_other(Factor, BaseExample):
+    v = (ps("Ek Ex {==(Clark(),x)do(Defeats(k,x))}"), ps("Ey {==(Clark()*,y)}"))
+    c = ps("Ek Ex {==(Clark(),x)do(Defeats(k,x))}")
+
+
+class new_e23_novelise(UniversalProduct, BaseExample):
+    v = (
+        ps(
+            "∀a ∃b ∃c ∃d ∃e ∃f ∃g ∃h ∃i ∃j ∃k ∃l ∃m ∃n ∃o ∃p ∃q ∃r ∃z {P(a)E(a,z),~P(a*), Q(b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r)}"
+        ),
+        ps("{P(j()*)}"),
+    )
+    c: View = ps(
+        "∃ak ∃ac ∃aa ∃ab ∃ah ∃ae ∃x ∃w ∃y ∃s ∃u ∃ai ∃aj ∃t ∃ag ∃af ∃ad ∃v {~P(j()*),Q(aa,ac,ad,w,v,s,ae,x,ah,ai,af,t,y,ak,ag,ab,aj),E(j(),u)P(j())}"
+    )
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].universal_product(cls.v[1], verbose=verbose)
+        with pytest.raises(
+            ValueError, match="Too many unis or exis to feasibly compute"
+        ):
+            result.is_equivalent_under_arb_sub(cls.c)
 
 
 class AnswerPotential(BaseExample):

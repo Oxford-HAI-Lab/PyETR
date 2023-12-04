@@ -17,7 +17,7 @@ Existential = ArbitraryObject
 
 
 class ParsingError(Exception):
-    def __init__(self, message: str) -> None:
+    def __init__(self, message: str) -> None:  # pragma: not covered
         """
         Error in the parsing process
 

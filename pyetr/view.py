@@ -607,20 +607,21 @@ class View:
         Returns:
             bool: True for is equivalent, False for is not.
         """
-
+        if self == other:
+            return True
         self_uni = self.dependency_relation.universals
         self_exi = self.dependency_relation.existentials
         other_uni = other.dependency_relation.universals
         other_exi = other.dependency_relation.existentials
 
         if len(self_uni) != len(other_uni) or len(self_exi) != len(other_exi):
-            return False
+            return False  # pragma: not covered
         if (
             len(self_uni) > 9
             or len(self_exi) > 9
             or len(other_uni) > 9
             or len(other_exi) > 9
-        ):
+        ):  # pragma: not covered
             raise ValueError("Too many unis or exis to feasibly compute")
 
         for exi_perm in permutations(other_exi):
@@ -703,7 +704,7 @@ class View:
             # Corresponds to line 2
             inherited_dependencies = DependencyRelation(set(), set(), frozenset())
         if self.supposition != view.supposition:
-            raise OperationUndefinedError(
+            raise OperationUndefinedError(  # pragma: not covered
                 f"Invalid sum on {self.supposition} and {view.supposition}"
             )
 

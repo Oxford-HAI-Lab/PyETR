@@ -136,34 +136,22 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
         if len(s) == 1:
             state = next(iter(s))
             assert len(state) > 0
-            if len(state) == 1:
-                atom = next(iter(state))
+            new_atoms: list[LogicPredicate | BoolNot] = []
+            for atom in state:
                 if not isinstance(atom, PredicateAtom):
                     raise FOLNotSupportedError(
                         f"Non predicate atom: {atom}  found - FOL not supported"
                     )
-                return convert_atom(atom, issue_structure, issue_atoms)
+                new_atoms.append(convert_atom(atom, issue_structure, issue_atoms))
+            if len(new_atoms) == 1:
+                return new_atoms[0]
             else:
-                new_atoms: list[LogicPredicate | BoolNot] = []
-                for atom in state:
-                    if not isinstance(atom, PredicateAtom):
-                        raise FOLNotSupportedError(
-                            f"Non predicate atom: {atom}  found - FOL not supported"
-                        )
-                    new_atoms.append(convert_atom(atom, issue_structure, issue_atoms))
                 return BoolAnd([new_atoms])
         else:
             new_ands: list[LogicPredicate | BoolNot | BoolAnd | Truth] = []
             for state in s:
                 if len(state) == 0:
-                    new_ands.append(Truth([]))
-                elif len(state) == 1:
-                    atom = next(iter(state))
-                    if not isinstance(atom, PredicateAtom):
-                        raise FOLNotSupportedError(
-                            f"Non predicate atom: {atom}  found - FOL not supported"
-                        )
-                    new_ands.append(convert_atom(atom, issue_structure, issue_atoms))
+                    new_item = Truth([])
                 else:
                     new_atoms = []
                     for atom in state:
@@ -174,7 +162,11 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
                         new_atoms.append(
                             convert_atom(atom, issue_structure, issue_atoms)
                         )
-                    new_ands.append(BoolAnd([new_atoms]))
+                    if len(new_atoms) == 1:
+                        new_item = new_atoms[0]
+                    else:
+                        new_item = BoolAnd([new_atoms])
+                new_ands.append(new_item)
             return BoolOr([new_ands])
 
 

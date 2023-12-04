@@ -73,7 +73,7 @@ class ArbitraryObject(AbstractArbitraryObject, Term):
         if self == old_term:
             return new_term
         else:
-            return old_term
+            return self
 
 
 class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
