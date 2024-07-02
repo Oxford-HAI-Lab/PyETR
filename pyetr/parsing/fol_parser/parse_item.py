@@ -1,3 +1,4 @@
+import typing
 from dataclasses import dataclass
 from typing import Literal, TypeVar, cast
 
@@ -18,8 +19,11 @@ from pyetr.parsing.common import (
     get_variable_map_and_dependencies,
     merge_terms_with_opens,
 )
+from pyetr.parsing.view_storage import ViewStorage
 from pyetr.stateset import SetOfStates, State
-from pyetr.view import View
+
+if typing.TYPE_CHECKING:
+    from pyetr.view import View
 
 from .parse_string import (
     AtomicItem,
@@ -205,7 +209,7 @@ def _parse_view(
     view_item: Item,
     dependency_relation: DependencyRelation,
     maps: Maps,
-) -> View:
+) -> ViewStorage:
     """
     Parses the view item and dep rel, with the maps
 
@@ -233,7 +237,7 @@ def _parse_view(
     #     parsed_stage, parsed_supposition = add_new_emphasis(
     #         parsed_stage, parsed_supposition, dependency_relation
     #     )
-    return View(
+    return ViewStorage(
         stage=parsed_stage,
         supposition=parsed_supposition,
         dependency_relation=dependency_relation,
@@ -372,7 +376,7 @@ def build_maps(
     return predicate_map, function_map, constant_map
 
 
-def parse_items(expr: list[Item], custom_functions: list[Function]) -> View:
+def parse_items(expr: list[Item], custom_functions: list[Function]) -> ViewStorage:
     """
     Converts the items parsed from the string to a view.
 
@@ -381,7 +385,7 @@ def parse_items(expr: list[Item], custom_functions: list[Function]) -> View:
         custom_functions (list[Function]): A list of custom functions to use in the view.
 
     Returns:
-        View: The parsed view.
+        ViewStorage: The parsed view.
     """
     view_item = None
     quantifieds: list[Quantified] = []

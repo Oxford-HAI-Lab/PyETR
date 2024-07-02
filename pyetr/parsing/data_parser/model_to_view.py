@@ -17,8 +17,8 @@ from pyetr.atoms.terms.open_term import (
 from pyetr.atoms.terms.term import ArbitraryObject, FunctionalTerm, Term
 from pyetr.dependency import Dependency, DependencyRelation
 from pyetr.issues import IssueStructure
+from pyetr.parsing.view_storage import ViewStorage
 from pyetr.stateset import SetOfStates, State
-from pyetr.view import View
 from pyetr.weight import Weight, Weights
 
 
@@ -212,7 +212,7 @@ def model_to_weight(w: models.Weight) -> Weight:
     return Weight(multiplicative=multi, additive=additive)
 
 
-def model_to_view(v: models.View) -> View:
+def model_to_view(v: models.View) -> ViewStorage:
     """
     Converts pydantic model View to View
 
@@ -220,7 +220,7 @@ def model_to_view(v: models.View) -> View:
         v (models.View): Pydantic model of views
 
     Returns:
-        View: The output view object
+        ViewStorage: The output view object
     """
     issues = IssueStructure(
         [
@@ -231,7 +231,7 @@ def model_to_view(v: models.View) -> View:
             for t, a in v.issues
         ]
     )
-    return View(
+    return ViewStorage(
         stage=SetOfStates([model_to_state(state) for state in v.stage]),
         supposition=SetOfStates([model_to_state(state) for state in v.supposition]),
         weights=Weights(

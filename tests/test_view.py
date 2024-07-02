@@ -1,7 +1,11 @@
 import pytest
 
-from pyetr.parsing.string_parser import string_to_view as ps
+from pyetr.atoms.terms.function import Function, NumFunc
 from pyetr.view import View
+
+
+def ps(s: str, custom_functions: list[NumFunc | Function] | None = None) -> View:
+    return View.from_str(s, custom_functions)
 
 
 class TestView:

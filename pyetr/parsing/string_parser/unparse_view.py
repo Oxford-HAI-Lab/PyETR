@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import typing
 from typing import cast
 
 import pyetr.parsing.string_parser.parse_string as parsing
@@ -17,7 +20,10 @@ from pyetr.atoms.terms import (
 from pyetr.issues import IssueStructure
 from pyetr.parsing.common import Variable, get_quantifiers
 from pyetr.stateset import State, Supposition
-from pyetr.view import View
+
+if typing.TYPE_CHECKING:
+    from pyetr.view import View
+
 from pyetr.weight import Weight, Weights
 
 

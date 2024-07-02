@@ -1,53 +1,52 @@
 import pytest
 
+from pyetr import View
 from pyetr.func_library import log, power
 from pyetr.parsing.common import ParsingError
-from pyetr.parsing.fol_parser import fol_to_view, view_to_fol
-from pyetr.parsing.view_parser import ViewParser
 
 
 class TestFunction:
     def test_parse(self):
         input_string = "(Jack(Card()) ∨ Ace(Card()))"
-        output_string = view_to_fol(fol_to_view(input_string))
+        output_string = View.from_fol(input_string).to_fol()
         alt_string = "(Ace(Card()) ∨ Jack(Card()))"
         assert output_string == input_string or output_string == alt_string
 
     def test_detailed(self):
         input_string = "∀x ∃y (S(j()*) ∧  D(n()*)) ∨ (T(j()) ∧ ~D(j()*) ∧ D(f(y, x)*))"
-        output_view = fol_to_view(input_string)
+        output_view = View.from_fol(input_string)
         assert output_view.detailed
 
     def test_repr(self):
         input_string = "∀x ∃y (S(j()*) ∧  D(n()*)) ∨ (T(j()) ∧ ~D(j()*) ∧ D(f(y, x)*))"
-        output_view = fol_to_view(input_string)
+        output_view = View.from_fol(input_string)
         assert repr(output_view)
 
     def test_custom_func_parse(self):
-        v = ViewParser.from_str(
+        v = View.from_str(
             "Ax {power(++(1, log(++(1, x))), -1)=+ 0} ^ {D(x*)}",
             custom_functions=[power, log],
         )
 
-        new_view = ViewParser.from_json(ViewParser.to_json(v))
+        new_view = View.from_json(v.to_json())
         assert new_view == v
 
     def test_arb_object_not_used(self):
         with pytest.raises(ValueError, match="not the same as states"):
-            ViewParser.from_str("Ax Ay {f(y)}")
+            View.from_str("Ax Ay {f(y)}")
         with pytest.raises(ParsingError, match="not found in quantifiers"):
-            ViewParser.from_fol("Ax Ay f(y)")
+            View.from_fol("Ax Ay f(y)")
         with pytest.raises(ValueError, match="not the same as states"):
-            ViewParser.from_str("Ax Ay {}")
+            View.from_str("Ax Ay {}")
 
     def test_arb_object_used_not_quantified(self):
         with pytest.raises(ParsingError, match="not found in quantifiers"):
-            ViewParser.from_str("{f(y)}")
+            View.from_str("{f(y)}")
         with pytest.raises(ParsingError, match="not found in quantifiers"):
-            ViewParser.from_fol("f(y)")
+            View.from_fol("f(y)")
 
     def test_invalid_view(self):
         with pytest.raises(ParsingError, match=""):
-            ViewParser.from_str("{")
+            View.from_str("{")
         with pytest.raises(ParsingError, match="Expected end of text"):
-            ViewParser.from_fol("f(")
+            View.from_fol("f(")

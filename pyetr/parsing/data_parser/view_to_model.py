@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import typing
 from typing import cast, overload
 
 import pyetr.parsing.data_parser.models as models
@@ -15,7 +18,9 @@ from pyetr.atoms.terms.abstract_term import (
 from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.open_term import QuestionMark
 from pyetr.dependency import DependencyRelation
-from pyetr.view import View
+
+if typing.TYPE_CHECKING:
+    from pyetr.view import View
 
 
 @overload

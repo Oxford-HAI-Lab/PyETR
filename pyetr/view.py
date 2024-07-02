@@ -2,13 +2,18 @@ __all__ = ["View"]
 
 from functools import reduce
 from itertools import permutations
-from typing import Callable, Optional, cast
+from typing import Callable, Optional, Self, Unpack, cast
 
 from pyetr.atoms.abstract import Atom
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
+from pyetr.atoms.terms.function import Function, NumFunc
 from pyetr.atoms.terms.open_term import QuestionMark
 from pyetr.exceptions import OperationUndefinedError
 from pyetr.parsing.common import get_quantifiers
+from pyetr.parsing.data_parser import json_to_view, view_to_json
+from pyetr.parsing.fol_parser import fol_to_view, view_to_fol
+from pyetr.parsing.string_parser import StringConversion, string_to_view, view_to_string
+from pyetr.parsing.view_storage import ViewStorage
 
 from .atoms import PredicateAtom, equals_predicate
 from .atoms.terms import ArbitraryObject, FunctionalTerm, RealNumber, Term
@@ -2006,3 +2011,97 @@ class View:
         if verbose:
             print(f"WhichOutput: {out}")
         return out
+
+    @classmethod
+    def _from_view_storage(cls, v: ViewStorage):
+        return cls(
+            stage=v.stage,
+            supposition=v.supposition,
+            dependency_relation=v.dependency_relation,
+            issue_structure=v.issue_structure,
+            weights=v.weights,
+            is_pre_view=v.is_pre_view,
+        )
+
+    @classmethod
+    def from_json(cls, s: str) -> Self:
+        """
+        Parses from json form to View form
+
+        Args:
+            s (str): The json string
+
+        Returns:
+            View: The parsed view
+        """
+        return cls._from_view_storage(json_to_view(s))
+
+    def to_json(self) -> str:
+        """
+        Parses from View form to json form
+
+        Args:
+            v (View): The input view
+
+        Returns:
+            str: The output json
+        """
+        return view_to_json(self)
+
+    @classmethod
+    def from_str(
+        cls, s: str, custom_functions: list[NumFunc | Function] | None = None
+    ) -> Self:
+        """
+        Parses from view string form to view form.
+
+        Args:
+            s (str): view string
+            custom_functions (list[NumFunc | Function] | None, optional): Custom functions used in the
+                string. It assumes the name of the function is that used in the string. Useful
+                for using func callers. Defaults to None.
+
+        Returns:
+            View: The output view
+        """
+        return cls._from_view_storage(string_to_view(s, custom_functions))
+
+    def to_str(self, **string_conversion_args: Unpack[StringConversion]) -> str:
+        """
+        Parses from View form to view string form
+
+        Args:
+            v (View): The view to convert to string
+
+        Returns:
+            str: The view string
+        """
+        return view_to_string(self, **string_conversion_args)
+
+    @classmethod
+    def from_fol(
+        cls, s: str, custom_functions: list[NumFunc | Function] | None = None
+    ) -> Self:
+        """
+        Parses from first order logic string form to View form.
+        Args:
+            s (str): A first order logic string
+            custom_functions (list[NumFunc | Function] | None, optional): Custom functions used in the
+                string. It assumes the name of the function is that used in the string. Useful
+                for using func callers. Defaults to None.
+        Returns:
+            View: The parsed view
+        """
+        return cls._from_view_storage(fol_to_view(s, custom_functions=custom_functions))
+
+    def to_fol(self) -> str:
+        """
+        Parses from View form to first order logic string form.
+
+        Args:
+            v (View): The View object
+
+        Returns:
+            str: The first order logic string form.
+        """
+        return view_to_fol(self)

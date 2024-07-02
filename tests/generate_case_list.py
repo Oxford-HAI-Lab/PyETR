@@ -4,8 +4,8 @@ with open("../pyetr/cases.py", "r") as f:
 import json
 import re
 
+from pyetr import View
 from pyetr.parsing.common import ParsingError
-from pyetr.parsing.view_parser import ViewParser
 
 pattern = r'"(.*?)"'
 
@@ -14,7 +14,7 @@ for line in out:
     matches = re.findall(pattern, line)
     for match in matches:
         try:
-            new_view = ViewParser.from_str(match)
+            new_view = View.from_str(match)
         except ParsingError:
             new_view = None
         if new_view is not None and match not in output_list:

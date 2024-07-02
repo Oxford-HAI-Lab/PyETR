@@ -3,9 +3,8 @@ from abc import ABCMeta, abstractmethod
 from pyclbr import Function
 from typing import cast
 
-from pyetr.atoms.terms.function import Function, RealNumber
+from pyetr.atoms.terms.function import Function, NumFunc, RealNumber
 from pyetr.atoms.terms.term import FunctionalTerm
-from pyetr.parsing.string_parser import string_to_view as ps
 
 from .func_library import div, log, power
 from .inference import (
@@ -15,6 +14,10 @@ from .inference import (
     default_procedure_what_is_prob,
 )
 from .view import View
+
+
+def ps(s: str, custom_functions: list[NumFunc | Function] | None = None) -> View:
+    return View.from_str(s, custom_functions)
 
 
 class BaseExample(metaclass=ABCMeta):

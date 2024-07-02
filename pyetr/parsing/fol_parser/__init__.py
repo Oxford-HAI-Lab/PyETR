@@ -1,11 +1,16 @@
+from __future__ import annotations
+
 __all__ = ["fol_to_view", "view_to_fol"]
 
-
+import typing
 from typing import Optional
 
 from pyetr.atoms.terms.function import Function, NumFunc
 from pyetr.parsing.common import funcs_converter
-from pyetr.view import View
+from pyetr.parsing.view_storage import ViewStorage
+
+if typing.TYPE_CHECKING:
+    from pyetr.view import View
 
 from .parse_item import parse_items
 from .parse_string import parse_string
@@ -15,7 +20,7 @@ from .unparse_view import unparse_view
 
 def fol_to_view(
     s: str, custom_functions: Optional[list[NumFunc | Function]] = None
-) -> View:
+) -> ViewStorage:
     """
     Parses from first order logic string form to View form.
     Args:
@@ -25,7 +30,7 @@ def fol_to_view(
             for using func callers. Defaults to None.
 
     Returns:
-        View: The parsed view
+        ViewStorage: The parsed view
     """
     if custom_functions is None:
         custom_functions = []

@@ -24,8 +24,8 @@ from pyetr.parsing.common import (
     merge_atoms_with_opens,
     merge_terms_with_opens,
 )
+from pyetr.parsing.view_storage import ViewStorage
 from pyetr.stateset import SetOfStates, State
-from pyetr.view import View
 from pyetr.weight import Weight, Weights
 
 
@@ -340,7 +340,7 @@ def get_function_map(
     return func_map
 
 
-def parse_pv(pv: parsing.ParserView, custom_functions: list[Function]) -> View:
+def parse_pv(pv: parsing.ParserView, custom_functions: list[Function]) -> ViewStorage:
     """
     Parses the view from parser representation to view representation.
 
@@ -368,7 +368,7 @@ def parse_pv(pv: parsing.ParserView, custom_functions: list[Function]) -> View:
     else:
         supp = SetOfStates([State([])])
     stage = SetOfStates(weights.keys())
-    return View(
+    return ViewStorage(
         stage=stage,
         supposition=supp,
         dependency_relation=dep_rel,

@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import typing
 from typing import cast
 
 from pyetr.atoms import OpenPredicateAtom, PredicateAtom
@@ -25,7 +28,9 @@ from pyetr.parsing.fol_parser.parse_string import (
     Variable,
 )
 from pyetr.stateset import SetOfStates
-from pyetr.view import View
+
+if typing.TYPE_CHECKING:
+    from pyetr.view import View
 
 
 class FOLNotSupportedError(Exception):
