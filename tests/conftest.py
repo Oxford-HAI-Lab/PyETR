@@ -11,6 +11,7 @@ from pyetr.cases import BaseExample
 from pyetr.exceptions import OperationUndefinedError
 from pyetr.parsing.fol_parser.unparse_view import FOLNotSupportedError
 from pyetr.parsing.view_parser import ViewParser
+from pyetr.view import View
 
 
 class ExampleCollector(pytest.File):
@@ -138,10 +139,20 @@ class ParseCompareViaFOL(BaseParseItem):
 
 
 class OperationTest(pytest.Item):
-    def __init__(self, *args, view_string1: str, view_string2: str, **kwargs):
+    def __init__(
+        self,
+        *args,
+        view_string1: str,
+        view_string2: str,
+        view1: View,
+        view2: View,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.view_string1 = view_string1
         self.view_string2 = view_string2
+        self.view1 = view1
+        self.view2 = view2
 
     def reportinfo(self):
         return (
@@ -151,8 +162,8 @@ class OperationTest(pytest.Item):
         )
 
     def runtest(self):
-        parsed_view1 = ViewParser.from_str(self.view_string1)
-        parsed_view2 = ViewParser.from_str(self.view_string1)
+        parsed_view1 = self.view1
+        parsed_view2 = self.view2
 
         parsed_view1.product(parsed_view2)
         try:
@@ -189,13 +200,16 @@ class ParseTestCollector(pytest.File):
             for item in json_file:
                 yield test_set.from_parent(parent=self, view_string=item, name=item)
         if self.config.option.viewops:
-            for item1 in json_file:
-                for item2 in json_file:
+            parsed_json = [(i, ViewParser.from_str(i)) for i in json_file]
+            for item1, parsed_view1 in parsed_json:
+                for item2, parsed_view2 in parsed_json:
                     if item1 != item2:
                         yield OperationTest.from_parent(
                             parent=self,
                             view_string1=item1,
                             view_string2=item2,
+                            view1=parsed_view1,
+                            view2=parsed_view2,
                             name=item1 + item2,
                         )
 
@@ -205,10 +219,7 @@ def is_case_file(path: Path) -> bool:
 
 
 def is_case_list(path: Path) -> bool:
-    return (
-        re.match(re.compile(r"case_list.json"), path.name) is not None
-        or re.match(re.compile(r"case_list_extra.json"), path.name) is not None
-    )
+    return re.match(re.compile(r"case_list.json"), path.name) is not None
 
 
 def pytest_collect_file(parent: pytest.Session, file_path: Path):

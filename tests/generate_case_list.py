@@ -20,4 +20,7 @@ for line in out:
         if new_view is not None and match not in output_list:
             output_list.append(match)
 
+extras: list[str] = json.load(open("case_list_extra.json"))
+output_list += extras
+
 json.dump(output_list, open("case_list.json", "w+"), indent=2)

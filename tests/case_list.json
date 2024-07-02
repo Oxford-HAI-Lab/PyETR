@@ -328,8 +328,6 @@
   "{==(Clark(),f(Superman()*))}",
   "{==(Clark()*,Superman())}^{}",
   "Ey {==(Clark()*,y)}",
-  "\u2200a \u2203b \u2203c \u2203d \u2203e \u2203f \u2203g \u2203h \u2203i \u2203j \u2203k \u2203l \u2203m \u2203n \u2203o \u2203p \u2203q \u2203r \u2203z {P(a)E(a,z),~P(a*), Q(b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r)}",
-  "\u2203ak \u2203ac \u2203aa \u2203ab \u2203ah \u2203ae \u2203x \u2203w \u2203y \u2203s \u2203u \u2203ai \u2203aj \u2203t \u2203ag \u2203af \u2203ad \u2203v {~P(j()*),Q(aa,ac,ad,w,v,s,ae,x,ah,ai,af,t,y,ak,ag,ab,aj),E(j(),u)P(j())}",
   "{1.0=* 2.0=+ A()B() , 0.4=* B()C(), C()A()}",
   "{B()}",
   "{C()}",
@@ -339,5 +337,10 @@
   "\u2203a {~P(j()*),P(j())E(j(),a)}",
   "\u2200x {T(x,m())S(m()*)S(j()*),T(x,j())S(m()*)S(j()*)}",
   "\u2200x \u2203a {T(x,a)S(a*)}",
-  "\u2203a \u2200x {T(x,a)S(a*)}"
+  "\u2203a \u2200x {T(x,a)S(a*)}",
+  "{0} ^ {}",
+  "{do(A(f()*),B(f()), C(f()))}",
+  "{0, 1=* f(x())}",
+  "{do()}",
+  "{~do()}"
 ]
