@@ -1,0 +1,24 @@
+site_name: PyETR
+
+theme:
+  name: 'material'
+  palette:
+    - scheme: default
+      primary: 'green'
+      accent: 'green'
+      toggle:
+          icon: material/lightbulb
+          name: Switch to dark mode
+    - scheme: slate
+      primary: 'green'
+      accent: 'light green'
+      toggle:
+          icon: material/lightbulb-outline
+          name: Switch to light mode
+  icon:
+    logo: fontawesome/solid/brain
+
+
+plugins:
+  - search:
+      separator: '[\s\-\.\_]+'
