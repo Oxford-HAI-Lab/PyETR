@@ -6,28 +6,41 @@ nav:
     - 'Installation': 'getting_started/installation.md'
     - 'Example': 'getting_started/example.md'
     - 'Case Example': 'getting_started/case_example.md'
+    - 'View Methods Example': 'getting_started/view_methods_example.md'
+    - 'Direct Decision Example': 'getting_started/direct_decision_example.md'
+    - 'View Construction': 'getting_started/view_construction.md'
   - 'Troubleshooting': 'troubleshooting.md'
   - 'Reference':
     - 'Case Index': 'case_index.md'
+    - 'View Methods': 'view_methods.md'
+    - 'Inference Index': 'inference_index.md'
   - 'For Developers': 'development.md'
 theme:
   name: 'material'
+  features:
+    - content.code.copy
   palette:
     - scheme: default
-      primary: 'green'
-      accent: 'green'
+      primary: 'black'
+      accent: 'amber'
       toggle:
           icon: material/lightbulb
           name: Switch to dark mode
     - scheme: slate
-      primary: 'green'
-      accent: 'light green'
+      primary: 'yellow'
+      accent: 'amber'
       toggle:
           icon: material/lightbulb-outline
           name: Switch to light mode
   icon:
     logo: fontawesome/solid/brain
 
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+  - attr_list
 
 plugins:
   - search:

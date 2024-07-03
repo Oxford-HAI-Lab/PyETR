@@ -14,7 +14,7 @@ C There isn't an ace in the hand.
 
 For the full code see [here](#full-example)
 ## Step 1: Import package
-```py
+```python
 from pyetr import View, default_inference_procedure
 ```
 Import the parsing object
@@ -50,7 +50,5 @@ p2 = View.from_str("{King(k())}")
 c = default_inference_procedure((p1, p2))
 print(c) #"{~Ace(a())}"
 ```
-
-# Object methods, update etc
 
 # Default decision
