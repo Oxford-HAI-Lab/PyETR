@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyetr"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["mark-todd <markpeter.todd@hotmail.co.uk>"]
 readme = "README.md"

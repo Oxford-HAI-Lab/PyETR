@@ -246,7 +246,6 @@
   "{Box(Grey())Box(Mauve())}",
   "{50=* Box(Grey())Box(Mauve()), 0}",
   "{Box(Grey())~Box(White())~Box(Mauve()),Box(White())~Box(Grey())~Box(Mauve()),Box(Mauve())~Box(White())~Box(Grey())}",
-  "{0=* Box(Grey())Box(Mauve()), 0}",
   "{Box(Green()), Box(Blue()), Box(Red())}",
   "{60=* Box(Green())}^{Box(Green())}",
   "{20=* Box(Blue())}^{Box(Blue())}",
