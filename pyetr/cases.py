@@ -1,4 +1,135 @@
-__all__ = ["BaseExample"]
+__all__ = [
+    "e1",
+    "e2",
+    "e3",
+    "e5ii",
+    "e5iii",
+    "e5iv",
+    "e5v",
+    "e6",
+    "e7",
+    "e8",
+    "e10",
+    "e11",
+    "e12i",
+    "e12ii",
+    "e12iii",
+    "e13",
+    "e14_1",
+    "e14_2",
+    "e14_3",
+    "e14_6",
+    "e14_7",
+    "e15",
+    "e16",
+    "e17",
+    "e19",
+    "e20",
+    "e21",
+    "e22",
+    "e23_with_inquire",
+    "e23_without_inquire",
+    "e24",
+    "e25i",
+    "e25ii",
+    "e25iii",
+    "e25iv",
+    "e25v",
+    "e25vi",
+    "e26",
+    "e28",
+    "e32_1",
+    "e32_2",
+    "e33",
+    "e40i",
+    "e40ii",
+    "e41",
+    "e42",
+    "e44_1",
+    "e45",
+    "e46i",
+    "e46ii",
+    "e47",
+    "e48",
+    "e49",
+    "e50_part1",
+    "e50_part2",
+    "e50_part2_arbs",
+    "e51",
+    "e52",
+    "e53",
+    "e54",
+    "e56_default_inference",
+    "e56_basic_step",
+    "e57",
+    "e58_reversed",
+    "e61",
+    "e62",
+    "e63",
+    "e63_modified",
+    "e64i",
+    "e64ii",
+    "e65",
+    "e66i",
+    "e66ii",
+    "e67",
+    "e69_part1",
+    "e69_part2",
+    "e70",
+    "e71",
+    "e72",
+    "e74",
+    "e76",
+    "e81i",
+    "e81ii",
+    "e81iii",
+    "e82i",
+    "e82ii",
+    "e82iii",
+    "e82iv",
+    "e83i",
+    "e83ii",
+    "e84i",
+    "e84ii",
+    "e85",
+    "e86",
+    "e88",
+    "e90_condA",
+    "e90_condB",
+    "e92_award",
+    "e92_deny",
+    "e93_grp1",
+    "new_e1",
+    "new_e2",
+    "else_inquire",
+    "else_merge",
+    "else_suppose",
+    "else_uni_prod",
+    "else_query",
+    "else_which",
+    "new_e5",
+    "new_e6_leibniz",
+    "new_e7_aristotle",
+    "new_e8",
+    "new_e9",
+    "new_e10",
+    "new_e11",
+    "new_e12",
+    "new_e13",
+    "new_e14",
+    "new_e15",
+    "new_e16",
+    "new_e17",
+    "new_e18",
+    "new_e19_first_atom_do_atom",
+    "new_e20_nested_issue_in_pred",
+    "new_e21_supp_is_something",
+    "new_e22_restrict_dep_rel_is_not_other",
+    "AnswerPotential",
+    "UniProduct",
+    "QueryTest",
+    "QueryTest2",
+]
 from abc import ABCMeta, abstractmethod
 from pyclbr import Function
 from typing import cast
@@ -20,7 +151,52 @@ def ps(s: str, custom_functions: list[NumFunc | Function] | None = None) -> View
     return View.from_str(s, custom_functions)
 
 
-class BaseExample(metaclass=ABCMeta):
+name_mapping = {
+    "v": "Views",
+    "c": "Conclusion",
+    "prob": "Probability",
+    "cv": "Consequence Views",
+    "pr": "Priority Views",
+    "g1": "Another View",
+    "g2": "Another View",
+}
+
+
+class BaseMeta(ABCMeta):
+    @property
+    def description(self):
+        return self.__doc__
+
+    def __repr__(self):
+        final_str = ""
+        if self.description is not None:
+            final_str += "\ndescription:"
+            final_str += self.description
+
+        for attr, mapped_name in name_mapping.items():
+            if hasattr(self, attr):
+                attribute = getattr(self, attr)
+                long_name = " (" + mapped_name + ")"
+                if isinstance(attribute, tuple):
+                    full_name = (
+                        attr
+                        + long_name
+                        + ": "
+                        + "(\n   "
+                        + ",\n   ".join([i.to_str() for i in attribute])
+                        + "\n)"
+                    )
+                else:
+                    full_name = attr + long_name + ": " + attribute.to_str()
+                final_str += "\n" + full_name
+
+        if hasattr(self, "test"):
+            final_str += "\n" + "test(verbose=False): Method used to test the example"
+        final_str += "\n"
+        return final_str
+
+
+class BaseExample(metaclass=BaseMeta):
     """
     The base class for all examples. It contains a series of views (v)
     for operations and a conclusion (c).
@@ -598,6 +774,8 @@ class e20(DefaultInference, BaseExample):
 class e21(BaseExample):
     """
     Example 21, p86
+
+    Any view Δ^{0} = [Δ^{0}]ᶰ can be derived from the absurd view
     """
 
     v: tuple[View] = (ps("{" + f"{samples.delta}" + "}"),)

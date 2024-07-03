@@ -17,15 +17,11 @@ class ExampleCollector(pytest.File):
     def collect(self):
         classes: list[ExampleItem] = []
         assert self.parent is not None
-        for name, case in vars(pyetr.cases).items():
-            if (
-                isinstance(case, type)
-                and issubclass(case, BaseExample)
-                and case != BaseExample
-            ):
-                classes.append(
-                    ExampleItem.from_parent(parent=self, test_class=case, name=name)
-                )
+        for name in pyetr.cases.__all__:
+            case = getattr(pyetr.cases, name)
+            classes.append(
+                ExampleItem.from_parent(parent=self, test_class=case, name=name)
+            )
         return classes
 
 

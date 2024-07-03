@@ -1,5 +1,15 @@
 site_name: PyETR
 
+nav:
+  - 'Home': 'index.md'
+  - 'Getting started':
+    - 'Installation': 'getting_started/installation.md'
+    - 'Example': 'getting_started/example.md'
+    - 'Case Example': 'getting_started/case_example.md'
+  - 'Troubleshooting': 'troubleshooting.md'
+  - 'Reference':
+    - 'Case Index': 'case_index.md'
+  - 'For Developers': 'development.md'
 theme:
   name: 'material'
   palette:
