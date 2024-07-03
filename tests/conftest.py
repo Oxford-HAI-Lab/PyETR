@@ -205,7 +205,7 @@ class ParseTestCollector(pytest.File):
                             view_string2=item2,
                             view1=parsed_view1,
                             view2=parsed_view2,
-                            name=item1 + item2,
+                            name="View1:" + item1 + " View2:" + item2,
                         )
 
 

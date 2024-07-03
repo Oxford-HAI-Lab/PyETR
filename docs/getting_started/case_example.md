@@ -1,6 +1,8 @@
 # Case Example
 
-All of the examples from the book "Reason and Inquiry" are available as part of the PyETR package. Let's start off by inspecting one of the examples:
+All of the examples from the book "Reason and Inquiry" are available as part of the PyETR package. Below is shown an example detailing how to extract one of these from the package. This lets you get started with views without having to construct any yourself. If you would like to find another example, please see the case index. If would like to learn how to construct them yourself, please see here.
+
+Let's start off by inspecting one of the examples:
 
 ```py
 from pyetr.cases import e17
@@ -87,5 +89,8 @@ We can also inspect the input and output views:
 print(e17.v) # ({~King(k())Ace(a()),King(k())~Ace(a())}, {King(k())})
 print(e17.c) # {~Ace(a())}
 ```
+
+## Example Broken Down
+### The default inference way
 default_inference_procedure(e17.v)
-```
+### The view operation way

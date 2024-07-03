@@ -275,12 +275,12 @@ class DependencyRelation:
         if pre_view:
             if not (self.universals | self.existentials).issuperset(arb_objects):
                 raise ValueError(
-                    f"Universals with existentials: {self.universals | self.existentials} not superset of states {arb_objects}"
+                    f"Universals with existentials: {self.universals | self.existentials} not superset of those in stage/supposition {arb_objects}"
                 )
         else:
             if frozenset(arb_objects) != self.universals | self.existentials:
                 raise ValueError(
-                    f"Universals with existentials: {self.universals | self.existentials} not the same as states {arb_objects}"
+                    f"Universals with existentials: {self.universals | self.existentials} not the same as those in stage/supposition {arb_objects}"
                 )
 
     def _validate(self):

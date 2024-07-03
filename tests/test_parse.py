@@ -32,11 +32,15 @@ class TestFunction:
         assert new_view == v
 
     def test_arb_object_not_used(self):
-        with pytest.raises(ValueError, match="not the same as states"):
+        with pytest.raises(
+            ValueError, match="not the same as those in stage/supposition"
+        ):
             View.from_str("Ax Ay {f(y)}")
         with pytest.raises(ParsingError, match="not found in quantifiers"):
             View.from_fol("Ax Ay f(y)")
-        with pytest.raises(ValueError, match="not the same as states"):
+        with pytest.raises(
+            ValueError, match="not the same as those in stage/supposition"
+        ):
             View.from_str("Ax Ay {}")
 
     def test_arb_object_used_not_quantified(self):

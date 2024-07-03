@@ -4,11 +4,13 @@ nav:
   - 'Home': 'index.md'
   - 'Getting started':
     - 'Installation': 'getting_started/installation.md'
+    - 'Python': 'getting_started/getting_started_with_python.md'
     - 'Example': 'getting_started/example.md'
     - 'Case Example': 'getting_started/case_example.md'
+    - 'View Construction': 'getting_started/view_construction.md'
     - 'View Methods Example': 'getting_started/view_methods_example.md'
     - 'Direct Decision Example': 'getting_started/direct_decision_example.md'
-    - 'View Construction': 'getting_started/view_construction.md'
+    
   - 'Troubleshooting': 'troubleshooting.md'
   - 'Reference':
     - 'Case Index': 'case_index.md'

@@ -1975,7 +1975,10 @@ class e72(BaseExample):
         )
         if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
             raise RuntimeError(f"Expected: {cls.c[0]} but received {mid_result}")
-        result = mid_result.query(cls.v[4], verbose=verbose)
+        # NOTE: This is an additional inquire to what was in the book
+        result = mid_result.inquire(cls.v[4], verbose=verbose).query(
+            cls.v[4], verbose=verbose
+        )
         if not result.is_equivalent_under_arb_sub(cls.c[1]):
             raise RuntimeError(f"Expected: {cls.c[1]} but received {result}")
 
@@ -2225,7 +2228,7 @@ class e84ii(WhatIsProb, BaseExample):
         ),
     )
     prob = ps("{Box(Grey())Box(Mauve())}")
-    c = ps("{0=* Box(Grey())Box(Mauve()), 0}")
+    c = ps("{0}")
 
 
 class e85(WhatIsProb, BaseExample):

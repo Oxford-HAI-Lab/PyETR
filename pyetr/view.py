@@ -1179,6 +1179,7 @@ class View:
                 return reduce(
                     mul,
                     [SetOfStates({State({x}), State({~x})}) for x in N(gamma)],
+                    SetOfStates((State(),)),
                 )
 
             # BIG_UNION(e) = ∪_γ∈Γ,e∈A(γ) {γ}∪{{x∈γ : e∉A(x)} ∪ δ : δ ∈ BIG_PRODUCT(γ) ∧ δ⊈γ}
@@ -1698,7 +1699,7 @@ class View:
             )
             # Γ^Θ'_[R⋈R'][I∪I'] [Δ^Ψ_gSJ]ᵁ[Δ^Ψ_gSJ]ᴱ[Δ^Ψ_gSJ]ᴬ[Δ^Ψ_gSJ]ᴹ
             out = (
-                View(
+                View.with_restriction(
                     stage=self.stage,
                     supposition=v_prime.stage,
                     dependency_relation=self.dependency_relation.fusion(
