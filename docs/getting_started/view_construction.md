@@ -5,7 +5,7 @@ The same string representation is used for printing views as the results of calc
 
 For convenience, you only need to include in the string those parts of the view that are non-trivial or have non-default values.
 Recall that *Reason & Inquiry* builds up to the full theory of views through iterative enrichments of the possible view contents.
-Thus, by only relying on restricted kinds of content one can use *PyETR* for computations with any of the restricted theories of views in the earlier chapters of the book, even though *PyETR* is technically a single implementation of the full theory.
+Thus, by only relying on restricted kinds of content one can use PyETR for computations with any of the restricted theories of views in the earlier chapters of the book, even though PyETR is technically a single implementation of the full theory.
 There are a few notational caveats which will become apparent below.
 
 As an example, consider running the following code.
@@ -37,23 +37,71 @@ To turn a view object into a string, use `to_str` of that view object.
 This string representation completely determines the view object, but for troubleshooting and debugging each view has a `detailed` property which explicitly states the entire contents.
 We can see in the above that while `p1.to_str()` only presents the `stage` of `p1`, in fact `p1` has a supposition (with default value `{{}}`) as well as a dependency relation, issue structure, and a collection of weights (all empty by default).
 
-The example here made use of the convention in *Reason & Inquiry* that the supposition part of a view consists of a single empty state.
-The empty state in string representations is always notated `0`, as in the book, rather than `{}`.
-Thus if one changes a line in the code above to
-```py
-p1 = View.from_str("{GrassWet()}^{0}")
-```
-we should see exactly the same output.
+## Stages, states, and simple atoms
 
-For a non-trivial supposition
-```py
-p1 = View.from_str("{GrassWet()}^{Raining()}")
-print("The view is " + p1.to_str())
+Let us break down the following representation of view found in [Example 8](/case_index/#e8).
 ```
-yields the following.
+{k()t(),a()q()}
 ```
-The view is {GrassWet()}^{Raining()}
+
+At the core of any view is a set of states.
+In *Reason & Inquiry*, this is the element of a view typically denoted by &Gamma; (upper-case gamma).
+In the code base for PyETR, this is called the `stage`.
+A string representing a view must specify a stage between `{` and `}` as a comma-separated list of states.
+Thus in the example above, the view specifies a stage with two states: `k()t()` and `a()q()`.
+
+A state is a set of atoms.
+It is specified in PyETR as a list of atoms *without any delimiters*.
+Thus the two states in the example each consist of two atoms, one has `k()` and `t()` and the other has `a()` and `q()`.
+All atoms in PyETR consist of a string of ordinary characters followed by (possibly empty) matching parentheses, thus the parsing of a string representing a state into a list of strings representing atoms is unambiguous, despite the lack of delimiters.
+
+Atoms written with an empty pair of parentheses correspond to the atoms in Chapter 2 of *Reason & Inquiry*, which act a like the literals of propositional logic.
+In the book, the view from the example is written more like this:
 ```
+{kt, aq}
+```
+For technical reasons we do not adopt this notation in PyETR.
+Thus, when working in the propositional fragment of ETR, it is necessary to insert the empty parentheses as a suffix to the name of atoms.
+This is mildly more cluttered than the notation used in Chapters 2 and 3 of *Reason & Inquiry*, but, on the other hand, the presence of parentheses assists in using names for atoms that are longer than a single character.
+
+!!! info
+    Note that the ordering of states in the stage, and of atoms within each state, are immaterial to the denoted view.
+    Thus the view above could equally well be denoted as follows.
+    ```
+    {q()a(),t()k()}
+    ```
+    Indeed,
+    ```py
+    View.from_str("{k()t(),a()q()}") == View.from_str("{q()a(),t()k()}")
+    ```
+    will return `True`.
+
+!!! warning
+    Since the order is not meant to matter, the result of `to_str()` need not exactly match the input to `View.from_str`.
+    The representation of View objects internal to PyETR and Python does require an arbitrary order to be imposed, but this can be quite unpredictable and might depend on your computing setup.
+    For example, despite the equality above, you may find that
+    ```
+    View.from_str("{k()t(),a()q()}").to_str() == View.from_str("{q()a(),t()k()}").to_str()
+    ```
+    returns `False`!
+    PyETR overloads Python's equality test to give a more correct equality test for View objects.
+    See TODO for further discussion of equality testing.
+
+## Negation
+
+An atom is made negative by prepending a tilde `~` to it.
+This corresponds to the notation in *Reason & Inquiry* where the negative counterpart of a positive atom was denoted by the same letter with an overline.
+
+For example, consider [Example 22](/case_index/#e22).
+Starting with the view denoted
+```
+{a()c()b()}
+```
+which has a single state containing the three atoms `a()`, `b()`, and `c()`, its negation is computed to be the view denoted
+```
+{~c(),~b(),~a()}
+```
+which has three states, each containing a singleton negative atom.
 
 ## Quantifiers
 
