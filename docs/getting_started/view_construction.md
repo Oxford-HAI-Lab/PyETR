@@ -31,7 +31,7 @@ In detail:
   weights=<Weights {'{<PredicateAtom predicate=<Predicate name=GrassWet arity=0> terms=()>}': '<Weight multi=<Multiset items=[]> add=<Multiset items=[]>>'}> 
 >
 ```
-Observe that the basic method for creating a view from a string representation is the `Vfrom_str` method of the `View` class.
+Observe that the basic method for creating a view from a string representation is the `from_str` method of the `View` class.
 To turn a view object into a string, use `to_str` of that view object.
 
 This string representation completely determines the view object, but for troubleshooting and debugging each view has a `detailed` property which explicitly states the entire contents.
@@ -54,6 +54,9 @@ A state is a set of atoms.
 It is specified in PyETR as a list of atoms *without any delimiters*.
 Thus the two states in the example each consist of two atoms, one has `k()` and `t()` and the other has `a()` and `q()`.
 All atoms in PyETR consist of a string of ordinary characters followed by (possibly empty) matching parentheses, thus the parsing of a string representing a state into a list of strings representing atoms is unambiguous, despite the lack of delimiters.
+
+!!! info
+    The empty state is written `0`.
 
 Atoms written with an empty pair of parentheses correspond to the atoms in Chapter 2 of *Reason & Inquiry*, which act a like the literals of propositional logic.
 In the book, the view from the example is written more like this:
@@ -80,7 +83,7 @@ This is mildly more cluttered than the notation used in Chapters 2 and 3 of *Rea
     Since the order is not meant to matter, the result of `to_str()` need not exactly match the input to `View.from_str`.
     The representation of View objects internal to PyETR and Python does require an arbitrary order to be imposed, but this can be quite unpredictable and might depend on your computing setup.
     For example, despite the equality above, you may find that
-    ```
+    ```py
     View.from_str("{k()t(),a()q()}").to_str() == View.from_str("{q()a(),t()k()}").to_str()
     ```
     returns `False`!
@@ -102,6 +105,23 @@ which has a single state containing the three atoms `a()`, `b()`, and `c()`, its
 {~c(),~b(),~a()}
 ```
 which has three states, each containing a singleton negative atom.
+
+## Suppositions
+
+Suppositions are optional and are denoted with a `^` after the stage, using the same syntax for a set of states as for stages.
+In *Reason & Inquiry*, suppositions were typically denoted by &Theta; (upper-case theta) and placed in superscript position following the stage.
+
+For example, consider [Example 28](/case_index/#28).
+There is a view denoted
+```
+{Tiger()Orange()}^{Tiger()}
+```
+Here, the stage is `{Tiger()Orange()}` consisting of one state with two atoms (`Tiger()` and `Orange()`).
+The supposition is `{Tiger()}`, which consists of one state with one atom (just `Tiger()`).
+
+!!! info
+    Omitting the supposition is equivalent to a supposition of `{0}`.
+    That is, unless otherwise specified, a view has as its supposition the singleton set consisting of the empty state.
 
 ## Quantifiers
 
