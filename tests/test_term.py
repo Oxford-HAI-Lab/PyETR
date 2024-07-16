@@ -57,5 +57,5 @@ class TestFunctionalTerm:
         t = FunctionalTerm(func, [arb_obj])
         assert (
             t.detailed
-            == "<FunctionalTerm f=Function(func, 1) t=(<ArbitraryObject name=x1>,)>"
+            == "<FunctionalTerm f=Function(func, 1) t=(<ArbitraryObject name=x1>)>"
         )

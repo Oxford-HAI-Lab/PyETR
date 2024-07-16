@@ -431,6 +431,7 @@ def get_expr() -> pp.Forward:
         + pp.Suppress(")").setResultsName("atom", listAllMatches=True)
     ).setParseAction(Atom)
     do_word = pp.Literal("do") | pp.Literal("DO")
+    verum = pp.Suppress(pp.Literal("0")).setParseAction(State)
     doatom = (
         (
             pp.Optional("~")
@@ -442,7 +443,7 @@ def get_expr() -> pp.Forward:
         .setResultsName("doatom", listAllMatches=True)
         .setParseAction(DoAtom)
     )
-    verum = pp.Suppress(pp.Literal("0")).setParseAction(State)
+
     state = (
         pp.ZeroOrMore(doatom | atom)
         .setResultsName("state", listAllMatches=True)

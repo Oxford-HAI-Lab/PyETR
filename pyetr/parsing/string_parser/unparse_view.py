@@ -5,6 +5,7 @@ from typing import cast
 
 import pyetr.parsing.string_parser.parse_string as parsing
 from pyetr.atoms import Atom, DoAtom, OpenDoAtom, OpenPredicateAtom, PredicateAtom
+from pyetr.atoms.open_predicate_atom import get_open_atom_equivalent
 from pyetr.atoms.terms import (
     ArbitraryObject,
     FunctionalTerm,
@@ -123,10 +124,29 @@ def unparse_do_atom(
     Returns:
         parsing.DoAtom: The parsing do atom.
     """
-    new_atoms: list[parsing.Atom] = [
-        unparse_predicate_atom(atom, [(t, list(o.atoms)[i]) for t, o in open_do_atoms])
-        for i, atom in enumerate(do_atom.atoms)
-    ]
+
+    def open_atom_corresponds(
+        open_atom: OpenPredicateAtom, atom: PredicateAtom, term: Term
+    ) -> bool:
+        closed_atom = open_atom(term)
+        if closed_atom == atom:
+            basic_open_atom = get_open_atom_equivalent(closed_atom)
+            return open_atom != basic_open_atom
+        return False
+
+    new_atoms: list[parsing.Atom] = []
+    for atom in do_atom.atoms:
+        # For each atom in the do atom
+        assoc_open_atoms: list[tuple[Term, OpenPredicateAtom]] = []
+        for t, o in open_do_atoms:
+            # Check each of the open do atoms
+            for open_atom in o.atoms:
+                if open_atom_corresponds(open_atom, atom, t):
+                    assoc_open_atoms.append((t, open_atom))
+
+        new_atom = unparse_predicate_atom(atom, assoc_open_atoms)
+        new_atoms.append(new_atom)
+
     items = [] if do_atom.polarity else ["~"]
 
     return parsing.DoAtom(items + new_atoms)
