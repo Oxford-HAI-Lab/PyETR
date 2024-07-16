@@ -388,7 +388,7 @@ def get_terms(variable: ParserElement) -> ParserElement:
         rpar=pp.Suppress(")"),
     )
     term <<= terms
-    return pp.ZeroOrMore(term)
+    return pp.OneOrMore(term)
 
 
 @cache
@@ -445,7 +445,7 @@ def get_expr() -> pp.Forward:
     )
 
     state = (
-        pp.ZeroOrMore(doatom | atom)
+        pp.OneOrMore(doatom | atom)
         .setResultsName("state", listAllMatches=True)
         .setParseAction(State)
     )
