@@ -103,4 +103,4 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
 
     @property
     def detailed(self):
-        return "{" + ",".join([a.detailed for _, a in self]) + "}"
+        return "{" + ",".join([f"({t.detailed},{a.detailed})" for t, a in self]) + "}"

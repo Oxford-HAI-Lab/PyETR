@@ -115,4 +115,4 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
 
     @property
     def detailed(self) -> str:
-        return f"<{type(self).__name__} f={self.f.detailed} t=({','.join(t.detailed for t in self.t)},)>"
+        return f"<{type(self).__name__} f={self.f.detailed} t=({','.join(t.detailed for t in self.t)})>"

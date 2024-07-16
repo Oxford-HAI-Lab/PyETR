@@ -57,7 +57,8 @@ class Function:
 
         Args:
             name (str): The name of the function
-            arity (Optional[int]): The arity of the function; how many arguments it receives.
+            arity (Optional[int]): The arity of the function; how many arguments it receives. If None, then the function
+                applies to a multiset of terms.
             func_caller (Optional[NumFunc], optional): A numerical function to convert received numeric terms.
                 If None is provided, no conversion will take place. Defaults to None.
 
@@ -66,6 +67,10 @@ class Function:
         """
         if arity is not None and arity < 0:
             raise ValueError("arity must not be less than 0")
+
+        # if arity is not None and func_caller is not None and len(signature(func_caller).parameters):
+        #     raise ValueError("arity must match func caller")
+
         self.name = name
         self.arity = arity
         self.func_caller = func_caller

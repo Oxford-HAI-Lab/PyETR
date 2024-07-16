@@ -176,7 +176,9 @@ class Weights:
 
     @property
     def detailed(self):
-        weight_details = {s.detailed: w.detailed for s, w in self._weights.items()}
+        weight_details = ",".join(
+            [f"{s.detailed}: {w.detailed}" for s, w in self._weights.items()]
+        )
         return f"<Weights {weight_details}>"
 
     def __getitem__(self, item: State):

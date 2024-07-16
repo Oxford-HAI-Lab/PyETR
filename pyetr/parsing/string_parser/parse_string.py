@@ -75,7 +75,7 @@ class DoAtom:
             not_str = ""
         else:
             not_str = "~"
-        out = "".join([a.to_string(**kwargs) for a in self.atoms])
+        out = ",".join([a.to_string(**kwargs) for a in self.atoms])
         return f"{not_str}do({out})"
 
 
@@ -414,9 +414,13 @@ def get_expr() -> pp.Forward:
     ).setResultsName("quantifier")
     quantified_expr = pp.Group(quantifier + variable).setParseAction(Quantified)
 
-    do_word = pp.Literal("do")
-    predicate_word = (pp.Word(pp.alphas, pp.alphanums) + ~do_word) | pp.Literal("==")
-
+    predicate_word = pp.And(
+        [
+            ~pp.Keyword("do"),
+            ~pp.Keyword("DO"),
+            pp.Word(pp.alphas, pp.alphanums) | pp.Literal("=="),
+        ]
+    )
     terms = get_terms(variable).setResultsName("terms", listAllMatches=True)
 
     atom = (
@@ -426,12 +430,13 @@ def get_expr() -> pp.Forward:
         + pp.Optional(pp.delimitedList(terms))
         + pp.Suppress(")").setResultsName("atom", listAllMatches=True)
     ).setParseAction(Atom)
+    do_word = pp.Literal("do") | pp.Literal("DO")
     doatom = (
         (
             pp.Optional("~")
             + pp.Suppress(do_word)
             + pp.Suppress("(")
-            + pp.ZeroOrMore(atom)
+            + pp.Optional(pp.delimitedList(atom))
             + pp.Suppress(")")
         )
         .setResultsName("doatom", listAllMatches=True)
@@ -523,7 +528,7 @@ def parse_string(input_string: str) -> ParserView:
     try:
         out = expr.parse_string(input_string, parseAll=True).as_list()
     except ParseException as e:
-        raise ParsingError(e.msg)
+        raise ParsingError(e.msg + f" Input String: {input_string}")
 
     quantifieds = []
     stage = None
