@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Callable, Optional, cast
 if TYPE_CHECKING:  # pragma: not covered
     from .abstract_term import AbstractFunctionalTerm, TermType
 
-from inspect import getsource, signature
+from inspect import Parameter, getsource, signature
 
 NumFunc = Callable[..., float]
 
@@ -68,8 +68,30 @@ class Function:
         if arity is not None and arity < 0:
             raise ValueError("arity must not be less than 0")
 
-        # if arity is not None and func_caller is not None and len(signature(func_caller).parameters):
-        #     raise ValueError("arity must match func caller")
+        # If func_caller is defined, check arity matches
+
+        if func_caller is not None:
+            params = list(signature(func_caller).parameters.values())
+            if arity is None:
+                # Multiset case
+                if not (
+                    len(params) == 1 and params[0].kind == Parameter.VAR_POSITIONAL
+                ):
+                    raise ValueError(
+                        "Multiset case must accept only one argument, and it must be var positional (like *args)"
+                    )
+            else:
+                if not (
+                    (len(params) == arity)
+                    and all(
+                        p.kind
+                        in (Parameter.POSITIONAL_ONLY, Parameter.POSITIONAL_OR_KEYWORD)
+                        for p in params
+                    )
+                ):
+                    raise ValueError(
+                        "Arity for function must match in tuple case, and all args must be positional"
+                    )
 
         self.name = name
         self.arity = arity

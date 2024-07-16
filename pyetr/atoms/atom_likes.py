@@ -55,11 +55,11 @@ class DoAtomLike(Generic[AtomType]):
     with DoAtom and OpenDoAtom
     """
 
-    atoms: list[AtomType]
+    atoms: set[AtomType]
     polarity: bool
 
     def __init__(self, atoms: Iterable[AtomType], polarity: bool = True) -> None:
-        self.atoms = list(set(atoms))
+        self.atoms = set(atoms)
         self.polarity = polarity
 
     @property
