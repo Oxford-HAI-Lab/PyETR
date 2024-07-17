@@ -23,8 +23,8 @@ from pyetr.parsing.common import ParsingError, Quantified, Variable
 
 ParserElement.enablePackrat()
 
-pp_left = pp.opAssoc.LEFT  # type:ignore
-pp_right = pp.opAssoc.RIGHT  # type:ignore
+pp_left = pp.opAssoc.LEFT
+pp_right = pp.opAssoc.RIGHT
 
 
 class SingleOperand:
@@ -264,7 +264,7 @@ def parse_string(input_string: str) -> list[Item]:
     try:
         new_string: list[Item] = expr.parse_string(
             input_string, parseAll=True
-        ).as_list()  # type:ignore reportUnknownMemberType
+        ).as_list()
     except ParseException as e:
         raise ParsingError(e.msg)
     return new_string

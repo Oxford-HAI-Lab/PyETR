@@ -9,6 +9,7 @@ import pyetr.cases
 from pyetr import ArbitraryObject, Function, FunctionalTerm
 from pyetr.cases import BaseExample
 from pyetr.exceptions import OperationUndefinedError
+from pyetr.parsing.common import ParsingError
 from pyetr.parsing.fol_parser.unparse_view import FOLNotSupportedError
 from pyetr.view import View
 
@@ -133,6 +134,12 @@ class ParseCompareViaFOL(BaseParseItem):
             pass
 
 
+class ParseFailure(BaseParseItem):
+    def runtest(self):
+        with pytest.raises(ParsingError):
+            View.from_str(self.view_string)
+
+
 class OperationTest(pytest.Item):
     def __init__(
         self,
@@ -209,6 +216,14 @@ class ParseTestCollector(pytest.File):
                         )
 
 
+class ParseFailureCollector(pytest.File):
+    def collect(self):
+        with open(self.path) as f:
+            json_file: list[str] = json.load(f)
+        for item in json_file:
+            yield ParseFailure.from_parent(parent=self, view_string=item, name=item)
+
+
 def is_case_file(path: Path) -> bool:
     return re.match(re.compile(r"test_cases.py"), path.name) is not None
 
@@ -217,11 +232,17 @@ def is_case_list(path: Path) -> bool:
     return re.match(re.compile(r"case_list.json"), path.name) is not None
 
 
+def is_failure_file(path: Path) -> bool:
+    return re.match(re.compile(r"failure_list.json"), path.name) is not None
+
+
 def pytest_collect_file(parent: pytest.Session, file_path: Path):
     if is_case_file(file_path):
         return ExampleCollector.from_parent(parent=parent, path=file_path)
     elif is_case_list(file_path):
         return ParseTestCollector.from_parent(parent=parent, path=file_path)
+    elif is_failure_file(file_path):
+        return ParseFailureCollector.from_parent(parent=parent, path=file_path)
 
 
 @pytest.fixture
