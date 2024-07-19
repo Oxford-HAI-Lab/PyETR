@@ -1,4 +1,4 @@
-from typing import Generic, Iterable, TypeVar
+from typing import Generic, TypeVar
 
 from .abstract import AbstractAtom
 from .predicate import Predicate
@@ -58,7 +58,7 @@ class DoAtomLike(Generic[AtomType]):
     atoms: set[AtomType]
     polarity: bool
 
-    def __init__(self, atoms: Iterable[AtomType], polarity: bool = True) -> None:
+    def __init__(self, atoms: set[AtomType], polarity: bool = True) -> None:
         self.atoms = set(atoms)
         self.polarity = polarity
 
@@ -72,7 +72,7 @@ class DoAtomLike(Generic[AtomType]):
         return self.atoms == other.atoms and self.polarity == other.polarity
 
     def __hash__(self) -> int:
-        return hash((type(self).__name__, tuple(self.atoms), self.polarity))
+        return hash((type(self).__name__, frozenset(self.atoms), self.polarity))
 
     def __repr__(self) -> str:
         terms = ",".join([repr(i) for i in self.atoms])
