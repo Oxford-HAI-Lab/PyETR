@@ -80,4 +80,4 @@ class DoAtomLike(Generic[AtomType]):
             tilde = ""
         else:
             tilde = "~"
-        return f"{tilde}DO({terms})"
+        return f"{tilde}do({terms})"

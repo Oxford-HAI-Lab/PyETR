@@ -228,7 +228,7 @@ def parse_weighted_states(
     Returns:
         tuple[Weights, list[tuple[Term, OpenAtom]]]: The weighted state in parsed form.
     """
-    weights: dict[State, Weight] = {}
+    weights: Weights = Weights({})
     issues: list[tuple[Term, OpenAtom]] = []
     for state in w_states:
         parsed_state, new_issues = parse_state(
@@ -253,8 +253,8 @@ def parse_weighted_states(
         else:
             multiplicative = Multiset([])
         weight = Weight(multiplicative=multiplicative, additive=additive)
-        weights[parsed_state] = weight
-    return Weights(weights), issues
+        weights.adding(parsed_state, weight)
+    return weights, issues
 
 
 def gather_funcs(term: parsing.Term) -> list[Function]:
