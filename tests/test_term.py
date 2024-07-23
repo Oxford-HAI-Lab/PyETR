@@ -15,11 +15,8 @@ class TestFunction:
     def test_same_name_different_arity(self):
         func1 = Function(name="gentoo", arity=0)
         func2 = Function(name="gentoo", arity=1)
-        with pytest.raises(
-            ValueError,
-            match="Equality on two functions of same name gentoo, gentoo, different arity 0, 1",
-        ):
-            func1.__eq__(func2)
+
+        assert not func1.__eq__(func2)
 
     def test_eq_diff_obj(self):
         func1 = Function(name="gentoo", arity=0)

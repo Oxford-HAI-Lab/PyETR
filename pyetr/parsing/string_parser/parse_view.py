@@ -29,10 +29,21 @@ from pyetr.stateset import SetOfStates, State
 from pyetr.weight import Weight, Weights
 
 
+def get_function(
+    function_map: dict[tuple[str, int | None], Function], name: str, num_args: int
+) -> None | Function:
+    if (name, None) in function_map:
+        return function_map[name, None]
+    elif (name, num_args) in function_map:
+        return function_map[name, num_args]
+    else:
+        return None
+
+
 def parse_term(
     t: parsing.Term,
     variable_map: dict[str, ArbitraryObject],
-    function_map: dict[str, Function],
+    function_map: dict[tuple[str, int | None], Function],
 ) -> tuple[Term, list[tuple[Term, OpenTerm]]]:
     """
     Convert parser representation term to view term.
@@ -40,7 +51,7 @@ def parse_term(
     Args:
         t (parsing.Term): The term
         variable_map (dict[str, ArbitraryObject]): The map from variable name to variable.
-        function_map (dict[str, Function]): The map from function name to function.
+        function_map (dict[tuple[str,int | None], Function]): The map from function name to function.
 
     Returns:
         tuple[Term, list[tuple[Term, OpenTerm]]]: Tuple of terms and open terms associated.
@@ -58,10 +69,10 @@ def parse_term(
         return parsed_term, [*open_terms, (parsed_term, QuestionMark())]
     elif isinstance(t, parsing.Function):
         # These represent a list in term order, where each element is a list of derived open atom pairs
-        if t.name not in function_map:
+        num_args = len(t.args)
+        f = get_function(function_map, t.name, num_args)
+        if f is None:
             raise ValueError(f"Term: {t} not found in function map")
-        f = function_map[t.name]
-
         terms: list[Term] = []
         open_term_sets: list[list[tuple[Term, OpenTerm]]] = []
         for arg in t.args:
@@ -88,7 +99,17 @@ def parse_term(
         new_right, new_issues2 = parse_term(
             t.right, variable_map=variable_map, function_map=function_map
         )
-        return FunctionalTerm(XBar, (new_left, new_right)), new_issues1 + new_issues2
+        new_open_terms_sets = merge_terms_with_opens(
+            [new_left, new_right], [new_issues1, new_issues2]
+        )
+
+        functional_opens = [
+            (t, OpenFunctionalTerm(f=XBar, t=open_terms))
+            for t, open_terms in new_open_terms_sets
+        ]
+        return FunctionalTerm(XBar, (new_left, new_right)), cast(
+            list[tuple[Term, OpenTerm]], functional_opens
+        )
     elif isinstance(t, parsing.Summation):
         issues: list[tuple[Term, OpenTerm]] = []
         new_args: list[Term] = []
@@ -106,7 +127,7 @@ def parse_term(
 def parse_predicate_atom(
     atom: parsing.Atom,
     variable_map: dict[str, ArbitraryObject],
-    function_map: dict[str, Function],
+    function_map: dict[tuple[str, int | None], Function],
 ) -> tuple[PredicateAtom, list[tuple[Term, OpenPredicateAtom]]]:
     """
     Parse the parser atom to predicate atom form.
@@ -114,7 +135,7 @@ def parse_predicate_atom(
     Args:
         atom (parsing.Atom): Parser atom representation
         variable_map (dict[str, ArbitraryObject]): The map from variable name to variable.
-        function_map (dict[str, Function]): The map from function name to function.
+        function_map (dict[tuple[str,int | None], Function]): The map from function name to function.
 
     Returns:
         tuple[PredicateAtom, list[tuple[Term, OpenPredicateAtom]]]: The parsed predicate atom
@@ -144,7 +165,7 @@ def parse_predicate_atom(
 def parse_do_atom(
     atom: parsing.DoAtom,
     variable_map: dict[str, ArbitraryObject],
-    function_map: dict[str, Function],
+    function_map: dict[tuple[str, int | None], Function],
 ) -> tuple[DoAtom, list[tuple[Term, OpenDoAtom]]]:
     """
     Converts the parser do atom to DoAtom form.
@@ -152,7 +173,7 @@ def parse_do_atom(
     Args:
         atom (parsing.DoAtom): The Parser do atom
         variable_map (dict[str, ArbitraryObject]): The map from variable name to variable.
-        function_map (dict[str, Function]): The map from function name to function.
+        function_map (dict[tuple[str,int | None], Function]): The map from function name to function.
 
     Returns:
         tuple[DoAtom, list[tuple[Term, OpenDoAtom]]]: The parsed do atom and its associated open
@@ -180,7 +201,7 @@ def parse_do_atom(
 def parse_state(
     s: parsing.State,
     variable_map: dict[str, ArbitraryObject],
-    function_map: dict[str, Function],
+    function_map: dict[tuple[str, int | None], Function],
 ) -> tuple[State, list[tuple[Term, OpenAtom]]]:
     """
     Parses the state from the parsing representation to the state and associated
@@ -189,7 +210,7 @@ def parse_state(
     Args:
         s (parsing.State): The parsing representation of the state.
         variable_map (dict[str, ArbitraryObject]): The map from variable name to variable.
-        function_map (dict[str, Function]): The map from function name to function.
+        function_map (dict[tuple[str, int | None], Function]): The map from function name to function.
 
     Returns:
         tuple[State, list[tuple[Term, OpenAtom]]]: The parsed state and its associated open
@@ -214,7 +235,7 @@ def parse_state(
 def parse_weighted_states(
     w_states: list[parsing.WeightedState],
     variable_map: dict[str, ArbitraryObject],
-    function_map: dict[str, Function],
+    function_map: dict[tuple[str, int | None], Function],
 ) -> tuple[Weights, list[tuple[Term, OpenAtom]]]:
     """
     Parses the weighted state from the parsing representation to the weights and associated
@@ -223,7 +244,7 @@ def parse_weighted_states(
     Args:
         w_states (list[parsing.WeightedState]): The weighted states.
         variable_map (dict[str, ArbitraryObject]): The map from variable name to variable.
-        function_map (dict[str, Function]): The map from function name to function.
+        function_map (dict[tuple[str,int | None], Function]): The map from function name to function.
 
     Returns:
         tuple[Weights, list[tuple[Term, OpenAtom]]]: The weighted state in parsed form.
@@ -295,7 +316,7 @@ def get_function_map(
     stage: parsing.Stage,
     supposition: Optional[parsing.Supposition],
     custom_functions: list[Function],
-) -> dict[str, Function]:
+) -> dict[tuple[str, None | int], Function]:
     """
     Get the function map from name to object.
 
@@ -305,7 +326,7 @@ def get_function_map(
         custom_functions (list[Function]): Additional "override" functions.
 
     Returns:
-        dict[str, Function]: The map between function name and object.
+        dict[tuple[str,int | None], Function]: The map between function name and object.
     """
     terms_to_scan: list[parsing.Term] = []
     for state in stage.states:
@@ -329,14 +350,34 @@ def get_function_map(
                     for a in atom.atoms:
                         terms_to_scan += a.terms
 
-    func_map: dict[str, Function] = {f.name: f for f in custom_functions}
+    func_map: dict[tuple[str, None | int], Function] = {}
+    for f in custom_functions:
+        if (f.name, f.arity) in func_map:
+            raise ParsingError(
+                f"Reuse of name and arity in custom function for name: {f.name} and arity: {f.arity}"
+            )
+        else:
+            func_map[f.name, f.arity] = f
+
+    for name, arity in func_map:
+        if arity is None:
+            for second_name, second_arity in func_map:
+                if name == second_name and second_arity is not None:
+                    raise ParsingError(
+                        f"Multiset function detected, alongside custom function name: {name} and arity {second_arity}"
+                    )
+
     new_funcs: list[Function] = []
     for term in terms_to_scan:
         new_funcs += gather_funcs(term)
 
     for new_func in new_funcs:
-        if new_func.name not in func_map:
-            func_map[new_func.name] = new_func
+        if (new_func.name, new_func.arity) not in func_map and (
+            new_func.name,
+            None,
+        ) not in func_map:
+            func_map[new_func.name, new_func.arity] = new_func
+
     return func_map
 
 

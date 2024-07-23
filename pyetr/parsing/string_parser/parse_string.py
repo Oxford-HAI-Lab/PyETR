@@ -344,6 +344,10 @@ class Stage:
         return "{" + f"{out}" + "}"
 
 
+def resolve_edge_case(t):
+    return Xbar([[Emphasis([[t[0][0]]]), t[0][1]]])
+
+
 @cache
 def get_terms(variable: ParserElement) -> ParserElement:
     """
@@ -378,9 +382,11 @@ def get_terms(variable: ParserElement) -> ParserElement:
         + pp.Optional(pp.delimitedList(term))
         + pp.Suppress(")")
     ).setParseAction(Summation)
+    xbar_emphasis = pp.Suppress(emphasis + xbar)
     terms = pp.infixNotation(
         function | summation | reals | variable,
         [
+            (xbar_emphasis, 2, pp_left, resolve_edge_case),
             (xbar, 2, pp_left, Xbar),
             (emphasis, 1, pp_left, Emphasis),
         ],
