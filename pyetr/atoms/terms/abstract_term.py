@@ -115,4 +115,7 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
 
     @property
     def detailed(self) -> str:
-        return f"<{type(self).__name__} f={self.f.detailed} t=({','.join(t.detailed for t in self.t)})>"
+        if isinstance(self.t, Multiset):
+            return f"<{type(self).__name__} f={self.f.detailed} t={self.t.detailed}>"
+        else:
+            return f"<{type(self).__name__} f={self.f.detailed} t=({','.join(t.detailed for t in self.t)})>"

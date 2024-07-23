@@ -84,10 +84,10 @@ def parse_term(
         new_open_terms_sets = merge_terms_with_opens(terms, open_term_sets)
 
         functional_opens = [
-            (t, OpenFunctionalTerm(f=f, t=tuple(open_terms)))
+            (t, OpenFunctionalTerm(f=f, t=open_terms))
             for t, open_terms in new_open_terms_sets
         ]
-        return FunctionalTerm(f, tuple(terms)), cast(
+        return FunctionalTerm(f, terms), cast(
             list[tuple[Term, OpenTerm]], functional_opens
         )
     elif isinstance(t, parsing.Real):
@@ -111,15 +111,22 @@ def parse_term(
             list[tuple[Term, OpenTerm]], functional_opens
         )
     elif isinstance(t, parsing.Summation):
-        issues: list[tuple[Term, OpenTerm]] = []
+        open_term_sets: list[list[tuple[Term, OpenTerm]]] = []
         new_args: list[Term] = []
         for arg in t.args:
             new_arg, new_issues = parse_term(
                 arg, variable_map=variable_map, function_map=function_map
             )
             new_args.append(new_arg)
-            issues += new_issues
-        return FunctionalTerm(Summation, Multiset(new_args)), issues
+            open_term_sets.append(new_issues)
+        new_open_terms_sets = merge_terms_with_opens(new_args, open_term_sets)
+        functional_opens = [
+            (t, OpenFunctionalTerm(f=Summation, t=open_terms))
+            for t, open_terms in new_open_terms_sets
+        ]
+        return FunctionalTerm(Summation, new_args), cast(
+            list[tuple[Term, OpenTerm]], functional_opens
+        )
     else:
         raise ValueError(f"Invalid term {t}")
 
