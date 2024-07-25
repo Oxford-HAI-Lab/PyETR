@@ -2,12 +2,8 @@ site_name: PyETR
 
 nav:
   - 'Home': 'index.md'
-<<<<<<< Updated upstream
-  - 'Getting started':
-=======
   - 'Introduction': 'introduction.md'
   - 'Getting started': 
->>>>>>> Stashed changes
     - 'Installation': 'getting_started/installation.md'
     - 'Python': 'getting_started/getting_started_with_python.md'
     - 'Example': 'getting_started/example.md'
@@ -22,6 +18,7 @@ nav:
     - 'View Methods': 'view_methods.md'
     - 'Inference Index': 'inference_index.md'
   - 'For Developers': 'development.md'
+  - 'Credits': 'credits.md'
 theme:
   name: 'material'
   features:
