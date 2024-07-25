@@ -12,8 +12,8 @@ def sum_func_new(*x: float):
     return sum(x)
 
 
-XBar = Function("XBar", 2, func_caller=multi_func_new)
-Summation = Function("Summation", None, func_caller=sum_func_new)
+XBar = Function("x̄", 2, func_caller=multi_func_new)
+Summation = Function("σ", None, func_caller=sum_func_new)
 
 
 def multiset_product(m1: Multiset[Term], m2: Multiset[Term]) -> Multiset[Term]:

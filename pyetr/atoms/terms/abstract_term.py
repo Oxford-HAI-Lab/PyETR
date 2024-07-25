@@ -109,6 +109,9 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
     def __repr__(self) -> str:
         if self.f.arity == 0:
             return f"{self.f.name}"
+        elif self.f.arity is None:
+            terms = ",".join([repr(i) for i in self.t])
+            return f"{self.f.name}《{terms}》"
         else:
             terms = ",".join([repr(i) for i in self.t])
             return f"{self.f.name}({terms})"
