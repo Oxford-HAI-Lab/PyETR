@@ -348,6 +348,10 @@ def resolve_edge_case(t):
     return Xbar([[Emphasis([[t[0][0]]]), t[0][1]]])
 
 
+def xbar_prefix_parse(t):
+    return Xbar([t])
+
+
 @cache
 def get_terms(variable: ParserElement) -> ParserElement:
     """
@@ -382,9 +386,13 @@ def get_terms(variable: ParserElement) -> ParserElement:
         + pp.Optional(pp.delimitedList(term))
         + pp.Suppress(")")
     ).setParseAction(Summation)
+    xbar_prefix = (
+        xbar + pp.Suppress("(") + pp.Optional(pp.delimitedList(term)) + pp.Suppress(")")
+    ).setParseAction(xbar_prefix_parse)
+
     xbar_emphasis = pp.Suppress(emphasis + xbar)
     terms = pp.infixNotation(
-        function | summation | reals | variable,
+        function | summation | xbar_prefix | reals | variable,
         [
             (xbar_emphasis, 2, pp_left, resolve_edge_case),
             (xbar, 2, pp_left, Xbar),
