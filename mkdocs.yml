@@ -3,6 +3,8 @@ site_name: PyETR
 nav:
   - 'Home': 'index.md'
   - 'Introduction': 'introduction.md'
+  - 'Theory' :
+    - 'Overview' : 'theory/overview.md'
   - 'Getting started': 
     - 'Installation': 'getting_started/installation.md'
     - 'Python': 'getting_started/getting_started_with_python.md'
@@ -17,6 +19,7 @@ nav:
     - 'Case Index': 'case_index.md'
     - 'View Methods': 'view_methods.md'
     - 'Inference Index': 'inference_index.md'
+  - 'Glossary' : 'glossary.md'
   - 'For Developers': 'development.md'
   - 'Credits': 'credits.md'
 theme:
@@ -45,6 +48,12 @@ markdown_extensions:
   - toc:
       permalink: true
   - attr_list
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 plugins:
   - search:
