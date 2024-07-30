@@ -10,11 +10,16 @@ From [the publisher](https://global.oup.com/academic/product/reason-and-inquiry-
 
     The book's central idea is that our minds naturally aim at resolving issues, and if we are sufficiently inquisitive in the process, we can avoid mistakes. The erotetic theory holds that both the successes and the failures of reason are due to this aim. Rationality is secured if we reach what is described by the theory as erotetic equilibrium.
 
-For different users we recommend different entry points in the documentation.
+The documentation is structured as follows.
 
-- If you are not familiar with ETR, it may be helpful to start with the !!Overview!!. Then you may wish to head to [Installation](getting_started/installation.md) and then start picking up the system [Examples](getting_started/example.md).
-- If you want to use PyETR to help your start *Reason & Inquiry* should read !!Systems!!
+- [Theory] recaps the ideas from *Reason & Inquiry* that are important for PyETR. Most users will benefit from reading the [Overview] for a quick orientation before using PyETR. Users who are also readers of the book should also read [Comparison with R&I] for some important information. The rest of [Theory] can be consulted as needed by advanced users.
 
-See the [Introduction](introduction) for a quick orientation and important information for readers of the book.
+- [Getting started] contains instructions for [Installation] and running [Python], with some [example usages].
 
-Here you'll find details of how to install the package, get started using it and details of advanced usage.
+- [Usage] explains in detail how the string-based method for inputting [View] objects, as well as [...].
+
+- [Troubleshooting]
+
+- [Reference]
+
+- Other sections are self-explanatory.
