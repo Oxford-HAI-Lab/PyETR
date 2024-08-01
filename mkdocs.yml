@@ -5,6 +5,7 @@ nav:
   - 'Introduction': 'introduction.md'
   - 'Theory' :
     - 'Overview' : 'theory/overview.md'
+    - 'Systems from R&I' : 'theory/systems.md'
   - 'Getting started': 
     - 'Installation': 'getting_started/installation.md'
     - 'Python': 'getting_started/getting_started_with_python.md'

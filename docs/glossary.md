@@ -1,5 +1,10 @@
 # Glossary of operations and terms
 
+## Atom
+
+An atoms are the smallest units with logical content in PyETR, corresponding to positive and negative atomic formulae in logic.
+They are most often built out of [predicates] possibly applied to [terms], but there are also [do-atoms]
+
 ## Multiset
 
 A multiset is a collection of objects which is *unordered* and *possibly has repeats*, cf. [Set](#set)
@@ -12,6 +17,12 @@ In ETR multisets are represented as comma-separated lists between double-angle b
 are three ways of writing the same thing: the multiset containing two copies of the number $1$ and one copy of the number $2$.
 
 In ETR, multisets are always finite and can be empty.
+
+## Novelization
+
+Novelizing a set of [arbitrary objects] in a view (or state, etc) means selecting a replacement for each one, all distinct from any arbitrary object used up to that point, and systematically substituting the replacements for all occurrences of the originals.
+
+The resulting view is 'alpha-equivalent' to the original one, in the sense familiar from logic, type theory, and programming languages.
 
 ## Set
 
@@ -29,11 +40,26 @@ In PyETR, all sets are finite, so we usually write 'set' when we really mean 'fi
 ## Stage
 
 The main component of a view is the stage.
-The stage is a set of [States]
+In general, the stage is a set of [weighted states](#weighted-state), but if all weights are trivial it will appear just as a set of [states](#state).
+
+Intuitively, the stage expresses a disjunction of the states it contains, with extra non-logical information in the weights.
+
+## State
+
+A state is a set of atoms. Intuitively, a state expresses a conjunction of the atoms it contains.
 
 ## Update
 
-Update is a view operation, the workhorse of reasoning. Written 
+`update` is a view operation. It is the workhorse of reasoning, being a key component of the [Default Reasoning Procedure].
+For an initial view `G` and an incoming view `D`, `G.update(D)` is a view which updates `G` by treating `D` as a source of new information that potentially resolves some of the inquisitiveness of `G`.
+
+`update` actually decomposes into more basic operations. In PyETR, `G.update(D)` 
+
+
+ written $G[D]^\circlearrowright$ in R&I and `G.update(D)` in PyETR.
+
+
+
 
 First View: Currently active point of view
 Second View: Treated as a fact
@@ -46,6 +72,10 @@ Take a starting view, and when provided a new perspective produces a third view.
 A view is the basic object manipulated during reasoning. The current focus of a reasoner is taken to be a view. Incoming information arrives as a sequence of views, and latent beliefs are a collection of views. The different view operations correspond to different ways of evolving the current view in light of either new information or selected latent beliefs.
 
 Views are built up from a [Stage], a [Supposition], a [Dependency Relation], and an [Issue Structure].
+
+## Weight
+
+## Weighted state
 
 ## Default Reasoning Procedure
 
