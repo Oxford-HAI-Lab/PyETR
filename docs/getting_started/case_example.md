@@ -1,4 +1,4 @@
-# Case Example
+# Exploring the pre-defined cases
 
 All of the examples from the book "Reason and Inquiry" are available as part of the PyETR package. Below is shown an example detailing how to extract one of these from the package. This lets you get started with views without having to construct any yourself. If you would like to find another example, please see the case index. If would like to learn how to construct them yourself, please see here.
 

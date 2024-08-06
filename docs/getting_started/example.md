@@ -1,4 +1,4 @@
-# Example
+# First Steps
 
 ## Intro
 
