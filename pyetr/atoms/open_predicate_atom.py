@@ -1,6 +1,6 @@
 from pyetr.atoms.terms.open_term import get_open_equivalent
 
-from .abstract import OpenAtom
+from .abstract import Atom, OpenAtom
 from .atom_likes import PredicateAtomLike
 from .predicate_atom import PredicateAtom
 from .terms import ArbitraryObject, OpenTerm, Term
@@ -24,6 +24,17 @@ class OpenPredicateAtom(PredicateAtomLike[OpenTerm], OpenAtom):
 
     def __invert__(self) -> "OpenPredicateAtom":
         return OpenPredicateAtom(~self.predicate, self.terms)
+
+    def context_equals(self, atom: "Atom", question_term: "Term") -> bool:
+        if not isinstance(atom, PredicateAtom):
+            return False
+        if self.predicate != atom.predicate or len(self.terms) != len(atom.terms):
+            return False
+
+        return all(
+            t.context_equals(atom.terms[i], question_term)
+            for i, t in enumerate(self.terms)
+        )
 
 
 def get_open_atom_equivalent(atom: PredicateAtom) -> OpenPredicateAtom:

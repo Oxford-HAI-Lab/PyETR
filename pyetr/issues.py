@@ -55,7 +55,11 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
 
     def restriction(self, atoms: set[Atom]) -> "IssueStructure":
         return IssueStructure(
-            {(term, open_atom) for term, open_atom in self if open_atom(term) in atoms}
+            {
+                (term, open_atom)
+                for term, open_atom in self
+                if any(open_atom.context_equals(atom, term) for atom in atoms)
+            }
         )
 
     @classmethod
@@ -104,3 +108,6 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
     @property
     def detailed(self):
         return "{" + ",".join([f"({t.detailed},{a.detailed})" for t, a in self]) + "}"
+
+    def __repr__(self) -> str:
+        return "{" + ",".join([f"({t},{a})" for t, a in self]) + "}"

@@ -64,6 +64,10 @@ class OpenAtom(AbstractAtom):
         """
         ...
 
+    @abstractmethod
+    def context_equals(self, atom: "Atom", question_term: "Term") -> bool:
+        ...
+
 
 class Atom(AbstractAtom):
     """
