@@ -506,21 +506,22 @@ class View:
         elif self.is_verum:
             return "T"
 
-        if len(self.dependency_relation.dependencies) == 0:
+        if (
+            len(
+                self.dependency_relation.universals
+                | self.dependency_relation.existentials
+            )
+            == 0
+        ):
             dep_string = ""
         else:
-            dep_string = f" deps={self.dependency_relation}"
+            dep_string = f" {self.dependency_relation}"
         if len(self.issue_structure) == 0:
             issue_string = ""
         else:
             issue_string = f" issues={self.issue_structure}"
 
-        quantifiers = get_quantifiers(
-            self.dependency_relation,
-        )
-        quant_str = " ".join([i.to_string() for i in quantifiers])
-        end_str = " " if len(quant_str) > 0 else ""
-        return f"{quant_str}{end_str}{self.weights}^{self.supposition}{issue_string}{dep_string}"
+        return f"{self.weights}^{self.supposition}{issue_string}{dep_string}"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, View):

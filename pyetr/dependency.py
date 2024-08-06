@@ -186,13 +186,18 @@ class DependencyRelation:
                     )
 
     def __repr__(self) -> str:
+        universal_str = f"U=" + "{" + ",".join(repr(u) for u in self.universals) + "}"
+        existential_str = (
+            f" E=" + "{" + ",".join(repr(e) for e in self.existentials) + "}"
+        )
         if len(self.dependencies) == 0:
-            return "None"
+            dep_string = ""
         else:
-            return "".join(
+            dep_string = " deps=" + "".join(
                 f"{u}" + "{" + ",".join(repr(e) for e in exis) + "}"
                 for u, exis in dependencies_to_sets(self.dependencies)
             )
+        return universal_str + existential_str + dep_string
 
     @property
     def detailed(self):

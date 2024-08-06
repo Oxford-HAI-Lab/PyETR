@@ -416,10 +416,10 @@ class e2(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{T(w())K(z()),Q(y())A(x())}"),
-        ps("{K(z())}"),
+        ps("{T()K(),Q()A()}"),
+        ps("{K()}"),
     )
-    c: View = ps("{T(w())}")
+    c: View = ps("{T()}")
 
 
 class e3(DefaultInference, BaseExample):
@@ -433,10 +433,10 @@ class e3(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{King(k())Ace(a()),Jack(j())Queen(q())}"),
-        ps("{~Ace(a())}"),
+        ps("{King()Ace(),Jack()Queen()}"),
+        ps("{~Ace()}"),
     )
-    c: View = ps("{Jack(j())Queen(q())}")
+    c: View = ps("{Jack()Queen()}")
 
 
 # e4 is not a test
@@ -576,8 +576,8 @@ class e12i(Negation, BaseExample):
     ItisnotthecasethatPorQorR
     """
 
-    v: tuple[View] = (ps("{P(p()),Q(q()),R(r())}"),)
-    c: View = ps("{~R(r())~Q(q())~P(p())}")
+    v: tuple[View] = (ps("{P(),Q(),R()}"),)
+    c: View = ps("{~R()~Q()~P()}")
 
 
 class e12ii(Negation, BaseExample):
@@ -587,8 +587,8 @@ class e12ii(Negation, BaseExample):
     ItisnotthecasethatPandQandR
     """
 
-    v: tuple[View] = (ps("{P(p())R(r())Q(q())}"),)
-    c: View = ps("{~R(r()),~P(p()),~Q(q())}")
+    v: tuple[View] = (ps("{P()R()Q()}"),)
+    c: View = ps("{~R(),~P(),~Q()}")
 
 
 class e12iii(Negation, BaseExample):
@@ -598,8 +598,8 @@ class e12iii(Negation, BaseExample):
     It is not the case that, supposing S, ((P and Q) or R)
     """
 
-    v: tuple[View] = (ps("{P(p())Q(q()),R(r())}^{S(s())}"),)
-    c: View = ps("{~P(p())S(s())~R(r()),~R(r())~Q(q())S(s())}")
+    v: tuple[View] = (ps("{P()Q(),R()}^{S()}"),)
+    c: View = ps("{~P()S()~R(),~R()~Q()S()}")
 
 
 class e13(DefaultInference, BaseExample):
@@ -612,10 +612,10 @@ class e13(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{IsQueen(q())IsJack(j()),IsAce(a())IsKing(k())}"),
-        ps("{~IsAce(a())}"),
+        ps("{IsQueen()IsJack(),IsAce()IsKing()}"),
+        ps("{~IsAce()}"),
     )
-    c: View = ps("{IsQueen(q())IsJack(j())}")
+    c: View = ps("{IsQueen()IsJack()}")
 
 
 class e14_1(Factor, BaseExample):
@@ -626,10 +626,10 @@ class e14_1(Factor, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{P(p())R(r()),P(p())Q(q())}"),
-        ps("{P(p())}"),
+        ps("{P()R(),P()Q()}"),
+        ps("{P()}"),
     )
-    c: View = ps("{Q(q()),R(r())}")
+    c: View = ps("{Q(),R()}")
 
 
 class e14_2(Factor, BaseExample):
@@ -640,10 +640,10 @@ class e14_2(Factor, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{P(p())R(r()),P(p())S(s())R(r()),P(p())S(s())Q(q())}"),
-        ps("{P(p())}^{S(s())}"),
+        ps("{P()R(),P()S()R(),P()S()Q()}"),
+        ps("{P()}^{S()}"),
     )
-    c: View = ps("{Q(q())S(s()),P(p())R(r()),S(s())R(r())}")
+    c: View = ps("{Q()S(),P()R(),S()R()}")
 
 
 class e14_3(Factor, BaseExample):
@@ -654,10 +654,10 @@ class e14_3(Factor, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{P(p())S(s()),Q(q())S(s()),P(p())R(r()),Q(q())R(r())}"),
-        ps("{P(p()),Q(q())}"),
+        ps("{P()S(),Q()S(),P()R(),Q()R()}"),
+        ps("{P(),Q()}"),
     )
-    c: View = ps("{S(s()),R(r())}")
+    c: View = ps("{S(),R()}")
 
 
 class e14_6(Factor, BaseExample):
@@ -668,10 +668,10 @@ class e14_6(Factor, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{Q(q())S(s()),P(p())R(r())}"),
-        ps("{T(t()),P(p()),Q(q())}"),
+        ps("{Q()S(),P()R()}"),
+        ps("{T(),P(),Q()}"),
     )
-    c: View = ps("{Q(q())S(s()),P(p())R(r())}")
+    c: View = ps("{Q()S(),P()R()}")
 
 
 class e14_7(Factor, BaseExample):
@@ -682,10 +682,10 @@ class e14_7(Factor, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{Q(q())S(s()),P(p())R(r()),P(p())}"),
-        ps("{P(p()),Q(q())}"),
+        ps("{Q()S(),P()R(),P()}"),
+        ps("{P(),Q()}"),
     )
-    c: View = ps("{0,S(s()),R(r())}")
+    c: View = ps("{0,S(),R()}")
 
 
 class e15(DefaultInference, BaseExample):
@@ -699,11 +699,11 @@ class e15(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("{Ace(a()),Jack(j())Queen(q())Ace(a()),Four(f())Ten(t())Eight(e())}"),
-        ps("{Jack(j())Ten(t())Ace(a())Eight(e())}"),
-        ps("{~Queen(q())}"),
+        ps("{Ace(),Jack()Queen()Ace(),Four()Ten()Eight()}"),
+        ps("{Jack()Ten()Ace()Eight()}"),
+        ps("{~Queen()}"),
     )
-    c: View = ps("{Four(f())}")
+    c: View = ps("{Four()}")
 
 
 class e16(DefaultInference, BaseExample):
@@ -716,11 +716,11 @@ class e16(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("{King(k())Jack(j())Queen(q()),Ace(a()),Four(f())Ten(t())Eight(e())}"),
-        ps("{~Four(f())}"),
-        ps("{~Ace(a())}"),
+        ps("{King()Jack()Queen(),Ace(),Four()Ten()Eight()}"),
+        ps("{~Four()}"),
+        ps("{~Ace()}"),
     )
-    c: View = ps("{King(k())Jack(j())Queen(q())}")
+    c: View = ps("{King()Jack()Queen()}")
 
 
 class e17(DefaultInference, BaseExample):
@@ -733,10 +733,10 @@ class e17(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{~King(k())Ace(a()),King(k())~Ace(a())}"),
-        ps("{King(k())}"),
+        ps("{~King()Ace(),King()~Ace()}"),
+        ps("{King()}"),
     )
-    c: View = ps("{~Ace(a())}")
+    c: View = ps("{~Ace()}")
 
 
 class e19(Suppose, BaseExample):
@@ -764,9 +764,9 @@ class e20(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View, View] = (
-        ps("{Queen(q()),King(k())}"),
-        ps("{Win(mary())}^{King(k())}"),
-        ps("{Win(bill())}^{Queen(q())}"),
+        ps("{Queen(),King()}"),
+        ps("{Win(mary())}^{King()}"),
+        ps("{Win(bill())}^{Queen()}"),
     )
     c: View = ps("{Win(bill()),Win(mary())}")
 
@@ -1056,10 +1056,10 @@ class e32_1(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{P(p())Q(q())}^{P(p())}"),
-        ps("{P(p())}"),
+        ps("{P()Q()}^{P()}"),
+        ps("{P()}"),
     )
-    c: View = ps("{Q(q())}")
+    c: View = ps("{Q()}")
 
 
 class e32_2(DefaultInference, BaseExample):
@@ -1072,10 +1072,10 @@ class e32_2(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{P(p())}"),
-        ps("{P(p())Q(q())}^{P(p())}"),
+        ps("{P()}"),
+        ps("{P()Q()}^{P()}"),
     )
-    c: View = ps("{Q(q())}")
+    c: View = ps("{Q()}")
 
 
 class e33(DefaultInference, BaseExample):
@@ -1088,10 +1088,10 @@ class e33(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{E(e())R(r())}^{R(r())}"),
-        ps("{E(e())}"),
+        ps("{E()R()}^{R()}"),
+        ps("{E()}"),
     )
-    c: View = ps("{R(r())}")
+    c: View = ps("{R()}")
 
 
 class e40i(BaseExample):
@@ -1174,10 +1174,10 @@ class e41(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{~Q(q())~P(p())}^{~Q(q())}"),
-        ps("{~Q(q())}"),
+        ps("{~Q()~P()}^{~Q()}"),
+        ps("{~Q()}"),
     )
-    c: View = ps("{~P(p())}")
+    c: View = ps("{~P()}")
 
 
 class e42(DefaultInference, BaseExample):
