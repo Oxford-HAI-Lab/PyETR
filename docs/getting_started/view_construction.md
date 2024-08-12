@@ -39,7 +39,7 @@ We can see in the above that while `p1.to_str()` only presents the `stage` of `p
 
 ## Stages and states
 
-Let us break down the following representation of view found in [Example 8](/case_index/#e8).
+Let us break down the following representation of view found in [Example 8](../case_index.md#e8).
 ```
 {k()t(),a()q()}
 ```
@@ -96,7 +96,7 @@ Thus the parsing of a string representing a state into a list of strings represe
 An atom is made negative by prepending a tilde `~` to it.
 This corresponds to the notation in *Reason & Inquiry* where the negative counterpart of a positive atom was denoted by the same letter with an overline.
 
-For example, consider [Example 22](/case_index/#e22).
+For example, consider [Example 22](../case_index.md#e22).
 Starting with the view denoted
 ```
 {a()c()b()}
@@ -112,7 +112,7 @@ which has three states, each containing a singleton negative atom.
 Suppositions are optional and are denoted with a `^` after the stage, using the same syntax for a set of states as for stages.
 In *Reason & Inquiry*, suppositions were typically denoted by &Theta; (upper-case theta) and placed in superscript position following the stage.
 
-For example, consider [Example 28](/case_index/#e28).
+For example, consider [Example 28](../case_index.md#e28).
 There is a view denoted
 ```
 {Tiger()Orange()}^{Tiger()}
@@ -127,7 +127,7 @@ The supposition is `{Tiger()}`, which consists of one state with one atom (just 
 ## Atoms
 
 Atoms are formed by applying a predicate to a (possibly empty) list of terms.
-Consider this view from [Example 50](/case_index/#e50_part1).
+Consider this view from [Example 50](../case_index.md#e50_part1).
 ```
 {L(j(),s())L(s(),g())}
 ```
@@ -141,7 +141,7 @@ The `j()`, `s()`, and `g()` are examples of terms, we will see more examples in 
     ```
     {==(Clark(),Superman())}
     ```
-    from [Example 88](/case_index/#e88).
+    from [Example 88](../case_index.md#e88).
 
 !!! warning
     Atoms and terms can look similar.
@@ -152,7 +152,7 @@ The `j()`, `s()`, and `g()` are examples of terms, we will see more examples in 
     Atoms such as `k()` considered in [Stages and states](#stages-and-states) are a special case where a predicate is given an empty list of arguments.
     In logic, propositional calculus is embedded into first-order logic by considering primitive propositions as predicates taking no arguments.
     We use this same idea to embed the atoms of Chapter 2 of *Reason & Inquiry*, which act like the literals of propositional logic, into PyETR.
-    This is why examples such as [Example 8](/case_index/#e8) have extra parentheses in PyETR relative to *Reason & Inquiry*.
+    This is why examples such as [Example 8](../case_index.md#e8) have extra parentheses in PyETR relative to *Reason & Inquiry*.
 
 !!! warning
     Occasionally, atoms are compared for having the same underlying predicate.
@@ -200,7 +200,7 @@ These can only appear if there is a suitable dependency relation and will be dis
 ## Issue structures
 
 Issue structures are specified inserting asterisks immediately after a term which is at issue for its environment.
-For example, in [Example 47](/case_index/#47), the view
+For example, in [Example 47](../case_index.md#47), the view
 ```
 {Thermotogum(Maritima()*)}
 ```
@@ -230,7 +230,7 @@ has the (functional) term `Maritima()` at issue for the context `Thermotogum(?)`
 ## Dependency relations
 
 Dependency relations are specified by giving an equivalent string of quantifiers from first-order logic.
-For example, consider the following view from [Example 56](/case_index/#e56_default_inference).
+For example, consider the following view from [Example 56](../case_index.md#e56_default_inference).
 ```
 ∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
 ```
@@ -283,7 +283,7 @@ Az Ew {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
 ## Weights
 
 Weights are an optional prefix to each state in the stage.
-For example, consider the following view appearing in [Example 65](/case_index/#e65).
+For example, consider the following view appearing in [Example 65](../case_index.md#e65).
 ```
 ∀x {0.3=* P(x*)C(x),P(x*)~C(x)}^{P(x*)},
 ```
@@ -334,7 +334,7 @@ TODO `print`ing this view gives
 ## Do atoms
 
 Further to the predicate atoms discussed above at [Atoms](#atoms), `do`-atoms are formed by using `do` like a predicate.
-For example, the following appears in [Example 90](/case_index/#e90_conda).
+For example, the following appears in [Example 90](../case_index.md#e90_conda).
 ```
 {do(Buy(Video()*)),~do(Buy(Video()))}
 ```
