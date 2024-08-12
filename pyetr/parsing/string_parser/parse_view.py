@@ -198,11 +198,11 @@ def parse_do_atom(
     new_open_terms_sets = merge_atoms_with_opens(atoms, open_atom_sets)
 
     open_do_atoms = [
-        (t, OpenDoAtom(atoms=set(open_atoms), polarity=atom.polarity))
+        (t, OpenDoAtom(atoms=open_atoms, polarity=atom.polarity))
         for t, open_atoms in new_open_terms_sets
     ]
 
-    return DoAtom(polarity=atom.polarity, atoms=set(atoms)), open_do_atoms
+    return DoAtom(polarity=atom.polarity, atoms=atoms), open_do_atoms
 
 
 def parse_state(

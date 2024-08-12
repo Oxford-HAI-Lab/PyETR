@@ -1,3 +1,5 @@
+from typing import Collection
+
 from .abstract import Atom, OpenAtom
 from .atom_likes import DoAtomLike
 from .doatom import DoAtom
@@ -7,8 +9,8 @@ from .terms import ArbitraryObject, Term
 
 
 def set_context_equals(
-    open_atom_set: set[OpenPredicateAtom],
-    pred_atom_set: set[PredicateAtom],
+    open_atom_set: Collection[OpenPredicateAtom],
+    pred_atom_set: Collection[PredicateAtom],
     question_term: "Term",
 ) -> bool:
     if len(open_atom_set) != len(pred_atom_set):
@@ -28,13 +30,13 @@ def set_context_equals(
 
 class OpenDoAtom(DoAtomLike[OpenPredicateAtom], OpenAtom):
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenDoAtom":
-        return OpenDoAtom({atom.replace(replacements) for atom in self.atoms})
+        return OpenDoAtom([atom.replace(replacements) for atom in self.atoms])
 
     def __invert__(self) -> "OpenDoAtom":
         return OpenDoAtom(self.atoms, not self.polarity)
 
     def __call__(self, term: Term) -> DoAtom:
-        return DoAtom(atoms={atom(term) for atom in self.atoms})
+        return DoAtom(atoms=[atom(term) for atom in self.atoms])
 
     def question_count(self) -> int:
         question_count = 0

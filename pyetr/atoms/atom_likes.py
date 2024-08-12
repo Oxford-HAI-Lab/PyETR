@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Generic, Iterable, TypeVar
 
 from .abstract import AbstractAtom
 from .predicate import Predicate
@@ -58,7 +58,7 @@ class DoAtomLike(Generic[AtomType]):
     atoms: set[AtomType]
     polarity: bool
 
-    def __init__(self, atoms: set[AtomType], polarity: bool = True) -> None:
+    def __init__(self, atoms: Iterable[AtomType], polarity: bool = True) -> None:
         self.atoms = set(atoms)
         self.polarity = polarity
 
