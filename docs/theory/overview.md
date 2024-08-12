@@ -14,6 +14,43 @@ The extra content can be seen as 'inquisitiveness' about certain topics.
 The central hypothesis of ETR is that the goal of reasoning is to resolve inquisitiveness.
 Moreover, it is hypothesized that failures of reasoning, relative to formal standards of rationality, arise from this tendency and that failure can be averted by explicitly enforcing a certain amount of inquisitiveness.
 
+## Looking at a view
+
+For concreteness, let us study a view from [Example 56](case_index/e56_default_inference). Once you have set up PyETR you can inspect the provided examples as follows.
+```
+>>> from pyetr.cases import e56_default_inference
+>>> v = e56_default_inference.v[1]
+>>> v
+∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
+```
+Lines beginning `>>>` are user input and other lines are Python output.
+Here we have imported one of the views from Example 56 of R&I and given it the name `v`.
+Then asking Python for `v` causes a string representation of `v` to be printed.
+
+!!! warning
+    There are several formats that can be used for 'printing' views in PyETR. The default one is chosen for convenience of reading and writing, rather than a perfect match to the notation used in R&I.
+
+!!! info
+    Instead of importing the example, you could copy and paste any string given as an output like this
+    ```
+    >>> from pyetr import View
+    >>> v = View.from_str("∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}")
+    >>> v
+    ∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
+    ```
+
+Asking Python for `v` is equivalent to the following
+```
+>>> print(v.to_str())
+∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
+```
+Aside from `to_str()`, another way to render a view is `base`.
+```
+>>> print(v.base)
+{Student(z)Reads(z,w)Book(w)}^{Student(z)} issues={(z,Student(?))} U={z} E={w} deps=z{w}
+```
+This is provided to give a close match to the notation and theoretical structure of views provided in R&I. It should not be necessary to use `base` to follow calculations, as all relevant information is encoded in the `to_str()` representation, but it may be helpful for learning to connect the concrete `to_str()` syntax with the abstract structures of R&I.
+
 ## Anatomy of a view
 
 A view consists of four main parts.
@@ -23,41 +60,98 @@ A view consists of four main parts.
 - Dependency Relation
 - Issue Structure
 
-For concreteness, let us study a view from [Example 56](case_index/e56_default_inference). Once you have set up PyETR you can inspect the provided examples as follows.
-```
->>> from pyetr.cases import e56_default_inference
->>> v = e56_default_inference.v[1]
->>> print(v)
-∀z ∃w {Student(z)Reads(z,w)Book(w)}^{Student(z)} issues=IssueStructure({(z, Student(?))}) deps=z{w}
-```
-!!! Todo
-    The dependency is a bit confusing??
+Let's see how these appear in the Python printout for our running example.
 
-Here we have imported a view `v` from Example 56 of R&I.
-The four main parts of the view are present as follows.
+In `v.to_str()`, the stage and the supposition appear with the issue structure mixed in as
+```
+{Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
+```
+where the `^` separates the stage on the left from the supposition on the right.
+(In R&I, the supposition is written as a superscript).
+The asterisks encode the issue structure and are not technically part of the stage or structure.
+This is made more clear with `v.base` where
+```
+{Student(z)Reads(z,w)Book(w)}^{Student(z)} issues={(z,Student(?))}
+```
+shows the stage and supposition in the same format but without asterisks, and the issue structure given separately.
+The issue structure tells us that `z` is at issue for being a `Student`.
 
-```
-{Student(z)Reads(z,w)Book(w)}
-```
-is a rendering of the stage, and we can see it as the main logical content of the view `v`. It asserts a conjunction of atomic propositions corresponding to '`z` is a student', '`w` is a book', and '`z` reads `w`'.
-Every view has a stage.
+!!! info
+    For this view, the issue structure contains only a single item, which is clear from `v.base` but less so from `v.to_str()`.
+    This is because issues are not local to particular positions in the stage or supposition, but apply globally to a view
+    We will discuss this further in [TODO].
+    This is one advantage to the more verbose `base` representation.
 
+Finally, the dependency relation is determined by the prefix
 ```
-^{Student(z)}
+∀z ∃w
 ```
-is a rendering of the supposition, indicated with a `^` on the right of the stage. Suppositions are optional. The presence supposition indicates that belief in the stage is actually conditional on the truth of the supposition, in this case, the supposition indicates that the belief about all `z`'s reading a book is restricted to those `z`'s which are students.
+in the case of `v.to_str()` and the suffix
+```
+U={z} E={w} deps=z{w}
+```
+in the case of `v.base`.
+The latter tells us that the view contains the arbitrary objects `z` and `w`, with `z` being universal and `w` being existential.
+In ETR, existential objects can depend on universals, and so the `deps` part tells us that the set of existentials depending on `z` is just the set `w`, i.e. that the only dependency is that of `w` on `z`.
 
-The dependency relation is displayed in the parts
-```
-∀z ∃w ... deps=z{w}
-```
-The beginning of the dependency relation tells us which terms appearing in the view are *arbitrary objects*, and further more which are *universal arbitrary objects* (indicated by ∀, analogous to universally quantified bound variables) and which are *existential arbitrary objects* (indicated by ∃, analogous to existentially quantified bound variables). In ETR, existential arbitrary objects can *depend* on universal arbitrary objects. This is indicated by the last part: `z{w}` tells us that the set of existentials depending on the universal `z` consists of just `w`. In the case of the view `v`, the view refers to students universally and asserts the existence of a book that *depends* on that student. This distinguishes it from a view which asserts that there is at least one book that all students read. For convenience, the dependencies are also displayed in the initial part of the printout: by the fact that `∃w` is to the right of `∀z` we see that `w` depends on `z`.
+The `to_str()` representation contains the same information in a condensed form.
+We can see the ∀ (for all) and ∃ (there exists) quantifier symbols attached to each arbitrary object tell us whether they are universal or existential repsectively.
+The dependencies are encoded in the order that the variables are listed: because the existential `w` is to the right of the universal `z`, `w` must depend on `z`.
 
-The issue structure is displayed as
-```
-issues=IssueStructure({(z, Student(?))})
-```
-Issue structures are optional, and have no effect on the logical reading of a view. This issue structure tells us that "`z` is at issue for being a student". This has significance for several view operations whose implementation is guided by issue structures.
+!!! info
+    The dependency relations of ETR are in one-to-one correspondence with strings of first-order quantifiers *up to reordering of similar quantifiers*.
+    This justifies the use of the quantifier string as a convenient notation for dependency relations.
+    The key caveat is that in a chain of quantifiers of the same type, e.g. `∃a ∃b ∃c`, there is no significance at all to the ordering of `a`, `b`, and `c`: effectively an order is just chosen arbitrarily in order to print out a string.
+    Another way to say this is that in first-order logic, permuting such strings of quantifiers preserves logical equivalence, but in ETR it actually preserves the equality class of the view.
 
+## States and weights
 
-TODO: weights, multiple states, view operations, default reasoning.
+In the example above, the stage appeared as sequence of three 'atoms': `Student(z)`, `Reads(z,w)`, `Book(w)`.
+Intuitively, this is a conjunction ('and') of the three atomic propositions.
+Really, a stage is a comma-separated set of *states*, each of which is a set of *atoms*.
+Each state is intuitively a conjunction of its constituent atoms, and the stage is intuitively a disjunction ('or') of its constituent states.
+The order of atoms within a state, and the order of states within the stage, have no significance.
+Furthermore, each state in the stage can carry an optional 'multiplicative' weight and/or 'additive weight'.
+
+Let us consider another example from [Example 69](../case_index.md#e69_part1).
+```
+>>> from pyetr.cases import e69_part1
+>>> v2 = e69_part1.v[1]
+>>> v2
+{0.000001=* ~Guilty(Suspect())Match(Suspect()),~Guilty(Suspect())~Match(Suspect())}^{~Guilty(Suspect())}
+```
+Here the stage consists of two states (because there is one comma).
+Each state consists of two atoms, but the first (in the arbitrary printed order) state has a multiplicative weight of `0.000001`, as indicated by the `0.000001=*` prefix.
+
+The supposition of a view is also set of states, but states in a supposition do not carry weights.
+Most commonly, the supposition consists of a single empty state, in which case we omit the supposition in notation.
+Next most typically the supposition is a single state with a single atom, occasionally it is a single state with more than one atom, and only very rarely will it have a different number of states.
+
+## Operations and inference procedures
+
+Once we have a view, reasoning consists in changes to that view, possibly in light of new information.
+In ETR, changes to the current view are effected by a basic set of *operations*, each of which acts on the current view in light of a second view.
+The second view is sometimes either new or recalled information, though often it does not stand for its logical content.
+
+View operations can be referenced in their own [index](../view_methods.md).
+As an example, perhaps the most useful operation is [update](../view_methods.md#update), used as follows.
+```
+>>> from pyetr import View
+>>> v2 = View.from_str("{Man(Socrates()*)}")
+>>> v3 = View.from_str("Ax {Mortal(x)}^{Man(x*)}")
+>>> v2.update(v3)
+{Mortal(Socrates())Man(Socrates()*)}
+```
+
+In ETR, the capacity for reasoning is constrained by the limited set of view operations, and the process of reasoning consists in following procedures that chain together these basic operations rather than apply single basic operations.
+A few built-in inference procedures are listed in an [index](../inference_index.md).
+For example, the default inference procedure for "what if anything follows?" questions can be used as follows.
+```
+>>> from pyetr import View
+>>> from pyetr.inference import default_inference_procedure
+>>> v2 = View.from_str("{Man(Socrates()*)}")
+>>> v3 = View.from_str("Ax {Mortal(x)}^{Man(x*)}")
+>>> default_inference_procedure([v2,v3])
+{Mortal(Socrates())}
+```
+The `default_inference_procedure` internally uses the `update` operation, but chains it with other operations to produce a conclusion with only novel contents.
