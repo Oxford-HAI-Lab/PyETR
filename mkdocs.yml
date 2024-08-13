@@ -2,7 +2,6 @@ site_name: PyETR
 
 nav:
   - 'Home': 'index.md'
-  - 'Introduction': 'introduction.md'
   - 'Theory' :
     - 'Overview' : 'theory/overview.md'
     - 'Systems from R&I' : 'theory/systems.md'
