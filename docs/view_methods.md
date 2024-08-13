@@ -239,7 +239,7 @@ Below you'll find all of the methods of View, including associated operations an
             I Case: Γ^Θ_fRI[Δ^{0}_gSJ]ˢ = Γ^(Θ⨂Δ)_fRI[Δ^{0}_gSJ]ᵁ[Δ^{0}_gSJ]ᴱ[Δ^{0}_gSJ]ᴬ[Δ^{0}_gSJ]ᴹ
 
         Else:
-            Γ^Θ_fRI[Δ^Ψ_gSJ]ᴵ = Γ^Θ_fRI
+            Γ^Θ_fRI[Δ^Ψ_gSJ]ˢ = Γ^Θ_fRI
 
         Args:
             self: (View): Γ^Θ_fRI

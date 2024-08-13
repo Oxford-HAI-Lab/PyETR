@@ -3,7 +3,7 @@
 Below you'll find all of the cases in pyetr.cases, and their associated views. You can use this page as an index of the current cases.
 
 ## e1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L391)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L394)
 
 
 ```
@@ -16,7 +16,7 @@ description:
     C Jane is looking at the TV.
     
 v (Views): (
-   {LookingAtTV(Jane())KneelingByTheFire(Jane()),PeeringIntoTheGarden(Mark())StandingAtTheWindow(Mark())},
+   {KneelingByTheFire(Jane())LookingAtTV(Jane()),PeeringIntoTheGarden(Mark())StandingAtTheWindow(Mark())},
    {KneelingByTheFire(Jane())}
 )
 c (Conclusion): {LookingAtTV(Jane())}
@@ -24,7 +24,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L410)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L413)
 
 
 ```
@@ -36,7 +36,7 @@ description:
     C There is a ten.
     
 v (Views): (
-   {T()K(),Q()A()},
+   {T()K(),A()Q()},
    {K()}
 )
 c (Conclusion): {T()}
@@ -44,7 +44,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e3
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L426)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L429)
 
 
 ```
@@ -57,15 +57,15 @@ description:
     C There is a queen and a jack.
     
 v (Views): (
-   {King()Ace(),Jack()Queen()},
+   {King()Ace(),Queen()Jack()},
    {~Ace()}
 )
-c (Conclusion): {Jack()Queen()}
+c (Conclusion): {Queen()Jack()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e5ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L453)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L456)
 
 
 ```
@@ -73,15 +73,15 @@ description:
     Example 5, p72, part ii
     
 v (Views): (
-   {r1()s1(),q1()p1()},
-   {q2()p2(),s2()r2()}
+   {s1()r1(),q1()p1()},
+   {p2()q2(),s2()r2()}
 )
-c (Conclusion): {q2()p2()r1()s1(),s2()r1()r2()s1(),s2()q1()r2()p1(),q2()p2()q1()p1()}
+c (Conclusion): {r1()s1()p2()q2(),s1()r1()s2()r2(),q1()p1()s2()r2(),q1()p2()p1()q2()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e5iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L467)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L470)
 
 
 ```
@@ -89,7 +89,7 @@ description:
     Example 5, p72, part iii
     
 v (Views): (
-   {q1()p1(),r1()s1()},
+   {q1()p1(),s1()r1()},
    {}
 )
 c (Conclusion): {}
@@ -97,7 +97,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e5iv
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L479)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L482)
 
 
 ```
@@ -105,15 +105,15 @@ description:
     Example 5, p72, part iv
     
 v (Views): (
-   {q1()p1(),r1()s1()},
+   {q1()p1(),s1()r1()},
    {0}
 )
-c (Conclusion): {q1()p1(),r1()s1()}
+c (Conclusion): {q1()p1(),s1()r1()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e5v
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L491)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L494)
 
 
 ```
@@ -122,14 +122,14 @@ description:
     
 v (Views): (
    {0},
-   {q1()p1(),r1()s1()}
+   {q1()p1(),s1()r1()}
 )
-c (Conclusion): {q1()p1(),r1()s1()}
+c (Conclusion): {q1()p1(),s1()r1()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e6
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L503)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L506)
 
 
 ```
@@ -142,12 +142,12 @@ v (Views): (
    {a()},
    {k()}
 )
-c (Conclusion): {k()a()}
+c (Conclusion): {a()k()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e7
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L514)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L517)
 
 
 ```
@@ -165,7 +165,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e8
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L525)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L528)
 
 
 ```
@@ -178,7 +178,7 @@ description:
     C There is a ten (and a king)
     
 v (Views): (
-   {k()t(),q()a()},
+   {t()k(),a()q()},
    {k()}
 )
 c (Conclusion): {t()}
@@ -186,7 +186,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e10
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L539)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L542)
 
 
 ```
@@ -199,14 +199,14 @@ description:
     
 v (Views): (
    {K(x())},
-   {T(w())K(z()),A(x())Q(y())}
+   {T(w())K(z()),Q(y())A(x())}
 )
 c (Conclusion): {0}
 test(verbose=False): Method used to test the example
 ```
 
 ## e11
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L555)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L558)
 
 
 ```
@@ -223,12 +223,12 @@ v (Views): (
    {Drinks(j())}^{Smokes(j())},
    {Eats(m())}^{Smokes(m())}
 )
-c (Conclusion): {Smokes(j())Drinks(j()),Smokes(m())Eats(m())}
+c (Conclusion): {Drinks(j())Smokes(j()),Smokes(m())Eats(m())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e12i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L573)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L576)
 
 
 ```
@@ -245,7 +245,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e12ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L584)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L587)
 
 
 ```
@@ -255,14 +255,14 @@ description:
     ItisnotthecasethatPandQandR
     
 v (Views): (
-   {P()Q()R()}
+   {P()R()Q()}
 )
 c (Conclusion): {~R(),~P(),~Q()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e12iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L595)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L598)
 
 
 ```
@@ -274,12 +274,12 @@ description:
 v (Views): (
    {P()Q(),R()}^{S()}
 )
-c (Conclusion): {~P()S()~R(),~Q()S()~R()}
+c (Conclusion): {S()~P()~R(),~Q()S()~R()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e13
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L606)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L609)
 
 
 ```
@@ -291,7 +291,7 @@ description:
     C There is a queen and a jack.
     
 v (Views): (
-   {IsQueen()IsJack(),IsKing()IsAce()},
+   {IsQueen()IsJack(),IsAce()IsKing()},
    {~IsAce()}
 )
 c (Conclusion): {IsQueen()IsJack()}
@@ -299,7 +299,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L622)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L625)
 
 
 ```
@@ -317,7 +317,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L636)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L639)
 
 
 ```
@@ -327,15 +327,15 @@ description:
     Factor examples
     
 v (Views): (
-   {P()R(),P()S()R(),P()Q()S()},
+   {P()R(),P()R()S(),P()S()Q()},
    {P()}^{S()}
 )
-c (Conclusion): {Q()S(),P()R(),S()R()}
+c (Conclusion): {S()Q(),P()R(),R()S()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e14_3
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L650)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L653)
 
 
 ```
@@ -345,7 +345,7 @@ description:
     Factor examples
     
 v (Views): (
-   {P()S(),Q()S(),P()R(),Q()R()},
+   {P()S(),S()Q(),P()R(),R()Q()},
    {P(),Q()}
 )
 c (Conclusion): {S(),R()}
@@ -353,7 +353,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_6
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L664)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L667)
 
 
 ```
@@ -363,15 +363,15 @@ description:
     Factor examples
     
 v (Views): (
-   {Q()S(),P()R()},
+   {S()Q(),P()R()},
    {T(),P(),Q()}
 )
-c (Conclusion): {Q()S(),P()R()}
+c (Conclusion): {S()Q(),P()R()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e14_7
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L678)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L681)
 
 
 ```
@@ -381,7 +381,7 @@ description:
     Factor examples
     
 v (Views): (
-   {Q()S(),P()R(),P()},
+   {S()Q(),P()R(),P()},
    {P(),Q()}
 )
 c (Conclusion): {0,S(),R()}
@@ -389,7 +389,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e15
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L692)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L695)
 
 
 ```
@@ -402,8 +402,8 @@ description:
     C There is a four
     
 v (Views): (
-   {Ace(),Ace()Jack()Queen(),Eight()Four()Ten()},
-   {Ace()Jack()Eight()Ten()},
+   {Ace(),Queen()Jack()Ace(),Four()Eight()Ten()},
+   {Jack()Eight()Ace()Ten()},
    {~Queen()}
 )
 c (Conclusion): {Four()}
@@ -411,7 +411,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e16
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L710)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L713)
 
 
 ```
@@ -423,16 +423,16 @@ description:
     P3 There isn't an ace.
     
 v (Views): (
-   {King()Jack()Queen(),Ace(),Eight()Four()Ten()},
+   {Queen()King()Jack(),Ace(),Four()Eight()Ten()},
    {~Four()},
    {~Ace()}
 )
-c (Conclusion): {King()Jack()Queen()}
+c (Conclusion): {Queen()King()Jack()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e17
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L727)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L730)
 
 
 ```
@@ -444,7 +444,7 @@ description:
     C There isn't an ace in the hand.
     
 v (Views): (
-   {Ace()~King(),King()~Ace()},
+   {~King()Ace(),King()~Ace()},
    {King()}
 )
 c (Conclusion): {~Ace()}
@@ -452,7 +452,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e19
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L743)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L746)
 
 
 ```
@@ -470,7 +470,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e20
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L757)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L760)
 
 
 ```
@@ -492,7 +492,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e21
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L775)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L778)
 
 
 ```
@@ -502,14 +502,14 @@ description:
     Any view Δ^{0} = [Δ^{0}]ᶰ can be derived from the absurd view
     
 v (Views): (
-   {r1()s1()}
+   {s1()r1()}
 )
 c (Conclusion): {~r1(),~s1()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e22
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L793)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L796)
 
 
 ```
@@ -519,20 +519,20 @@ description:
     It is not the case that A and B and C
     
 v (Views): (
-   {a()c()b()},
+   {b()a()c()},
    {a()},
    {b()},
    {c()}
 )
 c (Conclusion): (
    {~c(),~b(),~a()},
-   {~c()a()~b(),~c()~a()~b(),~c()b()~a(),~c()a()b(),a()c()~b(),b()~a()c(),c()~a()~b()}
+   {a()~c()~b(),~c()~b()~a(),b()~c()~a(),b()a()~c(),c()a()~b(),b()c()~a(),c()~b()~a()}
 )
 test(verbose=False): Method used to test the example
 ```
 
 ## e23_with_inquire
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L832)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L835)
 
 
 ```
@@ -550,14 +550,14 @@ v (Views): (
    {K()}
 )
 c (Conclusion): (
-   {P()S()~K(),L()K(),P()S()K()},
+   {P()~K()S(),L()K(),P()S()K()},
    {L()K(),P()S()K()}
 )
 test(verbose=False): Method used to test the example
 ```
 
 ## e23_without_inquire
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L868)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L871)
 
 
 ```
@@ -582,7 +582,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e24
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L900)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L903)
 
 
 ```
@@ -599,14 +599,14 @@ v (Views): (
    {a(),q()}
 )
 c (Conclusion): (
-   {a()~q(),q()a()},
+   {a()~q(),a()q()},
    {a(),q()}
 )
 test(verbose=False): Method used to test the example
 ```
 
 ## e25i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L933)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L936)
 
 
 ```
@@ -614,7 +614,7 @@ description:
     Example 25i, p89
     
 v (Views): (
-   {r()p(),q()p()},
+   {p()r(),p()q()},
    {p()}
 )
 c (Conclusion): {p()}
@@ -622,7 +622,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L942)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L945)
 
 
 ```
@@ -630,7 +630,7 @@ description:
     Example 25ii, p89
     
 v (Views): (
-   {r()p(),q()p()},
+   {p()r(),p()q()},
    {q()}
 )
 c (Conclusion): {0,q()}
@@ -638,7 +638,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L951)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L954)
 
 
 ```
@@ -646,7 +646,7 @@ description:
     Example 25iii, p89
     
 v (Views): (
-   {t(),r()p(),q()p(),s()},
+   {t(),p()r(),p()q(),s()},
    {p(),s()}
 )
 c (Conclusion): {0,p(),s()}
@@ -654,7 +654,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25iv
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L963)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L966)
 
 
 ```
@@ -662,7 +662,7 @@ description:
     Example 25iv, p89
     
 v (Views): (
-   {t(),r()p(),q()p(),s()},
+   {t(),p()r(),p()q(),s()},
    {t(),p(),s()}
 )
 c (Conclusion): {t(),p(),s()}
@@ -670,7 +670,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25v
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L975)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L978)
 
 
 ```
@@ -678,7 +678,7 @@ description:
     Example 25v, p89
     
 v (Views): (
-   {q()s()p(),r()s()p()},
+   {s()p()q(),s()p()r()},
    {p()}^{s()}
 )
 c (Conclusion): {p()}
@@ -686,7 +686,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25vi
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L987)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L990)
 
 
 ```
@@ -694,7 +694,7 @@ description:
     Example 25vi, p89
     
 v (Views): (
-   {q()s()p(),r()s()p()},
+   {s()p()q(),s()p()r()},
    {p()}^{t()}
 )
 c (Conclusion): {0}
@@ -702,7 +702,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e26
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L999)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1002)
 
 
 ```
@@ -713,36 +713,36 @@ description:
     C Supposing John plays, John wins
     
 v (Views): (
-   {Win(J())Play(J()),Play(B()),Play(M())},
+   {Play(J())Win(J()),Play(B()),Play(M())},
    {Play(J())},
    {Win(J())}^{Play(J())}
 )
 c (Conclusion): (
-   {Win(J())Play(J())}^{Play(J())},
+   {Play(J())Win(J())}^{Play(J())},
    {Win(J())}^{Play(J())}
 )
 test(verbose=False): Method used to test the example
 ```
 
 ## e26_does_it_follow
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1032)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1035)
 
 
 ```
 v (Views): (
-   {Win(J())Play(J()),Play(B()),Play(M())},
+   {Play(J())Win(J()),Play(B()),Play(M())},
    {Play(J())},
    {Win(J())}^{Play(J())}
 )
 c (Conclusion): (
-   {Win(J())Play(J())}^{Play(J())},
+   {Play(J())Win(J())}^{Play(J())},
    {Win(J())}^{Play(J())}
 )
 test(verbose=False): Method used to test the example
 ```
 
 ## e28
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1043)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1046)
 
 
 ```
@@ -764,7 +764,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e32_1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1061)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1064)
 
 
 ```
@@ -784,7 +784,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e32_2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1077)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1080)
 
 
 ```
@@ -804,7 +804,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e33
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1093)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1096)
 
 
 ```
@@ -816,7 +816,7 @@ description:
     C The card is red
     
 v (Views): (
-   {E()R()}^{R()},
+   {R()E()}^{R()},
    {E()}
 )
 c (Conclusion): {R()}
@@ -824,7 +824,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e40i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1109)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1112)
 
 
 ```
@@ -838,7 +838,7 @@ description:
     C Falsum
     
 v (Views): (
-   {SquareB()~CircleB()~TriangleB(),~SquareB()~TriangleB()CircleB(),TriangleB()~CircleB()~SquareB()},
+   {SquareB()~CircleB()~TriangleB(),~SquareB()CircleB()~TriangleB(),TriangleB()~SquareB()~CircleB()},
    {SquareB()CircleT()}^{CircleT()},
    {TriangleB()}
 )
@@ -847,7 +847,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e40ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1142)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1145)
 
 
 ```
@@ -865,16 +865,16 @@ description:
     order.
     
 v (Views): (
-   {SquareB()~CircleB()~TriangleB(),~SquareB()~TriangleB()CircleB(),TriangleB()~CircleB()~SquareB()},
+   {SquareB()~CircleB()~TriangleB(),~SquareB()CircleB()~TriangleB(),TriangleB()~SquareB()~CircleB()},
    {TriangleB()},
    {SquareB()CircleT()}^{CircleT()}
 )
-c (Conclusion): {~CircleT()TriangleB()~CircleB()~SquareB()}
+c (Conclusion): {TriangleB()~CircleT()~SquareB()~CircleB()}
 test(verbose=False): Method used to test the example
 ```
 
 ## e41
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1179)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1182)
 
 
 ```
@@ -894,7 +894,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e42
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1195)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1198)
 
 
 ```
@@ -915,7 +915,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e44_1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1215)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1218)
 
 
 ```
@@ -928,16 +928,16 @@ description:
     C The chair is saleable elegant and stable.
     
 v (Views): (
-   {Elegant(c())Saleable(c()),~Elegant(c())~Saleable(c())},
-   {~Elegant(c())~Stable(c()),Elegant(c())Stable(c())},
-   {Elegant(c())Saleable(c()),Stable(c()),Saleable(c())}
+   {Saleable(c())Elegant(c()),~Saleable(c())~Elegant(c())},
+   {~Stable(c())~Elegant(c()),Elegant(c())Stable(c())},
+   {Saleable(c())Elegant(c()),Stable(c()),Saleable(c())}
 )
-c (Conclusion): {Elegant(c())Saleable(c())Stable(c())}
+c (Conclusion): {Saleable(c())Elegant(c())Stable(c())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e45
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1233)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1236)
 
 
 ```
@@ -951,17 +951,17 @@ description:
 v (Views): (
    {0,M()},
    {0,B()},
-   {0,M()B()}
+   {0,B()M()}
 )
 c (Conclusion): (
-   {0,M(),B(),M()B()},
-   {0,M()B()}
+   {0,M(),B(),B()M()},
+   {0,B()M()}
 )
 test(verbose=False): Method used to test the example
 ```
 
 ## e46i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1260)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1263)
 
 
 ```
@@ -986,7 +986,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e46ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1297)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1300)
 
 
 ```
@@ -996,7 +996,7 @@ description:
     If we had a view{VMR,VMS, T} and applied [{vm, 0}]Q we would get [{vm, 0}]
     
 v (Views): (
-   {M()V()S(),M()V()R(),T()},
+   {M()S()V(),R()M()V(),T()},
    {0,M()V()}
 )
 c (Conclusion): {0,M()V()}
@@ -1004,7 +1004,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e47
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1311)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1314)
 
 
 ```
@@ -1025,7 +1025,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e48
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1328)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1331)
 
 
 ```
@@ -1045,7 +1045,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e49
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1344)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1347)
 
 
 ```
@@ -1058,7 +1058,7 @@ description:
     C Truth
     
 v (Views): (
-   ∃x ∃y {Ace(Mary())King(x),Queen(John())Jack(y)},
+   ∃y ∃x {Ace(Mary())King(x),Jack(y)Queen(John())},
    {King(Sally())}
 )
 c (Conclusion): {0}
@@ -1066,7 +1066,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e50_part1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1361)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1364)
 
 
 ```
@@ -1084,17 +1084,17 @@ v (Views): (
    {L(j(),s())L(s(),g())},
    {~M(g()*)M(j()*)},
    {},
-   ∃a ∃b {~M(b*)M(a*)L(a,b)}
+   ∃a ∃b {L(a,b)~M(b*)M(a*)}
 )
 c (Conclusion): (
-   {~M(g()*)L(j(),s())M(j()*)L(s(),g())},
+   {L(j(),s())L(s(),g())~M(g()*)M(j()*)},
    {0}
 )
 test(verbose=False): Method used to test the example
 ```
 
 ## e50_part2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1398)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1401)
 
 
 ```
@@ -1112,16 +1112,16 @@ v (Views): (
    {L(j(),s())L(s(),g())},
    {~M(g())M(j())},
    {M(s())},
-   ∃a ∃b {~M(b*)M(a*)L(a,b)}
+   ∃a ∃b {L(a,b)~M(b*)M(a*)}
 )
-c (Conclusion): ∃a ∃b {~M(b*)M(a*)L(a,b)}
-g1 (Another View): {L(j(),s())~M(g())L(s(),g())M(s())M(j()),~M(s())L(j(),s())~M(g())L(s(),g())M(j())}
-g2 (Another View): {L(j(),s())~M(g()*)L(s(),g())M(s())M(j()*),~M(s()*)L(j(),s())~M(g()*)L(s(),g())M(j()*)}
+c (Conclusion): ∃a ∃b {L(a,b)~M(b*)M(a*)}
+g1 (Another View): {~M(g())L(s(),g())M(j())L(j(),s())M(s()),~M(s())~M(g())L(s(),g())M(j())L(j(),s())}
+g2 (Another View): {~M(g()*)L(s(),g())M(j()*)L(j(),s())M(s()),~M(s()*)~M(g()*)L(s(),g())M(j()*)L(j(),s())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e50_part2_arbs
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1443)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1446)
 
 
 ```
@@ -1129,18 +1129,18 @@ description:
     Duplicate of e50, uses arb objects, some changes
     
 v (Views): (
-   ∃j ∃g ∃s {L(j,s)~M(g)L(s,g)M(j)},
+   ∃g ∃j ∃s {L(s,g)~M(g)L(j,s)M(j)},
    ∃s {M(s)},
-   ∃a ∃b {~M(b*)M(a*)L(a,b)}
+   ∃a ∃b {L(a,b)~M(b*)M(a*)}
 )
-c (Conclusion): ∃a ∃b {~M(b*)M(a*)L(a,b)}
-g1 (Another View): ∃j ∃g ∃s {M(j)L(s,g)M(s)L(j,s)~M(g),M(j)L(s,g)L(j,s)~M(g)~M(s)}
-g2 (Another View): ∃j ∃g ∃s {M(j*)L(s,g)M(s)L(j,s)~M(g*),M(j*)L(s,g)L(j,s)~M(g*)~M(s*)}
+c (Conclusion): ∃a ∃b {L(a,b)~M(b*)M(a*)}
+g1 (Another View): ∃g ∃j ∃s {L(j,s)~M(g)M(s)M(j)L(s,g),L(j,s)~M(g)M(j)L(s,g)~M(s)}
+g2 (Another View): ∃g ∃j ∃s {L(j,s)~M(g*)M(s)M(j*)L(s,g),L(j,s)~M(g*)M(j*)L(s,g)~M(s*)}
 test(verbose=False): Method used to test the example
 ```
 
 ## e51
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1474)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1477)
 
 
 ```
@@ -1153,7 +1153,7 @@ description:
     C: Halobacterium is an archaeon and has a nucleus
     
 v (Views): (
-   ∀x {IsArchaeon(x*)HasNucleus(x)}^{IsArchaeon(x*)},
+   ∀x {HasNucleus(x)IsArchaeon(x*)}^{IsArchaeon(x*)},
    {IsArchaeon(Halobacterium()*)}
 )
 c (Conclusion): {IsArchaeon(Halobacterium()*)HasNucleus(Halobacterium())}
@@ -1161,7 +1161,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e52
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1491)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1494)
 
 
 ```
@@ -1173,15 +1173,15 @@ description:
     C John Fs and Gs.
     
 v (Views): (
-   ∀x {F(x)G(x*)}^{F(x)},
+   ∀x {G(x*)F(x)}^{F(x)},
    {G(John()*)}
 )
-c (Conclusion): {F(John())G(John()*)}
+c (Conclusion): {G(John()*)F(John())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e53
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1507)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1510)
 
 
 ```
@@ -1200,8 +1200,22 @@ c (Conclusion): ∀x {A(x)B(x)}^{B(x)}
 test(verbose=False): Method used to test the example
 ```
 
+## e53_does_it_follow
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1537)
+
+
+```
+v (Views): (
+   ∀x {A(x)B(x)}^{A(x)},
+   ∀x {B(x)},
+   ∀x {A(x)B(x)}^{B(x)}
+)
+c (Conclusion): ∀x {A(x)B(x)}^{B(x)}
+test(verbose=False): Method used to test the example
+```
+
 ## e54
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1534)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1548)
 
 
 ```
@@ -1216,12 +1230,12 @@ v (Views): (
    ∀x {0,Shark(x*)Attack(x)}^{Shark(x*)},
    {Shark(Whitey()*)}
 )
-c (Conclusion): {Attack(Whitey())Shark(Whitey()*)}
+c (Conclusion): {Shark(Whitey()*)Attack(Whitey())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e56_default_inference
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1567)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1581)
 
 
 ```
@@ -1234,28 +1248,28 @@ description:
     C: Every professor teaches some student who reads some book
     
 v (Views): (
-   ∀x ∃y {Student(y*)Professor(x)Teaches(x,y)}^{Professor(x)},
-   ∀z ∃w {Reads(z,w)Student(z*)Book(w)}^{Student(z*)}
+   ∀x ∃y {Teaches(x,y)Student(y*)Professor(x)}^{Professor(x)},
+   ∀z ∃w {Student(z*)Book(w)Reads(z,w)}^{Student(z*)}
 )
-c (Conclusion): ∃y ∃b {0,Reads(y,b)Book(b)}
+c (Conclusion): ∃y ∃b {0,Book(b)Reads(y,b)}
 test(verbose=False): Method used to test the example
 ```
 
 ## e56_basic_step
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1584)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1598)
 
 
 ```
 v (Views): (
-   ∀x ∃y {Student(y*)Professor(x)Teaches(x,y)}^{Professor(x)},
-   ∀z ∃w {Reads(z,w)Student(z*)Book(w)}^{Student(z*)}
+   ∀x ∃y {Teaches(x,y)Student(y*)Professor(x)}^{Professor(x)},
+   ∀z ∃w {Student(z*)Book(w)Reads(z,w)}^{Student(z*)}
 )
-c (Conclusion): ∀a ∃b ∃c {Professor(a)Student(b*)Book(c)Teaches(a,b)Reads(b,c),~Professor(a)}
+c (Conclusion): ∀a ∃c ∃b {Book(c)Student(b*)Reads(b,c)Teaches(a,b)Professor(a),~Professor(a)}
 test(verbose=False): Method used to test the example
 ```
 
 ## e57
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1590)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1604)
 
 
 ```
@@ -1268,14 +1282,14 @@ description:
     
 v (Views): (
    ∀x {A(x)B(x*)}^{B(x*)},
-   ∃x {C(x)B(x*)}
+   ∃x {B(x*)C(x)}
 )
-c (Conclusion): ∃y {B(y*)C(y)A(y)}
+c (Conclusion): ∃y {C(y)A(y)B(y*)}
 test(verbose=False): Method used to test the example
 ```
 
 ## e58_reversed
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1606)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1620)
 
 
 ```
@@ -1287,15 +1301,15 @@ description:
     C Some C are A.
     
 v (Views): (
-   ∀y {B(y*)C(y)}^{C(y)},
+   ∀y {C(y)B(y*)}^{C(y)},
    ∃x {A(x)B(x*)}
 )
-c (Conclusion): ∃y {B(y*)C(y)A(y)}
+c (Conclusion): ∃y {C(y)A(y)B(y*)}
 test(verbose=False): Method used to test the example
 ```
 
 ## e61
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1622)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1636)
 
 
 ```
@@ -1307,15 +1321,15 @@ description:
     C All dogs bite John
     
 v (Views): (
-   ∀x ∃a {~D(x),M(a*)B(x,a)D(x)},
+   ∀x ∃a {~D(x),D(x)M(a*)B(x,a)},
    {M(j()*)}
 )
-c (Conclusion): ∀x ∃a {M(a*)B(x,a)D(x)M(j()*),~D(x)M(j()*)}
+c (Conclusion): ∀x ∃a {D(x)M(a*)M(j()*)B(x,a),~D(x)M(j()*)}
 test(verbose=False): Method used to test the example
 ```
 
 ## e62
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1635)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1649)
 
 
 ```
@@ -1323,7 +1337,7 @@ description:
     Example 62, p176
     
 v (Views): (
-   {L(n(),m())S(m()*),S(j()*)T(n())D(m()),~S(n()*)D(b())},
+   {S(m()*)L(n(),m()),D(m())T(n())S(j()*),~S(n()*)D(b())},
    ∃a {S(a*)}
 )
 c (Conclusion): {0,S(j()*),S(m()*)}
@@ -1331,7 +1345,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e63
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1647)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1661)
 
 
 ```
@@ -1339,7 +1353,7 @@ description:
     Example 63, p176
     
 v (Views): (
-   {S(j()*)D(n()*),~D(j()*)T(j())D(n()*)},
+   {D(n()*)S(j()*),D(n()*)T(j())~D(j()*)},
    ∃a {D(a*)}
 )
 c (Conclusion): {D(n()*)}
@@ -1347,7 +1361,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e63_modified
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1659)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1673)
 
 
 ```
@@ -1355,7 +1369,7 @@ description:
     Example 63, p176
     
 v (Views): (
-   ∀x ∃y {S(j()*)D(n()*),~D(j()*)T(j())D(f(y,x)*)},
+   ∀x ∃y {D(n()*)S(j()*),T(j())D(f(y,x)*)~D(j()*)},
    ∃a {D(a*)}
 )
 c (Conclusion): ∀x ∃y {D(n()*),D(f(y,x)*)}
@@ -1363,7 +1377,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e64i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1671)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1685)
 
 
 ```
@@ -1380,8 +1394,8 @@ description:
     What is the chance that he is in fact a sufferer?
     
 v (Views): (
-   ∀x {90.0=* S(x*)T(x*),S(x*)~T(x)}^{S(x*)},
-   ∀x {1.0=* T(x)~S(x*),~S(x*)~T(x)}^{~S(x*)},
+   ∀x {90.0=* T(x*)S(x*),S(x*)~T(x)}^{S(x*)},
+   ∀x {1.0=* T(x)~S(x*),~T(x)~S(x*)}^{~S(x*)},
    {T(Smith()*)},
    {S(Smith())}
 )
@@ -1390,14 +1404,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e64ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1703)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1717)
 
 
 ```
 v (Views): (
-   ∀x {90.0=* S(x*)T(x*)P(x),S(x*)~T(x)P(x)}^{S(x*)P(x)},
-   ∀x {1.0=* T(x)~S(x*)P(x),~T(x)~S(x*)P(x)}^{~S(x*)P(x)},
-   ∀x {1.0=* S(x*)P(x),~S(x)P(x)}^{P(x)},
+   ∀x {90.0=* P(x)T(x*)S(x*),P(x)S(x*)~T(x)}^{P(x)S(x*)},
+   ∀x {1.0=* P(x)T(x)~S(x*),P(x)~T(x)~S(x*)}^{P(x)~S(x*)},
+   ∀x {1.0=* P(x)S(x*),P(x)~S(x)}^{P(x)},
    {P(Smith())T(Smith()*)},
    {S(Smith())}
 )
@@ -1406,7 +1420,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e65
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1723)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1737)
 
 
 ```
@@ -1425,9 +1439,9 @@ description:
     the probability that this person actually has colorectal cancer?
     
 v (Views): (
-   ∀x {0.3=* C(x)P(x*),~C(x)P(x*)}^{P(x*)},
-   ∀x {50.0=* C(x)T(x)P(x*),~T(x)C(x)P(x*)}^{C(x)P(x*)},
-   ∀x {3.0=* T(x)~C(x)P(x*),~T(x)~C(x)P(x*)}^{~C(x)P(x*)},
+   ∀x {0.3=* P(x*)C(x),P(x*)~C(x)}^{P(x*)},
+   ∀x {50.0=* P(x*)T(x)C(x),P(x*)~T(x)C(x)}^{P(x*)C(x)},
+   ∀x {3.0=* P(x*)T(x)~C(x),P(x*)~T(x)~C(x)}^{P(x*)~C(x)},
    ∃a {P(a*)T(a)},
    ∃a {C(a)}
 )
@@ -1436,7 +1450,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e66i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1757)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1771)
 
 
 ```
@@ -1459,7 +1473,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e66ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1785)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1799)
 
 
 ```
@@ -1472,7 +1486,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e67
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1802)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1816)
 
 
 ```
@@ -1485,7 +1499,7 @@ description:
     a cat, or both, as youngsters.
     
 v (Views): (
-   {94.0=* HadPet()IsCEO(),~IsCEO()},
+   {94.0=* IsCEO()HadPet(),~IsCEO()},
    {HadPet()},
    {IsCEO()}
 )
@@ -1494,7 +1508,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e69_part1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1831)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1845)
 
 
 ```
@@ -1517,7 +1531,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e69_part2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1865)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1879)
 
 
 ```
@@ -1534,7 +1548,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e70
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1892)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1906)
 
 
 ```
@@ -1555,7 +1569,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e71
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1917)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1931)
 
 
 ```
@@ -1569,20 +1583,20 @@ description:
     In the box there is a yellow card and there is not a brown card
     
 v (Views): (
-   {B(yellow())~B(brown()),~B(yellow())B(brown())},
-   {50.0=* 0}^{B(yellow())~B(brown())},
-   {50.0=* 0}^{~B(yellow())B(brown())},
-   {B(yellow())~B(brown())}
+   {~B(brown())B(yellow()),B(brown())~B(yellow())},
+   {50.0=* 0}^{~B(brown())B(yellow())},
+   {50.0=* 0}^{B(brown())~B(yellow())},
+   {~B(brown())B(yellow())}
 )
 c (Conclusion): (
-   {50.0=* B(yellow())~B(brown()),50.0=* ~B(yellow())B(brown())},
-   {50.0=* B(yellow())~B(brown()),0}
+   {50.0=* ~B(brown())B(yellow()),50.0=* B(brown())~B(yellow())},
+   {50.0=* ~B(brown())B(yellow()),0}
 )
 test(verbose=False): Method used to test the example
 ```
 
 ## e72
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1954)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1968)
 
 
 ```
@@ -1597,21 +1611,21 @@ description:
     There is a red marble and a blue marble in the box?
     
 v (Views): (
-   {B(g())~B(r())B(b()),~B(g())B(r()),B(r())~B(b())},
-   {33.333333=* 0}^{B(g())~B(r())B(b())},
+   {~B(r())B(g())B(b()),~B(g())B(r()),~B(b())B(r())},
+   {33.333333=* 0}^{~B(r())B(g())B(b())},
    {33.333333=* 0}^{~B(g())B(r())},
-   {33.333333=* 0}^{B(r())~B(b())},
-   {B(r())B(b())}
+   {33.333333=* 0}^{~B(b())B(r())},
+   {B(b())B(r())}
 )
 c (Conclusion): (
-   {33.333333=* B(g())~B(r())B(b()),33.333333=* ~B(g())B(r()),33.333333=* B(r())~B(b())},
-   {33.333333=* B(r())B(b()),0}
+   {33.333333=* ~B(r())B(g())B(b()),33.333333=* ~B(g())B(r()),33.333333=* ~B(b())B(r())},
+   {33.333333=* B(b())B(r()),0}
 )
 test(verbose=False): Method used to test the example
 ```
 
 ## e74
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1998)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2012)
 
 
 ```
@@ -1623,18 +1637,18 @@ description:
 v (Views): (
    {D(j())H(j()),H(j()),P(j())},
    {E(j()*)},
-   ∀x {0.85=* D(x)E(x*),0.15=* ~D(x)E(x*)}^{E(x*)},
-   ∀x {0.1=* E(x*)H(x),0.9=* ~H(x)E(x*)}^{E(x*)}
+   ∀x {0.85=* E(x*)D(x),0.15=* E(x*)~D(x)}^{E(x*)},
+   ∀x {0.1=* H(x)E(x*),0.9=* ~H(x)E(x*)}^{E(x*)}
 )
 c (Conclusion): (
-   {0.085=* E(j()*)H(j())D(j()),0.765=* ~H(j())E(j()*)D(j()),0.015=* ~D(j())E(j()*)H(j()),0.135=* ~D(j())E(j()*)~H(j())},
+   {0.085=* D(j())H(j())E(j()*),0.765=* D(j())~H(j())E(j()*),0.015=* ~D(j())H(j())E(j()*),0.135=* ~D(j())~H(j())E(j()*)},
    {D(j())H(j())}
 )
 test(verbose=False): Method used to test the example
 ```
 
 ## e76
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2034)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2048)
 
 
 ```
@@ -1647,16 +1661,16 @@ description:
     tune?
     
 v (Views): (
-   {Guitar(j())Gun(i())Fired(i()*)Outoftune(j()),Attic(a())},
-   ∀x {Trigger(x)Gun(x)Fired(x*),0}^{Gun(x)Fired(x*)},
+   {Fired(i()*)Outoftune(j())Guitar(j())Gun(i()),Attic(a())},
+   ∀x {Gun(x)Fired(x*)Trigger(x),0}^{Gun(x)Fired(x*)},
    {Trigger(i())}
 )
-c (Conclusion): {Fired(i()*)Guitar(j())Trigger(i())Gun(i())Outoftune(j())}
+c (Conclusion): {Trigger(i())Gun(i())Fired(i()*)Outoftune(j())Guitar(j())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e81i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2076)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2090)
 
 
 ```
@@ -1670,7 +1684,7 @@ description:
     In the box there is a yellow card
     
 v (Views): (
-   {~Box(Brown())Box(Yellow()),Box(Brown())~Box(Yellow())}
+   {~Box(Brown())Box(Yellow()),~Box(Yellow())Box(Brown())}
 )
 c (Conclusion): {50.0=* Box(Yellow()),0}
 prob (Probability): {Box(Yellow())}
@@ -1678,7 +1692,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e81ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2086)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2100)
 
 
 ```
@@ -1692,15 +1706,15 @@ description:
     In the box there is a yellow card and a brown card
     
 v (Views): (
-   {~Box(Brown())Box(Yellow()),Box(Brown())~Box(Yellow())}
+   {~Box(Brown())Box(Yellow()),~Box(Yellow())Box(Brown())}
 )
 c (Conclusion): {0}
-prob (Probability): {Box(Brown())Box(Yellow())}
+prob (Probability): {Box(Yellow())Box(Brown())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e81iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2096)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2110)
 
 
 ```
@@ -1714,15 +1728,15 @@ description:
     In the box there is neither a yellow card nor a brown card
     
 v (Views): (
-   {~Box(Brown())Box(Yellow()),Box(Brown())~Box(Yellow())}
+   {~Box(Brown())Box(Yellow()),~Box(Yellow())Box(Brown())}
 )
 c (Conclusion): {0}
-prob (Probability): {~Box(Brown())~Box(Yellow())}
+prob (Probability): {~Box(Yellow())~Box(Brown())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e82i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2119)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2133)
 
 
 ```
@@ -1737,7 +1751,7 @@ description:
     In the box there is a yellow card.
     
 v (Views): (
-   {Box(Brown())Box(Yellow())}^{Box(Yellow())}
+   {Box(Yellow())Box(Brown())}^{Box(Yellow())}
 )
 c (Conclusion): {50.0=* Box(Yellow()),0}
 prob (Probability): {Box(Yellow())}
@@ -1745,7 +1759,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e82ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2129)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2143)
 
 
 ```
@@ -1760,15 +1774,15 @@ description:
     In the box there is a yellow card and a brown card.
     
 v (Views): (
-   {Box(Brown())Box(Yellow())}^{Box(Yellow())}
+   {Box(Yellow())Box(Brown())}^{Box(Yellow())}
 )
-c (Conclusion): {50.0=* Box(Brown())Box(Yellow()),0}
-prob (Probability): {Box(Brown())Box(Yellow())}
+c (Conclusion): {50.0=* Box(Yellow())Box(Brown()),0}
+prob (Probability): {Box(Yellow())Box(Brown())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e82iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2139)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2153)
 
 
 ```
@@ -1783,7 +1797,7 @@ description:
     In the box there is a yellow card and there is not a brown card.
     
 v (Views): (
-   {Box(Brown())Box(Yellow())}^{Box(Yellow())}
+   {Box(Yellow())Box(Brown())}^{Box(Yellow())}
 )
 c (Conclusion): {0}
 prob (Probability): {~Box(Brown())Box(Yellow())}
@@ -1791,7 +1805,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e82iv
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2149)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2163)
 
 
 ```
@@ -1806,15 +1820,15 @@ description:
     In the box there is neither a yellow card nor a brown card.
     
 v (Views): (
-   {Box(Brown())Box(Yellow())}^{Box(Yellow())}
+   {Box(Yellow())Box(Brown())}^{Box(Yellow())}
 )
 c (Conclusion): {0}
-prob (Probability): {~Box(Brown())~Box(Yellow())}
+prob (Probability): {~Box(Yellow())~Box(Brown())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e83i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2178)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2192)
 
 
 ```
@@ -1830,7 +1844,7 @@ description:
     There is a red marble and blue in marble in the box.
     
 v (Views): (
-   {33.333333333333336=* Box(Red()),33.333333333333336=* Box(Green())Box(Blue()),33.333333333333336=* ~Box(Green())~Box(Blue())~Box(Red())}
+   {33.333333333333336=* Box(Red()),33.333333333333336=* Box(Green())Box(Blue()),33.333333333333336=* ~Box(Blue())~Box(Red())~Box(Green())}
 )
 c (Conclusion): {0}
 prob (Probability): {Box(Blue())Box(Red())}
@@ -1838,7 +1852,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e83ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2188)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2202)
 
 
 ```
@@ -1854,7 +1868,7 @@ description:
     There is a green marble and there is a blue marble.
     
 v (Views): (
-   {33.333333333333336=* Box(Red()),33.333333333333336=* Box(Green())Box(Blue()),33.333333333333336=* ~Box(Green())~Box(Blue())~Box(Red())}
+   {33.333333333333336=* Box(Red()),33.333333333333336=* Box(Green())Box(Blue()),33.333333333333336=* ~Box(Blue())~Box(Red())~Box(Green())}
 )
 c (Conclusion): {33.333333333333336=* Box(Green())Box(Blue()),0}
 prob (Probability): {Box(Green())Box(Blue())}
@@ -1862,7 +1876,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e84i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2201)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2215)
 
 
 ```
@@ -1878,15 +1892,15 @@ description:
     In the box there is a grey marble and there is a mauve marble.
     
 v (Views): (
-   {~Box(Mauve())Box(White())Box(Grey()),~Box(White())Box(Mauve())Box(Grey())}
+   {Box(Grey())~Box(Mauve())Box(White()),Box(Grey())Box(Mauve())~Box(White())}
 )
-c (Conclusion): {50.0=* Box(Mauve())Box(Grey()),0}
-prob (Probability): {Box(Mauve())Box(Grey())}
+c (Conclusion): {50.0=* Box(Grey())Box(Mauve()),0}
+prob (Probability): {Box(Grey())Box(Mauve())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e84ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2223)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2237)
 
 
 ```
@@ -1902,15 +1916,15 @@ description:
     In the box there is a grey marble and there is a mauve marble.
     
 v (Views): (
-   {~Box(Mauve())~Box(White())Box(Grey()),~Box(Mauve())Box(White())~Box(Grey()),~Box(White())Box(Mauve())~Box(Grey())}
+   {Box(Grey())~Box(Mauve())~Box(White()),~Box(Mauve())Box(White())~Box(Grey()),~Box(White())~Box(Grey())Box(Mauve())}
 )
 c (Conclusion): {0}
-prob (Probability): {Box(Mauve())Box(Grey())}
+prob (Probability): {Box(Grey())Box(Mauve())}
 test(verbose=False): Method used to test the example
 ```
 
 ## e85
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2246)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2260)
 
 
 ```
@@ -1937,7 +1951,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e86
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2269)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2283)
 
 
 ```
@@ -1953,8 +1967,8 @@ description:
     What is the probability that there is a ten?
     
 v (Views): (
-   {Q()A(),J()K(),X()},
-   {60.0=* Q()A()}^{Q()A()},
+   {A()Q(),J()K(),X()},
+   {60.0=* A()Q()}^{A()Q()},
    {20.0=* J()K()}^{J()K()}
 )
 c (Conclusion): {20.0=* X(),0}
@@ -1963,7 +1977,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e88
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2291)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2305)
 
 
 ```
@@ -1986,7 +2000,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e90_condA
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2321)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2335)
 
 
 ```
@@ -2014,7 +2028,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e90_condB
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2339)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2353)
 
 
 ```
@@ -2032,7 +2046,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e92_award
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2375)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2389)
 
 
 ```
@@ -2058,11 +2072,11 @@ c (Conclusion): {do(Award(ParentB()*))}
 cv (Consequence Views): (
    ∀x {Custody(x*)}^{do(Award(x*))},
    ∀x {~Custody(x*)}^{do(Deny(x*))},
-   {MedTime(ParentA())MedRapp(ParentA())LowTime(ParentB())HighRapp(ParentB())}
+   {MedTime(ParentA())LowTime(ParentB())HighRapp(ParentB())MedRapp(ParentA())}
 )
 pr (Priority Views): (
    ∀x {1.0=+ 0}^{Custody(x*)MedRapp(x)},
-   ∀x {3.0=+ 0}^{HighRapp(x)Custody(x*)},
+   ∀x {3.0=+ 0}^{Custody(x*)HighRapp(x)},
    ∀x {1.0=+ 0}^{Custody(x*)MedTime(x)},
    ∀x {1.0=+ 0}^{MedTime(x)~Custody(x*)},
    ∀x {2.0=+ 0}^{LowTime(x)~Custody(x*)}
@@ -2071,7 +2085,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e92_deny
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2386)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2400)
 
 
 ```
@@ -2097,11 +2111,11 @@ c (Conclusion): {do(Deny(ParentB()*))}
 cv (Consequence Views): (
    ∀x {Custody(x*)}^{do(Award(x*))},
    ∀x {~Custody(x*)}^{do(Deny(x*))},
-   {MedTime(ParentA())MedRapp(ParentA())LowTime(ParentB())HighRapp(ParentB())}
+   {MedTime(ParentA())LowTime(ParentB())HighRapp(ParentB())MedRapp(ParentA())}
 )
 pr (Priority Views): (
    ∀x {1.0=+ 0}^{Custody(x*)MedRapp(x)},
-   ∀x {3.0=+ 0}^{HighRapp(x)Custody(x*)},
+   ∀x {3.0=+ 0}^{Custody(x*)HighRapp(x)},
    ∀x {1.0=+ 0}^{Custody(x*)MedTime(x)},
    ∀x {1.0=+ 0}^{MedTime(x)~Custody(x*)},
    ∀x {2.0=+ 0}^{LowTime(x)~Custody(x*)}
@@ -2110,7 +2124,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e93_grp1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2396)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2410)
 
 
 ```
@@ -2134,92 +2148,92 @@ cv (Consequence Views): (
    {0.67=* D(600.0*),~D(600.0)}^{do(B())}
 )
 pr (Priority Views): (
-   ∀x {power(σ(log(σ(x,1.0)),1.0),-1.0)=+ 0}^{D(x*)},
-   ∀x {σ(log(σ(x,1.0)),1.0)=+ 0}^{S(x*)}
+   ∀x {power(σ(log(σ(1.0,x)),1.0),-1.0)=+ 0}^{D(x*)},
+   ∀x {σ(log(σ(1.0,x)),1.0)=+ 0}^{S(x*)}
 )
 test(verbose=False): Method used to test the example
 ```
 
 ## new_e1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2438)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2452)
 
 
 ```
 v (Views): (
-   ∀x ∃a ∀y {P(x,a)Q(a,y)},
+   ∀x ∃a ∀y {Q(a,y)P(x,a)},
    ∃b ∀z {P(b,z)}
 )
-c (Conclusion): ∃b ∀x ∀z ∃a ∀y {P(b,z)P(x,a)Q(a,y)}
+c (Conclusion): ∃b ∀z ∀x ∃a ∀y {Q(a,y)P(b,z)P(x,a)}
 test(verbose=False): Method used to test the example
 ```
 
 ## new_e2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2449)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2463)
 
 
 ```
 v (Views): (
    ∃a ∀x {Q(x*)P(a)},
-   ∀x ∃b {R(b)Q(x*)}^{Q(x*)}
+   ∀x ∃b {Q(x*)R(b)}^{Q(x*)}
 )
-c (Conclusion): ∃a ∀x ∃b {R(b)Q(x*)P(a)}
+c (Conclusion): ∃a ∀x ∃b {Q(x*)P(a)R(b)}
 test(verbose=False): Method used to test the example
 ```
 
 ## else_inquire
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2467)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2481)
 
 
 ```
 v (Views): (
    ∃a ∀x {Q(x*)P(a)},
-   ∀x ∃b {R(b)Q(x*)}^{Q(x*)}
+   ∀x ∃b {Q(x*)R(b)}^{Q(x*)}
 )
 c (Conclusion): ∃a ∀x {Q(x*)P(a)}
 test(verbose=False): Method used to test the example
 ```
 
 ## else_merge
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2471)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2485)
 
 
 ```
 v (Views): (
    ∃a ∀x {Q(x*)P(a)},
-   ∀x ∃b {R(b)Q(x*)}^{Q(x*)}
+   ∀x ∃b {Q(x*)R(b)}^{Q(x*)}
 )
 c (Conclusion): ∃a ∀x {Q(x*)P(a)}
 test(verbose=False): Method used to test the example
 ```
 
 ## else_suppose
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2475)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2489)
 
 
 ```
 v (Views): (
    ∃a ∀x {Q(x*)P(a)},
-   ∀x ∃b {R(b)Q(x*)}^{Q(x*)}
+   ∀x ∃b {Q(x*)R(b)}^{Q(x*)}
 )
 c (Conclusion): ∃a ∀x {Q(x*)P(a)}
 test(verbose=False): Method used to test the example
 ```
 
 ## else_uni_prod
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2479)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2493)
 
 
 ```
 v (Views): (
    ∃a ∀x {Q(x*)P(a)},
-   ∀x ∃b {R(b)Q(x*)}^{Q(x*)}
+   ∀x ∃b {Q(x*)R(b)}^{Q(x*)}
 )
 c (Conclusion): ∃a ∀x {Q(x*)P(a)}
 test(verbose=False): Method used to test the example
 ```
 
 ## else_query
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2488)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2502)
 
 
 ```
@@ -2232,7 +2246,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_which
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2492)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2506)
 
 
 ```
@@ -2245,25 +2259,25 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e5
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2496)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2510)
 
 
 ```
 v (Views): (
-   ∀y ∀x ∃b ∃a ∀z ∃c {P(a*)Q(x*)P(y)P(c)P(b)P(z)},
-   ∃d ∃f ∃e {P(d*)Q(e*)Q(f*)}
+   ∀y ∀x ∃b ∃a ∀z ∃c {P(a*)P(b)P(z)Q(x*)P(y)P(c)},
+   ∃e ∃f ∃d {Q(f*)P(d*)Q(e*)}
 )
-c (Conclusion): ∃d ∃f ∃e {P(d*)Q(e*)Q(f*)}
+c (Conclusion): ∃e ∃f ∃d {Q(f*)P(d*)Q(e*)}
 test(verbose=False): Method used to test the example
 ```
 
 ## new_e6_leibniz
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2504)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2518)
 
 
 ```
 v (Views): (
-   ∃a ∃b {~P(f(b),a)==(a,b)P(f(a),a)},
+   ∃a ∃b {P(f(a),a)==(a,b)~P(f(b),a)},
    {}
 )
 c (Conclusion): {}
@@ -2271,7 +2285,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e7_aristotle
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2509)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2523)
 
 
 ```
@@ -2284,7 +2298,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e8
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2514)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2528)
 
 
 ```
@@ -2297,7 +2311,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e9
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2519)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2533)
 
 
 ```
@@ -2310,7 +2324,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e10
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2524)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2538)
 
 
 ```
@@ -2323,7 +2337,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e11
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2529)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2543)
 
 
 ```
@@ -2336,7 +2350,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e12
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2534)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2548)
 
 
 ```
@@ -2349,7 +2363,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e13
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2539)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2553)
 
 
 ```
@@ -2362,12 +2376,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e14
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2545)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2559)
 
 
 ```
 v (Views): (
-   ∀x ∃y {A(f(x*))B(g(x*,y))},
+   ∀x ∃y {B(g(x*,y))A(f(x*))},
    {A(f(j()*))}
 )
 c (Conclusion): ∃y {B(g(j()*,y))A(f(j()*))}
@@ -2375,7 +2389,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e15
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2550)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2564)
 
 
 ```
@@ -2388,12 +2402,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e16
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2558)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2572)
 
 
 ```
 v (Views): (
-   ∃x ∃k {Defeats(k,x)==(Clark(),x)},
+   ∃k ∃x {Defeats(k,x)==(Clark(),x)},
    ∃x {==(Clark()*,x)}
 )
 c (Conclusion): ∃k {Defeats(k,Clark())==(Clark(),Clark())}
@@ -2401,12 +2415,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e17
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2563)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2577)
 
 
 ```
 v (Views): (
-   ∃x ∃k {do(Defeats(k,x))==(Clark(),x)},
+   ∃k ∃x {do(Defeats(k,x))==(Clark(),x)},
    ∃x {==(Clark()*,x)}
 )
 c (Conclusion): ∃k {do(Defeats(k,Clark()))==(Clark(),Clark())}
@@ -2414,7 +2428,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e18
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2568)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2582)
 
 
 ```
@@ -2427,7 +2441,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e19_first_atom_do_atom
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2573)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2587)
 
 
 ```
@@ -2440,7 +2454,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e20_nested_issue_in_pred
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2578)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2592)
 
 
 ```
@@ -2453,7 +2467,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e21_supp_is_something
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2586)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2600)
 
 
 ```
@@ -2466,25 +2480,25 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e22_restrict_dep_rel_is_not_other
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2594)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2608)
 
 
 ```
 v (Views): (
-   ∃x ∃k {do(Defeats(k,x))==(Clark(),x)},
+   ∃k ∃x {do(Defeats(k,x))==(Clark(),x)},
    ∃y {==(Clark()*,y)}
 )
-c (Conclusion): ∃x ∃k {do(Defeats(k,x))==(Clark(),x)}
+c (Conclusion): ∃k ∃x {do(Defeats(k,x))==(Clark(),x)}
 test(verbose=False): Method used to test the example
 ```
 
 ## AnswerPotential
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2599)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2613)
 
 
 ```
 v (Views): (
-   {1.0=* 2.0=+ B()A(),0.4=* C()B(),C()A()},
+   {1.0=* 2.0=+ B()A(),0.4=* B()C(),C()A()},
    {A()},
    {B()},
    {C()},
@@ -2496,12 +2510,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## UniProduct
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2641)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2655)
 
 
 ```
 v (Views): (
-   ∀x ∃a {E(x,a)P(x),~P(x*)},
+   ∀x ∃a {P(x)E(x,a),~P(x*)},
    {P(j()*)}
 )
 c (Conclusion): ∃a {~P(j()*),E(j(),a)P(j())}
@@ -2509,7 +2523,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## QueryTest
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2646)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2660)
 
 
 ```
@@ -2517,7 +2531,7 @@ description:
     From page 173
     
 v (Views): (
-   ∀x {S(j()*)T(x,m())S(m()*),S(j()*)T(x,j())S(m()*)},
+   ∀x {S(m()*)T(x,m())S(j()*),S(m()*)T(x,j())S(j()*)},
    ∀x ∃a {T(x,a)S(a*)}
 )
 c (Conclusion): ∀x ∃a {T(x,a)S(a*)}
@@ -2525,7 +2539,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## QueryTest2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2658)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2672)
 
 
 ```
@@ -2533,7 +2547,7 @@ description:
     From page 173
     
 v (Views): (
-   ∀x {S(j()*)T(x,m())S(m()*),S(j()*)T(x,j())S(m()*)},
+   ∀x {S(m()*)T(x,m())S(j()*),S(m()*)T(x,j())S(j()*)},
    ∃a ∀x {T(x,a)S(a*)}
 )
 c (Conclusion): ∀x ∃a {T(x,a)S(a*)}

@@ -42,7 +42,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `default_procedure_does_it_follow`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L90)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L91)
 
 
 ```
@@ -64,7 +64,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `default_procedure_what_is_prob`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L133)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L135)
 
 
 ```
@@ -97,7 +97,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `default_decision`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L227)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L229)
 
 
 ```

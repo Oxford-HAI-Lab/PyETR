@@ -37,6 +37,7 @@ __all__ = [
     "e25v",
     "e25vi",
     "e26",
+    "e26_does_it_follow",
     "e28",
     "e32_1",
     "e32_2",
@@ -58,6 +59,7 @@ __all__ = [
     "e51",
     "e52",
     "e53",
+    "e53_does_it_follow",
     "e54",
     "e56_default_inference",
     "e56_basic_step",
@@ -130,6 +132,7 @@ __all__ = [
     "QueryTest",
     "QueryTest2",
 ]
+
 from abc import ABCMeta, abstractmethod
 from pyclbr import Function
 from typing import cast
@@ -1529,6 +1532,17 @@ class e53(BaseExample):
         )
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class e53_does_it_follow(e53):
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = default_procedure_does_it_follow(
+            (cls.v[0],), target=cls.v[2], verbose=verbose
+        )
+
+        if not result:
+            raise RuntimeError(f"Did not follow, view {cls.v[0]}, target {cls.v[2]}")
 
 
 class e54(BasicStep, BaseExample):
