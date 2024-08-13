@@ -54,3 +54,13 @@ class TestFunction:
             View.from_str("{")
         with pytest.raises(ParsingError, match="Expected end of text"):
             View.from_fol("f(")
+
+    def test_summation(self):
+        v1 = View.from_str("{A(++(1,2))}")
+        v2 = View.from_str("{A(3)}")
+        assert v1 == v2
+
+    def test_summation_with_emphasis(self):
+        v1 = View.from_str("{A(++(1,2*))}")
+        v2 = View.from_str("{A(3)}")
+        assert v1 == v2

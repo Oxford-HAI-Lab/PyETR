@@ -135,7 +135,7 @@ def model_to_open_atom(a: models.Atom | models.DoAtom) -> OpenAtom:
             terms=tuple([model_to_open_term(t) for t in a.terms]),
         )
     else:
-        return OpenDoAtom({model_to_open_atom(atom) for atom in a.atoms})
+        return OpenDoAtom([model_to_open_atom(atom) for atom in a.atoms])
 
 
 @overload
@@ -180,7 +180,7 @@ def model_to_atom(a: models.Atom | models.DoAtom) -> Atom:
             ),
         )
     else:
-        return DoAtom({model_to_atom(atom) for atom in a.atoms}, polarity=a.polarity)
+        return DoAtom([model_to_atom(atom) for atom in a.atoms], polarity=a.polarity)
 
 
 def model_to_state(s: list[models.Atom | models.DoAtom]) -> State:
