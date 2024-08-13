@@ -353,23 +353,84 @@ For example, the following is a valid view.
     In *Reason & Inquiry*, 'do' could not appear inside the contents of a do-atom.
     PyETR does not currently enforce this, but behaviour when nested `do`-atoms might be unpredictable.
 
-## Custom Functions
+## Numeric Functions
 
 !!! warning "Caveat for Readers of *Reason & Inquiry*"
     Custom function in the current implementation deviates.
 
+There are are number of numeric functions available in PyETR. It's also possible to define your own custom functions, but for details of this please see the [advanced section](../func_callers.md).
+
 ## Special Functions
+
+Below are the details for each of the built-in numeric functions, that each have their own syntaxes for view construction.
 
 ### Equality
 
+Equality represents a numerical operation of stating two items are equivalent. We'll use one of the views from [Example 88](../case_index.md#e88) to demonstrate:
+```
+{==(Clark(), Superman())}
+```
+The above statement is the same as "Clark is superman", we see the equates the ideas of Clark and Superman. It's defined in the usual way for a function, using `==` as the function name.
+
 ### Xbar
+
+Xbar is numeric multiplication, receiving 2 arguments. There are a couple of different ways to express this function. It may be represented using `**` or `x̄`; for the purposes of demonstration we'll use `**`.
+
+As demonstrated in [Example 74](../case_index.md#e74), it can be used to simply represent a numeric multiplication like so:
+
+```
+{A(4**5)} # Resolving to {A(20.0)}
+```
+If preferred it can also be written using the prefix notation:
+```
+{A(**(4,5))} # Resolving to {A(20.0)}
+```
+
+It is also used in the Non-Book example [New Example 18](../case_index.md#new_e18):
+
+```
+{m()=* A()}
+{n()=* B()}
+
+# And the result after an update operation:
+{m() ** n()=* A() B()}
+```
+
+Here we see that multiplication can also result from internal operations.
 
 ### Summation
 
+Summation is numeric summation, receiving a [Multiset](../glossary.md#multiset) of arguments. It may be represented using `++` or `σ`; for the purposes of demonstration we'll use `++`.
+
+This is used internally, and in part of [Example 93](../case_index.md#e93_grp1).
+
+```
+Ax {++(1, log(++(1, x)))=+ 0} ^ {S(x*)}
+```
+
+Here this is used to represent the term: 1+log(1+x)
+
+The summation may contain zero or more arguments.
+
 ## Sample functions
 
+Sample functions can be imported from the func_library namespace. These represent some simple example numeric functions - below is a short example detailing usage with the div function:
+
+```py
+from pyetr import View
+from pyetr.func_library import div
+
+
+print(View.from_str("{A(div(100,3))}", custom_functions=[div]))
+```
 ### `div`
+
+A function representing divide (takes 2 arguments, numerator and denominator)
 
 ### `power`
 
+A function representing power (takes 2 arguments, base and power)
+
 ### `log`
+
+A function representing log base 10 (takes 1 argument)

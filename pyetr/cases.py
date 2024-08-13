@@ -273,6 +273,7 @@ class Sum(BaseTest):
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
+
 class Answer(BaseTest):
     v: tuple[View, View]
 
