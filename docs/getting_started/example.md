@@ -14,7 +14,8 @@ For this example we'll be basing it on Example 17 from the book.
 For the full code see [here](#full-example)
 ## Step 1: Import package
 ```python
-from pyetr import View, default_inference_procedure
+from pyetr import View
+from pyetr.inference import default_inference_procedure
 ```
 Import the parsing object
 
@@ -41,7 +42,9 @@ print(c) #"{~Ace(a())}"
 ## Full Example
 
 ```py
-from pyetr import View, default_inference_procedure
+from pyetr import View
+from pyetr.inference import default_inference_procedure
+
 p1 = View.from_str(
     "{~King(k())Ace(a()),King(k())~Ace(a())}"
 )
