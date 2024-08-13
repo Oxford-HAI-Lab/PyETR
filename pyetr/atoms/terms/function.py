@@ -113,7 +113,9 @@ class Function:
         return apply_func(func_term, self.func_caller)
 
     @classmethod
-    def numeric(cls, func_caller: NumFunc) -> "Function":
+    def numeric(
+        cls, func_caller: NumFunc, name_override: Optional[str] = None
+    ) -> "Function":
         """
         Creates a function purely based on a python function.
 
@@ -123,11 +125,24 @@ class Function:
         Returns:
             Function: The output function.
         """
-        return cls(
-            name=func_caller.__name__,
-            arity=len(signature(func_caller).parameters),
-            func_caller=func_caller,
-        )
+        if name_override is not None:
+            name = name_override
+        else:
+            name = func_caller.__name__
+        params = list(signature(func_caller).parameters.values())
+        if len(params) == 1 and params[0].kind == Parameter.VAR_POSITIONAL:
+            # Multiset case
+            return cls(
+                name=name,
+                arity=None,
+                func_caller=func_caller,
+            )
+        else:
+            return cls(
+                name=name,
+                arity=len(params),
+                func_caller=func_caller,
+            )
 
     def __repr__(self) -> str:
         return f"Function({self.name}, {self.arity})"

@@ -1,5 +1,7 @@
 from typing import Generic, Iterable, TypeVar
 
+from pyetr.atoms.terms.multiset import Multiset
+
 from .abstract import AbstractAtom
 from .predicate import Predicate
 from .terms.abstract_term import TermType
@@ -55,11 +57,11 @@ class DoAtomLike(Generic[AtomType]):
     with DoAtom and OpenDoAtom
     """
 
-    atoms: set[AtomType]
+    atoms: Multiset[AtomType]
     polarity: bool
 
     def __init__(self, atoms: Iterable[AtomType], polarity: bool = True) -> None:
-        self.atoms = set(atoms)
+        self.atoms = Multiset(atoms)
         self.polarity = polarity
 
     @property

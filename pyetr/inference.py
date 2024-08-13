@@ -62,16 +62,57 @@ def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> V
     Returns:
         View: G''
     """  # Inference: Where is does x follow?
-    g_prime = basic_step(v=v, verbose=verbose)
-    for i, view in enumerate(v):
-        if i == 0:
-            # G'[P₁[]ᴰ]ꟳ
-            g_prime = g_prime.factor(view.depose(verbose=verbose), verbose=verbose)
-        else:
-            # G'[Pₙ]ꟳ
-            g_prime = g_prime.factor(view, verbose=verbose)
-            # Inference: Where are (2) and (3)?
+
+    def _default_inference_step1(rel_v: tuple[View, ...]):
+        g_prime = basic_step(v=rel_v, verbose=verbose)
+        # Step (1)
+        for i, view in enumerate(rel_v):
+            if i == 0:
+                # G'[P₁[]ᴰ]ꟳ
+                g_prime = g_prime.factor(view.depose(verbose=verbose), verbose=verbose)
+            else:
+                # G'[Pₙ]ꟳ
+                g_prime = g_prime.factor(view, verbose=verbose)
+        return g_prime
+
+    g_prime = _default_inference_step1(v)
+    if g_prime.is_verum or g_prime.is_falsum:
+        # Step (2)
+        reversed_v = tuple(reversed(v))
+        g_prime = _default_inference_step1(reversed_v)
+        if g_prime.is_verum or g_prime.is_falsum:
+            # Step (3)
+            return View.get_verum()
+    # Step (4)
     return g_prime
+
+
+def default_procedure_does_it_follow(
+    v: tuple[View, ...], target: View, verbose: bool = False
+) -> bool:
+    def _default_does_it_follow_step1(rel_v: tuple[View, ...]):
+        g_prime = basic_step(rel_v)
+        return g_prime.suppose(
+            View.with_restriction(
+                stage=target.supposition,
+                supposition=SetOfStates({State({})}),
+                dependency_relation=target.dependency_relation,
+                issue_structure=target.issue_structure,
+                weights=None,
+            ),
+            verbose=verbose,
+        ).query(target, verbose=verbose)
+
+    # Step (1)
+    g_prime_prime = _default_does_it_follow_step1(v)
+    if g_prime_prime == target:
+        return True
+    else:
+        # Step (2)
+        reversed_v = tuple(reversed(v))
+        g_prime_prime = _default_does_it_follow_step1(reversed_v)
+        # Step (3)
+        return g_prime_prime == target
 
 
 def default_procedure_what_is_prob(

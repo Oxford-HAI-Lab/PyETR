@@ -142,6 +142,7 @@ from .inference import (
     basic_step,
     default_decision,
     default_inference_procedure,
+    default_procedure_does_it_follow,
     default_procedure_what_is_prob,
 )
 from .view import View
@@ -1026,6 +1027,17 @@ class e26(BaseExample):
 
         if not result.is_equivalent_under_arb_sub(cls.c[1]):
             raise RuntimeError(f"Expected result: {cls.c[1]} but received {result}")
+
+
+class e26_does_it_follow(e26):
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = default_procedure_does_it_follow(
+            (cls.v[0],), target=cls.v[2], verbose=verbose
+        )
+
+        if not result:
+            raise RuntimeError(f"Did not follow, view {cls.v[0]}, target {cls.v[2]}")
 
 
 class e28(BasicStep, BaseExample):

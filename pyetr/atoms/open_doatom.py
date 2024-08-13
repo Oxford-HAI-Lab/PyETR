@@ -1,4 +1,4 @@
-from typing import Collection
+from pyetr.atoms.terms.multiset import Multiset
 
 from .abstract import Atom, OpenAtom
 from .atom_likes import DoAtomLike
@@ -9,8 +9,8 @@ from .terms import ArbitraryObject, Term
 
 
 def set_context_equals(
-    open_atom_set: Collection[OpenPredicateAtom],
-    pred_atom_set: Collection[PredicateAtom],
+    open_atom_set: Multiset[OpenPredicateAtom],
+    pred_atom_set: Multiset[PredicateAtom],
     question_term: "Term",
 ) -> bool:
     if len(open_atom_set) != len(pred_atom_set):
