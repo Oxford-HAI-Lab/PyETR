@@ -38,19 +38,25 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
     ) -> "IssueStructure":  # pragma: not covered
         return IssueStructure(super().symmetric_difference(__s))
 
-    def union(self, *s: Iterable[tuple[Term, OpenAtom]]) -> "IssueStructure":
+    def union(  # pyright: ignore [reportIncompatibleMethodOverride]
+        self, *s: Iterable[tuple[Term, OpenAtom]]
+    ) -> "IssueStructure":
         return IssueStructure(super().union(*s))  # pragma: not covered
 
     def __and__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
         return IssueStructure(super().__and__(__value))  # pragma: not covered
 
-    def __or__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
+    def __or__(  # pyright: ignore [reportIncompatibleMethodOverride]
+        self, __value: AbstractSet[tuple[Term, OpenAtom]]
+    ) -> "IssueStructure":
         return IssueStructure(super().__or__(__value))  # pragma: not covered
 
     def __sub__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
         return IssueStructure(super().__sub__(__value))  # pragma: not covered
 
-    def __xor__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
+    def __xor__(  # pyright: ignore [reportIncompatibleMethodOverride]
+        self, __value: AbstractSet[tuple[Term, OpenAtom]]
+    ) -> "IssueStructure":
         return IssueStructure(super().__xor__(__value))  # pragma: not covered
 
     def restriction(self, atoms: set[Atom]) -> "IssueStructure":

@@ -79,19 +79,25 @@ class State(frozenset[Atom]):
     ) -> "State":  # pragma: not covered
         return State(super().symmetric_difference(__s))
 
-    def union(self, *s: Iterable[Atom]) -> "State":  # pragma: not covered
+    def union(  # pyright: ignore [reportIncompatibleMethodOverride]
+        self, *s: Iterable[Atom]
+    ) -> "State":  # pragma: not covered
         return State(super().union(*s))
 
     def __and__(self, __value: AbstractSet[Atom]) -> "State":  # pragma: not covered
         return State(super().__and__(__value))
 
-    def __or__(self, __value: AbstractSet[Atom]) -> "State":
+    def __or__(  # pyright: ignore [reportIncompatibleMethodOverride]
+        self, __value: AbstractSet[Atom]
+    ) -> "State":
         return State(super().__or__(__value))
 
     def __sub__(self, __value: AbstractSet[Atom]) -> "State":
         return State(super().__sub__(__value))
 
-    def __xor__(self, __value: AbstractSet[Atom]) -> "State":  # pragma: not covered
+    def __xor__(  # pyright: ignore [reportIncompatibleMethodOverride]
+        self, __value: AbstractSet[Atom]
+    ) -> "State":  # pragma: not covered
         return State(super().__xor__(__value))
 
     @property
@@ -215,7 +221,9 @@ class SetOfStates(frozenset[State]):
     ) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().symmetric_difference(__s))
 
-    def union(self, *s: Iterable[State]) -> "SetOfStates":  # pragma: not covered
+    def union(  # pyright: ignore [reportIncompatibleMethodOverride]
+        self, *s: Iterable[State]
+    ) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().union(*s))
 
     def __and__(
@@ -223,7 +231,9 @@ class SetOfStates(frozenset[State]):
     ) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().__and__(__value))
 
-    def __or__(self, __value: AbstractSet[State]) -> "SetOfStates":
+    def __or__(  # pyright: ignore [reportIncompatibleMethodOverride]
+        self, __value: AbstractSet[State]
+    ) -> "SetOfStates":
         return SetOfStates(super().__or__(__value))
 
     def __sub__(
@@ -231,7 +241,7 @@ class SetOfStates(frozenset[State]):
     ) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().__sub__(__value))
 
-    def __xor__(
+    def __xor__(  # pyright: ignore [reportIncompatibleMethodOverride]
         self, __value: AbstractSet[State]
     ) -> "SetOfStates":  # pragma: not covered
         return SetOfStates(super().__xor__(__value))
