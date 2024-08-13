@@ -57,7 +57,7 @@ description:
     C There is a queen and a jack.
     
 v (Views): (
-   {King()Ace(),Queen()Jack()},
+   {Ace()King(),Queen()Jack()},
    {~Ace()}
 )
 c (Conclusion): {Queen()Jack()}
@@ -73,10 +73,10 @@ description:
     Example 5, p72, part ii
     
 v (Views): (
-   {s1()r1(),q1()p1()},
-   {p2()q2(),s2()r2()}
+   {r1()s1(),q1()p1()},
+   {q2()p2(),r2()s2()}
 )
-c (Conclusion): {r1()s1()p2()q2(),s1()r1()s2()r2(),q1()p1()s2()r2(),q1()p2()p1()q2()}
+c (Conclusion): {q2()p2()r1()s1(),r2()s2()r1()s1(),r2()s2()q1()p1(),q2()p2()q1()p1()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -89,7 +89,7 @@ description:
     Example 5, p72, part iii
     
 v (Views): (
-   {q1()p1(),s1()r1()},
+   {q1()p1(),r1()s1()},
    {}
 )
 c (Conclusion): {}
@@ -105,10 +105,10 @@ description:
     Example 5, p72, part iv
     
 v (Views): (
-   {q1()p1(),s1()r1()},
+   {q1()p1(),r1()s1()},
    {0}
 )
-c (Conclusion): {q1()p1(),s1()r1()}
+c (Conclusion): {q1()p1(),r1()s1()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -122,9 +122,9 @@ description:
     
 v (Views): (
    {0},
-   {q1()p1(),s1()r1()}
+   {q1()p1(),r1()s1()}
 )
-c (Conclusion): {q1()p1(),s1()r1()}
+c (Conclusion): {q1()p1(),r1()s1()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -142,7 +142,7 @@ v (Views): (
    {a()},
    {k()}
 )
-c (Conclusion): {a()k()}
+c (Conclusion): {k()a()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -178,7 +178,7 @@ description:
     C There is a ten (and a king)
     
 v (Views): (
-   {t()k(),a()q()},
+   {k()t(),a()q()},
    {k()}
 )
 c (Conclusion): {t()}
@@ -199,7 +199,7 @@ description:
     
 v (Views): (
    {K(x())},
-   {T(w())K(z()),Q(y())A(x())}
+   {K(z())T(w()),A(x())Q(y())}
 )
 c (Conclusion): {0}
 test(verbose=False): Method used to test the example
@@ -223,7 +223,7 @@ v (Views): (
    {Drinks(j())}^{Smokes(j())},
    {Eats(m())}^{Smokes(m())}
 )
-c (Conclusion): {Drinks(j())Smokes(j()),Smokes(m())Eats(m())}
+c (Conclusion): {Smokes(j())Drinks(j()),Smokes(m())Eats(m())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -240,7 +240,7 @@ description:
 v (Views): (
    {P(),Q(),R()}
 )
-c (Conclusion): {~Q()~P()~R()}
+c (Conclusion): {~R()~Q()~P()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -255,7 +255,7 @@ description:
     ItisnotthecasethatPandQandR
     
 v (Views): (
-   {P()R()Q()}
+   {P()Q()R()}
 )
 c (Conclusion): {~R(),~P(),~Q()}
 test(verbose=False): Method used to test the example
@@ -274,7 +274,7 @@ description:
 v (Views): (
    {P()Q(),R()}^{S()}
 )
-c (Conclusion): {S()~P()~R(),~Q()S()~R()}
+c (Conclusion): {~R()S()~P(),~R()~Q()S()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -291,10 +291,10 @@ description:
     C There is a queen and a jack.
     
 v (Views): (
-   {IsQueen()IsJack(),IsAce()IsKing()},
+   {IsJack()IsQueen(),IsKing()IsAce()},
    {~IsAce()}
 )
-c (Conclusion): {IsQueen()IsJack()}
+c (Conclusion): {IsJack()IsQueen()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -327,10 +327,10 @@ description:
     Factor examples
     
 v (Views): (
-   {P()R(),P()R()S(),P()S()Q()},
+   {P()R(),P()S()R(),P()S()Q()},
    {P()}^{S()}
 )
-c (Conclusion): {S()Q(),P()R(),R()S()}
+c (Conclusion): {S()Q(),P()R(),S()R()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -402,8 +402,8 @@ description:
     C There is a four
     
 v (Views): (
-   {Ace(),Queen()Jack()Ace(),Four()Eight()Ten()},
-   {Jack()Eight()Ace()Ten()},
+   {Ace(),Ace()Queen()Jack(),Four()Ten()Eight()},
+   {Ace()Ten()Jack()Eight()},
    {~Queen()}
 )
 c (Conclusion): {Four()}
@@ -423,11 +423,11 @@ description:
     P3 There isn't an ace.
     
 v (Views): (
-   {Queen()King()Jack(),Ace(),Four()Eight()Ten()},
+   {Queen()Jack()King(),Ace(),Four()Ten()Eight()},
    {~Four()},
    {~Ace()}
 )
-c (Conclusion): {Queen()King()Jack()}
+c (Conclusion): {Queen()Jack()King()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -444,7 +444,7 @@ description:
     C There isn't an ace in the hand.
     
 v (Views): (
-   {~King()Ace(),King()~Ace()},
+   {Ace()~King(),King()~Ace()},
    {King()}
 )
 c (Conclusion): {~Ace()}
@@ -502,9 +502,9 @@ description:
     Any view Δ^{0} = [Δ^{0}]ᶰ can be derived from the absurd view
     
 v (Views): (
-   {s1()r1()}
+   {r1()s1()}
 )
-c (Conclusion): {~r1(),~s1()}
+c (Conclusion): {~s1(),~r1()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -526,7 +526,7 @@ v (Views): (
 )
 c (Conclusion): (
    {~c(),~b(),~a()},
-   {a()~c()~b(),~c()~b()~a(),b()~c()~a(),b()a()~c(),c()a()~b(),b()c()~a(),c()~b()~a()}
+   {~c()a()~b(),~c()~b()~a(),~c()b()~a(),~c()b()a(),a()c()~b(),b()c()~a(),~b()c()~a()}
 )
 test(verbose=False): Method used to test the example
 ```
@@ -550,7 +550,7 @@ v (Views): (
    {K()}
 )
 c (Conclusion): (
-   {P()~K()S(),L()K(),P()S()K()},
+   {~K()P()S(),L()K(),P()S()K()},
    {L()K(),P()S()K()}
 )
 test(verbose=False): Method used to test the example
@@ -614,7 +614,7 @@ description:
     Example 25i, p89
     
 v (Views): (
-   {p()r(),p()q()},
+   {r()p(),q()p()},
    {p()}
 )
 c (Conclusion): {p()}
@@ -630,7 +630,7 @@ description:
     Example 25ii, p89
     
 v (Views): (
-   {p()r(),p()q()},
+   {r()p(),q()p()},
    {q()}
 )
 c (Conclusion): {0,q()}
@@ -646,7 +646,7 @@ description:
     Example 25iii, p89
     
 v (Views): (
-   {t(),p()r(),p()q(),s()},
+   {t(),r()p(),q()p(),s()},
    {p(),s()}
 )
 c (Conclusion): {0,p(),s()}
@@ -662,7 +662,7 @@ description:
     Example 25iv, p89
     
 v (Views): (
-   {t(),p()r(),p()q(),s()},
+   {t(),r()p(),q()p(),s()},
    {t(),p(),s()}
 )
 c (Conclusion): {t(),p(),s()}
@@ -678,7 +678,7 @@ description:
     Example 25v, p89
     
 v (Views): (
-   {s()p()q(),s()p()r()},
+   {s()q()p(),r()s()p()},
    {p()}^{s()}
 )
 c (Conclusion): {p()}
@@ -694,7 +694,7 @@ description:
     Example 25vi, p89
     
 v (Views): (
-   {s()p()q(),s()p()r()},
+   {s()q()p(),r()s()p()},
    {p()}^{t()}
 )
 c (Conclusion): {0}
@@ -713,12 +713,12 @@ description:
     C Supposing John plays, John wins
     
 v (Views): (
-   {Play(J())Win(J()),Play(B()),Play(M())},
+   {Win(J())Play(J()),Play(B()),Play(M())},
    {Play(J())},
    {Win(J())}^{Play(J())}
 )
 c (Conclusion): (
-   {Play(J())Win(J())}^{Play(J())},
+   {Win(J())Play(J())}^{Play(J())},
    {Win(J())}^{Play(J())}
 )
 test(verbose=False): Method used to test the example
@@ -730,12 +730,12 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   {Play(J())Win(J()),Play(B()),Play(M())},
+   {Win(J())Play(J()),Play(B()),Play(M())},
    {Play(J())},
    {Win(J())}^{Play(J())}
 )
 c (Conclusion): (
-   {Play(J())Win(J())}^{Play(J())},
+   {Win(J())Play(J())}^{Play(J())},
    {Win(J())}^{Play(J())}
 )
 test(verbose=False): Method used to test the example
@@ -756,10 +756,10 @@ description:
     
 v (Views): (
    {~Tiger(),Tiger()},
-   {Orange()Tiger()}^{Tiger()},
+   {Tiger()Orange()}^{Tiger()},
    {Orange()}
 )
-c (Conclusion): {Orange()Tiger()}
+c (Conclusion): {Tiger()Orange()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -838,8 +838,8 @@ description:
     C Falsum
     
 v (Views): (
-   {SquareB()~CircleB()~TriangleB(),~SquareB()CircleB()~TriangleB(),TriangleB()~SquareB()~CircleB()},
-   {SquareB()CircleT()}^{CircleT()},
+   {SquareB()~CircleB()~TriangleB(),CircleB()~TriangleB()~SquareB(),TriangleB()~CircleB()~SquareB()},
+   {CircleT()SquareB()}^{CircleT()},
    {TriangleB()}
 )
 c (Conclusion): {}
@@ -865,11 +865,11 @@ description:
     order.
     
 v (Views): (
-   {SquareB()~CircleB()~TriangleB(),~SquareB()CircleB()~TriangleB(),TriangleB()~SquareB()~CircleB()},
+   {SquareB()~CircleB()~TriangleB(),CircleB()~TriangleB()~SquareB(),TriangleB()~CircleB()~SquareB()},
    {TriangleB()},
-   {SquareB()CircleT()}^{CircleT()}
+   {CircleT()SquareB()}^{CircleT()}
 )
-c (Conclusion): {TriangleB()~CircleT()~SquareB()~CircleB()}
+c (Conclusion): {~CircleT()TriangleB()~CircleB()~SquareB()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -928,11 +928,11 @@ description:
     C The chair is saleable elegant and stable.
     
 v (Views): (
-   {Saleable(c())Elegant(c()),~Saleable(c())~Elegant(c())},
-   {~Stable(c())~Elegant(c()),Elegant(c())Stable(c())},
+   {Saleable(c())Elegant(c()),~Elegant(c())~Saleable(c())},
+   {~Elegant(c())~Stable(c()),Stable(c())Elegant(c())},
    {Saleable(c())Elegant(c()),Stable(c()),Saleable(c())}
 )
-c (Conclusion): {Saleable(c())Elegant(c())Stable(c())}
+c (Conclusion): {Saleable(c())Stable(c())Elegant(c())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -975,11 +975,11 @@ description:
     
 v (Views): (
    {P()V()}^{P()},
-   {M()~P(),P()~M()},
-   {0,M()V()}
+   {~P()M(),P()~M()},
+   {0,V()M()}
 )
 c (Conclusion): (
-   {M()~P(),P()V()~M()},
+   {~P()M(),P()V()~M()},
    {0}
 )
 test(verbose=False): Method used to test the example
@@ -996,10 +996,10 @@ description:
     If we had a view{VMR,VMS, T} and applied [{vm, 0}]Q we would get [{vm, 0}]
     
 v (Views): (
-   {M()S()V(),R()M()V(),T()},
-   {0,M()V()}
+   {S()V()M(),M()V()R(),T()},
+   {0,V()M()}
 )
-c (Conclusion): {0,M()V()}
+c (Conclusion): {0,V()M()}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1037,7 +1037,7 @@ description:
     C Truth
     
 v (Views): (
-   ∃x {T(x)D(x*)},
+   ∃x {D(x*)T(x)},
    {~D(Turgidum()*)}
 )
 c (Conclusion): {0}
@@ -1081,13 +1081,13 @@ description:
     (C) Cannot be determined
     
 v (Views): (
-   {L(j(),s())L(s(),g())},
-   {~M(g()*)M(j()*)},
+   {L(s(),g())L(j(),s())},
+   {M(j()*)~M(g()*)},
    {},
-   ∃a ∃b {L(a,b)~M(b*)M(a*)}
+   ∃b ∃a {L(a,b)~M(b*)M(a*)}
 )
 c (Conclusion): (
-   {L(j(),s())L(s(),g())~M(g()*)M(j()*)},
+   {M(j()*)L(s(),g())L(j(),s())~M(g()*)},
    {0}
 )
 test(verbose=False): Method used to test the example
@@ -1109,14 +1109,14 @@ description:
     (C) Cannot be determined
     
 v (Views): (
-   {L(j(),s())L(s(),g())},
-   {~M(g())M(j())},
+   {L(s(),g())L(j(),s())},
+   {M(j())~M(g())},
    {M(s())},
-   ∃a ∃b {L(a,b)~M(b*)M(a*)}
+   ∃b ∃a {L(a,b)~M(b*)M(a*)}
 )
-c (Conclusion): ∃a ∃b {L(a,b)~M(b*)M(a*)}
-g1 (Another View): {~M(g())L(s(),g())M(j())L(j(),s())M(s()),~M(s())~M(g())L(s(),g())M(j())L(j(),s())}
-g2 (Another View): {~M(g()*)L(s(),g())M(j()*)L(j(),s())M(s()),~M(s()*)~M(g()*)L(s(),g())M(j()*)L(j(),s())}
+c (Conclusion): ∃b ∃a {L(a,b)~M(b*)M(a*)}
+g1 (Another View): {L(s(),g())~M(g())M(s())M(j())L(j(),s()),L(s(),g())~M(s())~M(g())M(j())L(j(),s())}
+g2 (Another View): {L(s(),g())~M(g()*)M(s())M(j()*)L(j(),s()),L(s(),g())~M(s()*)~M(g()*)M(j()*)L(j(),s())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1129,13 +1129,13 @@ description:
     Duplicate of e50, uses arb objects, some changes
     
 v (Views): (
-   ∃g ∃j ∃s {L(s,g)~M(g)L(j,s)M(j)},
+   ∃j ∃g ∃s {~M(g)L(j,s)M(j)L(s,g)},
    ∃s {M(s)},
-   ∃a ∃b {L(a,b)~M(b*)M(a*)}
+   ∃b ∃a {L(a,b)~M(b*)M(a*)}
 )
-c (Conclusion): ∃a ∃b {L(a,b)~M(b*)M(a*)}
-g1 (Another View): ∃g ∃j ∃s {L(j,s)~M(g)M(s)M(j)L(s,g),L(j,s)~M(g)M(j)L(s,g)~M(s)}
-g2 (Another View): ∃g ∃j ∃s {L(j,s)~M(g*)M(s)M(j*)L(s,g),L(j,s)~M(g*)M(j*)L(s,g)~M(s*)}
+c (Conclusion): ∃b ∃a {L(a,b)~M(b*)M(a*)}
+g1 (Another View): ∃j ∃g ∃s {L(s,g)M(s)L(j,s)~M(g)M(j),L(s,g)L(j,s)~M(g)M(j)~M(s)}
+g2 (Another View): ∃j ∃g ∃s {L(s,g)M(s)L(j,s)~M(g*)M(j*),L(s,g)L(j,s)~M(g*)M(j*)~M(s*)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1156,7 +1156,7 @@ v (Views): (
    ∀x {HasNucleus(x)IsArchaeon(x*)}^{IsArchaeon(x*)},
    {IsArchaeon(Halobacterium()*)}
 )
-c (Conclusion): {IsArchaeon(Halobacterium()*)HasNucleus(Halobacterium())}
+c (Conclusion): {HasNucleus(Halobacterium())IsArchaeon(Halobacterium()*)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1173,10 +1173,10 @@ description:
     C John Fs and Gs.
     
 v (Views): (
-   ∀x {G(x*)F(x)}^{F(x)},
+   ∀x {F(x)G(x*)}^{F(x)},
    {G(John()*)}
 )
-c (Conclusion): {G(John()*)F(John())}
+c (Conclusion): {F(John())G(John()*)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1192,11 +1192,11 @@ description:
     C All B are A.
     
 v (Views): (
-   ∀x {A(x)B(x)}^{A(x)},
+   ∀x {B(x)A(x)}^{A(x)},
    ∀x {B(x)},
-   ∀x {A(x)B(x)}^{B(x)}
+   ∀x {B(x)A(x)}^{B(x)}
 )
-c (Conclusion): ∀x {A(x)B(x)}^{B(x)}
+c (Conclusion): ∀x {B(x)A(x)}^{B(x)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1206,11 +1206,11 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   ∀x {A(x)B(x)}^{A(x)},
+   ∀x {B(x)A(x)}^{A(x)},
    ∀x {B(x)},
-   ∀x {A(x)B(x)}^{B(x)}
+   ∀x {B(x)A(x)}^{B(x)}
 )
-c (Conclusion): ∀x {A(x)B(x)}^{B(x)}
+c (Conclusion): ∀x {B(x)A(x)}^{B(x)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1248,10 +1248,10 @@ description:
     C: Every professor teaches some student who reads some book
     
 v (Views): (
-   ∀x ∃y {Teaches(x,y)Student(y*)Professor(x)}^{Professor(x)},
-   ∀z ∃w {Student(z*)Book(w)Reads(z,w)}^{Student(z*)}
+   ∀x ∃y {Professor(x)Teaches(x,y)Student(y*)}^{Professor(x)},
+   ∀z ∃w {Book(w)Reads(z,w)Student(z*)}^{Student(z*)}
 )
-c (Conclusion): ∃y ∃b {0,Book(b)Reads(y,b)}
+c (Conclusion): ∃b ∃y {0,Book(b)Reads(y,b)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1261,10 +1261,10 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   ∀x ∃y {Teaches(x,y)Student(y*)Professor(x)}^{Professor(x)},
-   ∀z ∃w {Student(z*)Book(w)Reads(z,w)}^{Student(z*)}
+   ∀x ∃y {Professor(x)Teaches(x,y)Student(y*)}^{Professor(x)},
+   ∀z ∃w {Book(w)Reads(z,w)Student(z*)}^{Student(z*)}
 )
-c (Conclusion): ∀a ∃c ∃b {Book(c)Student(b*)Reads(b,c)Teaches(a,b)Professor(a),~Professor(a)}
+c (Conclusion): ∀a ∃c ∃b {Teaches(a,b)Book(c)Professor(a)Reads(b,c)Student(b*),~Professor(a)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1281,10 +1281,10 @@ description:
     C Some C are A.
     
 v (Views): (
-   ∀x {A(x)B(x*)}^{B(x*)},
-   ∃x {B(x*)C(x)}
+   ∀x {B(x*)A(x)}^{B(x*)},
+   ∃x {C(x)B(x*)}
 )
-c (Conclusion): ∃y {C(y)A(y)B(y*)}
+c (Conclusion): ∃y {A(y)C(y)B(y*)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1302,9 +1302,9 @@ description:
     
 v (Views): (
    ∀y {C(y)B(y*)}^{C(y)},
-   ∃x {A(x)B(x*)}
+   ∃x {B(x*)A(x)}
 )
-c (Conclusion): ∃y {C(y)A(y)B(y*)}
+c (Conclusion): ∃y {A(y)C(y)B(y*)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1321,10 +1321,10 @@ description:
     C All dogs bite John
     
 v (Views): (
-   ∀x ∃a {~D(x),D(x)M(a*)B(x,a)},
+   ∀x ∃a {~D(x),D(x)B(x,a)M(a*)},
    {M(j()*)}
 )
-c (Conclusion): ∀x ∃a {D(x)M(a*)M(j()*)B(x,a),~D(x)M(j()*)}
+c (Conclusion): ∀x ∃a {M(j()*)B(x,a)D(x)M(a*),M(j()*)~D(x)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1337,7 +1337,7 @@ description:
     Example 62, p176
     
 v (Views): (
-   {S(m()*)L(n(),m()),D(m())T(n())S(j()*),~S(n()*)D(b())},
+   {S(m()*)L(n(),m()),T(n())S(j()*)D(m()),D(b())~S(n()*)},
    ∃a {S(a*)}
 )
 c (Conclusion): {0,S(j()*),S(m()*)}
@@ -1369,7 +1369,7 @@ description:
     Example 63, p176
     
 v (Views): (
-   ∀x ∃y {D(n()*)S(j()*),T(j())D(f(y,x)*)~D(j()*)},
+   ∀x ∃y {D(n()*)S(j()*),D(f(y,x)*)T(j())~D(j()*)},
    ∃a {D(a*)}
 )
 c (Conclusion): ∀x ∃y {D(n()*),D(f(y,x)*)}
@@ -1409,10 +1409,10 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   ∀x {90.0=* P(x)T(x*)S(x*),P(x)S(x*)~T(x)}^{P(x)S(x*)},
-   ∀x {1.0=* P(x)T(x)~S(x*),P(x)~T(x)~S(x*)}^{P(x)~S(x*)},
+   ∀x {90.0=* T(x*)P(x)S(x*),P(x)S(x*)~T(x)}^{P(x)S(x*)},
+   ∀x {1.0=* T(x)P(x)~S(x*),P(x)~T(x)~S(x*)}^{P(x)~S(x*)},
    ∀x {1.0=* P(x)S(x*),P(x)~S(x)}^{P(x)},
-   {P(Smith())T(Smith()*)},
+   {T(Smith()*)P(Smith())},
    {S(Smith())}
 )
 c (Conclusion): {90.0=* S(Smith()*)}
@@ -1439,10 +1439,10 @@ description:
     the probability that this person actually has colorectal cancer?
     
 v (Views): (
-   ∀x {0.3=* P(x*)C(x),P(x*)~C(x)}^{P(x*)},
-   ∀x {50.0=* P(x*)T(x)C(x),P(x*)~T(x)C(x)}^{P(x*)C(x)},
-   ∀x {3.0=* P(x*)T(x)~C(x),P(x*)~T(x)~C(x)}^{P(x*)~C(x)},
-   ∃a {P(a*)T(a)},
+   ∀x {0.3=* C(x)P(x*),~C(x)P(x*)}^{P(x*)},
+   ∀x {50.0=* C(x)T(x)P(x*),C(x)P(x*)~T(x)}^{C(x)P(x*)},
+   ∀x {3.0=* ~C(x)T(x)P(x*),~C(x)P(x*)~T(x)}^{~C(x)P(x*)},
+   ∃a {T(a)P(a*)},
    ∃a {C(a)}
 )
 c (Conclusion): ∃a {15.0=* C(a),0}
@@ -1465,8 +1465,8 @@ description:
     How many of those who test positive do have the disease? Out of ?
     
 v (Views): (
-   {1.0=* D()T(),1.0=* ~D()T(),98.0=* ~D()},
-   {D()T()}
+   {1.0=* T()D(),1.0=* T()~D(),98.0=* ~D()},
+   {T()D()}
 )
 c (Conclusion): {}
 test(verbose=False): Method used to test the example
@@ -1478,7 +1478,7 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   {1.0=* D()T(),1.0=* ~D()T(),98.0=* ~D()},
+   {1.0=* T()D(),1.0=* T()~D(),98.0=* ~D()},
    {T()}
 )
 c (Conclusion): {}
@@ -1524,9 +1524,9 @@ description:
     
 v (Views): (
    {Match(Suspect())},
-   {0.000001=* ~Guilty(Suspect())Match(Suspect()),~Guilty(Suspect())~Match(Suspect())}^{~Guilty(Suspect())}
+   {0.000001=* Match(Suspect())~Guilty(Suspect()),~Match(Suspect())~Guilty(Suspect())}^{~Guilty(Suspect())}
 )
-c (Conclusion): {0.000001=* ~Guilty(Suspect())Match(Suspect()),Match(Suspect())Guilty(Suspect())}
+c (Conclusion): {0.000001=* Match(Suspect())~Guilty(Suspect()),Guilty(Suspect())Match(Suspect())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1536,12 +1536,12 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   {0.000001=* ~Guilty(Suspect())Match(Suspect()),Match(Suspect())Guilty(Suspect())},
-   {999999.999999=* 0}^{Match(Suspect())Guilty(Suspect())},
+   {0.000001=* Match(Suspect())~Guilty(Suspect()),Guilty(Suspect())Match(Suspect())},
+   {999999.999999=* 0}^{Guilty(Suspect())Match(Suspect())},
    {Guilty(Suspect())}
 )
 c (Conclusion): (
-   {0.000001=* ~Guilty(Suspect())Match(Suspect()),999999.999999=* Match(Suspect())Guilty(Suspect())},
+   {0.000001=* Match(Suspect())~Guilty(Suspect()),999999.999999=* Guilty(Suspect())Match(Suspect())},
    {999999.999999=* Guilty(Suspect()),0}
 )
 test(verbose=False): Method used to test the example
@@ -1583,14 +1583,14 @@ description:
     In the box there is a yellow card and there is not a brown card
     
 v (Views): (
-   {~B(brown())B(yellow()),B(brown())~B(yellow())},
-   {50.0=* 0}^{~B(brown())B(yellow())},
-   {50.0=* 0}^{B(brown())~B(yellow())},
-   {~B(brown())B(yellow())}
+   {B(yellow())~B(brown()),~B(yellow())B(brown())},
+   {50.0=* 0}^{B(yellow())~B(brown())},
+   {50.0=* 0}^{~B(yellow())B(brown())},
+   {B(yellow())~B(brown())}
 )
 c (Conclusion): (
-   {50.0=* ~B(brown())B(yellow()),50.0=* B(brown())~B(yellow())},
-   {50.0=* ~B(brown())B(yellow()),0}
+   {50.0=* B(yellow())~B(brown()),50.0=* ~B(yellow())B(brown())},
+   {50.0=* B(yellow())~B(brown()),0}
 )
 test(verbose=False): Method used to test the example
 ```
@@ -1611,15 +1611,15 @@ description:
     There is a red marble and a blue marble in the box?
     
 v (Views): (
-   {~B(r())B(g())B(b()),~B(g())B(r()),~B(b())B(r())},
-   {33.333333=* 0}^{~B(r())B(g())B(b())},
-   {33.333333=* 0}^{~B(g())B(r())},
-   {33.333333=* 0}^{~B(b())B(r())},
-   {B(b())B(r())}
+   {B(b())~B(r())B(g()),B(r())~B(g()),B(r())~B(b())},
+   {33.333333=* 0}^{B(b())~B(r())B(g())},
+   {33.333333=* 0}^{B(r())~B(g())},
+   {33.333333=* 0}^{B(r())~B(b())},
+   {B(r())B(b())}
 )
 c (Conclusion): (
-   {33.333333=* ~B(r())B(g())B(b()),33.333333=* ~B(g())B(r()),33.333333=* ~B(b())B(r())},
-   {33.333333=* B(b())B(r()),0}
+   {33.333333=* B(b())~B(r())B(g()),33.333333=* B(r())~B(g()),33.333333=* B(r())~B(b())},
+   {33.333333=* B(r())B(b()),0}
 )
 test(verbose=False): Method used to test the example
 ```
@@ -1635,14 +1635,14 @@ description:
     (includes two background commitments)
     
 v (Views): (
-   {D(j())H(j()),H(j()),P(j())},
+   {H(j())D(j()),H(j()),P(j())},
    {E(j()*)},
-   ∀x {0.85=* E(x*)D(x),0.15=* E(x*)~D(x)}^{E(x*)},
-   ∀x {0.1=* H(x)E(x*),0.9=* ~H(x)E(x*)}^{E(x*)}
+   ∀x {0.85=* D(x)E(x*),0.15=* E(x*)~D(x)}^{E(x*)},
+   ∀x {0.1=* E(x*)H(x),0.9=* ~H(x)E(x*)}^{E(x*)}
 )
 c (Conclusion): (
-   {0.085=* D(j())H(j())E(j()*),0.765=* D(j())~H(j())E(j()*),0.015=* ~D(j())H(j())E(j()*),0.135=* ~D(j())~H(j())E(j()*)},
-   {D(j())H(j())}
+   {0.085=* H(j())D(j())E(j()*),0.765=* D(j())E(j()*)~H(j()),0.015=* H(j())E(j()*)~D(j()),0.135=* ~H(j())E(j()*)~D(j())},
+   {H(j())D(j())}
 )
 test(verbose=False): Method used to test the example
 ```
@@ -1662,10 +1662,10 @@ description:
     
 v (Views): (
    {Fired(i()*)Outoftune(j())Guitar(j())Gun(i()),Attic(a())},
-   ∀x {Gun(x)Fired(x*)Trigger(x),0}^{Gun(x)Fired(x*)},
+   ∀x {Trigger(x)Gun(x)Fired(x*),0}^{Gun(x)Fired(x*)},
    {Trigger(i())}
 )
-c (Conclusion): {Trigger(i())Gun(i())Fired(i()*)Outoftune(j())Guitar(j())}
+c (Conclusion): {Outoftune(j())Trigger(i())Fired(i()*)Guitar(j())Gun(i())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1684,7 +1684,7 @@ description:
     In the box there is a yellow card
     
 v (Views): (
-   {~Box(Brown())Box(Yellow()),~Box(Yellow())Box(Brown())}
+   {~Box(Brown())Box(Yellow()),Box(Brown())~Box(Yellow())}
 )
 c (Conclusion): {50.0=* Box(Yellow()),0}
 prob (Probability): {Box(Yellow())}
@@ -1706,10 +1706,10 @@ description:
     In the box there is a yellow card and a brown card
     
 v (Views): (
-   {~Box(Brown())Box(Yellow()),~Box(Yellow())Box(Brown())}
+   {~Box(Brown())Box(Yellow()),Box(Brown())~Box(Yellow())}
 )
 c (Conclusion): {0}
-prob (Probability): {Box(Yellow())Box(Brown())}
+prob (Probability): {Box(Brown())Box(Yellow())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1728,10 +1728,10 @@ description:
     In the box there is neither a yellow card nor a brown card
     
 v (Views): (
-   {~Box(Brown())Box(Yellow()),~Box(Yellow())Box(Brown())}
+   {~Box(Brown())Box(Yellow()),Box(Brown())~Box(Yellow())}
 )
 c (Conclusion): {0}
-prob (Probability): {~Box(Yellow())~Box(Brown())}
+prob (Probability): {~Box(Brown())~Box(Yellow())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1751,7 +1751,7 @@ description:
     In the box there is a yellow card.
     
 v (Views): (
-   {Box(Yellow())Box(Brown())}^{Box(Yellow())}
+   {Box(Brown())Box(Yellow())}^{Box(Yellow())}
 )
 c (Conclusion): {50.0=* Box(Yellow()),0}
 prob (Probability): {Box(Yellow())}
@@ -1774,10 +1774,10 @@ description:
     In the box there is a yellow card and a brown card.
     
 v (Views): (
-   {Box(Yellow())Box(Brown())}^{Box(Yellow())}
+   {Box(Brown())Box(Yellow())}^{Box(Yellow())}
 )
-c (Conclusion): {50.0=* Box(Yellow())Box(Brown()),0}
-prob (Probability): {Box(Yellow())Box(Brown())}
+c (Conclusion): {50.0=* Box(Brown())Box(Yellow()),0}
+prob (Probability): {Box(Brown())Box(Yellow())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1797,7 +1797,7 @@ description:
     In the box there is a yellow card and there is not a brown card.
     
 v (Views): (
-   {Box(Yellow())Box(Brown())}^{Box(Yellow())}
+   {Box(Brown())Box(Yellow())}^{Box(Yellow())}
 )
 c (Conclusion): {0}
 prob (Probability): {~Box(Brown())Box(Yellow())}
@@ -1820,10 +1820,10 @@ description:
     In the box there is neither a yellow card nor a brown card.
     
 v (Views): (
-   {Box(Yellow())Box(Brown())}^{Box(Yellow())}
+   {Box(Brown())Box(Yellow())}^{Box(Yellow())}
 )
 c (Conclusion): {0}
-prob (Probability): {~Box(Yellow())~Box(Brown())}
+prob (Probability): {~Box(Brown())~Box(Yellow())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1844,10 +1844,10 @@ description:
     There is a red marble and blue in marble in the box.
     
 v (Views): (
-   {33.333333333333336=* Box(Red()),33.333333333333336=* Box(Green())Box(Blue()),33.333333333333336=* ~Box(Blue())~Box(Red())~Box(Green())}
+   {33.333333333333336=* Box(Red()),33.333333333333336=* Box(Blue())Box(Green()),33.333333333333336=* ~Box(Red())~Box(Green())~Box(Blue())}
 )
 c (Conclusion): {0}
-prob (Probability): {Box(Blue())Box(Red())}
+prob (Probability): {Box(Red())Box(Blue())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1868,10 +1868,10 @@ description:
     There is a green marble and there is a blue marble.
     
 v (Views): (
-   {33.333333333333336=* Box(Red()),33.333333333333336=* Box(Green())Box(Blue()),33.333333333333336=* ~Box(Blue())~Box(Red())~Box(Green())}
+   {33.333333333333336=* Box(Red()),33.333333333333336=* Box(Blue())Box(Green()),33.333333333333336=* ~Box(Red())~Box(Green())~Box(Blue())}
 )
-c (Conclusion): {33.333333333333336=* Box(Green())Box(Blue()),0}
-prob (Probability): {Box(Green())Box(Blue())}
+c (Conclusion): {33.333333333333336=* Box(Blue())Box(Green()),0}
+prob (Probability): {Box(Blue())Box(Green())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1892,10 +1892,10 @@ description:
     In the box there is a grey marble and there is a mauve marble.
     
 v (Views): (
-   {Box(Grey())~Box(Mauve())Box(White()),Box(Grey())Box(Mauve())~Box(White())}
+   {~Box(Mauve())Box(Grey())Box(White()),Box(Mauve())Box(Grey())~Box(White())}
 )
-c (Conclusion): {50.0=* Box(Grey())Box(Mauve()),0}
-prob (Probability): {Box(Grey())Box(Mauve())}
+c (Conclusion): {50.0=* Box(Mauve())Box(Grey()),0}
+prob (Probability): {Box(Mauve())Box(Grey())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1916,10 +1916,10 @@ description:
     In the box there is a grey marble and there is a mauve marble.
     
 v (Views): (
-   {Box(Grey())~Box(Mauve())~Box(White()),~Box(Mauve())Box(White())~Box(Grey()),~Box(White())~Box(Grey())Box(Mauve())}
+   {~Box(Mauve())Box(Grey())~Box(White()),~Box(Mauve())~Box(Grey())Box(White()),Box(Mauve())~Box(Grey())~Box(White())}
 )
 c (Conclusion): {0}
-prob (Probability): {Box(Grey())Box(Mauve())}
+prob (Probability): {Box(Mauve())Box(Grey())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -1967,9 +1967,9 @@ description:
     What is the probability that there is a ten?
     
 v (Views): (
-   {A()Q(),J()K(),X()},
+   {A()Q(),K()J(),X()},
    {60.0=* A()Q()}^{A()Q()},
-   {20.0=* J()K()}^{J()K()}
+   {20.0=* K()J()}^{K()J()}
 )
 c (Conclusion): {20.0=* X(),0}
 prob (Probability): {X()}
@@ -2072,14 +2072,14 @@ c (Conclusion): {do(Award(ParentB()*))}
 cv (Consequence Views): (
    ∀x {Custody(x*)}^{do(Award(x*))},
    ∀x {~Custody(x*)}^{do(Deny(x*))},
-   {MedTime(ParentA())LowTime(ParentB())HighRapp(ParentB())MedRapp(ParentA())}
+   {HighRapp(ParentB())MedRapp(ParentA())MedTime(ParentA())LowTime(ParentB())}
 )
 pr (Priority Views): (
-   ∀x {1.0=+ 0}^{Custody(x*)MedRapp(x)},
-   ∀x {3.0=+ 0}^{Custody(x*)HighRapp(x)},
-   ∀x {1.0=+ 0}^{Custody(x*)MedTime(x)},
+   ∀x {1.0=+ 0}^{MedRapp(x)Custody(x*)},
+   ∀x {3.0=+ 0}^{HighRapp(x)Custody(x*)},
+   ∀x {1.0=+ 0}^{MedTime(x)Custody(x*)},
    ∀x {1.0=+ 0}^{MedTime(x)~Custody(x*)},
-   ∀x {2.0=+ 0}^{LowTime(x)~Custody(x*)}
+   ∀x {2.0=+ 0}^{~Custody(x*)LowTime(x)}
 )
 test(verbose=False): Method used to test the example
 ```
@@ -2111,14 +2111,14 @@ c (Conclusion): {do(Deny(ParentB()*))}
 cv (Consequence Views): (
    ∀x {Custody(x*)}^{do(Award(x*))},
    ∀x {~Custody(x*)}^{do(Deny(x*))},
-   {MedTime(ParentA())LowTime(ParentB())HighRapp(ParentB())MedRapp(ParentA())}
+   {HighRapp(ParentB())MedRapp(ParentA())MedTime(ParentA())LowTime(ParentB())}
 )
 pr (Priority Views): (
-   ∀x {1.0=+ 0}^{Custody(x*)MedRapp(x)},
-   ∀x {3.0=+ 0}^{Custody(x*)HighRapp(x)},
-   ∀x {1.0=+ 0}^{Custody(x*)MedTime(x)},
+   ∀x {1.0=+ 0}^{MedRapp(x)Custody(x*)},
+   ∀x {3.0=+ 0}^{HighRapp(x)Custody(x*)},
+   ∀x {1.0=+ 0}^{MedTime(x)Custody(x*)},
    ∀x {1.0=+ 0}^{MedTime(x)~Custody(x*)},
-   ∀x {2.0=+ 0}^{LowTime(x)~Custody(x*)}
+   ∀x {2.0=+ 0}^{~Custody(x*)LowTime(x)}
 )
 test(verbose=False): Method used to test the example
 ```
@@ -2148,8 +2148,8 @@ cv (Consequence Views): (
    {0.67=* D(600.0*),~D(600.0)}^{do(B())}
 )
 pr (Priority Views): (
-   ∀x {power(σ(log(σ(1.0,x)),1.0),-1.0)=+ 0}^{D(x*)},
-   ∀x {σ(log(σ(1.0,x)),1.0)=+ 0}^{S(x*)}
+   ∀x {power(σ(1.0,log(σ(1.0,x))),-1.0)=+ 0}^{D(x*)},
+   ∀x {σ(1.0,log(σ(1.0,x)))=+ 0}^{S(x*)}
 )
 test(verbose=False): Method used to test the example
 ```
@@ -2163,7 +2163,7 @@ v (Views): (
    ∀x ∃a ∀y {Q(a,y)P(x,a)},
    ∃b ∀z {P(b,z)}
 )
-c (Conclusion): ∃b ∀z ∀x ∃a ∀y {Q(a,y)P(b,z)P(x,a)}
+c (Conclusion): ∃b ∀z ∀x ∃a ∀y {Q(a,y)P(x,a)P(b,z)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -2239,7 +2239,7 @@ test(verbose=False): Method used to test the example
 ```
 v (Views): (
    ∃a ∀x {Q(x*)P(a)},
-   ∀y ∃a {R(a)Q(y*)}^{Q(y*)}
+   ∀y ∃a {Q(y*)R(a)}^{Q(y*)}
 )
 c (Conclusion): ∃a ∀x {Q(x*)P(a)}
 test(verbose=False): Method used to test the example
@@ -2252,7 +2252,7 @@ test(verbose=False): Method used to test the example
 ```
 v (Views): (
    ∃a ∀x {Q(x*)P(a)},
-   ∀y ∃a {R(a)Q(y*)}^{Q(y*)}
+   ∀y ∃a {Q(y*)R(a)}^{Q(y*)}
 )
 c (Conclusion): ∃a ∀x {Q(x*)P(a)}
 test(verbose=False): Method used to test the example
@@ -2264,10 +2264,10 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   ∀y ∀x ∃b ∃a ∀z ∃c {P(a*)P(b)P(z)Q(x*)P(y)P(c)},
-   ∃e ∃f ∃d {Q(f*)P(d*)Q(e*)}
+   ∀x ∀y ∃a ∃b ∀z ∃c {P(b)P(y)P(z)P(a*)P(c)Q(x*)},
+   ∃f ∃e ∃d {P(d*)Q(f*)Q(e*)}
 )
-c (Conclusion): ∃e ∃f ∃d {Q(f*)P(d*)Q(e*)}
+c (Conclusion): ∃f ∃e ∃d {P(d*)Q(e*)Q(f*)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -2277,7 +2277,7 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   ∃a ∃b {P(f(a),a)==(a,b)~P(f(b),a)},
+   ∃b ∃a {==(a,b)P(f(a),a)~P(f(b),a)},
    {}
 )
 c (Conclusion): {}
@@ -2381,7 +2381,7 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   ∀x ∃y {B(g(x*,y))A(f(x*))},
+   ∀x ∃y {A(f(x*))B(g(x*,y))},
    {A(f(j()*))}
 )
 c (Conclusion): ∃y {B(g(j()*,y))A(f(j()*))}
@@ -2394,10 +2394,10 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   ∃k {Defeats(k,Superman())==(Clark(),Superman())},
+   ∃k {==(Clark(),Superman())Defeats(k,Superman())},
    {==(Clark()*,Superman())}
 )
-c (Conclusion): ∃k {Defeats(k,Clark())==(Clark(),Clark())}
+c (Conclusion): ∃k {==(Clark(),Clark())Defeats(k,Clark())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -2407,10 +2407,10 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   ∃k ∃x {Defeats(k,x)==(Clark(),x)},
+   ∃k ∃x {==(Clark(),x)Defeats(k,x)},
    ∃x {==(Clark()*,x)}
 )
-c (Conclusion): ∃k {Defeats(k,Clark())==(Clark(),Clark())}
+c (Conclusion): ∃k {==(Clark(),Clark())Defeats(k,Clark())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -2446,10 +2446,10 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   ∃k {Defeats(k,Superman())==(Clark(),Superman())},
+   ∃k {==(Clark(),Superman())Defeats(k,Superman())},
    {do(A())}
 )
-c (Conclusion): ∃k {Defeats(k,Superman())==(Clark(),Superman())}
+c (Conclusion): ∃k {==(Clark(),Superman())Defeats(k,Superman())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -2459,10 +2459,10 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   ∃k {Defeats(k,Superman())==(Clark(),Superman())},
+   ∃k {==(Clark(),Superman())Defeats(k,Superman())},
    {==(Clark(),f(Superman()*))}
 )
-c (Conclusion): ∃k {Defeats(k,Superman())==(Clark(),Superman())}
+c (Conclusion): ∃k {==(Clark(),Superman())Defeats(k,Superman())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -2472,10 +2472,10 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   ∃k {Defeats(k,Superman())==(Clark(),Superman())},
+   ∃k {==(Clark(),Superman())Defeats(k,Superman())},
    {==(Clark()*,Superman())}^{}
 )
-c (Conclusion): ∃k {Defeats(k,Superman())==(Clark(),Superman())}
+c (Conclusion): ∃k {==(Clark(),Superman())Defeats(k,Superman())}
 test(verbose=False): Method used to test the example
 ```
 
@@ -2498,7 +2498,7 @@ test(verbose=False): Method used to test the example
 
 ```
 v (Views): (
-   {1.0=* 2.0=+ B()A(),0.4=* B()C(),C()A()},
+   {1.0=* 2.0=+ B()A(),0.4=* C()B(),C()A()},
    {A()},
    {B()},
    {C()},
@@ -2518,7 +2518,7 @@ v (Views): (
    ∀x ∃a {P(x)E(x,a),~P(x*)},
    {P(j()*)}
 )
-c (Conclusion): ∃a {~P(j()*),E(j(),a)P(j())}
+c (Conclusion): ∃a {~P(j()*),P(j())E(j(),a)}
 test(verbose=False): Method used to test the example
 ```
 
@@ -2531,7 +2531,7 @@ description:
     From page 173
     
 v (Views): (
-   ∀x {S(m()*)T(x,m())S(j()*),S(m()*)T(x,j())S(j()*)},
+   ∀x {S(m()*)S(j()*)T(x,m()),S(m()*)T(x,j())S(j()*)},
    ∀x ∃a {T(x,a)S(a*)}
 )
 c (Conclusion): ∀x ∃a {T(x,a)S(a*)}
@@ -2547,7 +2547,7 @@ description:
     From page 173
     
 v (Views): (
-   ∀x {S(m()*)T(x,m())S(j()*),S(m()*)T(x,j())S(j()*)},
+   ∀x {S(m()*)S(j()*)T(x,m()),S(m()*)T(x,j())S(j()*)},
    ∃a ∀x {T(x,a)S(a*)}
 )
 c (Conclusion): ∀x ∃a {T(x,a)S(a*)}

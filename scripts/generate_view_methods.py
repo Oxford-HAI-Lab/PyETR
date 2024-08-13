@@ -38,27 +38,27 @@ def get_line_no(method):
         return ""
 
 
-out = []
-for section, section_items in relevant_methods.items():
-    out.append(f"{section}\n")
-    for name in section_items:
-        assert name in dir(View)
-        method = getattr(View, name)
+def main():
+    out = []
+    for section, section_items in relevant_methods.items():
+        out.append(f"{section}\n")
+        for name in section_items:
+            assert name in dir(View)
+            method = getattr(View, name)
 
-        main_str = (
-            "### `"
-            + name
-            + "`\n"
-            + get_line_no(method)
-            + "```\n"
-            + method.__doc__
-            + "\n```"
-        )
+            main_str = (
+                "### `"
+                + name
+                + "`\n"
+                + get_line_no(method)
+                + "```\n"
+                + method.__doc__
+                + "\n```"
+            )
 
-        out.append(main_str)
+            out.append(main_str)
 
-
-with open("../../docs/view_methods.md", "w+") as f:
-    intro = "# View Methods Index\n\nBelow you'll find all of the methods of View, including associated operations and ways of creating them.\n"
-    full_page = intro + "\n\n".join(out)
-    f.write(full_page)
+    with open("./docs/view_methods.md", "w+") as f:
+        intro = "# View Methods Index\n\nBelow you'll find all of the methods of View, including associated operations and ways of creating them.\n"
+        full_page = intro + "\n\n".join(out)
+        f.write(full_page)

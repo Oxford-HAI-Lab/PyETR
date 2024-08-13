@@ -25,3 +25,11 @@ mkdocs-material = "^9.5.28"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+case-index = "scripts.generate_case_index:main"
+case-list = "scripts.generate_case_list:main"
+infer-index = "scripts.generate_inference_page:main"
+view-methods = "scripts.generate_view_methods:main"
+gen-all = "scripts.generate_all:main"
