@@ -273,6 +273,15 @@ class Sum(BaseTest):
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
+class Answer(BaseTest):
+    v: tuple[View, View]
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = cls.v[0].answer(cls.v[1])
+        if not result == cls.c:
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
 
 class Factor(BaseTest):
     v: tuple[View, View]
@@ -539,7 +548,7 @@ class e8(DefaultInference, BaseExample):
     c: View = ps("{t()}")
 
 
-class e10(DefaultInference, BaseExample):
+class e10(Answer, BaseExample):
     """
     Example 10, p76
 
@@ -549,10 +558,10 @@ class e10(DefaultInference, BaseExample):
     """
 
     v: tuple[View, View] = (
-        ps("{K(x())}"),
-        ps("{T(w())K(z()),Q(y())A(x())}"),
+        ps("{K()}"),
+        ps("{T()K(),Q()A()}"),
     )
-    c: View = ps("{0}")
+    c: View = ps("{K()}")
 
 
 class e11(BasicStep, BaseExample):
