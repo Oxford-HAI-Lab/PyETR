@@ -554,7 +554,7 @@ class e10(Answer, BaseExample):
 
     P1 There is a king.
     P2 There is at least an ace and a queen, or else at least a king and a ten.
-    C There is a ten.
+    C There is a king (reversed premises blocking illusory inference).
     """
 
     v: tuple[View, View] = (
