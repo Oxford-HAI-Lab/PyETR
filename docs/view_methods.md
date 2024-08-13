@@ -5,6 +5,9 @@ Below you'll find all of the methods of View, including associated operations an
 
 
 ### `product`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L654)
+
 ```
 
         Based on definition 5.15, p208
@@ -26,6 +29,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `sum`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L694)
+
 ```
 
         Based on definition 5.14, p208
@@ -46,6 +52,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `update`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1008)
+
 ```
 
         Based on Definition 4.34, p163
@@ -63,6 +72,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `answer`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L859)
+
 ```
 
         Based on definition 5.13, p206
@@ -80,6 +92,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `negation`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L882)
+
 ```
 
         Based on definition 5.16, p210
@@ -96,6 +111,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `merge`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L910)
+
 ```
 
         Based on Definition 5.26, p221
@@ -113,6 +131,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `division`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1295)
+
 ```
 
         Based on definition 4.38, p168
@@ -132,6 +153,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `factor`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1343)
+
 ```
 
         Based on definition 5.17 p210 (contradiction)
@@ -154,6 +178,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `depose`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1527)
+
 ```
 
         Based on definition 5.23
@@ -169,6 +196,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `inquire`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1558)
+
 ```
 
         Based on definition 5.18, p210
@@ -193,6 +223,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `suppose`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1651)
+
 ```
 
         Based on definition 5.22, p219
@@ -219,6 +252,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `query`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1770)
+
 ```
 
         Based on definition 5.19, p210
@@ -230,6 +266,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `which`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1945)
+
 ```
 
         Based on definition 5.33, p232
@@ -249,6 +288,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `universal_product`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1055)
+
 ```
 
         Based on Definition 5.28, p223
@@ -258,6 +300,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `atomic_answer`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L742)
+
 ```
 
         Based on definition 5.12, p206
@@ -275,6 +320,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `equilibrium_answer`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L797)
+
 ```
 
         Based on definition 5.10, p205
@@ -292,6 +340,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `existential_sum`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1129)
+
 ```
 
         Based on Definition 5.34, p233
@@ -306,6 +357,9 @@ Below you'll find all of the methods of View, including associated operations an
 
 
 ### `from_str`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2057)
+
 ```
 
         Parses from view string form to view form.
@@ -322,6 +376,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `to_str`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2075)
+
 ```
 
         Parses from View form to view string form
@@ -335,6 +392,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `from_fol`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2087)
+
 ```
 
         Parses from first order logic string form to View form.
@@ -349,6 +409,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `to_fol`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2103)
+
 ```
 
         Parses from View form to first order logic string form.
@@ -362,6 +425,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `from_json`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2032)
+
 ```
 
         Parses from json form to View form
@@ -375,6 +441,9 @@ Below you'll find all of the methods of View, including associated operations an
 ```
 
 ### `to_json`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2045)
+
 ```
 
         Parses from View form to json form

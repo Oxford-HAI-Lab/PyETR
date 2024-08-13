@@ -3,6 +3,7 @@ __all__ = [
     "default_inference_procedure",
     "default_procedure_what_is_prob",
     "default_decision",
+    "default_procedure_does_it_follow",
 ]
 from typing import Iterable, Optional
 
@@ -61,7 +62,7 @@ def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> V
 
     Returns:
         View: G''
-    """  # Inference: Where is does x follow?
+    """
 
     def _default_inference_step1(rel_v: tuple[View, ...]):
         g_prime = basic_step(v=rel_v, verbose=verbose)
@@ -90,6 +91,22 @@ def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> V
 def default_procedure_does_it_follow(
     v: tuple[View, ...], target: View, verbose: bool = False
 ) -> bool:
+    """
+    Based Definition 4.47 p180
+
+    (Sub-procedure for "does Δ^Ψ_RI follow?" tasks)
+    G' = T[P₁[]ᴰ]^↻[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
+    G'' = G'[Ψ^{0}_[R][I]]ˢ[Δ^Ψ_RI]ꟴ
+
+    Args:
+        v (tuple[View, ...]): (P₁,..., Pₙ)
+        target View: Δ^Ψ_RI
+        verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+    Returns:
+        bool: Report yes or no, note: Report G'' -> yes
+    """
+
     def _default_does_it_follow_step1(rel_v: tuple[View, ...]):
         g_prime = basic_step(rel_v)
         return g_prime.suppose(

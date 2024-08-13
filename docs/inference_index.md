@@ -3,6 +3,9 @@
 Below you'll find all of the cases in pyetr.cases, and their associated views. You can use this page as an index of the current cases.
 
 ## `basic_step`
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L30)
+
+
 ```
 
     Based Definition 4.47 p179-180
@@ -19,6 +22,9 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `default_inference_procedure`
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L52)
+
+
 ```
 
     Based Definition 4.47 p179-180
@@ -35,7 +41,32 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
     
 ```
 
+## `default_procedure_does_it_follow`
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L90)
+
+
+```
+
+    Based Definition 4.47 p180
+
+    (Sub-procedure for "does Δ^Ψ_RI follow?" tasks)
+    G' = T[P₁[]ᴰ]^↻[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
+    G'' = G'[Ψ^{0}_[R][I]]ˢ[Δ^Ψ_RI]ꟴ
+
+    Args:
+        v (tuple[View, ...]): (P₁,..., Pₙ)
+        target View: Δ^Ψ_RI
+        verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+    Returns:
+        bool: Report yes or no, note: Report G'' -> yes
+    
+```
+
 ## `default_procedure_what_is_prob`
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L133)
+
+
 ```
 
     Based on definition 5.20, p212
@@ -66,6 +97,9 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `default_decision`
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L227)
+
+
 ```
 
     Based on Definition 6.7, p272
