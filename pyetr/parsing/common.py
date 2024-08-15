@@ -140,34 +140,6 @@ def merge_terms_with_opens(
     return new_terms_sets
 
 
-def merge_atoms_with_opens(
-    atoms: list[PredicateAtom],
-    open_atom_sets: list[list[tuple[Term, OpenPredicateAtom]]],
-) -> list[tuple[Term, list[OpenPredicateAtom]]]:
-    """
-
-    Combines a list of atoms from inside an object, and combines them
-
-    Args:
-        atoms (list[PredicateAtom]): A list of atoms inside a doatom [A, B]
-        open_atom_sets (list[list[tuple[Term, OpenPredicateAtom]]]): The open atoms associated with
-        each as here: [[(A, openA1), (A, openA2)],[(B, openB1)]]
-
-    Returns:
-        list[tuple[Term, list[OpenPredicateAtom]]]: The merged form:
-            [(A, [openA1, B]), (A, [openA2, B]), (B, [A, openB1])]
-    """
-    new_atoms = [get_open_atom_equivalent(a) for a in atoms]
-    new_atoms_sets: list[tuple[Term, list[OpenPredicateAtom]]] = []
-    for i, open_atoms in enumerate(open_atom_sets):
-        if len(open_atoms) > 0:
-            for t, open_atom in open_atoms:
-                fresh_atoms = copy(new_atoms)
-                fresh_atoms[i] = open_atom
-                new_atoms_sets.append((t, fresh_atoms))
-    return new_atoms_sets
-
-
 class QuantList:
     """
     Simulates needed interface for parser

@@ -35,40 +35,6 @@ class AbstractAtom(ABC):
         ...
 
 
-class OpenAtom(AbstractAtom):
-    """
-    The abstract base class of all open atoms.
-    """
-
-    @abstractmethod
-    def __call__(self, term: Term) -> "Atom":
-        """
-        Replaces the term given in place of the question mark in the
-        open atom. This produces a regular Atom.
-
-        Args:
-            term (Term): The term to be replaced.
-
-        Returns:
-            Atom: The Atom with the question mark replaced
-        """
-        ...
-
-    @abstractmethod
-    def question_count(self) -> int:
-        """
-        Counts the question marks present in the open atom
-
-        Returns:
-            int: The number of Question Marks.
-        """
-        ...
-
-    @abstractmethod
-    def context_equals(self, atom: "Atom", question_term: "Term") -> bool:
-        ...
-
-
 class Atom(AbstractAtom):
     """
     The abstract base class of all atoms (not opens).

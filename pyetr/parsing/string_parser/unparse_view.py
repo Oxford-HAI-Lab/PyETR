@@ -4,7 +4,7 @@ import typing
 from typing import cast
 
 import pyetr.parsing.string_parser.parse_string as parsing
-from pyetr.atoms import Atom, DoAtom, OpenDoAtom, OpenPredicateAtom, PredicateAtom
+from pyetr.atoms import Atom, DoAtom, OpenPredicateAtom, PredicateAtom
 from pyetr.atoms.open_predicate_atom import get_open_atom_equivalent
 from pyetr.atoms.terms import (
     ArbitraryObject,
@@ -111,14 +111,14 @@ def unparse_predicate_atom(
 
 
 def unparse_do_atom(
-    do_atom: DoAtom, open_do_atoms: list[tuple[Term, OpenDoAtom]]
+    do_atom: DoAtom, open_atoms: list[tuple[Term, OpenPredicateAtom]]
 ) -> parsing.DoAtom:
     """
     Converts a do atom to parsing atom form.
 
     Args:
         do_atom (DoAtom): The do atom to convert
-        open_do_atoms (list[tuple[Term, OpenDoAtom]]): The associated open
+        open_do_atoms (list[tuple[Term, OpenPredicateAtom]]): The associated open
             do atoms.
 
     Returns:
@@ -138,11 +138,10 @@ def unparse_do_atom(
     for atom in do_atom.atoms:
         # For each atom in the do atom
         assoc_open_atoms: list[tuple[Term, OpenPredicateAtom]] = []
-        for t, o in open_do_atoms:
+        for t, o in open_atoms:
             # Check each of the open do atoms
-            for open_atom in o.atoms:
-                if open_atom_corresponds(open_atom, atom, t):
-                    assoc_open_atoms.append((t, open_atom))
+            if open_atom_corresponds(o, atom, t):
+                assoc_open_atoms.append((t, o))
 
         new_atom = unparse_predicate_atom(atom, assoc_open_atoms)
         new_atoms.append(new_atom)
@@ -175,7 +174,7 @@ def unparse_atom(
             atom, cast(list[tuple[Term, OpenPredicateAtom]], open_atoms)
         )
     elif isinstance(atom, DoAtom):
-        return unparse_do_atom(atom, cast(list[tuple[Term, OpenDoAtom]], open_atoms))
+        return unparse_do_atom(atom, open_atoms)
     else:
         assert False
 

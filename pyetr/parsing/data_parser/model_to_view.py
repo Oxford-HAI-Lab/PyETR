@@ -1,9 +1,8 @@
 from typing import cast, overload
 
 import pyetr.parsing.data_parser.models as models
-from pyetr.atoms.abstract import Atom, OpenAtom
+from pyetr.atoms.abstract import Atom
 from pyetr.atoms.doatom import DoAtom
-from pyetr.atoms.open_doatom import OpenDoAtom
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
 from pyetr.atoms.predicate import Predicate
 from pyetr.atoms.predicate_atom import PredicateAtom
@@ -102,7 +101,7 @@ def model_to_open_term(
 
 
 @overload
-def model_to_open_atom(a: models.DoAtom) -> OpenDoAtom:
+def model_to_open_atom(a: models.DoAtom) -> list[OpenPredicateAtom]:
     ...
 
 
@@ -112,11 +111,15 @@ def model_to_open_atom(a: models.Atom) -> OpenPredicateAtom:
 
 
 @overload
-def model_to_open_atom(a: models.Atom | models.DoAtom) -> OpenAtom:
+def model_to_open_atom(
+    a: models.Atom | models.DoAtom,
+) -> OpenPredicateAtom | list[OpenPredicateAtom]:
     ...
 
 
-def model_to_open_atom(a: models.Atom | models.DoAtom) -> OpenAtom:
+def model_to_open_atom(
+    a: models.Atom | models.DoAtom,
+) -> OpenPredicateAtom | list[OpenPredicateAtom]:
     """
     Converts a pydantic form atom to view openatom
     Args:
@@ -135,7 +138,12 @@ def model_to_open_atom(a: models.Atom | models.DoAtom) -> OpenAtom:
             terms=tuple([model_to_open_term(t) for t in a.terms]),
         )
     else:
-        return OpenDoAtom([model_to_open_atom(atom) for atom in a.atoms])
+        final_atoms: list[OpenPredicateAtom] = []
+        for atom in a.atoms:
+            new_atom = model_to_open_atom(atom)
+            if new_atom.question_count != 0:
+                final_atoms.append(new_atom)
+        return final_atoms
 
 
 @overload
@@ -222,15 +230,18 @@ def model_to_view(v: models.View) -> ViewStorage:
     Returns:
         ViewStorage: The output view object
     """
-    issues = IssueStructure(
-        [
-            (
-                model_to_term(cast(models.ArbitraryObject | models.FunctionalTerm, t)),
-                model_to_open_atom(a),
-            )
-            for t, a in v.issues
-        ]
-    )
+    issues_list: list[tuple[Term, OpenPredicateAtom]] = []
+    for t, a in v.issues:
+        new_term = model_to_term(
+            cast(models.ArbitraryObject | models.FunctionalTerm, t)
+        )
+        new_atoms = model_to_open_atom(a)
+        if isinstance(new_atoms, list):
+            for open_atom in new_atoms:
+                issues_list.append((new_term, open_atom))
+        else:
+            issues_list.append((new_term, new_atoms))
+    issues = IssueStructure(issues_list)
     return ViewStorage(
         stage=SetOfStates([model_to_state(state) for state in v.stage]),
         supposition=SetOfStates([model_to_state(state) for state in v.supposition]),

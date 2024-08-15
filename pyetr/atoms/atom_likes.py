@@ -1,4 +1,4 @@
-from typing import Generic, Iterable, TypeVar
+from typing import Generic, TypeVar
 
 from pyetr.atoms.terms.multiset import Multiset
 
@@ -49,37 +49,3 @@ class PredicateAtomLike(Generic[TermType]):
         else:
             tilde = "~"
         return f"{tilde}{self.predicate.name}({terms})"
-
-
-class DoAtomLike(Generic[AtomType]):
-    """
-    This "AtomLike" is a mixin for the doatom-like properties associated
-    with DoAtom and OpenDoAtom
-    """
-
-    atoms: Multiset[AtomType]
-    polarity: bool
-
-    def __init__(self, atoms: Iterable[AtomType], polarity: bool = True) -> None:
-        self.atoms = Multiset(atoms)
-        self.polarity = polarity
-
-    @property
-    def detailed(self) -> str:
-        return f"<{type(self).__name__} polarity={self.polarity} atoms=({','.join(a.detailed for a in self.atoms)})>"
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, type(self)):
-            return False
-        return self.atoms == other.atoms and self.polarity == other.polarity
-
-    def __hash__(self) -> int:
-        return hash((type(self).__name__, frozenset(self.atoms), self.polarity))
-
-    def __repr__(self) -> str:
-        terms = ",".join([repr(i) for i in self.atoms])
-        if self.polarity:
-            tilde = ""
-        else:
-            tilde = "~"
-        return f"{tilde}do({terms})"
