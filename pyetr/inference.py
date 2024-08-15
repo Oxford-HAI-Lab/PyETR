@@ -5,7 +5,7 @@ __all__ = [
     "default_decision",
     "default_procedure_does_it_follow",
 ]
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Sequence
 
 from pyetr.atoms.terms.function import RealNumber
 from pyetr.atoms.terms.multiset import Multiset
@@ -27,14 +27,14 @@ from .view import View
 #     return out.factor(View.get_falsum(), verbose=verbose)
 
 
-def basic_step(v: tuple[View, ...], verbose: bool = False) -> View:
+def basic_step(v: Sequence[View], verbose: bool = False) -> View:
     """
     Based Definition 4.47 p179-180
 
     G' = T[P₁[]ᴰ]^↻[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
 
     Args:
-        v (tuple[View, ...]): (P₁,..., Pₙ)
+        v (Sequence[View]): (P₁,..., Pₙ)
         verbose (bool, optional): Enables verbose mode. Defaults to False.
 
     Returns:
@@ -49,7 +49,7 @@ def basic_step(v: tuple[View, ...], verbose: bool = False) -> View:
     return out.factor(View.get_falsum(), verbose=verbose)
 
 
-def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> View:
+def default_inference_procedure(v: Sequence[View], verbose: bool = False) -> View:
     """
     Based Definition 4.47 p179-180
 
@@ -57,14 +57,14 @@ def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> V
     G'' = G'[P₁[]ᴰ]ꟳ...[Pₙ]ꟳ
 
     Args:
-        v (tuple[View, ...]): (P₁,..., Pₙ)
+        v (Sequence[View]): (P₁,..., Pₙ)
         verbose (bool, optional): Enables verbose mode. Defaults to False.
 
     Returns:
         View: G''
     """
 
-    def _default_inference_step1(rel_v: tuple[View, ...]):
+    def _default_inference_step1(rel_v: Sequence[View]):
         g_prime = basic_step(v=rel_v, verbose=verbose)
         # Step (1)
         for i, view in enumerate(rel_v):
@@ -89,7 +89,7 @@ def default_inference_procedure(v: tuple[View, ...], verbose: bool = False) -> V
 
 
 def default_procedure_does_it_follow(
-    v: tuple[View, ...], target: View, verbose: bool = False
+    v: Sequence[View], target: View, verbose: bool = False
 ) -> bool:
     """
     Based Definition 4.47 p180
@@ -99,7 +99,7 @@ def default_procedure_does_it_follow(
     G'' = G'[Ψ^{0}_[R][I]]ˢ[Δ^Ψ_RI]ꟴ
 
     Args:
-        v (tuple[View, ...]): (P₁,..., Pₙ)
+        v (Sequence[View]): (P₁,..., Pₙ)
         target View: Δ^Ψ_RI
         verbose (bool, optional): Enables verbose mode. Defaults to False.
 
@@ -107,7 +107,7 @@ def default_procedure_does_it_follow(
         bool: Report yes or no, note: Report G'' -> yes
     """
 
-    def _default_does_it_follow_step1(rel_v: tuple[View, ...]):
+    def _default_does_it_follow_step1(rel_v: Sequence[View]):
         g_prime = basic_step(rel_v)
         return g_prime.suppose(
             View.with_restriction(
@@ -133,7 +133,7 @@ def default_procedure_does_it_follow(
 
 
 def default_procedure_what_is_prob(
-    v: tuple[View, ...], prob_of: View, verbose: bool = False
+    v: Sequence[View], prob_of: View, verbose: bool = False
 ) -> View:
     """
     Based on definition 5.20, p212
@@ -154,7 +154,7 @@ def default_procedure_what_is_prob(
         Else:
             return ⊥
     Args:
-        v (tuple[View, ...]): (P₁,..., Pₙ)
+        v (Sequence[View]): (P₁,..., Pₙ)
         prob_of (View): Δ^Ψ
         verbose (bool, optional): Enables verbose mode. Defaults to False.
 

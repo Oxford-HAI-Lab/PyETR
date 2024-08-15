@@ -13,7 +13,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
     G' = T[P₁[]ᴰ]^↻[P₂]^↻...[Pₙ]^↻[⊥]ꟳ
 
     Args:
-        v (tuple[View, ...]): (P₁,..., Pₙ)
+        v (Sequence[View]): (P₁,..., Pₙ)
         verbose (bool, optional): Enables verbose mode. Defaults to False.
 
     Returns:
@@ -33,7 +33,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
     G'' = G'[P₁[]ᴰ]ꟳ...[Pₙ]ꟳ
 
     Args:
-        v (tuple[View, ...]): (P₁,..., Pₙ)
+        v (Sequence[View]): (P₁,..., Pₙ)
         verbose (bool, optional): Enables verbose mode. Defaults to False.
 
     Returns:
@@ -54,7 +54,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
     G'' = G'[Ψ^{0}_[R][I]]ˢ[Δ^Ψ_RI]ꟴ
 
     Args:
-        v (tuple[View, ...]): (P₁,..., Pₙ)
+        v (Sequence[View]): (P₁,..., Pₙ)
         target View: Δ^Ψ_RI
         verbose (bool, optional): Enables verbose mode. Defaults to False.
 
@@ -87,7 +87,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
         Else:
             return ⊥
     Args:
-        v (tuple[View, ...]): (P₁,..., Pₙ)
+        v (Sequence[View]): (P₁,..., Pₙ)
         prob_of (View): Δ^Ψ
         verbose (bool, optional): Enables verbose mode. Defaults to False.
 
