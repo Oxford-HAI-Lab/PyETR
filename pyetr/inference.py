@@ -239,9 +239,9 @@ def default_decision(
     dq[dq[CV]^↻[⊥]ꟳ[PR]^↻]
 
     Args:
-        dq (View): dq
-        cv (Iterable[View]): CV
-        pr (Iterable[View]): PR
+        dq (View): dq, Decision Question
+        cv (Iterable[View]): CV, Consequence Views
+        pr (Iterable[View]): PR, Priority Views
         verbose (bool, optional): Enable verbose mode. Defaults to False.
         absurd_states (Optional[list[State]], optional): Any additional absurd states in the system. Defaults to None.
 
