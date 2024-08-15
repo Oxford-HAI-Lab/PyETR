@@ -1,12 +1,12 @@
 from pyetr.atoms.terms.open_term import get_open_equivalent
 
-from .abstract import Atom, OpenAtom
+from .abstract import AbstractAtom, Atom
 from .atom_likes import PredicateAtomLike
 from .predicate_atom import PredicateAtom
 from .terms import ArbitraryObject, OpenTerm, Term
 
 
-class OpenPredicateAtom(PredicateAtomLike[OpenTerm], OpenAtom):
+class OpenPredicateAtom(PredicateAtomLike[OpenTerm], AbstractAtom):
     def __call__(self, term: Term) -> PredicateAtom:
         return PredicateAtom(
             predicate=self.predicate, terms=tuple([t(term) for t in self.terms])

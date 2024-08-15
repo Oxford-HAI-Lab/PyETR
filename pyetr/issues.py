@@ -1,18 +1,20 @@
 from typing import AbstractSet, Iterable, Optional
 
-from .atoms import Atom, OpenAtom
+from pyetr.atoms.doatom import DoAtom
+
+from .atoms import Atom, OpenPredicateAtom
 from .atoms.terms import ArbitraryObject, Term
 from .stateset import SetOfStates
 
 
-class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
+class IssueStructure(frozenset[tuple[Term, OpenPredicateAtom]]):
     """
     An IssueStructure is a set of <Term, OpenAtom> where each open atom
     has exactly one question mark
     """
 
     def __new__(
-        cls, __iterable: Optional[Iterable[tuple[Term, OpenAtom]]] = None, /
+        cls, __iterable: Optional[Iterable[tuple[Term, OpenPredicateAtom]]] = None, /
     ) -> "IssueStructure":
         if __iterable is None:
             return super().__new__(cls)
@@ -34,42 +36,51 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
         return IssueStructure(super().intersection(*s))
 
     def symmetric_difference(
-        self, __s: Iterable[tuple[Term, OpenAtom]]
+        self, __s: Iterable[tuple[Term, OpenPredicateAtom]]
     ) -> "IssueStructure":  # pragma: not covered
         return IssueStructure(super().symmetric_difference(__s))
 
     def union(  # pyright: ignore [reportIncompatibleMethodOverride]
-        self, *s: Iterable[tuple[Term, OpenAtom]]
+        self, *s: Iterable[tuple[Term, OpenPredicateAtom]]
     ) -> "IssueStructure":
         return IssueStructure(super().union(*s))  # pragma: not covered
 
-    def __and__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
+    def __and__(
+        self, __value: AbstractSet[tuple[Term, OpenPredicateAtom]]
+    ) -> "IssueStructure":
         return IssueStructure(super().__and__(__value))  # pragma: not covered
 
     def __or__(  # pyright: ignore [reportIncompatibleMethodOverride]
-        self, __value: AbstractSet[tuple[Term, OpenAtom]]
+        self, __value: AbstractSet[tuple[Term, OpenPredicateAtom]]
     ) -> "IssueStructure":
         return IssueStructure(super().__or__(__value))  # pragma: not covered
 
-    def __sub__(self, __value: AbstractSet[tuple[Term, OpenAtom]]) -> "IssueStructure":
+    def __sub__(
+        self, __value: AbstractSet[tuple[Term, OpenPredicateAtom]]
+    ) -> "IssueStructure":
         return IssueStructure(super().__sub__(__value))  # pragma: not covered
 
     def __xor__(  # pyright: ignore [reportIncompatibleMethodOverride]
-        self, __value: AbstractSet[tuple[Term, OpenAtom]]
+        self, __value: AbstractSet[tuple[Term, OpenPredicateAtom]]
     ) -> "IssueStructure":
         return IssueStructure(super().__xor__(__value))  # pragma: not covered
 
     def restriction(self, atoms: set[Atom]) -> "IssueStructure":
-        return IssueStructure(
-            {
-                (term, open_atom)
-                for term, open_atom in self
-                if any(open_atom.context_equals(atom, term) for atom in atoms)
-            }
-        )
+        new_issues: list[tuple[Term, OpenPredicateAtom]] = []
+        for term, open_atom in self:
+            atom_bools: list[bool] = []
+            for atom in atoms:
+                if isinstance(atom, DoAtom):
+                    for a in atom.atoms:
+                        atom_bools.append(open_atom.context_equals(a, term))
+                else:
+                    atom_bools.append(open_atom.context_equals(atom, term))
+            if any(atom_bools):
+                new_issues.append((term, open_atom))
+        return IssueStructure(new_issues)
 
     @classmethod
-    def _validate(cls, __iterable: Iterable[tuple[Term, OpenAtom]]):
+    def _validate(cls, __iterable: Iterable[tuple[Term, OpenPredicateAtom]]):
         for _, o in __iterable:
             if o.question_count() != 1:
                 raise ValueError(
@@ -79,7 +90,11 @@ class IssueStructure(frozenset[tuple[Term, OpenAtom]]):
     def validate_against_states(self, states: SetOfStates):
         for t, a in self:
             atom = a(t)
-            if atom not in states.atoms and ~atom not in states.atoms:
+
+            if (
+                atom not in states.predicate_atoms
+                and ~atom not in states.predicate_atoms
+            ):
                 raise ValueError(
                     f"Issue atom {(t, a)} is not a subset of atoms in stage/supposition: {states.atoms}"
                 )

@@ -1,9 +1,8 @@
 from typing import Optional, cast
 
 import pyetr.parsing.string_parser.parse_string as parsing
-from pyetr.atoms import Atom, OpenAtom, OpenPredicateAtom, Predicate, PredicateAtom
+from pyetr.atoms import Atom, OpenPredicateAtom, Predicate, PredicateAtom
 from pyetr.atoms.doatom import DoAtom
-from pyetr.atoms.open_doatom import OpenDoAtom
 from pyetr.atoms.terms import (
     ArbitraryObject,
     Function,
@@ -21,7 +20,6 @@ from pyetr.parsing.common import (
     ParsingError,
     Variable,
     get_variable_map_and_dependencies,
-    merge_atoms_with_opens,
     merge_terms_with_opens,
 )
 from pyetr.parsing.view_storage import ViewStorage
@@ -173,7 +171,7 @@ def parse_do_atom(
     atom: parsing.DoAtom,
     variable_map: dict[str, ArbitraryObject],
     function_map: dict[tuple[str, int | None], Function],
-) -> tuple[DoAtom, list[tuple[Term, OpenDoAtom]]]:
+) -> tuple[DoAtom, list[tuple[Term, OpenPredicateAtom]]]:
     """
     Converts the parser do atom to DoAtom form.
 
@@ -183,33 +181,26 @@ def parse_do_atom(
         function_map (dict[tuple[str,int | None], Function]): The map from function name to function.
 
     Returns:
-        tuple[DoAtom, list[tuple[Term, OpenDoAtom]]]: The parsed do atom and its associated open
+        tuple[DoAtom, list[tuple[Term, OpenPredicateAtom]]]: The parsed do atom and its associated open
             terms.
     """
     atoms: list[PredicateAtom] = []
-    open_atom_sets: list[list[tuple[Term, OpenPredicateAtom]]] = []
+    open_atom_sets: list[tuple[Term, OpenPredicateAtom]] = []
     for a in atom.atoms:
         parsed_a, open_atoms = parse_predicate_atom(
             a, variable_map=variable_map, function_map=function_map
         )
         atoms.append(parsed_a)
-        open_atom_sets.append(open_atoms)
+        open_atom_sets += open_atoms
 
-    new_open_terms_sets = merge_atoms_with_opens(atoms, open_atom_sets)
-
-    open_do_atoms = [
-        (t, OpenDoAtom(atoms=open_atoms, polarity=atom.polarity))
-        for t, open_atoms in new_open_terms_sets
-    ]
-
-    return DoAtom(polarity=atom.polarity, atoms=atoms), open_do_atoms
+    return DoAtom(polarity=atom.polarity, atoms=atoms), open_atom_sets
 
 
 def parse_state(
     s: parsing.State,
     variable_map: dict[str, ArbitraryObject],
     function_map: dict[tuple[str, int | None], Function],
-) -> tuple[State, list[tuple[Term, OpenAtom]]]:
+) -> tuple[State, list[tuple[Term, OpenPredicateAtom]]]:
     """
     Parses the state from the parsing representation to the state and associated
     open atoms.
@@ -220,10 +211,10 @@ def parse_state(
         function_map (dict[tuple[str, int | None], Function]): The map from function name to function.
 
     Returns:
-        tuple[State, list[tuple[Term, OpenAtom]]]: The parsed state and its associated open
+        tuple[State, list[tuple[Term, OpenPredicateAtom]]]: The parsed state and its associated open
             terms.
     """
-    issues: list[tuple[Term, OpenAtom]] = []
+    issues: list[tuple[Term, OpenPredicateAtom]] = []
     new_atoms: list[Atom] = []
     for atom in s.atoms:
         if isinstance(atom, parsing.Atom):
@@ -243,7 +234,7 @@ def parse_weighted_states(
     w_states: list[parsing.WeightedState],
     variable_map: dict[str, ArbitraryObject],
     function_map: dict[tuple[str, int | None], Function],
-) -> tuple[Weights, list[tuple[Term, OpenAtom]]]:
+) -> tuple[Weights, list[tuple[Term, OpenPredicateAtom]]]:
     """
     Parses the weighted state from the parsing representation to the weights and associated
     open atoms.
@@ -254,10 +245,10 @@ def parse_weighted_states(
         function_map (dict[tuple[str,int | None], Function]): The map from function name to function.
 
     Returns:
-        tuple[Weights, list[tuple[Term, OpenAtom]]]: The weighted state in parsed form.
+        tuple[Weights, list[tuple[Term, OpenPredicateAtom]]]: The weighted state in parsed form.
     """
     weights: Weights = Weights({})
-    issues: list[tuple[Term, OpenAtom]] = []
+    issues: list[tuple[Term, OpenPredicateAtom]] = []
     for state in w_states:
         parsed_state, new_issues = parse_state(
             state.state, variable_map=variable_map, function_map=function_map

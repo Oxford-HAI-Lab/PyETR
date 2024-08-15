@@ -4,6 +4,7 @@ from copy import copy
 from functools import reduce
 from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
+from pyetr.atoms.doatom import DoAtom
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
 from pyetr.atoms.terms.open_term import (
     OpenFunctionalTerm,
@@ -380,6 +381,18 @@ class SetOfStates(frozenset[State]):
         for state in self:
             a |= state.atoms
         return a
+
+    @property
+    def predicate_atoms(self) -> set[PredicateAtom]:
+        all_atoms = self.atoms
+        p_atoms: set[PredicateAtom] = set()
+        for a in all_atoms:
+            if isinstance(a, DoAtom):
+                p_atoms |= a.atoms
+            else:
+                assert isinstance(a, PredicateAtom)
+                p_atoms.add(a)
+        return p_atoms
 
 
 Stage = SetOfStates

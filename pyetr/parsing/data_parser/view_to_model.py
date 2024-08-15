@@ -6,7 +6,6 @@ from typing import cast, overload
 import pyetr.parsing.data_parser.models as models
 from pyetr.atoms.abstract import AbstractAtom
 from pyetr.atoms.doatom import DoAtom
-from pyetr.atoms.open_doatom import OpenDoAtom
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
 from pyetr.atoms.predicate_atom import PredicateAtom
 from pyetr.atoms.terms.abstract_term import (
@@ -103,7 +102,7 @@ def atom_to_model(a: AbstractAtom) -> models.Atom | models.DoAtom:
             ),
             terms=[term_to_model(term) for term in a.terms],
         )
-    elif isinstance(a, (DoAtom, OpenDoAtom)):
+    elif isinstance(a, DoAtom):
         return models.DoAtom(
             atoms=cast(list[models.Atom], [atom_to_model(atom) for atom in a.atoms]),
             polarity=a.polarity,
