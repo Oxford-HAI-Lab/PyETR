@@ -16,7 +16,7 @@ Moreover, it is hypothesized that failures of reasoning, relative to formal stan
 
 ## Looking at a view
 
-For concreteness, let us study a view from [Example 56](case_index/e56_default_inference). Once you have set up PyETR you can inspect the provided examples as follows.
+For concreteness, let us study a view from [Example 56](../case_index.md#e56_default_inference). Once you have set up PyETR you can inspect the provided examples as follows.
 ```
 >>> from pyetr.cases import e56_default_inference
 >>> v = e56_default_inference.v[1]

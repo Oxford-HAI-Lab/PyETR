@@ -200,7 +200,7 @@ These can only appear if there is a suitable dependency relation and will be dis
 ## Issue structures
 
 Issue structures are specified inserting asterisks immediately after a term which is at issue for its environment.
-For example, in [Example 47](../case_index.md#47), the view
+For example, in [Example 47](../case_index.md#e47), the view
 ```
 {Thermotogum(Maritima()*)}
 ```
