@@ -11,9 +11,10 @@ There are a few superficial notational differences worth summarizing.
 + Names of constants in PyETR normally need to be input with empty brackets, e.g. `John()` and rather than `John`. Similarly, primitive propositions (nullary predicates) need empty brackets too, e.g. `IsRaining()` rather than `IsRaining`.
 + The special $=$ binary predicate symbol from R&I Chapter 4 onwards is notated with a double equal sign `==`. It appears as prefix, just like any other predicate, e.g. `==(Clark(),Superman())`.
 + The notation for multisets is a bit different, see [View construction]() for weights and just below for $\sigma$.
-+ The special $\overline\times$ binary function symbol from R&I Chapter 5 onwards is notated with a double asterisk `**` in PyETR. It should be used as an infix operator, e.g. `2 ** 3`. See also [Collapsing functions](#collapsing-functions).
-+ The special $\sigma$ function symbol from R&I Chapter 5 onwards is notated either `++` (for convenient typing) or `σ`. It is used as a prefix on a comma-separated list of arguments inside round brackets, e.g. `++(1,1,2)`. Any number of items can appear in the argument list, which is interpreted as a multiset. See also [Collapsing functions](#collapsing-functions).
++ The special $\overline\times$ binary function symbol from R&I Chapter 5 onwards is notated with a double asterisk `**` in PyETR. It can be used either prefix or infix, e.g. both `**(2,x)` and `2 ** x` are valid and denote the same term. See also [Collapsing functions](#collapsing-functions).
++ The special $\sigma$ function symbol from R&I Chapter 5 onwards is notated either `++` (for convenient typing) or `σ`. It is used as a prefix on a comma-separated list of arguments inside round brackets, e.g. `++(1,1,x)`. Any number of items can appear in the argument list, which is interpreted as a multiset. See also [Collapsing functions](#collapsing-functions).
 + Real numbers were introduced as terms in R&I Chapter 5. In PyETR, terms that should be real numbers are inferred automatically from their name TODO.
++ TODO Do atoms are notated with a comma-separated list.
 
 ## Commitments
 
@@ -54,7 +55,6 @@ For example, consider parsing the string `∀x { do( A(x*) B() ) }`.
 >>> from pyetr import View
 >>> v = View.from_str("∀x { do(A(x*),B()) }")
 >>> print(v.base)
-{do(A(x),B())}^{0} issues={(x,do(B(),A(?)))} U={x} E={}
+{do(B(),A(x))}^{0} issues={(x,A(?))} U={x} E={}
 ```
-TODO redo this when fixed.
 Note that resulting issue structure contains `(x,A(?))`, rather than `(x,do(A(?)B()))`.
