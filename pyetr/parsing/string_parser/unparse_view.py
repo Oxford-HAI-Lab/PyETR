@@ -167,7 +167,10 @@ def unparse_atom(
     open_atoms = [
         (term, open_atom)
         for term, open_atom in issue_structure
-        if (open_atom(term) == atom)
+        if (
+            open_atom(term) == atom
+            or (isinstance(atom, DoAtom) and (open_atom(term) in atom.atoms))
+        )
     ]
     if isinstance(atom, PredicateAtom):
         return unparse_predicate_atom(

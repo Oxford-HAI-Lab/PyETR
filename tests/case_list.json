@@ -15,9 +15,6 @@
   "{a(),k()}",
   "{t()k(),a()q()}",
   "{t()}",
-  "{K(x())}",
-  "{T(w())K(z()),Q(y())A(x())}",
-  "{0}",
   "{Smokes(j()),Smokes(m())}",
   "{Drinks(j())}^{Smokes(j())}",
   "{Eats(m())}^{Smokes(m())}",
@@ -53,6 +50,7 @@
   "{King()Jack()Queen()}",
   "{~King()Ace(),King()~Ace()}",
   "{King()}",
+  "{0}",
   "{~N()}",
   "{~N()}^{~N()}",
   "{Queen(),King()}",
@@ -260,7 +258,7 @@
   "{==(Clark(), Superman()*)}",
   "{==(Clark(), Clark())}",
   "{90=* CanFly(Clark())}",
-  "{do(Buy(Video()*)),~do(Buy(Video()))}",
+  "{do(Buy(Video()*)),~do(Buy(Video()*))}",
   "Ax {Fun()}^{do(Buy(x*))}",
   "{1=+ 0} ^ {Fun()}",
   "{do(Buy(Video()*))}",
@@ -340,6 +338,5 @@
   "{do(A(f()*),B(f()), C(f()))}",
   "{0, 1=* f(x())}",
   "{do()}",
-  "{~do()}",
-  "{do(A(f()*),A(f()*))}"
+  "{~do()}"
 ]

@@ -2354,7 +2354,7 @@ class e90_condA(DefaultDecision, BaseExample):
     of $14.99. What would you do in this situation?
     """
 
-    v = (ps("{do(Buy(Video()*)),~do(Buy(Video()))}"),)
+    v = (ps("{do(Buy(Video()*)),~do(Buy(Video()*))}"),)
     cv = (ps("Ax {Fun()}^{do(Buy(x*))}"),)
     pr = (ps("{1=+ 0} ^ {Fun()}"),)
     c = ps("{do(Buy(Video()*))}")

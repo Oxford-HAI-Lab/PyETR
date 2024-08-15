@@ -12,7 +12,7 @@ From [the publisher](https://global.oup.com/academic/product/reason-and-inquiry-
 
 The documentation is structured as follows.
 
-- [Theory] recaps the ideas from *Reason & Inquiry* that are important for PyETR. Most users will benefit from reading the [Overview] for a quick orientation before using PyETR. Users who are also readers of the book should also read [Comparison with R&I] for some important information. The rest of [Theory] can be consulted as needed by advanced users.
+- [Theory](./theory/overview.md) recaps the ideas from *Reason & Inquiry* that are important for PyETR. Most users will benefit from reading the [Overview] for a quick orientation before using PyETR. Users who are also readers of the book should also read [Comparison with R&I] for some important information. The rest of [Theory] can be consulted as needed by advanced users.
 
 - [Getting started] contains instructions for [Installation] and running [Python], with some [example usages].
 
