@@ -33,7 +33,7 @@ class DoAtom(Atom):
         return hash((type(self).__name__, frozenset(self.atoms), self.polarity))
 
     def __repr__(self) -> str:
-        terms = ",".join([repr(i) for i in self.atoms])
+        terms = "".join([repr(i) for i in self.atoms])
         if self.polarity:
             tilde = ""
         else:
