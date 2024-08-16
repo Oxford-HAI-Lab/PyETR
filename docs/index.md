@@ -14,13 +14,13 @@ Most users can dive straight in [here](./getting_started/overview.md) for the ov
 
 The documentation is structured as follows.
 
-- [Theory](./theory/overview.md) recaps the ideas from *Reason & Inquiry* that are important for PyETR. Most users will benefit from reading the [Overview](./theory/overview.md) for a quick orientation before using PyETR. Users who are also readers of the book should also read [Comparison with R&I] for some important information. The rest of [Theory](./theory/overview.md) can be consulted as needed by advanced users.
-
-- [Getting started](./getting_started/installation.md) contains instructions for [Installation](./getting_started/installation.md) and running [Python](./getting_started/python.md).
+- [Getting started](./getting_started/overview.md) contains instructions for [Installation](./getting_started/installation.md) and running [Python](./getting_started/python.md).
 
 - [Usage](./usage/first_steps.md) explains in detail how to get started with the package, how to construct views, and provides examples.
 
 - [Advanced Usage](./advanced_usage/overview.md) looks "under the hood" and at some more advanced view construction.
+
+- [Theory](./theory/systems.md) recaps the ideas from *Reason & Inquiry* that are important for PyETR. Users who are also readers of the book should also read this for some important information.
 
 - [Reference](./reference/overview.md) shows the available [cases](./reference/case_index.md), [operations](./reference/view_methods.md) and [inference methods](./reference/inference_index.md).
 

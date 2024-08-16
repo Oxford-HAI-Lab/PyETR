@@ -1,11 +1,11 @@
 # View construction
 
 This page is a comprehensive guide to building your own views via the `View.from_str()` method.
-It will also serve to make more precise the [anatomy of a view](../theory/overview.md) summarized earlier.
+It will also serve to make more precise the [anatomy of a view](../getting_started/overview.md#anatomy-of-a-view) summarized earlier.
 
 The `View.from_str()` is the basic way that views are created in the [case studies](../reference/case_index.md) and how we expect most users will input their own views.
 The syntax required broadly follows the notation used in *Reason & Inquiry*.
-The same syntax is the default format for printing views (the other formats were mentioned in the [overview](../theory/overview.md)).
+The same syntax is the default format for printing views (the other formats were mentioned in the [overview](../getting_started/overview.md)).
 You can explicitly convert to this string format with `.to_str()`.
 
 !!! info
@@ -92,37 +92,6 @@ Thus the parsing of a string representing a state into a list of strings represe
 !!! info
     The empty state is written `0`.
 
-!!! info
-    In *Reason & Inquiry*, the view from the example is written something like this:
-    ```
-    {kt, aq}
-    ```
-    For technical reasons we do not adopt this notation in PyETR.
-    Thus, when working in the propositional fragment of ETR, it is necessary to insert the empty parentheses as a suffix to the name of atoms.
-    This is mildly more cluttered than the notation used in Chapters 2 and 3 of *Reason & Inquiry*, but, on the other hand, the presence of parentheses assists in using names for atoms that are longer than a single character.
-
-!!! info
-    Note that the ordering of states in the stage, and of atoms within each state, are immaterial to the denoted view.
-    Thus the view above could equally well be denoted as follows.
-    ```
-    {q()a(),t()k()}
-    ```
-    Indeed,
-    ```py
-    View.from_str("{k()t(),a()q()}") == View.from_str("{q()a(),t()k()}")
-    ```
-    will return `True`. See [here](../advanced_usage/view_equality_and_equivalence.md) for details about equality.
-
-!!! warning
-    Since the order is not meant to matter, the result of `to_str()` need not exactly match the input to `View.from_str`.
-    The representation of View objects internal to PyETR and Python does require an arbitrary order to be imposed, but this can be quite unpredictable and might depend on your computing setup.
-    For example, despite the equality above, you may find that
-    ```py
-    View.from_str("{k()t(),a()q()}").to_str() == View.from_str("{q()a(),t()k()}").to_str()
-    ```
-    returns `False`!
-    PyETR overloads Python's equality test to give a more correct equality test for View objects.
-    See [View equality and equivalence](../advanced_usage/view_equality_and_equivalence.md) for further discussion of equality testing.
 
 ## Negation
 
@@ -188,10 +157,14 @@ The above statement is the same as "Clark is superman", we see the equates the i
 
 
 ### Propositional Atoms
+As in the example from [Stages and states](#stages-and-states), in *Reason & Inquiry*, the view from the example is written something like this:
+```
+{kt, aq}
+```
+For technical reasons we do not adopt this notation in PyETR.
+Thus, when working in the propositional fragment of ETR, it is necessary to insert the empty parentheses as a suffix to the name of atoms.
+This is mildly more cluttered than the notation used in Chapters 2 and 3 of *Reason & Inquiry*, but, on the other hand, the presence of parentheses assists in using names for atoms that are longer than a single character.
 
-Atoms such as `k()` considered in [Stages and states](#stages-and-states) are a special case where a predicate is given an empty list of arguments.
-In logic, propositional calculus is embedded into first-order logic by considering primitive propositions as predicates taking no arguments.
-We use this same idea to embed the atoms of Chapter 2 of *Reason & Inquiry*, which act like the literals of propositional logic, into PyETR.
 This is why examples such as [Example 8](../reference/case_index.md#e8) have extra parentheses in PyETR relative to *Reason & Inquiry*.
 
 ## Terms
@@ -217,7 +190,7 @@ power(σ(1.0,log(σ(1.0,x))),-1.0)
 
 #### Real numbers
 
-Integers and decimals such as `1`, `1.0`, `-1.0` TODO
+Integers and decimals such as `1`, `1.0`, `-1.0`. These are constants (0 arity functional terms), but notably do not use the open-close bracket syntax. See [here](../advanced_usage/func_callers.md) for details of how they interact with numeric functions.
 
 #### Arbitrary objects
 
@@ -278,47 +251,30 @@ Here, `z` and `w` are arbitrary objects.
 The prefix `∀z ∃w` specifies that `z` is a universal arbitrary object and that `w` is an existential arbitrary object, and moreover that `w` has a dependence on `z`.
 Alternatively, a prefix of `∃w ∀z` would import a lack of dependence of `w` on `z`.
 
+!!! warning
+    The set of arbitrary objects that appear in the quantifier string must precisely match the set of arbitrary objects that appear in either the stage or supposition of the view.
+    This is just as in *Reason & Inquiry*.
+    If it is not the case, an error will be raised.
+
+
+### Alternative syntax
+
 For convenience when typing, one can use `A` and `E` as synonyms for `∀` and `∃` respectively.
 So the above is equivalent to the following.
 ```
 Az Ew {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
 ```
 
-!!! warning
-    The set of arbitrary objects that appear in the quantifier string must precisely match the set of arbitrary objects that appear in either the stage or supposition of the view.
-    This is just as in *Reason & Inquiry*.
-    If it is not the case, an error will be raised.
 
-!!! info
-    The quantifier string corresponding to a dependency relation is unique up to reordering of within homogeneous quantifier blocks.
-    Thus the following prints `True`.
-    ```py
-    p1 = View.from_str("∀x ∀y {A(x),B(y)}")
-    p2 = View.from_str("∀y ∀x {A(x),B(y)}")
-    print(p1 == p2)
-    ```
+### Equality of dependency relations
 
-!!! warning
-    The presence of arbitrary objects makes equality comparison of views more subtle.
-    Continuing the example above, it is possible that
-    ```py
-    print(p1.to_str() == p2.to_str())
-    ```
-    prints `False` despite `p1 == p2` being `True`!
-
-    More significantly,
-    ```py
-    p3 = View.from_str("∀a ∀b {A(a),B(b)}")
-    print(p1 == p3)
-    ```
-    always prints `False`.
-    This may be confusing coming from logic, where we expect formulas to be considered equivalent if they differ by a renaming of bound variables ('alpha-equivalence').
-    In ETR, arbitrary objects do not behave precisely the same as bound variables in logic: in ETR the identity of arbitrary objects is often significant.
-    To assert that the views above are 'alpha-equivalent', we can use
-    ```py
-    print(p1.is_equivalent_under_arb_sub(p3))
-    ```
-    which prints `True`.
+The quantifier string corresponding to a dependency relation is unique up to reordering of within homogeneous quantifier blocks.
+Thus the following prints `True`.
+```py
+p1 = View.from_str("∀x ∀y {A(x),B(y)}")
+p2 = View.from_str("∀y ∀x {A(x),B(y)}")
+print(p1 == p2)
+```
 
 ## Weights
 
@@ -333,6 +289,21 @@ Each state has a *multiplicative* and an *additive* weight, introduced with `=*`
 Both are optional.
 The `=*` should not be confused with the `*` for introducing items to the issue structure.
 
+!!! abstract "Note for readers of *Reason and Inquiry*"
+
+    Note that the `base` representation of this view uses a notation for weights which is more familiar from *R&I*.
+    ```
+    {⟪1.0,1.0,2.25⟫×.⟪7.0⟫+.A(),⟪1.0⟫+.B(),C()}^{0}
+    ```
+    PyETR implements the double-weighted states of Chapter 6 of *Reason & Inquiry*.
+    To work with the single-weighted states of Chapter 5, only use the multiplicative weight `=*` and leave the additive weight `=+` empty.
+
+    Definition 5.4 of *Reason & Inquiry* introduces a special binary function symbol for multiplication, used when combining two multiplicatively-weighted states.
+    See [XBar](#xbar) for how to input it, and see [Collapsing functions](../theory/differences.md#collapsing-functions).
+
+
+### Multiset Weights
+
 Each weight is a multiset of terms, written as a list with the pipe `|` as delimiter.
 (A multiset is a set allowing repeated elements).
 For example,
@@ -345,57 +316,42 @@ The example could also be written with explicit empty multisets as follows.
 ```
 { 1.0|1.0|2.25=* 7.0=+ A(), =* 1=+ B(), =* =+ C() }
 ```
-Note that the `base` representation of this view uses a notation for weights which is more familiar from *R&I*.
+### Ordering
+Following the conventions of *Reason & Inquiry*, the multiplicative weight is always given first.
+For example,
 ```
-{⟪1.0,1.0,2.25⟫×.⟪7.0⟫+.A(),⟪1.0⟫+.B(),C()}^{0}
+{ 1.0=* 3.1=+ A()B() }
 ```
+is valid but
+```
+{ 3.1=+ 1.0=* A()B() }
+```
+will raise an error.
 
-!!! info
-    PyETR implements the double-weighted states of Chapter 6 of *Reason & Inquiry*.
-    To work with the single-weighted states of Chapter 5, only use the multiplicative weight `=*` and leave the additive weight `=+` empty.
-
-!!! info
-    Definition 5.4 of *Reason & Inquiry* introduces a special binary function symbol for multiplication, used when combining two multiplicatively-weighted states.
-    See [XBar](#xbar) for how to input it, and see [Collapsing functions](../theory/differences.md#collapsing-functions).
-
-!!! warning
-    Following the conventions of *Reason & Inquiry*, the multiplicative weight is always given first.
-    For example,
-    ```
-    { 1.0=* 3.1=+ A()B() }
-    ```
-    is valid but
-    ```
-    { 3.1=+ 1.0=* A()B() }
-    ```
-    will raise an error.
 
 ## Do atoms
 
-Further to the predicate atoms discussed above at [Atoms](#atoms), `do`-atoms are formed by using `do` like a predicate.
+Further to the predicate atoms discussed above at [Atoms](#atoms), do atoms are formed by using `do` like a predicate.
 For example, the following appears in [Example 90](../reference/case_index.md#e90_conda).
 ```
 {do(Buy(Video()*)),~do(Buy(Video()))}
 ```
-The first state consists of a single atom, a positive `do`-atom whose contents is `Buy(Video())`.
+The first state consists of a single atom, a positive do atom whose contents is `Buy(Video())`.
 Moreover, `Video()` is at issue for the matter of `do(Buy(?))`.
 The second state is a negative `do`-atom, simply the negation of the first.
 (Note that `Video()` is not at issue for `~do(Buy(?))`).
 
-The content of a `do`-atom can be any state, even empty (denoted by empty brackets)
+The content of a do atom can be any state, even empty (denoted by empty brackets)
 For example, the following is a valid view.
 ```
 ∀x { do(P(x)Q(x)R()), do(), do(P(x))do(Q(x)) }
 ```
 
-!!! warning
+!!! abstract "Note for readers of *Reason and Inquiry*"
     In *Reason & Inquiry*, 'do' could not appear inside the contents of a do-atom.
     PyETR does not currently enforce this, but behaviour when nested `do`-atoms might be unpredictable.
 
 ## Numeric Functions
-
-!!! warning "Caveat for Readers of *Reason & Inquiry*"
-    Custom function in the current implementation deviates.
 
 There are are number of numeric functions available in PyETR. It's also possible to define your own custom functions, but for details of this please see the [advanced section](../advanced_usage/func_callers.md).
 
