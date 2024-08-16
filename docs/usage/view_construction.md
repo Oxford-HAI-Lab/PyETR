@@ -168,35 +168,31 @@ This stage has a single state containing two atoms.
 For both atoms, `L` is read as a predicate applied to two terms, given as a comma-separated list inside the brackets following the name of the predicate.
 The `j()`, `s()`, and `g()` are examples of terms, we will see more examples as we continue.
 
-!!! info
-    In *Reason & Inquiry*, there is a privileged binary equality predicate which gets special treatment by some operations.
+Atoms and terms can look similar.
+In the above, the parser infers that `j()` is a term rather than an atom because it appears inside the brackets associated to an atom.
+Any item at the top-level of a state must be an atom.
 
-    We'll use one of the views from [Example 88](../reference/case_index.md#e88) to demonstrate:
-    ```
-    {==(Clark(), Superman())}
-    ```
-    The above statement is the same as "Clark is superman", we see the equates the ideas of Clark and Superman. It's defined in the usual way for a function, using `==` as the function name.
-
-!!! warning
-    Atoms and terms can look similar.
-    In the above, the parser infers that `j()` is a term rather than an atom because it appears inside the brackets associated to an atom.
-    Any item at the top-level of a state must be an atom.
-
-!!! info
-    Atoms such as `k()` considered in [Stages and states](#stages-and-states) are a special case where a predicate is given an empty list of arguments.
-    In logic, propositional calculus is embedded into first-order logic by considering primitive propositions as predicates taking no arguments.
-    We use this same idea to embed the atoms of Chapter 2 of *Reason & Inquiry*, which act like the literals of propositional logic, into PyETR.
-    This is why examples such as [Example 8](../reference/case_index.md#e8) have extra parentheses in PyETR relative to *Reason & Inquiry*.
-
-!!! warning
-    Occasionally, atoms are compared for having the same underlying predicate.
-    The 'arity' (number of arguments) is part of the identity of a predicate.
-    Thus, the atoms `L()`, `L(s1())`, `L(s1(),s2())`, etc, are all considered to have different underlying predicates.
-    In particular, no warning is given if a predicate name appears with different numbers of arguments.
 
 !!! warning
     `do` is a reserved name and should not be used for predicates.
     See [Do atoms](#do-atoms).
+
+### Equality Atoms
+In *Reason & Inquiry*, there is a privileged binary equality predicate which gets special treatment by some operations.
+
+We'll use one of the views from [Example 88](../reference/case_index.md#e88) to demonstrate:
+```
+{==(Clark(), Superman())}
+```
+The above statement is the same as "Clark is superman", we see the equates the ideas of Clark and Superman. It's defined in the usual way for a function, using `==` as the function name.
+
+
+### Propositional Atoms
+
+Atoms such as `k()` considered in [Stages and states](#stages-and-states) are a special case where a predicate is given an empty list of arguments.
+In logic, propositional calculus is embedded into first-order logic by considering primitive propositions as predicates taking no arguments.
+We use this same idea to embed the atoms of Chapter 2 of *Reason & Inquiry*, which act like the literals of propositional logic, into PyETR.
+This is why examples such as [Example 8](../reference/case_index.md#e8) have extra parentheses in PyETR relative to *Reason & Inquiry*.
 
 ## Terms
 
@@ -243,35 +239,33 @@ For example, in [Example 47](../reference/case_index.md#e47), the view
 has the (functional) term `Maritima()` at issue for the context `Thermotogum(?)`.
 
 !!! info
-    The issue structures in PyETR follow exactly the description given in Definition 4.7/A.29 in *Reason & Inquiry* and the informal use of the circumflex in the book agrees with the asterisk here.
-
-    In particular, the environment of a term for which it is at issue may include being a subterm of another term and extends upwards to the (first) atom containing it.
+    The issue structures in PyETR follow exactly the description given in Definition 4.7/A.29 in *Reason & Inquiry* and the informal use of the circumflex in the book agrees with the asterisk here. For more information about issue structures we recommend taking a look at this.
 
     See [Differences with R&I](../theory/differences.md#do-atoms-and-issue-structures), for a discussion on how [Do atoms](#do-atoms) interact with issues.
 
-!!! warning
-    For users unfamiliar with issue structures from *R&I*, the following is a likely source of initial confusion.
-    The following strings all represent the same view.
-    ```
-    {A(a()*),A(a())B(b())}
-    {A(a()),A(a()*)B(b())}
-    {A(a()*),A(a()*)B(b())}
-    ```
-    Converting any of them to string with `to_str()` will give the representation with two asterisks (i.e. the third one up to reordering).
+### Issue Contexts
+For users unfamiliar with issue structures from *R&I*, the following is a likely source of initial confusion.
+The following strings all represent the same view.
+```
+{A(a()*),A(a())B(b())}
+{A(a()),A(a()*)B(b())}
+{A(a()*),A(a()*)B(b())}
+```
+Converting any of them to string with `to_str()` will give the representation with two asterisks (i.e. the third one up to reordering).
 
-    This is expected behaviour.
-    The reason is that any of these asterisks informs PyETR that `a()` is at issue for the environment `A(?)`, and being at issue is a global property of the view *not* of the individual instances of `A(a())`.
-    Thus it is not meaningful for some 'instances' of `A(a())` to have `a()` at issue and not others.
-    When converting to string, all instances of `A(a())` are decorated with an asterisk as a canonical choice.
+This is expected behaviour.
+The reason is that any of these asterisks informs PyETR that `a()` is at issue for the environment `A(?)`, and being at issue is a global property of the view *not* of the individual instances of `A(a())`.
+Thus it is not meaningful for some 'instances' of `A(a())` to have `a()` at issue and not others.
+When converting to string, all instances of `A(a())` are decorated with an asterisk as a canonical choice.
 
-    This may be clearest if you print this in `v.base` mode like so:
-    ```py
-    from pyetr import View
+This may be clearest if you print this in `v.base` mode like so:
+```py
+from pyetr import View
 
-    print(View.from_str("{A(a()*),A(a())B(b())}").base) # {A(a),B(b)A(a)}^{0} issues={(a,A(?))}
-    print(View.from_str("{A(a()),A(a()*)B(b())}").base) # {A(a),A(a)B(b)}^{0} issues={(a,A(?))}
-    print(View.from_str("{A(a()*),A(a()*)B(b())}").base) # {A(a),A(a)B(b)}^{0} issues={(a,A(?))}
-    ```
+print(View.from_str("{A(a()*),A(a())B(b())}").base) # {A(a),B(b)A(a)}^{0} issues={(a,A(?))}
+print(View.from_str("{A(a()),A(a()*)B(b())}").base) # {A(a),A(a)B(b)}^{0} issues={(a,A(?))}
+print(View.from_str("{A(a()*),A(a()*)B(b())}").base) # {A(a),A(a)B(b)}^{0} issues={(a,A(?))}
+```
 
 ## Dependency relations
 

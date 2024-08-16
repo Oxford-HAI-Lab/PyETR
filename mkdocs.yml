@@ -2,11 +2,8 @@ site_name: PyETR
 
 nav:
   - 'Home': 'index.md'
-  - 'Theory' :
-    - 'Overview' : 'theory/overview.md'
-    - 'Systems from R&I' : 'theory/systems.md'
-    - 'Differences with R&I' : 'theory/differences.md'
-  - 'Getting started': 
+  - 'Getting started':
+    - 'Overview' : 'getting_started/overview.md'
     - 'Installation': 'getting_started/installation.md'
     - 'Python': 'getting_started/python.md'
   - 'Usage':
@@ -21,6 +18,9 @@ nav:
     - 'Func Callers': 'advanced_usage/func_callers.md'
     - 'Troubleshooting': 'advanced_usage/troubleshooting.md'
     - 'Equality': 'advanced_usage/view_equality_and_equivalence.md'
+  - 'Theory' :
+    - 'Systems from R&I' : 'theory/systems.md'
+    - 'Differences with R&I' : 'theory/differences.md'
   - 'Reference':
     - 'Overview': 'reference/overview.md'
     - 'Case Index': 'reference/case_index.md'

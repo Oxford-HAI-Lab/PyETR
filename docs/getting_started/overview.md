@@ -66,7 +66,7 @@ In `v.to_str()`, the stage and the supposition appear with the issue structure m
 ```
 where the `^` separates the stage on the left from the supposition on the right.
 (In R&I, the supposition is written as a superscript).
-The asterisks encode the issue structure and are not technically part of the stage or structure.
+Despite what the notation would suggest, the asterisks encode the issue structure which is a separate section of the view from the stage or supposition.
 This is made more clear with `v.base` where
 ```
 {Student(z)Reads(z,w)Book(w)}^{Student(z)} issues={(z,Student(?))}
