@@ -1,6 +1,6 @@
 # Custom Function Behaviour
 
-As discussed [here](./getting_started/view_construction.md#custom-functions) it's possible in PyETR to define and use numerical functions that combine real number terms in a variety of ways. In this section we'll discuss an advanced variant of this, wherein users may define their own custom functions.
+As discussed [here](./getting_started/view_construction.md#numeric-functions) it's possible in PyETR to define and use numerical functions that combine real number terms in a variety of ways. In this section we'll discuss an advanced variant of this, wherein users may define their own custom functions.
 
 ## A 3 Argument Function
 

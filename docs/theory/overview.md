@@ -78,24 +78,24 @@ The issue structure tells us that `z` is at issue for being a `Student`.
 
 !!! info
     For this view, the issue structure contains only a single item, which is clear from `v.base` but less so from `v.to_str()`.
-    This is because issues are not local to particular positions in the stage or supposition, but apply globally to a view
+    This is because issues are not local to particular positions in the stage or supposition, but apply globally to a view.
     We will discuss this further in [TODO].
     This is one advantage to the more verbose `base` representation.
 
-Finally, the dependency relation is determined by the prefix
+Finally, in `v.to_str()` the dependency relation is determined by the prefix
 ```
 ∀z ∃w
 ```
-in the case of `v.to_str()` and the suffix
+while for `v.base` it is determined by the suffix:
 ```
 U={z} E={w} deps=z{w}
 ```
-in the case of `v.base`.
-The latter tells us that the view contains the arbitrary objects `z` and `w`, with `z` being universal and `w` being existential.
+
+The `v.base` form tells us explicitly that the view contains the arbitrary objects `z` and `w`, with `z` being universal and `w` being existential.
 In ETR, existential objects can depend on universals, and so the `deps` part tells us that the set of existentials depending on `z` is just the set `w`, i.e. that the only dependency is that of `w` on `z`.
 
 The `to_str()` representation contains the same information in a condensed form.
-We can see the ∀ (for all) and ∃ (there exists) quantifier symbols attached to each arbitrary object tell us whether they are universal or existential repsectively.
+We can see the ∀ (for all) and ∃ (there exists) quantifier symbols attached to each arbitrary object tell us whether they are universal or existential respectively.
 The dependencies are encoded in the order that the variables are listed: because the existential `w` is to the right of the universal `z`, `w` must depend on `z`.
 
 !!! info
@@ -137,9 +137,9 @@ View operations can be referenced in their own [index](../view_methods.md).
 As an example, perhaps the most useful operation is [update](../view_methods.md#update), used as follows.
 ```
 >>> from pyetr import View
->>> v2 = View.from_str("{Man(Socrates()*)}")
->>> v3 = View.from_str("Ax {Mortal(x)}^{Man(x*)}")
->>> v2.update(v3)
+>>> v1 = View.from_str("{Man(Socrates()*)}")
+>>> v2 = View.from_str("Ax {Mortal(x)}^{Man(x*)}")
+>>> v1.update(v2)
 {Mortal(Socrates())Man(Socrates()*)}
 ```
 
@@ -149,9 +149,9 @@ For example, the default inference procedure for "what if anything follows?" que
 ```
 >>> from pyetr import View
 >>> from pyetr.inference import default_inference_procedure
->>> v2 = View.from_str("{Man(Socrates()*)}")
->>> v3 = View.from_str("Ax {Mortal(x)}^{Man(x*)}")
->>> default_inference_procedure([v2,v3])
+>>> v1 = View.from_str("{Man(Socrates()*)}")
+>>> v2 = View.from_str("Ax {Mortal(x)}^{Man(x*)}")
+>>> default_inference_procedure([v1,v2])
 {Mortal(Socrates())}
 ```
 The `default_inference_procedure` internally uses the `update` operation, but chains it with other operations to produce a conclusion with only novel contents.
