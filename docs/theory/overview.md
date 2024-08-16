@@ -17,11 +17,11 @@ Moreover, it is hypothesized that failures of reasoning, relative to formal stan
 ## Looking at a view
 
 For concreteness, let us study a view from [Example 56](../reference/case_index.md#e56_default_inference). Once you have set up PyETR you can inspect the provided examples as follows.
-```
->>> from pyetr.cases import e56_default_inference
->>> v = e56_default_inference.v[1]
->>> v
-∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
+```python
+from pyetr.cases import e56_default_inference
+
+v = e56_default_inference.v[1]
+print(v) # ∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
 ```
 Lines beginning `>>>` are user input and other lines are Python output.
 Here we have imported one of the views from Example 56 of R&I and given it the name `v`.
@@ -32,22 +32,20 @@ Then asking Python for `v` causes a string representation of `v` to be printed.
 
 !!! info
     Instead of importing the example, you could copy and paste any string given as an output like this
-    ```
-    >>> from pyetr import View
-    >>> v = View.from_str("∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}")
-    >>> v
-    ∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
+    ```python
+    from pyetr import View
+
+    v = View.from_str("∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}")
+    print(v) # ∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
     ```
 
-Asking Python for `v` is equivalent to the following
-```
->>> print(v.to_str())
-∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
+Asking Python to print `v` is equivalent to the following
+```python
+print(v.to_str()) # ∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
 ```
 Aside from `to_str()`, another way to render a view is `base`.
-```
->>> print(v.base)
-{Student(z)Reads(z,w)Book(w)}^{Student(z)} issues={(z,Student(?))} U={z} E={w} deps=z{w}
+```python
+print(v.base) # {Student(z)Reads(z,w)Book(w)}^{Student(z)} issues={(z,Student(?))} U={z} E={w} deps=z{w}
 ```
 This is provided to give a close match to the notation and theoretical structure of views provided in R&I. It should not be necessary to use `base` to follow calculations, as all relevant information is encoded in the `to_str()` representation, but it may be helpful for learning to connect the concrete `to_str()` syntax with the abstract structures of R&I.
 
@@ -114,11 +112,11 @@ The order of atoms within a state, and the order of states within the stage, hav
 Furthermore, each state in the stage can carry an optional 'multiplicative' weight and/or 'additive weight'.
 
 Let us consider another example from [Example 69](../reference/case_index.md#e69_part1).
-```
->>> from pyetr.cases import e69_part1
->>> v2 = e69_part1.v[1]
->>> v2
-{0.000001=* ~Guilty(Suspect())Match(Suspect()),~Guilty(Suspect())~Match(Suspect())}^{~Guilty(Suspect())}
+```python
+from pyetr.cases import e69_part1
+
+v2 = e69_part1.v[1]
+print(v2) # {0.000001=* ~Guilty(Suspect())Match(Suspect()),~Guilty(Suspect())~Match(Suspect())}^{~Guilty(Suspect())}
 ```
 Here the stage consists of two states (because there is one comma).
 Each state consists of two atoms, but the first (in the arbitrary printed order) state has a multiplicative weight of `0.000001`, as indicated by the `0.000001=*` prefix.
@@ -135,23 +133,23 @@ The second view is sometimes either new or recalled information, though often it
 
 View operations can be referenced in their own [index](../reference/view_methods.md).
 As an example, perhaps the most useful operation is [update](../reference/view_methods.md#update), used as follows.
-```
->>> from pyetr import View
->>> v1 = View.from_str("{Man(Socrates()*)}")
->>> v2 = View.from_str("Ax {Mortal(x)}^{Man(x*)}")
->>> v1.update(v2)
-{Mortal(Socrates())Man(Socrates()*)}
+```python
+from pyetr import View
+
+v1 = View.from_str("{Man(Socrates()*)}")
+v2 = View.from_str("Ax {Mortal(x)}^{Man(x*)}")
+v1.update(v2) # {Mortal(Socrates())Man(Socrates()*)}
 ```
 
 In ETR, the capacity for reasoning is constrained by the limited set of view operations, and the process of reasoning consists in following procedures that chain together these basic operations rather than apply single basic operations.
 A few built-in inference procedures are listed in an [index](../reference/inference_index.md).
 For example, the default inference procedure for "what if anything follows?" questions can be used as follows.
-```
->>> from pyetr import View
->>> from pyetr.inference import default_inference_procedure
->>> v1 = View.from_str("{Man(Socrates()*)}")
->>> v2 = View.from_str("Ax {Mortal(x)}^{Man(x*)}")
->>> default_inference_procedure([v1,v2])
-{Mortal(Socrates())}
+```python
+from pyetr import View
+from pyetr.inference import default_inference_procedure
+
+v1 = View.from_str("{Man(Socrates()*)}")
+v2 = View.from_str("Ax {Mortal(x)}^{Man(x*)}")
+print(default_inference_procedure([v1,v2])) # {Mortal(Socrates())}
 ```
 The `default_inference_procedure` internally uses the `update` operation, but chains it with other operations to produce a conclusion with only novel contents.
