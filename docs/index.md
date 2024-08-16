@@ -16,10 +16,17 @@ The documentation is structured as follows.
 
 - [Getting started](./getting_started/installation.md) contains instructions for [Installation](./getting_started/installation.md) and running [Python](./getting_started/python.md).
 
-- [Usage] explains in detail how the string-based method for inputting [View] objects, as well as [...].
+- [Usage](./usage/first_steps.md) explains in detail how to get started with the package, how to construct views, and provides examples.
 
-- [Troubleshooting]
+- [Advanced Usage](./advanced_usage/overview.md) looks "under the hood" and at some more advanced view construction.
 
-- [Reference]
+- [Reference](./reference/overview.md) shows the available [cases](./reference/case_index.md), [operations](./reference/view_methods.md) and [inference methods](./reference/inference_index.md).
 
-- Other sections are self-explanatory.
+- [Glossary](./glossary.md) describes terms used throughout the documentation.
+
+- [For Developers](./development.md) provides a summary of how to work on the package and produce new versions.
+
+- [Credits](./credits.md) lists the people that worked on this project.
+
+!!! info
+    Top tip! If you're wondering what a term or operation means, or how it works, remember to use the search bar at the top - this often will show you to the right section!

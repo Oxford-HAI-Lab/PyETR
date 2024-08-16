@@ -16,11 +16,13 @@ nav:
     - 'View Methods Example': 'usage/view_methods_example.md'
     - 'Direct Decision Example': 'usage/direct_decision_example.md'
   - 'Advanced Usage':
+    - 'Overview': 'advanced_usage/overview.md'
     - 'Defining Inference': 'advanced_usage/defining_inference.md'
     - 'Func Callers': 'advanced_usage/func_callers.md'
     - 'Troubleshooting': 'advanced_usage/troubleshooting.md'
     - 'Equality': 'advanced_usage/view_equality_and_equivalence.md'
   - 'Reference':
+    - 'Overview': 'reference/overview.md'
     - 'Case Index': 'reference/case_index.md'
     - 'View Methods': 'reference/view_methods.md'
     - 'Inference Index': 'reference/inference_index.md'
@@ -31,6 +33,7 @@ theme:
   name: 'material'
   features:
     - content.code.copy
+    - navigation.footer
   palette:
     - scheme: default
       primary: 'black'
