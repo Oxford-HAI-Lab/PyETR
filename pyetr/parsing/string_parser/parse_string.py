@@ -75,7 +75,7 @@ class DoAtom:
             not_str = ""
         else:
             not_str = "~"
-        out = ",".join([a.to_string(**kwargs) for a in self.atoms])
+        out = "".join([a.to_string(**kwargs) for a in self.atoms])
         return f"{not_str}do({out})"
 
 
@@ -451,7 +451,7 @@ def get_expr() -> pp.Forward:
             pp.Optional("~")
             + pp.Suppress(do_word)
             + pp.Suppress("(")
-            + pp.Optional(pp.delimitedList(atom))
+            + pp.ZeroOrMore(atom)
             + pp.Suppress(")")
         )
         .setResultsName("doatom", listAllMatches=True)
