@@ -76,7 +76,7 @@ Let us break down the following representation of view found in [Example 8](../c
 ```
 
 At the core of any view is a set of states.
-In *Reason & Inquiry*, this is the element of a view typically denoted by &Gamma; (upper-case gamma).
+In *Reason & Inquiry*, this is the element of a view typically denoted by Γ (upper-case gamma).
 In the code base for PyETR, this is called the `stage`.
 A string representing a view must specify a stage between `{` and `}` as a comma-separated list of states.
 Thus in the example above, the view specifies a stage with two states: `k()t()` and `a()q()`.
@@ -120,7 +120,7 @@ Thus the parsing of a string representing a state into a list of strings represe
     ```
     returns `False`!
     PyETR overloads Python's equality test to give a more correct equality test for View objects.
-    See TODO for further discussion of equality testing.
+    See [View equality and equivalence](../view_equality_and_equivalence.md) for further discussion of equality testing.
 
 ## Negation
 
@@ -141,7 +141,7 @@ which has three states, each containing a singleton negative atom.
 ## Suppositions
 
 Suppositions are optional and are denoted with a `^` after the stage, using the same syntax for a set of states as for stages.
-In *Reason & Inquiry*, suppositions were typically denoted by &Theta; (upper-case theta) and placed in superscript position following the stage.
+In *Reason & Inquiry*, suppositions were typically denoted by Θ (upper-case theta) and placed in superscript position following the stage.
 
 For example, consider [Example 28](../case_index.md#e28).
 There is a view denoted
@@ -164,7 +164,7 @@ Consider this view from [Example 50](../case_index.md#e50_part1).
 ```
 This stage has a single state containing two atoms.
 For both atoms, `L` is read as a predicate applied to two terms, given as a comma-separated list inside the brackets following the name of the predicate.
-The `j()`, `s()`, and `g()` are examples of terms, we will see more examples in TODO.
+The `j()`, `s()`, and `g()` are examples of terms, we will see more examples as we continue.
 
 !!! info
     In *Reason & Inquiry*, there is a privileged binary equality predicate which gets special treatment by some operations.
@@ -192,7 +192,8 @@ The `j()`, `s()`, and `g()` are examples of terms, we will see more examples in 
     In particular, no warning is given if a predicate name appears with different numbers of arguments.
 
 !!! warning
-    `do` is a reserved name and should not be used for predicates without regard to TODO.
+    `do` is a reserved name and should not be used for predicates.
+    See [Do atoms](#do-atoms).
 
 ## Terms
 
@@ -212,8 +213,8 @@ power(σ(1.0,log(σ(1.0,x))),-1.0)
 ```
 
 !!! warning
-    In PyETR, there are a few reserved function names TODO.
-    Moreover, the behaviour of `σ` mildly differs from *Reason & Inquiry*, see TODO.
+    In PyETR, there are a few reserved function names, see [Special functions](#special-functions).
+    Moreover, the behaviour of `σ` mildly differs from *Reason & Inquiry*, see [Collapsing functions](../theory/differences.md#collapsing-functions).
 
 #### Real numbers
 
@@ -222,7 +223,7 @@ Integers and decimals such as `1`, `1.0`, `-1.0` TODO
 #### Arbitrary objects
 
 In PyETR, a string of ordinary characters *not* followed by parentheses is an arbitrary object.
-These can only appear if there is a suitable dependency relation and will be discussed in that section TODO.
+These can only appear if there is a suitable [dependency relation](#dependency-relations).
 
 !!! warning
     Names can be reused between functional terms and arbitrary objects, e.g. `x()` and `x` are completely independent terms.
@@ -231,6 +232,7 @@ These can only appear if there is a suitable dependency relation and will be dis
 ## Issue structures
 
 Issue structures are specified inserting asterisks immediately after a term which is at issue for its environment.
+This applies to terms appearing in states of the stage or supposition, (but not in [weights](#weights))
 For example, in [Example 47](../case_index.md#e47), the view
 ```
 {Thermotogum(Maritima()*)}
@@ -238,14 +240,15 @@ For example, in [Example 47](../case_index.md#e47), the view
 has the (functional) term `Maritima()` at issue for the context `Thermotogum(?)`.
 
 !!! info
-    The issue structures in PyETR follow exactly the description given in Definition 4.7/A.29 in *Reason & Inquiry* and the informal use of the asterisk in the book agrees with this one.
+    The issue structures in PyETR follow exactly the description given in Definition 4.7/A.29 in *Reason & Inquiry* and the informal use of the circumflex in the book agrees with the asterisk here.
 
-    In particular, the environment of a term for which it is at issue may include being a subterm of another term and extends upwards precisely as far as the atom containing it.
-    (Terms cannot be at issue for membership of weights TODO).
-    TODO: demonstration with printing.
+    In particular, the environment of a term for which it is at issue may include being a subterm of another term and extends upwards to the (first) atom containing it.
+
+    See [Differences with R&I](../theory/differences.md#do-atoms-and-issue-structures), for a discussion on how [Do atoms](#do-atoms) interact with issues.
 
 !!! warning
-    A possible source of confusion is demonstrated by the fact that the following strings all represent the same view.
+    For users unfamiliar with issue structures from *R&I*, the following is a likely source of initial confusion.
+    The following strings all represent the same view.
     ```
     {A(a()*),A(a())B(b())}
     {A(a()),A(a()*)B(b())}
@@ -336,7 +339,7 @@ The example could also be written with explicit empty multisets as follows.
 ```
 { 1.0|1.0|2.25=* 7.0=+ A(), =* 1=+ B(), =* =+ C() }
 ```
-TODO `print`ing this view gives
+Note that the `base` representation of this view uses a notation for weights which is more familiar from *R&I*.
 ```
 {⟪1.0,1.0,2.25⟫×.⟪7.0⟫+.A(),⟪1.0⟫+.B(),C()}^{0}
 ```
@@ -347,8 +350,7 @@ TODO `print`ing this view gives
 
 !!! info
     Definition 5.4 of *Reason & Inquiry* introduces a special binary function symbol for multiplication, used when combining two multiplicatively-weighted states.
-    In PyETR this is written `Xbar`.
-    See TODO for an explanation of its novel behaviour in PyETR,
+    See [XBar](#xbar) for how to input it, and see [Collapsing functions](../theory/differences.md#collapsing-functions).
 
 !!! warning
     Following the conventions of *Reason & Inquiry*, the multiplicative weight is always given first.
