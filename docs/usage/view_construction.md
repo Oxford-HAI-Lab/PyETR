@@ -13,7 +13,7 @@ You can explicitly convert to this string format with `.to_str()`.
     ```
     v == View.from_str(v.to_str())
     ```
-    However, you should not expect
+    See [here](../advanced_usage/view_equality_and_equivalence.md) for details about equality. However, you should not expect
     ```
     View.from_str("...").to_str()
     ```
@@ -68,6 +68,8 @@ This string representation completely determines the view object, but for troubl
 We can see in the above that while `p1.to_str()` only presents the `stage` of `p1`, in fact `p1` has a supposition (with default value `{{}}`) as well as a dependency relation, issue structure, and a collection of weights (all empty by default).
 The `base` property is provided in case it is useful for troubleshooting and also for its slightly closer connection with the notation used in *R&I*.
 
+**Unless specified otherwise, we'll be using the `to_str()` representation as the default.**
+
 ## Stages and states
 
 Let us break down the following representation of view found in [Example 8](../reference/case_index.md#e8).
@@ -109,7 +111,7 @@ Thus the parsing of a string representing a state into a list of strings represe
     ```py
     View.from_str("{k()t(),a()q()}") == View.from_str("{q()a(),t()k()}")
     ```
-    will return `True`.
+    will return `True`. See [here](../advanced_usage/view_equality_and_equivalence.md) for details about equality.
 
 !!! warning
     Since the order is not meant to matter, the result of `to_str()` need not exactly match the input to `View.from_str`.
@@ -168,11 +170,12 @@ The `j()`, `s()`, and `g()` are examples of terms, we will see more examples as 
 
 !!! info
     In *Reason & Inquiry*, there is a privileged binary equality predicate which gets special treatment by some operations.
-    In PyETR, this predicate is written `==`, as in the view
+
+    We'll use one of the views from [Example 88](../reference/case_index.md#e88) to demonstrate:
     ```
-    {==(Clark(),Superman())}
+    {==(Clark(), Superman())}
     ```
-    from [Example 88](../reference/case_index.md#e88).
+    The above statement is the same as "Clark is superman", we see the equates the ideas of Clark and Superman. It's defined in the usual way for a function, using `==` as the function name.
 
 !!! warning
     Atoms and terms can look similar.
@@ -260,6 +263,15 @@ has the (functional) term `Maritima()` at issue for the context `Thermotogum(?)`
     The reason is that any of these asterisks informs PyETR that `a()` is at issue for the environment `A(?)`, and being at issue is a global property of the view *not* of the individual instances of `A(a())`.
     Thus it is not meaningful for some 'instances' of `A(a())` to have `a()` at issue and not others.
     When converting to string, all instances of `A(a())` are decorated with an asterisk as a canonical choice.
+
+    This may be clearest if you print this in `v.base` mode like so:
+    ```py
+    from pyetr import View
+
+    print(View.from_str("{A(a()*),A(a())B(b())}").base) # {A(a),B(b)A(a)}^{0} issues={(a,A(?))}
+    print(View.from_str("{A(a()),A(a()*)B(b())}").base) # {A(a),A(a)B(b)}^{0} issues={(a,A(?))}
+    print(View.from_str("{A(a()*),A(a()*)B(b())}").base) # {A(a),A(a)B(b)}^{0} issues={(a,A(?))}
+    ```
 
 ## Dependency relations
 
@@ -396,14 +408,6 @@ There are are number of numeric functions available in PyETR. It's also possible
 ## Special Functions
 
 Below are the details for each of the built-in numeric functions, that each have their own syntaxes for view construction.
-
-### Equality
-
-Equality represents a numerical operation of stating two items are equivalent. We'll use one of the views from [Example 88](../reference/case_index.md#e88) to demonstrate:
-```
-{==(Clark(), Superman())}
-```
-The above statement is the same as "Clark is superman", we see the equates the ideas of Clark and Superman. It's defined in the usual way for a function, using `==` as the function name.
 
 ### Xbar
 

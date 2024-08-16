@@ -13,18 +13,18 @@ Depending on your exact installation you may need to instead type `python3` or p
 
 This opens a shell like so:
 
-```
+```python
 >>>
 ```
 You can try something simple like:
 
-```
+```python
 >>> print("Hello world!")
 ```
 
 Or even:
 
-```
+```python
 >>> from pyetr import View
 ```
 To test that pyetr has installed correctly. This has full flexibility to allow you can type commands and test features, but a lot of the time you'll find it easier to work inside a script.
@@ -40,7 +40,7 @@ test.py
 
 Inside this file, place whatever commands you desire, like:
 
-```
+```python
 print("Hello world!")
 ```
 

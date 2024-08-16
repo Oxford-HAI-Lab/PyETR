@@ -75,7 +75,11 @@ Views are built up from a [Stage], a [Supposition], a [Dependency Relation], and
 
 ## Weight
 
+TODO
+
 ## Weighted state
+
+TODO
 
 ## Default Reasoning Procedure
 
@@ -91,9 +95,12 @@ To pose a question on a starting view, where the question is represented as anot
 
 ## Query
 
+TODO
+
 ## Merge
 
 Combine two views.
 
 ## Factor
 
+TODO

@@ -2,7 +2,7 @@
 
 ## Intro
 
-For this example we'll be basing it on Example 17 from the book.
+This example is based on Example 17 from the book.
 !!! quote "Example 17, p83"
 
     P1 There is a king in the hand and there is not an ace in the hand, or else there is an ace in the hand and there is not a king in the hand.
@@ -11,7 +11,7 @@ For this example we'll be basing it on Example 17 from the book.
 
     C There isn't an ace in the hand.
 
-For the full code see [here](#full-example)
+For the full example see [here](#full-example)
 ## Step 1: Import package
 ```python
 from pyetr import View
