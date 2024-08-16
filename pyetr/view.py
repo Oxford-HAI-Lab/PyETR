@@ -498,7 +498,7 @@ class View:
 
     @property
     def detailed(self) -> str:
-        return f"<View \n  stage={self.stage.detailed} \n  supposition={self.supposition.detailed} \n  dep_rel={self.dependency_relation.detailed} \n  issue_structure={self.issue_structure.detailed} \n  weights={self.weights.detailed} \n>"
+        return f"<View\n  stage={self.stage.detailed}\n  supposition={self.supposition.detailed}\n  dep_rel={self.dependency_relation.detailed}\n  issue_structure={self.issue_structure.detailed}\n  weights={self.weights.detailed}\n>"
 
     def __repr__(self) -> str:
         return self.to_str()

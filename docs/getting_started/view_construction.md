@@ -1,12 +1,35 @@
 # View construction
 
-The basic way to create your own views is to specify them via a string representation which closely follows the notation used in *Reason & Inquiry*.
-The same string representation is used for printing views as the results of calculations. [N.B. This isn't quite true, maybe we can make it true? Difference between `to_str` and `__str__`?]
+This page is a comprehensive guide to building your own views via the `View.from_str()` method.
+It will also serve to make more precise the [anatomy of a view](../theory/overview.md) summarized earlier.
+
+The `View.from_str()` is the basic way that views are created in the [case studies](../case_index.md) and how we expect most users will input their own views.
+The syntax required broadly follows the notation used in *Reason & Inquiry*.
+The same syntax is the default format for printing views (the other formats were mentioned in the [overview](../theory/overview.md)).
+You can explicitly convert to this string format with `.to_str()`.
+
+!!! info
+    Since views are completely determined by the string representation, the following boolean test should always return `True` for any view `v`.
+    ```
+    v == View.from_str(v.to_str())
+    ```
+    However, you should not expect
+    ```
+    View.from_str("...").to_str()
+    ```
+    to return an equal string.
+    One reason is because printing to a string requires us to impose a linear order on the unordered components of a view.
+    Another reason is that there are multiple ways to notate some features.
+    Typically, where there is a 'pretty' notation used for printing that is less convenient to type, an alternative notation is provided.
+    For example, `∀` is used in printing but for convenience `A` can be typed instead, see [Dependency relations](#dependency-relations).
+
+
 
 For convenience, you only need to include in the string those parts of the view that are non-trivial or have non-default values.
-Recall that *Reason & Inquiry* builds up to the full theory of views through iterative enrichments of the possible view contents.
-Thus, by only relying on restricted kinds of content one can use PyETR for computations with any of the restricted theories of views in the earlier chapters of the book, even though PyETR is technically a single implementation of the full theory.
-There are a few notational caveats which will become apparent below.
+This helps when using PyETR for the earlier [systems](../theory/systems.md) of *R&I*, even though PyETR implements the full Chapter 6 system, as you will never have views cluttered with default values for the irrelevant components.
+There are a few notational caveats which will become apparent below (also summarized in [Differences with R&I](../theory/differences.md)).
+
+## Basic example
 
 As an example, consider running the following code.
 This code might also be useful as a template for testing out features detailed below.
@@ -15,27 +38,35 @@ from pyetr import View
 
 p1 = View.from_str("{GrassWet()}")
 print("The view is " + p1.to_str())
+print("Slightly elaborated: " + p1.base)
 print("\nIn detail:")
 print(p1.detailed)
+print("\nNB 'to_str()' is implicit if we print a view by itself:")
+print(p1)
 ```
 The output should be
 ```
 The view is {GrassWet()}
+Slightly elaborated: {GrassWet()}^{0}
 
 In detail:
-<View 
-  stage={{<PredicateAtom predicate=<Predicate name=GrassWet arity=0> terms=()>}} 
-  supposition={{}} 
-  dep_rel=<DependencyRelation deps=[] unis=frozenset() exis=frozenset()> 
-  issue_structure={} 
-  weights=<Weights {'{<PredicateAtom predicate=<Predicate name=GrassWet arity=0> terms=()>}': '<Weight multi=<Multiset items=[]> add=<Multiset items=[]>>'}> 
+<View
+  stage={{<PredicateAtom predicate=<Predicate name=GrassWet arity=0> terms=()>}}
+  supposition={{}}
+  dep_rel=<DependencyRelation deps=[] unis=frozenset() exis=frozenset()>
+  issue_structure={}
+  weights=<Weights {<PredicateAtom predicate=<Predicate name=GrassWet arity=0> terms=()>}: <Weight multi=<Multiset items=[]> add=<Multiset items=[]>>>
 >
+
+NB 'to_str()' is implicit if we print a view by itself:
+{GrassWet()}
 ```
 Observe that the basic method for creating a view from a string representation is the `from_str` method of the `View` class.
 To turn a view object into a string, use `to_str` of that view object.
 
 This string representation completely determines the view object, but for troubleshooting and debugging each view has a `detailed` property which explicitly states the entire contents.
 We can see in the above that while `p1.to_str()` only presents the `stage` of `p1`, in fact `p1` has a supposition (with default value `{{}}`) as well as a dependency relation, issue structure, and a collection of weights (all empty by default).
+The `base` property is provided in case it is useful for troubleshooting and also for its slightly closer connection with the notation used in *R&I*.
 
 ## Stages and states
 

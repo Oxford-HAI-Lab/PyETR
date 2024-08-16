@@ -46,7 +46,7 @@ For example, the view `{ A(2 ** (3*)) }` is parsed equally to `{ A(6) }`, despit
 The reason is that, after simplifying `2 ** 3` to `6`, there is no longer identifiably an atom `A(2 ** ?)` with `3` in `?`-position.
 This does not affect any of the case studies from R&I.
 
-## Do atoms
+## Do atoms and issue structures
 
 In R&I Chapter 6, the interaction of do atoms and issue structures was left imprecise.
 In PyETR, the issue context of a term only extends to the first atom containing it, and does not include a `do`.
