@@ -16,7 +16,7 @@ Moreover, it is hypothesized that failures of reasoning, relative to formal stan
 
 ## Looking at a view
 
-For concreteness, let us study a view from [Example 56](../case_index.md#e56_default_inference). Once you have set up PyETR you can inspect the provided examples as follows.
+For concreteness, let us study a view from [Example 56](../reference/case_index.md#e56_default_inference). Once you have set up PyETR you can inspect the provided examples as follows.
 ```
 >>> from pyetr.cases import e56_default_inference
 >>> v = e56_default_inference.v[1]
@@ -113,7 +113,7 @@ Each state is intuitively a conjunction of its constituent atoms, and the stage 
 The order of atoms within a state, and the order of states within the stage, have no significance.
 Furthermore, each state in the stage can carry an optional 'multiplicative' weight and/or 'additive weight'.
 
-Let us consider another example from [Example 69](../case_index.md#e69_part1).
+Let us consider another example from [Example 69](../reference/case_index.md#e69_part1).
 ```
 >>> from pyetr.cases import e69_part1
 >>> v2 = e69_part1.v[1]
@@ -133,8 +133,8 @@ Once we have a view, reasoning consists in changes to that view, possibly in lig
 In ETR, changes to the current view are effected by a basic set of *operations*, each of which acts on the current view in light of a second view.
 The second view is sometimes either new or recalled information, though often it does not stand for its logical content.
 
-View operations can be referenced in their own [index](../view_methods.md).
-As an example, perhaps the most useful operation is [update](../view_methods.md#update), used as follows.
+View operations can be referenced in their own [index](../reference/view_methods.md).
+As an example, perhaps the most useful operation is [update](../reference/view_methods.md#update), used as follows.
 ```
 >>> from pyetr import View
 >>> v1 = View.from_str("{Man(Socrates()*)}")
@@ -144,7 +144,7 @@ As an example, perhaps the most useful operation is [update](../view_methods.md#
 ```
 
 In ETR, the capacity for reasoning is constrained by the limited set of view operations, and the process of reasoning consists in following procedures that chain together these basic operations rather than apply single basic operations.
-A few built-in inference procedures are listed in an [index](../inference_index.md).
+A few built-in inference procedures are listed in an [index](../reference/inference_index.md).
 For example, the default inference procedure for "what if anything follows?" questions can be used as follows.
 ```
 >>> from pyetr import View

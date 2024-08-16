@@ -3,7 +3,7 @@
 This page is a comprehensive guide to building your own views via the `View.from_str()` method.
 It will also serve to make more precise the [anatomy of a view](../theory/overview.md) summarized earlier.
 
-The `View.from_str()` is the basic way that views are created in the [case studies](../case_index.md) and how we expect most users will input their own views.
+The `View.from_str()` is the basic way that views are created in the [case studies](../reference/case_index.md) and how we expect most users will input their own views.
 The syntax required broadly follows the notation used in *Reason & Inquiry*.
 The same syntax is the default format for printing views (the other formats were mentioned in the [overview](../theory/overview.md)).
 You can explicitly convert to this string format with `.to_str()`.
@@ -70,7 +70,7 @@ The `base` property is provided in case it is useful for troubleshooting and als
 
 ## Stages and states
 
-Let us break down the following representation of view found in [Example 8](../case_index.md#e8).
+Let us break down the following representation of view found in [Example 8](../reference/case_index.md#e8).
 ```
 {k()t(),a()q()}
 ```
@@ -120,14 +120,14 @@ Thus the parsing of a string representing a state into a list of strings represe
     ```
     returns `False`!
     PyETR overloads Python's equality test to give a more correct equality test for View objects.
-    See [View equality and equivalence](../view_equality_and_equivalence.md) for further discussion of equality testing.
+    See [View equality and equivalence](../advanced_usage/view_equality_and_equivalence.md) for further discussion of equality testing.
 
 ## Negation
 
 An atom is made negative by prepending a tilde `~` to it.
 This corresponds to the notation in *Reason & Inquiry* where the negative counterpart of a positive atom was denoted by the same letter with an overline.
 
-For example, consider [Example 22](../case_index.md#e22).
+For example, consider [Example 22](../reference/case_index.md#e22).
 Starting with the view denoted
 ```
 {a()c()b()}
@@ -143,7 +143,7 @@ which has three states, each containing a singleton negative atom.
 Suppositions are optional and are denoted with a `^` after the stage, using the same syntax for a set of states as for stages.
 In *Reason & Inquiry*, suppositions were typically denoted by Θ (upper-case theta) and placed in superscript position following the stage.
 
-For example, consider [Example 28](../case_index.md#e28).
+For example, consider [Example 28](../reference/case_index.md#e28).
 There is a view denoted
 ```
 {Tiger()Orange()}^{Tiger()}
@@ -158,7 +158,7 @@ The supposition is `{Tiger()}`, which consists of one state with one atom (just 
 ## Atoms
 
 Atoms are formed by applying a predicate to a (possibly empty) list of terms.
-Consider this view from [Example 50](../case_index.md#e50_part1).
+Consider this view from [Example 50](../reference/case_index.md#e50_part1).
 ```
 {L(j(),s())L(s(),g())}
 ```
@@ -172,7 +172,7 @@ The `j()`, `s()`, and `g()` are examples of terms, we will see more examples as 
     ```
     {==(Clark(),Superman())}
     ```
-    from [Example 88](../case_index.md#e88).
+    from [Example 88](../reference/case_index.md#e88).
 
 !!! warning
     Atoms and terms can look similar.
@@ -183,7 +183,7 @@ The `j()`, `s()`, and `g()` are examples of terms, we will see more examples as 
     Atoms such as `k()` considered in [Stages and states](#stages-and-states) are a special case where a predicate is given an empty list of arguments.
     In logic, propositional calculus is embedded into first-order logic by considering primitive propositions as predicates taking no arguments.
     We use this same idea to embed the atoms of Chapter 2 of *Reason & Inquiry*, which act like the literals of propositional logic, into PyETR.
-    This is why examples such as [Example 8](../case_index.md#e8) have extra parentheses in PyETR relative to *Reason & Inquiry*.
+    This is why examples such as [Example 8](../reference/case_index.md#e8) have extra parentheses in PyETR relative to *Reason & Inquiry*.
 
 !!! warning
     Occasionally, atoms are compared for having the same underlying predicate.
@@ -233,7 +233,7 @@ These can only appear if there is a suitable [dependency relation](#dependency-r
 
 Issue structures are specified inserting asterisks immediately after a term which is at issue for its environment.
 This applies to terms appearing in states of the stage or supposition, (but not in [weights](#weights))
-For example, in [Example 47](../case_index.md#e47), the view
+For example, in [Example 47](../reference/case_index.md#e47), the view
 ```
 {Thermotogum(Maritima()*)}
 ```
@@ -264,7 +264,7 @@ has the (functional) term `Maritima()` at issue for the context `Thermotogum(?)`
 ## Dependency relations
 
 Dependency relations are specified by giving an equivalent string of quantifiers from first-order logic.
-For example, consider the following view from [Example 56](../case_index.md#e56_default_inference).
+For example, consider the following view from [Example 56](../reference/case_index.md#e56_default_inference).
 ```
 ∀z ∃w {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
 ```
@@ -317,7 +317,7 @@ Az Ew {Student(z*)Reads(z,w)Book(w)}^{Student(z*)}
 ## Weights
 
 Weights are an optional prefix to each state in the stage.
-For example, consider the following view appearing in [Example 65](../case_index.md#e65).
+For example, consider the following view appearing in [Example 65](../reference/case_index.md#e65).
 ```
 ∀x {0.3=* P(x*)C(x),P(x*)~C(x)}^{P(x*)},
 ```
@@ -367,7 +367,7 @@ Note that the `base` representation of this view uses a notation for weights whi
 ## Do atoms
 
 Further to the predicate atoms discussed above at [Atoms](#atoms), `do`-atoms are formed by using `do` like a predicate.
-For example, the following appears in [Example 90](../case_index.md#e90_conda).
+For example, the following appears in [Example 90](../reference/case_index.md#e90_conda).
 ```
 {do(Buy(Video()*)),~do(Buy(Video()))}
 ```
@@ -391,7 +391,7 @@ For example, the following is a valid view.
 !!! warning "Caveat for Readers of *Reason & Inquiry*"
     Custom function in the current implementation deviates.
 
-There are are number of numeric functions available in PyETR. It's also possible to define your own custom functions, but for details of this please see the [advanced section](../func_callers.md).
+There are are number of numeric functions available in PyETR. It's also possible to define your own custom functions, but for details of this please see the [advanced section](../advanced_usage/func_callers.md).
 
 ## Special Functions
 
@@ -399,7 +399,7 @@ Below are the details for each of the built-in numeric functions, that each have
 
 ### Equality
 
-Equality represents a numerical operation of stating two items are equivalent. We'll use one of the views from [Example 88](../case_index.md#e88) to demonstrate:
+Equality represents a numerical operation of stating two items are equivalent. We'll use one of the views from [Example 88](../reference/case_index.md#e88) to demonstrate:
 ```
 {==(Clark(), Superman())}
 ```
@@ -409,7 +409,7 @@ The above statement is the same as "Clark is superman", we see the equates the i
 
 Xbar is numeric multiplication, receiving 2 arguments. There are a couple of different ways to express this function. It may be represented using `**` or `x̄`; for the purposes of demonstration we'll use `**`.
 
-As demonstrated in [Example 74](../case_index.md#e74), it can be used to simply represent a numeric multiplication like so:
+As demonstrated in [Example 74](../reference/case_index.md#e74), it can be used to simply represent a numeric multiplication like so:
 
 ```
 {A(4**5)} # Resolving to {A(20.0)}
@@ -419,7 +419,7 @@ If preferred it can also be written using the prefix notation:
 {A(**(4,5))} # Resolving to {A(20.0)}
 ```
 
-It is also used in the Non-Book example [New Example 18](../case_index.md#new_e18):
+It is also used in the Non-Book example [New Example 18](../reference/case_index.md#new_e18):
 
 ```
 {m()=* A()}
@@ -435,7 +435,7 @@ Here we see that multiplication can also result from internal operations.
 
 Summation is numeric summation, receiving a [Multiset](../glossary.md#multiset) of arguments. It may be represented using `++` or `σ`; for the purposes of demonstration we'll use `++`.
 
-This is used internally, and in part of [Example 93](../case_index.md#e93_grp1).
+This is used internally, and in part of [Example 93](../reference/case_index.md#e93_grp1).
 
 ```
 Ax {++(1, log(++(1, x)))=+ 0} ^ {S(x*)}

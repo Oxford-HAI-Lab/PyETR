@@ -1,6 +1,6 @@
 # Custom Function Behaviour
 
-As discussed [here](./getting_started/view_construction.md#numeric-functions) it's possible in PyETR to define and use numerical functions that combine real number terms in a variety of ways. In this section we'll discuss an advanced variant of this, wherein users may define their own custom functions.
+As discussed [here](../usage/view_construction.md#numeric-functions) it's possible in PyETR to define and use numerical functions that combine real number terms in a variety of ways. In this section we'll discuss an advanced variant of this, wherein users may define their own custom functions.
 
 ## A 3 Argument Function
 
@@ -37,7 +37,7 @@ print(default_inference_procedure((v1,v2))) # {B(2.0)}
 
 ## Multiset functions
 
-You may have noticed that one of the predefined functions, Summation, does not in fact receive a fixed number of arguments as I have described above. This is because there exists another type of function, that receives a [Multiset](./glossary.md#multiset) of items instead of a fixed arity tuple.
+You may have noticed that one of the predefined functions, Summation, does not in fact receive a fixed number of arguments as I have described above. This is because there exists another type of function, that receives a [Multiset](../glossary.md#multiset) of items instead of a fixed arity tuple.
 
 To do this, we must use the "Var Positional" or `*args` kind of function argument. In the below example we create the operation "product", that as with Summation receives an unlimited number of arguments:
 

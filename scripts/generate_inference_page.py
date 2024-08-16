@@ -27,7 +27,7 @@ def main():
                 "`" + name + "`" + get_line_no(func) + "\n```\n" + new_doc + "\n```"
             )
 
-    with open("./docs/inference_index.md", "w+") as f:
+    with open("./docs/reference/inference_index.md", "w+") as f:
         intro = "# Inference Index\n\nBelow you'll find all of the cases in pyetr.cases, and their associated views. You can use this page as an index of the current cases.\n\n## "
         full_page = intro + "\n\n## ".join(out)
         f.write(full_page)

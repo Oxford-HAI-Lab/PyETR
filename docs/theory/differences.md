@@ -40,7 +40,7 @@ However, it does not only happen at parse time.
 Suppose a view contains a term such as `x ** 3` where `x` is an arbitrary object.
 Then, if in the process of computing an operation a real number term is substituted for `x`, the output view will have the corresponding substitution instances of `x ** 3` simplified already.
 
-The advantage of the approach taken in PyETR is that operations such as [Answer](../view_methods.md#answer) can operate without any intervention to simplify arithmetic expressions.
+The advantage of the approach taken in PyETR is that operations such as [Answer](../reference/view_methods.md#answer) can operate without any intervention to simplify arithmetic expressions.
 The main caveat is that sometimes issue items can unexpectedly disappear.
 For example, the view `{ A(2 ** (3*)) }` is parsed equally to `{ A(6) }`, despite the attempt to include a non-trivial issue structure in the first view.
 The reason is that, after simplifying `2 ** 3` to `6`, there is no longer identifiably an atom `A(2 ** ?)` with `3` in `?`-position.

@@ -58,7 +58,7 @@ def main():
 
             out.append(main_str)
 
-    with open("./docs/view_methods.md", "w+") as f:
+    with open("./docs/reference/view_methods.md", "w+") as f:
         intro = "# View Methods Index\n\nBelow you'll find all of the methods of View, including associated operations and ways of creating them.\n"
         full_page = intro + "\n\n".join(out)
         f.write(full_page)
