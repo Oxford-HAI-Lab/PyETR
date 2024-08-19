@@ -2,16 +2,17 @@
 
 ## Arbitrary Object
 
-Represents an attribute that can be replaced. Equivalent to a variable in mathematics.
+A kind of term. Analogous to 'bound variable' in logic.
+Comes in two kinds: 'universal arbitrary objects' can be read as generic objects, 'existential arbitrary objects' can be read as a specific but unidentified object.
 
 ## Arity
 
-The number of arguments received by a function.
+The 'number' of arguments received by a function. In PyETR, this usually is a non-negative integer, but some terms such as Summation take a multiset of terms.
 
 ## Atom
 
-An atoms are the smallest units with logical content in PyETR, corresponding to positive and negative atomic formulae in logic.
-They are most often built out of [predicates](#predicate) possibly applied to [terms](#term). See also [do-atoms](#do-atom) which can contain atoms.
+Atoms are the smallest units with logical content in PyETR, corresponding to positive and negative atomic formulae in logic.
+They are most often built out of [predicates](#predicate) possibly applied to [terms](#term). See also [do atoms](#do-atom) which can contain atoms.
 
 ## Constant
 
@@ -25,7 +26,8 @@ All operations take an initial view, and take on board a second view through the
 
 ## Dependency
 
-TODO
+Existential arbitrary objects can have a dependency on a number of universal arbitrary objects.
+If the existential $e$ depends on universals $u_1,\ldots,u_n$, this can be read as $e$ stands for a specific individual for every possible instantiation of $u_1,\ldots,u_n$.
 
 ## Dependency Relation
 
@@ -33,11 +35,13 @@ Contains the classifications of [arbitrary objects](#arbitrary-object) into univ
 
 ## Do Atom
 
-A [set](#set) of [atoms](#atom) representing a decisive action. e.g. `Do(Buy(Video()))` represents the action of buying a video.
+An atom formed by the keyword `do` applied to a [set](#set) of [atoms](#atoms).
+A chain of reasoning that ends in a view such as `{ do(A B C) }` means making a decision to 'act so as to make `A`, `B`, and `C` the case'.
 
 ## Factor
 
-TODO
+A view operation which reduces the complexity of the current view by factoring out the content of a second view.
+An important special case is to 'factor out falsum', which drops any states that contain a primitive absurdity.
 
 ## Functional Term
 
@@ -88,7 +92,7 @@ A type of [constant](#constant) with an associated numeric value.
 
 ## Query
 
-TODO
+A view operation for determining whether a given conclusion is directly supported by the current view.
 
 ## Set
 
@@ -99,7 +103,7 @@ As is standard, sets are represented as comma-separated lists between curly brac
     \{1,2\} = \{2,1\} = \{1,1,2\}
 \]
 
-are three (of many possible) ways of writing the same thing: the set whose members are $1$ and $2$ only (note that repeating a member in the description has no effect). However, note that a [State](#state) is by definition a kind of set, but when a set is considered as a state we use a different notation (TODO see that entry).
+are three (of many possible) ways of writing the same thing: the set whose members are $1$ and $2$ only (note that repeating a member in the description has no effect). However, note that a [State](#state) is by definition a kind of set, but when a set is considered as a state we use a different notation, see [Stages and states](usage/view_construction.md#stages-and-states) and [Do atoms](usage/view_construction.md#do-atoms) in View construction.
 
 In PyETR, all sets are finite, so we usually write 'set' when we really mean 'finite set'. In ETR, all sets involved in the construction of a [View](#view) are finite, but note that some entities, such as "the set of all views", are infinite sets.
 
@@ -147,10 +151,15 @@ Views are built up from a [Stage](#stage), a [Supposition](#supposition), a [Dep
 
 ## Weight
 
-TODO
+A weight is a [multiset](#multiset) of [terms](#term) designated as either the additive or multiplicative weight in a [weighted state](#weighted-state).
 
 ## Weighted state
 
-TODO
+Each [state](#state) in a [stage](#stage) is equipped with extra non-logical content in the form of additive and multiplicative [weights](#weights), making it a weighted state.
+States in [suppositions](#supposition) do not come with weights.
+One or both of the weights can be empty.
+A weighted state where both weights are the empty multiset is notated just as an ordinary state.
+
+
 
 
