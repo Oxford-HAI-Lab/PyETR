@@ -130,5 +130,5 @@ print(v1.update(v2)) # ∀x ∀a {A(f(3.0,x))A(f(3.0,a))}
 ```
 We now have no idea which f corresponds to which function - simply put in general it's really worth using different names.
 
-!!! Note
+!!! Info
     These kind of overlaps can also cause issues if one definition of the function uses a multiset function.

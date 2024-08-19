@@ -66,3 +66,6 @@ extra_javascript:
 plugins:
   - search:
       separator: '[\s\-\.\_]+'
+
+extra_css:
+  - stylesheets/extra.css

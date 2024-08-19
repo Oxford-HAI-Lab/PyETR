@@ -186,7 +186,9 @@ power(σ(1.0,log(σ(1.0,x))),-1.0)
 
 !!! warning
     In PyETR, there are a few reserved function names, see [Special functions](#special-functions).
-    Moreover, the behaviour of `σ` mildly differs from *Reason & Inquiry*, see [Collapsing functions](../theory/differences.md#collapsing-functions).
+
+!!! book "Note for readers of *Reason and Inquiry*"
+    The behaviour of `σ` mildly differs from *Reason & Inquiry*, see [Collapsing functions](../theory/differences.md#collapsing-functions).
 
 #### Real numbers
 
@@ -211,7 +213,7 @@ For example, in [Example 47](../reference/case_index.md#e47), the view
 ```
 has the (functional) term `Maritima()` at issue for the context `Thermotogum(?)`.
 
-!!! info
+!!! book "Note for readers of *Reason and Inquiry*"
     The issue structures in PyETR follow exactly the description given in Definition 4.7/A.29 in *Reason & Inquiry* and the informal use of the circumflex in the book agrees with the asterisk here. For more information about issue structures we recommend taking a look at this.
 
     See [Differences with R&I](../theory/differences.md#do-atoms-and-issue-structures), for a discussion on how [Do atoms](#do-atoms) interact with issues.
@@ -289,7 +291,7 @@ Each state has a *multiplicative* and an *additive* weight, introduced with `=*`
 Both are optional.
 The `=*` should not be confused with the `*` for introducing items to the issue structure.
 
-!!! abstract "Note for readers of *Reason and Inquiry*"
+!!! book "Note for readers of *Reason and Inquiry*"
 
     Note that the `base` representation of this view uses a notation for weights which is more familiar from *R&I*.
     ```
@@ -347,7 +349,7 @@ For example, the following is a valid view.
 ∀x { do(P(x)Q(x)R()), do(), do(P(x))do(Q(x)) }
 ```
 
-!!! abstract "Note for readers of *Reason and Inquiry*"
+!!! book "Note for readers of *Reason and Inquiry*"
     In *Reason & Inquiry*, 'do' could not appear inside the contents of a do-atom.
     PyETR does not currently enforce this, but behaviour when nested `do`-atoms might be unpredictable.
 

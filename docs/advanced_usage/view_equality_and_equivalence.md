@@ -61,5 +61,5 @@ v2 = View.from_str("∀y {A(y)}")
 print(v1 == v2) # Returns False
 print(v1.is_equivalent_under_arb_sub(v2)) # Returns True
 ```
-!!! note "Limit of Equivalence Check"
+!!! info "Limit of Equivalence Check"
     Due to the fact the comparison must check all permutations for a series of arbitrary objects, there is a certain computation limit. The computational complexity is O((n!)^2*n) where n is average num of existentials and universals, so as you can imagine for a feasible number of arbitrary objects this become impractical. We've set the limit at 9 of each type in each view, which seems to process in a reasonable computation time. Anything higher than this is unlikely to appear in real world scenarios.

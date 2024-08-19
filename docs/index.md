@@ -10,6 +10,9 @@ From [the publisher](https://global.oup.com/academic/product/reason-and-inquiry-
 
     The book's central idea is that our minds naturally aim at resolving issues, and if we are sufficiently inquisitive in the process, we can avoid mistakes. The erotetic theory holds that both the successes and the failures of reason are due to this aim. Rationality is secured if we reach what is described by the theory as erotetic equilibrium.
 
+!!! book "Note for readers of *Reason and Inquiry*"
+    Anywhere you see a box like this one will be a reference to the book *Reason & Inquiry*.
+
 Most users can dive straight in [here](./getting_started/overview.md) for the overview of the book and code. Book readers who may wish to understand how it relates to the code should instead begin [here](./theory/systems.md), before returning to the overview in "Getting Started".
 
 The documentation is structured as follows.
