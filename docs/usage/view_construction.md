@@ -395,7 +395,7 @@ This is used internally, and in part of [Example 93](../reference/case_index.md#
 Ax {++(1, log(++(1, x)))=+ 0} ^ {S(x*)}
 ```
 
-Here this is used to represent the term: 1+log(1+x)
+Here this is used to represent the term: $1+\log(1+x)$
 
 The summation may contain zero or more arguments.
 
