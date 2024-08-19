@@ -185,14 +185,14 @@ power(σ(1.0,log(σ(1.0,x))),-1.0)
 ```
 
 !!! warning
-    In PyETR, there are a few reserved function names, see [Special functions](#special-functions).
+    In PyETR, there are a few reserved function names, see [Special functions](#numeric-functions).
 
 !!! book "Note for readers of *Reason and Inquiry*"
     The behaviour of `σ` mildly differs from *Reason & Inquiry*, see [Collapsing functions](../theory/differences.md#collapsing-functions).
 
 #### Real numbers
 
-Integers and decimals such as `1`, `1.0`, `-1.0`. These are constants (0 arity functional terms), but notably do not use the open-close bracket syntax. See [here](../advanced_usage/func_callers.md) for details of how they interact with numeric functions.
+Integers and decimals such as `1`, `1.0`, `-1.0`. These are constants (0 arity functional terms), but notably do not use the open-close bracket syntax. See [here](#numeric-functions) for details of how they interact with numeric functions.
 
 #### Arbitrary objects
 
@@ -356,8 +356,6 @@ For example, the following is a valid view.
 ## Numeric Functions
 
 There are are number of numeric functions available in PyETR. It's also possible to define your own custom functions, but for details of this please see the [advanced section](../advanced_usage/func_callers.md).
-
-## Special Functions
 
 Below are the details for each of the built-in numeric functions, that each have their own syntaxes for view construction.
 
