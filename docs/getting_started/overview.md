@@ -77,7 +77,7 @@ The issue structure tells us that `z` is at issue for being a `Student`.
 !!! info
     For this view, the issue structure contains only a single item, which is clear from `v.base` but less so from `v.to_str()`.
     This is because issues are not local to particular positions in the stage or supposition, but apply globally to a view.
-    We will discuss this further in [TODO].
+    We will discuss this further in [View construction](../usage/view_construction.md#issue-structures).
     This is one advantage to the more verbose `base` representation.
 
 Finally, in `v.to_str()` the dependency relation is determined by the prefix
