@@ -25,18 +25,18 @@ P1 There is a king in the hand and there is not an ace in the hand, or else ther
 
 ```py
 p1 = View.from_str(
-    "{~King(k())Ace(a()),King(k())~Ace(a())}"
+    "{~King()Ace(),King()~Ace()}"
 )
 ```
 P2 There is a king in the hand.
 ```py
-p2 = View.from_str("{King(k())}")
+p2 = View.from_str("{King()}")
 ```
 
 ## Step 3: Check result
 ```py
 c = default_inference_procedure((p1, p2))
-print(c) #"{~Ace(a())}"
+print(c) #"{~Ace()}"
 ```
 
 ## Full Example
@@ -46,9 +46,9 @@ from pyetr import View
 from pyetr.inference import default_inference_procedure
 
 p1 = View.from_str(
-    "{~King(k())Ace(a()),King(k())~Ace(a())}"
+    "{~King()Ace(),King()~Ace()}"
 )
-p2 = View.from_str("{King(k())}")
+p2 = View.from_str("{King()}")
 c = default_inference_procedure((p1, p2))
-print(c) #"{~Ace(a())}"
+print(c) #"{~Ace()}"
 ```
