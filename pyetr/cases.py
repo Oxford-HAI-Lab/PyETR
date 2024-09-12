@@ -224,7 +224,7 @@ class BaseExample(metaclass=BaseMeta):
 
     @classmethod
     @abstractmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         ...
 
 
@@ -240,7 +240,7 @@ class BaseTest:
 
 class DefaultInference(BaseTest):
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = default_inference_procedure(cls.v, verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -248,7 +248,7 @@ class DefaultInference(BaseTest):
 
 class BasicStep(BaseTest):
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = basic_step(v=cls.v, verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -258,7 +258,7 @@ class Product(BaseTest):
     v: tuple[View, View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].product(cls.v[1])
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -268,7 +268,7 @@ class Sum(BaseTest):
     v: tuple[View, View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].sum(cls.v[1])
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -278,7 +278,7 @@ class Answer(BaseTest):
     v: tuple[View, View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].answer(cls.v[1])
         if not result == cls.c:
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -288,7 +288,7 @@ class Factor(BaseTest):
     v: tuple[View, View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].factor(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -298,7 +298,7 @@ class Negation(BaseTest):
     v: tuple[View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].negation(verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -308,7 +308,7 @@ class Query(BaseTest):
     v: tuple[View, View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].query(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -318,7 +318,7 @@ class Update(BaseTest):
     v: tuple[View, View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].update(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -328,7 +328,7 @@ class UniversalProduct(BaseTest):
     v: tuple[View, View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].universal_product(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -338,7 +338,7 @@ class Which(BaseTest):
     v: tuple[View, View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].which(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -348,7 +348,7 @@ class Suppose(BaseTest):
     v: tuple[View, View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].suppose(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -358,7 +358,7 @@ class Inquire(BaseTest):
     v: tuple[View, View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].inquire(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -368,7 +368,7 @@ class Merge(BaseTest):
     v: tuple[View, View]
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].merge(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -381,7 +381,7 @@ class DefaultDecision(BaseTest):
     c: View
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = default_decision(dq=cls.v[0], cv=cls.cv, pr=cls.pr, verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -393,7 +393,7 @@ class WhatIsProb(BaseTest):
     c: View
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = default_procedure_what_is_prob(
             cls.v, prob_of=cls.prob, verbose=verbose
         )
@@ -796,7 +796,7 @@ class e21(BaseExample):
     c: View = ps("{" + f"{samples.delta}" + "}").negation()
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         x = View.get_falsum().suppose(cls.v[0], verbose=verbose)
         result = x.depose(verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
@@ -824,7 +824,7 @@ class e22(BaseExample):
     )
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = cls.v[0].negation()
 
         if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
@@ -860,7 +860,7 @@ class e23_with_inquire(BaseExample):
     )
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = (
             View.get_verum()
             .update(cls.v[0], verbose=verbose)
@@ -896,7 +896,7 @@ class e23_without_inquire(BaseExample):
     )
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = View.get_verum().update(cls.v[0], verbose=verbose)
 
         if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
@@ -927,7 +927,7 @@ class e24(BaseExample):
     c: tuple[View, View] = (ps("{a()~q(),a()q()}"), ps("{a(),q()}"))
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result_1 = cls.v[0].inquire(other=cls.v[1], verbose=verbose)
 
         if not result_1.is_equivalent_under_arb_sub(cls.c[0]):
@@ -1028,7 +1028,7 @@ class e26(BaseExample):
     )
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = cls.v[0].suppose(other=cls.v[1])
 
         if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
@@ -1044,7 +1044,7 @@ class e26(BaseExample):
 
 class e26_does_it_follow(e26):
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = default_procedure_does_it_follow(
             (cls.v[0],), target=cls.v[2], verbose=verbose
         )
@@ -1140,7 +1140,7 @@ class e40i(BaseExample):
     c: View = View.get_falsum()
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = (
             cls.v[0]
             .update(cls.v[1].depose(verbose=verbose), verbose=verbose)
@@ -1177,7 +1177,7 @@ class e40ii(BaseExample):
     c: View = ps("{~CircleB()~CircleT()TriangleB()~SquareB()}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = (
             cls.v[0]
             .update(cls.v[1], verbose=verbose)
@@ -1256,7 +1256,7 @@ class e45(BaseExample):
     c: tuple[View, View] = (ps("{0,M(),B(),B()M()}"), ps("{0,B()M()}"))
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = cls.v[0].product(cls.v[1])
 
         if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
@@ -1288,7 +1288,7 @@ class e46i(BaseExample):
     c: tuple[View, View] = (ps("{~P()M(),V()P()~M()}"), ps("{0}"))
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = (
             cls.v[0]
             .depose(verbose=verbose)
@@ -1395,7 +1395,7 @@ class e50_part1(BaseExample):
     )
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = (
             cls.v[0].update(cls.v[1], verbose=verbose).factor(cls.v[2], verbose=verbose)
         )
@@ -1436,7 +1436,7 @@ class e50_part2(BaseExample):
     c: View = ps("∃b ∃a {M(a*)L(a,b)~M(b*)}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = (
             cls.v[0]
             .update(cls.v[1], verbose=verbose)
@@ -1471,7 +1471,7 @@ class e50_part2_arbs(BaseExample):
     c: View = ps("∃b ∃a {M(a*)L(a,b)~M(b*)}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = cls.v[0].inquire(cls.v[1], verbose=verbose)
         if not mid_result.is_equivalent_under_arb_sub(cls.g1):
             raise RuntimeError(
@@ -1533,7 +1533,7 @@ class e53(BaseExample):
     c: View = ps("∀x {A(x)B(x)}^{B(x)}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = (
             cls.v[0]
             .depose(verbose=verbose)
@@ -1546,7 +1546,7 @@ class e53(BaseExample):
 
 class e53_does_it_follow(e53):
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = default_procedure_does_it_follow(
             (cls.v[0],), target=cls.v[2], verbose=verbose
         )
@@ -1715,7 +1715,7 @@ class e64i(BaseExample):
     c: View = ps("{90=* S(Smith()*), 0}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = basic_step(v=cls.v[0:3], verbose=verbose).query(
             cls.v[3], verbose=verbose
         )
@@ -1735,7 +1735,7 @@ class e64ii(e64i):
     c: View = ps("{90=* S(Smith()*)}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = basic_step(v=cls.v[0:4], verbose=verbose).query(
             cls.v[4], verbose=verbose
         )
@@ -1770,7 +1770,7 @@ class e65(BaseExample):
     c: View = ps("∃a {15=* C(a), 0}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = basic_step(v=cls.v[0:4], verbose=verbose).query(
             cls.v[4], verbose=verbose
         )
@@ -1797,7 +1797,7 @@ class e66i(BaseExample):
     c: View = ps("{}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].stage.equilibrium_answer_potential(
             cls.v[1].stage, cls.v[0].weights
         )
@@ -1814,7 +1814,7 @@ class e66ii(e66i):
     c: View = ps("{}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].stage.equilibrium_answer_potential(
             cls.v[1].stage, cls.v[0].weights
         )
@@ -1841,7 +1841,7 @@ class e67(BaseExample):
     c: View = ps("{94=* IsCEO(), 0}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = (
             cls.v[0]
             .suppose(cls.v[1], verbose=verbose)
@@ -1876,7 +1876,7 @@ class e69_part1(BaseExample):
 
     # TODO: Switch to new basic step?
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = (
             cls.v[0]
             .update(cls.v[1].depose(verbose=verbose), verbose=verbose)
@@ -1902,7 +1902,7 @@ class e69_part2(BaseExample):
     )
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = cls.v[0].inquire(cls.v[1], verbose=verbose)
         if not mid_result.is_equivalent_under_arb_sub(cls.c[0]):
             raise RuntimeError(
@@ -1930,7 +1930,7 @@ class e70(BaseExample):
     c: View = ps("{Disease()Symptom()}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = (
             cls.v[0].update(cls.v[1], verbose=verbose).update(cls.v[2], verbose=verbose)
         )
@@ -1961,7 +1961,7 @@ class e71(BaseExample):
     )
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = (
             cls.v[0]
             .inquire(cls.v[1], verbose=verbose)
@@ -2002,7 +2002,7 @@ class e72(BaseExample):
     )
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = (
             cls.v[0]
             .inquire(cls.v[1], verbose=verbose)
@@ -2040,7 +2040,7 @@ class e74(BaseExample):
     )
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         mid_result = (
             cls.v[1].update(cls.v[2], verbose=verbose).update(cls.v[3], verbose=verbose)
         )
@@ -2073,7 +2073,7 @@ class e76(BaseExample):
     c: View = ps("{Fired(i()*)Gun(i())Guitar(j())Outoftune(j())Trigger(i())}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = (
             cls.v[0]
             .update(cls.v[1], verbose=verbose)
@@ -2331,7 +2331,7 @@ class e88(BaseExample):
     c: View = ps("{90=* CanFly(Clark())}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = (
             cls.v[0]
             .update(cls.v[1], verbose=verbose)
@@ -2445,7 +2445,7 @@ class e93_grp1(DefaultDecision, BaseExample):
     c = ps("{do(B())}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         absurd_view = ps("{D(0)D(600)}")
         absurd_state = next(iter(absurd_view.stage))
         result = default_decision(
@@ -2464,7 +2464,7 @@ class new_e1(BaseExample):
     c = ps("Eb Ax Az Ea Ay {P(x,a)P(b,z)Q(a,y)}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].update(cls.v[1], verbose=verbose)
         if not result.is_equivalent_under_arb_sub(cls.c):
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
@@ -2475,7 +2475,7 @@ class new_e2(BaseExample):
     c = ps("Ea Ax Eb {P(a)Q(x*)R(b)}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         result = cls.v[0].dependency_relation.fusion(cls.v[1].dependency_relation)
         if result != cls.c.dependency_relation:
             raise RuntimeError(
@@ -2632,7 +2632,7 @@ class AnswerPotential(BaseExample):
     c = ps("{}")
 
     @classmethod
-    def test(cls, verbose: bool = False):
+    def test(cls, verbose: bool = True):
         out = cls.v[0].stage.equilibrium_answer_potential(
             cls.v[1].stage, cls.v[0].weights
         )
