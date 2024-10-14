@@ -2,7 +2,7 @@ __all__ = ["View"]
 
 from functools import reduce
 from itertools import permutations
-from typing import Callable, Optional, Self, Set, Unpack, cast
+from typing import Callable, Optional, Self, Unpack, cast
 
 from pyetr.atoms.abstract import Atom
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
@@ -426,7 +426,7 @@ class View:
         return self._weights
 
     @property
-    def atoms(self) -> Set[Atom]:
+    def atoms(self) -> set[Atom]:
         return set.union(*[state.atoms for state in self.weights.keys()])
 
     def validate(self, *, pre_view: bool = False):
