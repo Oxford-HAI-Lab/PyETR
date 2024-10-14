@@ -427,7 +427,7 @@ class View:
 
     @property
     def atoms(self) -> set[Atom]:
-        return set.union(*[state.atoms for state in self.weights.keys()])
+        return self.stage.atoms | self.supposition.atoms
 
     def validate(self, *, pre_view: bool = False):
         self.dependency_relation.validate_against_states(
