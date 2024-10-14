@@ -17,6 +17,18 @@ from pyetr.weight import Weight, Weights
 from .view import View
 
 
+# Leaving as an alternative basic step that Sean and Philipp previously discussed
+# def basic_step(*, v: tuple[View, ...], verbose: bool = False) -> View:
+#     out = View.get_verum()
+
+#     for view in v:
+#         new_out = out.update(view, verbose=verbose)
+#         if new_out == out:
+#             new_out = out.update(view.depose(verbose=verbose), verbose=verbose)
+#         out = new_out
+#     return out.factor(View.get_falsum(), verbose=verbose)
+
+
 def basic_step(v: Sequence[View], verbose: bool = False) -> View:
     """
     Based Definition 4.47 p179-180
