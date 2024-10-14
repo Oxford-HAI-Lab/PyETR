@@ -4,6 +4,9 @@ __all__ = [
     "default_procedure_what_is_prob",
     "default_decision",
     "default_procedure_does_it_follow",
+    "classically_valid_basic_step",
+    "classically_valid_inference_procedure",
+    "classically_valid_does_it_follow",
 ]
 from typing import Iterable, Optional, Sequence
 
