@@ -182,14 +182,9 @@ class BaseMeta(ABCMeta):
                 attribute = getattr(self, attr)
                 long_name = " (" + mapped_name + ")"
                 if isinstance(attribute, tuple):
-                    full_name = (
-                        attr
-                        + long_name
-                        + ": "
-                        + "(\n   "
-                        + ",\n   ".join([i.to_str() for i in attribute])
-                        + "\n)"
-                    )
+                    full_name = ""
+                    for i, v in enumerate(attribute):
+                        full_name += f"v[{i}]: {v.to_str()}\n"
                 else:
                     full_name = attr + long_name + ": " + attribute.to_str()
                 final_str += "\n" + full_name
