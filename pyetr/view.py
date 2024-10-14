@@ -2,7 +2,7 @@ __all__ = ["View"]
 
 from functools import reduce
 from itertools import permutations
-from typing import Callable, Optional, Self, Unpack, cast
+from typing import Callable, Optional, Self, Set, Unpack, cast
 
 from pyetr.atoms.abstract import Atom
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
@@ -424,6 +424,10 @@ class View:
     @property
     def weights(self) -> Weights:
         return self._weights
+
+    @property
+    def atoms(self) -> Set[Atom]:
+        return set.union(*[state.atoms for state in self.weights.keys()])
 
     def validate(self, *, pre_view: bool = False):
         self.dependency_relation.validate_against_states(
@@ -2111,3 +2115,17 @@ class View:
             str: The first order logic string form.
         """
         return view_to_fol(self)
+
+    @classmethod
+    def from_atom(cls, atom: Atom) -> Self:
+        """
+        Returns a View containing just a single Atom in stage.
+        Useful for atomic inquiry, which helps in equilibrium reasoning.
+        """
+        return cls(
+            stage=SetOfStates([State([atom])]),
+            supposition=SetOfStates([State({})]),
+            dependency_relation=DependencyRelation({}, {}, {}),
+            issue_structure=IssueStructure(),
+            weights=None,
+        )
