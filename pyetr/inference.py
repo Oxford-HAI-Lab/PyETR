@@ -19,7 +19,6 @@ from pyetr.weight import Weight, Weights
 
 from .view import View
 
-
 # Leaving as an alternative basic step that Sean and Philipp previously discussed
 # def basic_step(*, v: tuple[View, ...], verbose: bool = False) -> View:
 #     out = View.get_verum()
@@ -279,13 +278,15 @@ def classically_valid_basic_step(v: Sequence[View], verbose: bool = False) -> Vi
         else:
             for a in view.atoms:
                 # Inquire on all the atoms of both out and view
-                out = out.inquire(View.from_atom(a))
-                view = view.inquire(View.from_atom(a))
+                out = out.inquire(View.with_defaults(stage=SetOfStates({State({a})})))
+                view = view.inquire(View.with_defaults(stage=SetOfStates({State({a})})))
             out = out.update(view, verbose=verbose)
     return out.factor(View.get_falsum(), verbose=verbose)
 
 
-def classically_valid_inference_procedure(v: Sequence[View], verbose: bool = False) -> View:
+def classically_valid_inference_procedure(
+    v: Sequence[View], verbose: bool = False
+) -> View:
     """
     Same as default_inference_procedure, except we inquire on all atoms in the original view to preserve
     alternatives in a classically valid way.
