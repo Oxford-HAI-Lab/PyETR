@@ -471,6 +471,31 @@ class View:
         )
 
     @classmethod
+    def with_defaults(
+        cls,
+        stage: Optional[Stage] = None,
+        supposition: Optional[Supposition] = None,
+        dependency_relation: Optional[DependencyRelation] = None,
+        issue_structure: Optional[IssueStructure] = None,
+        weights: Optional[Weights] = None,
+    ):
+        if stage is None:
+            stage = SetOfStates()
+        if supposition is None:
+            supposition = SetOfStates({State(set())})
+        if dependency_relation is None:
+            dependency_relation = DependencyRelation(set(), set(), set())
+        if issue_structure is None:
+            issue_structure = IssueStructure()
+        return cls(
+            stage=stage,
+            supposition=supposition,
+            dependency_relation=dependency_relation,
+            issue_structure=issue_structure,
+            weights=weights,
+        )
+
+    @classmethod
     def with_restriction(
         cls,
         stage: Stage,
@@ -2115,17 +2140,3 @@ class View:
             str: The first order logic string form.
         """
         return view_to_fol(self)
-
-    @classmethod
-    def from_atom(cls, atom: Atom) -> Self:
-        """
-        Returns a View containing just a single Atom in stage.
-        Useful for atomic inquiry, which helps in equilibrium reasoning.
-        """
-        return cls(
-            stage=SetOfStates([State([atom])]),
-            supposition=SetOfStates([State({})]),
-            dependency_relation=DependencyRelation({}, {}, {}),
-            issue_structure=IssueStructure(),
-            weights=None,
-        )
