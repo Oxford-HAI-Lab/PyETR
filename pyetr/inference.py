@@ -250,3 +250,84 @@ def default_decision(
     for v in pr:
         result = result.update(v, verbose=verbose)
     return dq.answer(result, verbose=verbose)
+
+
+def classically_valid_basic_step(v: Sequence[View], verbose: bool = False) -> View:
+    """
+    Same as basic_step, except we inquire on all atoms in the original view to preserve alternatives
+    in a classically valid way.
+    """
+    out = View.get_verum()
+    for i, view in enumerate(v):
+        if i == 0:
+            out = out.update(view.depose(verbose=verbose), verbose=verbose)
+        else:
+            for a in view.atoms:
+                # Inquire on all the atoms of both out and view
+                out = out.inquire(View.from_atom(a))
+                view = view.inquire(View.from_atom(a))
+            out = out.update(view, verbose=verbose)
+    return out.factor(View.get_falsum(), verbose=verbose)
+
+
+def classically_valid_inference_procedure(v: Sequence[View], verbose: bool = False) -> View:
+    """
+    Same as default_inference_procedure, except we inquire on all atoms in the original view to preserve
+    alternatives in a classically valid way.
+    """
+
+    def _default_inference_step1(rel_v: Sequence[View]):
+        g_prime = classically_valid_basic_step(rel_v, verbose=verbose)
+        # Step (1)
+        for i, view in enumerate(rel_v):
+            if i == 0:
+                # G'[P₁[]ᴰ]ꟳ
+                g_prime = g_prime.factor(view.depose(verbose=verbose), verbose=verbose)
+            else:
+                # G'[Pₙ]ꟳ
+                g_prime = g_prime.factor(view, verbose=verbose)
+        return g_prime
+
+    g_prime = _default_inference_step1(v)
+    if g_prime.is_verum or g_prime.is_falsum:
+        # Step (2)
+        reversed_v = tuple(reversed(v))
+        g_prime = _default_inference_step1(reversed_v)
+        if g_prime.is_verum or g_prime.is_falsum:
+            # Step (3)
+            return View.get_verum()
+    # Step (4)
+    return g_prime
+
+
+def classically_valid_does_it_follow(
+    v: Sequence[View], target: View, verbose: bool = False
+) -> View:
+    """
+    Same as default_procedure_does_it_follow, except we inquire on all atoms in the original view to preserve
+    alternatives in a classically valid way.
+    """
+
+    def _default_does_it_follow_step1(rel_v: Sequence[View]):
+        g_prime = classically_valid_basic_step(rel_v)
+        return g_prime.suppose(
+            View.with_restriction(
+                stage=target.supposition,
+                supposition=SetOfStates({State({})}),
+                dependency_relation=target.dependency_relation,
+                issue_structure=target.issue_structure,
+                weights=None,
+            ),
+            verbose=verbose,
+        ).query(target, verbose=verbose)
+
+    # Step (1)
+    g_prime_prime = _default_does_it_follow_step1(v)
+    if g_prime_prime == target:
+        return True
+    else:
+        # Step (2)
+        reversed_v = tuple(reversed(v))
+        g_prime_prime = _default_does_it_follow_step1(reversed_v)
+        # Step (3)
+        return g_prime_prime == target
