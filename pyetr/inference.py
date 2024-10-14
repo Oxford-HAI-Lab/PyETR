@@ -314,7 +314,7 @@ def classically_valid_inference_procedure(v: Sequence[View], verbose: bool = Fal
 
 def classically_valid_does_it_follow(
     v: Sequence[View], target: View, verbose: bool = False
-) -> View:
+) -> bool:
     """
     Same as default_procedure_does_it_follow, except we inquire on all atoms in the original view to preserve
     alternatives in a classically valid way.
