@@ -131,6 +131,11 @@ __all__ = [
     "UniProduct",
     "QueryTest",
     "QueryTest2",
+    "ClassicInfer",
+    "ClassicInferBlocked",
+    "ClassicInferVerum",
+    "ClassicSimpleMP",
+    "ClassicIllusoryBlocked",
 ]
 
 from abc import ABCMeta, abstractmethod
@@ -143,6 +148,8 @@ from pyetr.atoms.terms.term import FunctionalTerm
 from .func_library import div, log, power
 from .inference import (
     basic_step,
+    classically_valid_does_it_follow,
+    classically_valid_inference_procedure,
     default_decision,
     default_inference_procedure,
     default_procedure_does_it_follow,
@@ -217,9 +224,11 @@ class BaseExample(metaclass=BaseMeta):
         assert isinstance(v, tuple)
         for i in v:
             assert isinstance(i, View)
-        c: View | tuple[View, ...] = getattr(cls, "c")
-        assert isinstance(c, View) or (
-            isinstance(c, tuple) and all(isinstance(x, View) for x in c)
+        c: View | tuple[View, ...] | bool = getattr(cls, "c")
+        assert (
+            isinstance(c, bool)
+            or isinstance(c, View)
+            or (isinstance(c, tuple) and all(isinstance(x, View) for x in c))
         )
 
     @classmethod
@@ -398,6 +407,31 @@ class WhatIsProb(BaseTest):
             cls.v, prob_of=cls.prob, verbose=verbose
         )
         if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class ClassicalValidInference(BaseTest):
+    v: tuple[View, ...]
+    c: View
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = classically_valid_inference_procedure(cls.v, verbose=verbose)
+        if not result.is_equivalent_under_arb_sub(cls.c):
+            raise RuntimeError(f"Expected: {cls.c} but received {result}")
+
+
+class ClassicalValidInferenceDoesItFollow(BaseTest):
+    v: tuple[View, ...]
+    target: View
+    result: bool
+
+    @classmethod
+    def test(cls, verbose: bool = False):
+        result = classically_valid_does_it_follow(
+            cls.v, target=cls.target, verbose=verbose
+        )
+        if not result == cls.result:
             raise RuntimeError(f"Expected: {cls.c} but received {result}")
 
 
@@ -2689,3 +2723,36 @@ class QueryTest2(Query, BaseExample):
         ps("∃a ∀x {T(x,a)S(a*)}"),
     )
     c = ps("∀x ∃a {T(x,a)S(a*)}")
+
+
+class ClassicInfer(ClassicalValidInference, BaseExample):
+    v = (View.from_str("{p()}"), View.from_str("{q()}^{p()}"))
+    c = View.from_str("{q()}")
+
+
+class ClassicInferBlocked(ClassicalValidInference, BaseExample):
+    v = (View.from_str("{a()b(), c()d()}"), View.from_str("{a()}"))
+    c = View.from_str("{~c()b()~d(),c()d()~b(),b()c()~d(),~c()b()d(),c()b()d()}")
+
+
+class ClassicInferVerum(ClassicalValidInference, BaseExample):
+    v = (View.from_str("{0}"), View.from_str("{p()}"))
+    c = View.from_str("{0}")
+
+
+class ClassicSimpleMP(ClassicalValidInferenceDoesItFollow, BaseExample):
+    v = (View.from_str("{p()}"), View.from_str("{q()}^{p()}"))
+    target = View.from_str("{q()}")
+    result = True
+    c = View.from_str(
+        "{}"
+    )  # Note: This is only required as each test needs a conclusion view - consider revision
+
+
+class ClassicIllusoryBlocked(ClassicalValidInferenceDoesItFollow, BaseExample):
+    v = (View.from_str("{a()b(), c()d()}"), View.from_str("{a()}"))
+    target = View.from_str("{b()}")
+    result = False
+    c = View.from_str(
+        "{}"
+    )  # Note: This is only required as each test needs a conclusion view - consider revision
