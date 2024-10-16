@@ -478,7 +478,20 @@ class View:
         dependency_relation: Optional[DependencyRelation] = None,
         issue_structure: Optional[IssueStructure] = None,
         weights: Optional[Weights] = None,
-    ):
+    ) -> Self:
+        """Generates a View object with some sensible defaults; useful for avoiding cumbersome
+        View(...) constructor calls.
+
+        Args:
+            stage (Optional[Stage], optional): Defaults to {}, which is Falsum.
+            supposition (Optional[Supposition], optional): Defaults to {0}, which is Verum.
+            dependency_relation (Optional[DependencyRelation], optional): Defaults to an empty dependency relation ({}, {}, {}).
+            issue_structure (Optional[IssueStructure], optional): Defaults to an empty IssueStructure().
+            weights (Optional[Weights], optional): Defaults to None.
+
+        Returns:
+            Self: A View object.
+        """
         if stage is None:
             stage = SetOfStates()
         if supposition is None:
