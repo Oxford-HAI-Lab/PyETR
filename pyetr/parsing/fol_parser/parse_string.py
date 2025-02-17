@@ -192,7 +192,7 @@ def get_expr() -> pp.Forward:
     """
     expr = pp.Forward()
     variable = (
-        pp.Word(pp.alphas, pp.alphanums)
+        pp.Word(pp.alphas + "_", pp.alphanums + "_")
         .setResultsName("variables", listAllMatches=True)
         .setParseAction(Variable)
     )
@@ -205,12 +205,11 @@ def get_expr() -> pp.Forward:
     bool_or = pp.Suppress(pp.oneOf("∨ |"))
     bool_and = pp.Suppress(pp.oneOf("∧ &"))
     implies = pp.Suppress(pp.Char("→"))
-    equals = pp.Suppress(pp.Char("="))
     emphasis = pp.Suppress(pp.Char("*"))
 
     term = pp.Forward()
 
-    predicate_word = pp.Word(pp.alphas, pp.alphanums).setResultsName(
+    predicate_word = pp.Word(pp.alphas + "_", pp.alphanums + "_").setResultsName(
         "predicate"
     ) | pp.Literal("==")
     predicate = (
