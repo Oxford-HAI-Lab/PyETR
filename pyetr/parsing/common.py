@@ -1,5 +1,7 @@
 from copy import copy
-from typing import Any, Iterable
+from typing import Any, Iterable, Optional
+
+import pyparsing
 
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom, get_open_atom_equivalent
 from pyetr.atoms.predicate_atom import PredicateAtom
@@ -17,14 +19,48 @@ Existential = ArbitraryObject
 
 
 class ParsingError(Exception):
-    def __init__(self, message: str) -> None:  # pragma: not covered
+    def __init__(self, msg: str) -> None:  # pragma: not covered
         """
         Error in the parsing process
 
         Args:
             message (str): Reason for error
         """
-        super().__init__(message)
+        super().__init__(msg)
+
+
+def check_brackets(s: str) -> Optional[tuple[str, int] | tuple[str, int, int]]:
+    stack = []
+    bracket_map = {")": "(", "]": "[", "}": "{"}
+    open_brackets = set(bracket_map.values())
+    inv_bracket_map = {v: k for k, v in bracket_map.items()}
+    for i, char in enumerate(s):
+        if char in open_brackets:  # is open
+            stack.append((char, i))
+        elif char in bracket_map:  # is close
+            if stack and stack[-1][0] == bracket_map[char]:
+                stack.pop()
+            else:
+                if stack:
+                    last_bracket_added = stack[-1][0]
+                    last_bracket_pos = stack[-1][1]
+                    expected_close = inv_bracket_map[last_bracket_added]
+                    return (
+                        f"Expected '{expected_close}' for open at char {last_bracket_pos} but received '{char}' at char {i}",
+                        i,
+                        last_bracket_pos,
+                    )
+                else:
+                    return f"Unmatched closing bracket '{char}' at position {i}", i
+
+    if stack:
+        unmatched = stack[-1]
+        return (
+            f"Unmatched opening bracket '{unmatched[0]}' at position {unmatched[1]}",
+            unmatched[1],
+        )
+
+    return None
 
 
 class Variable:

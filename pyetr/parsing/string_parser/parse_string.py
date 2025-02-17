@@ -6,13 +6,13 @@ from functools import cache
 from typing import Any, Optional
 
 import pyparsing as pp
-from pyparsing import ParseException, ParserElement
+from pyparsing import ParserElement
 
-from pyetr.parsing.common import ParsingError, Quantified, Variable
+from pyetr.parsing.common import ParsingError, Quantified, Variable, check_brackets
 
 sys.setrecursionlimit(10000)
 
-ParserElement.enablePackrat()
+ParserElement.enable_packrat(force=True)
 
 pp_left = pp.opAssoc.LEFT  # type:ignore
 pp_right = pp.opAssoc.RIGHT  # type:ignore
@@ -375,7 +375,7 @@ def get_terms(variable: ParserElement) -> ParserElement:
     reals = real_word.setResultsName("reals").setParseAction(Real)
     summation_word = pp.Literal("++") | pp.Literal("σ")
     function = (
-        (pp.Word(pp.alphas, pp.alphanums))
+        (pp.Word(pp.alphas + "_", pp.alphanums + "_"))
         + pp.Suppress("(")
         + pp.Optional(pp.delimitedList(term))
         + pp.Suppress(")")
@@ -418,7 +418,7 @@ def get_expr() -> pp.Forward:
     new_alphanums = pp.alphanums.replace("A", "").replace("E", "")
     new_alphas = pp.alphas.replace("A", "").replace("E", "")
     variable = (
-        pp.Word(init_chars=new_alphas, body_chars=new_alphanums)
+        pp.Word(init_chars=new_alphas + "_", body_chars=new_alphanums + "_")
         .setResultsName("variables", listAllMatches=True)
         .setParseAction(Variable)
     )
@@ -432,7 +432,7 @@ def get_expr() -> pp.Forward:
         [
             ~pp.Keyword("do"),
             ~pp.Keyword("DO"),
-            pp.Word(pp.alphas, pp.alphanums) | pp.Literal("=="),
+            pp.Word(pp.alphas + "_", pp.alphanums + "_") | pp.Literal("=="),
         ]
     )
     terms = get_terms(variable).setResultsName("terms", listAllMatches=True)
@@ -485,10 +485,8 @@ def get_expr() -> pp.Forward:
     ).setParseAction(WeightedState)
     stage = (
         (
-            pp.Suppress("{}")
-            | pp.Suppress("{")
-            + pp.Optional(pp.DelimitedList(weighted_state, ","))
-            + pp.Suppress("}")
+            pp.Suppress("{") + pp.DelimitedList(weighted_state, ",") + pp.Suppress("}")
+            | pp.Suppress("{}")
         )
         .setResultsName("stage", listAllMatches=True)
         .setParseAction(Stage)
@@ -540,10 +538,33 @@ def parse_string(input_string: str) -> ParserView:
         ParserView: The Parser view representation.
     """
     expr = get_expr()
+
     try:
         out = expr.parse_string(input_string, parseAll=True).as_list()
-    except ParseException as e:
-        raise ParsingError(e.msg + f" Input String: {input_string}")
+    except pp.ParseException as pe:
+        ret = []
+        ret.append("Parsing info:\n")
+        ret.append(" " * 5 + str(pe))
+        ret.append(" " * 5 + pe.line)
+        ret.append(" " * 5 + " " * (pe.column - 1) + "^")
+        bracket_out = check_brackets(pe.line)
+        if bracket_out is not None:
+            ret.append("Bracket info:\n")
+            ret.append(" " * 5 + bracket_out[0])
+            ret.append(" " * 5 + pe.line)
+            if len(bracket_out) == 2:
+                ret.append(" " * 5 + " " * (bracket_out[1]) + "^")
+            else:
+                bracket_pos = sorted(list(bracket_out[1:]))
+                ret.append(
+                    " " * 5
+                    + " " * (bracket_pos[0])
+                    + "^"
+                    + " " * (bracket_pos[1] - bracket_pos[0] - 1)
+                    + "^"
+                )
+
+        raise ParsingError(msg="\n\n" + "\n".join(ret)) from None
 
     quantifieds = []
     stage = None
