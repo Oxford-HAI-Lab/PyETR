@@ -177,7 +177,7 @@ class Weights:
     @property
     def detailed(self):
         weight_details = ",".join(
-            [f"{s.detailed}: {w.detailed}" for s, w in self._weights.items()]
+            [f"{s.detailed}: {w.detailed}" for s, w in self.sorted_items()]
         )
         return f"<Weights {weight_details}>"
 
@@ -196,6 +196,9 @@ class Weights:
 
     def items(self):
         return self._weights.items()
+
+    def sorted_items(self):
+        return sorted(self._weights.items(), key=str)
 
     def values(self):
         return self._weights.values()
@@ -246,4 +249,4 @@ class Weights:
         return Weights({k: v for k, v in self.items() if k in set_of_states})
 
     def __repr__(self) -> str:
-        return "{" + ",".join([f"{w}{s}" for s, w in self.items()]) + "}"
+        return "{" + ",".join([f"{w}{s}" for s, w in self.sorted_items()]) + "}"

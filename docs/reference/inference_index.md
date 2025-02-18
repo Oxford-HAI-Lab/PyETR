@@ -3,7 +3,7 @@
 Below you'll find all of the cases in pyetr.cases, and their associated views. You can use this page as an index of the current cases.
 
 ## `basic_step`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L35)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L34)
 
 
 ```
@@ -22,7 +22,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `default_inference_procedure`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L57)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L56)
 
 
 ```
@@ -42,7 +42,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `default_procedure_does_it_follow`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L96)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L95)
 
 
 ```
@@ -64,7 +64,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `default_procedure_what_is_prob`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L140)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L139)
 
 
 ```
@@ -97,7 +97,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `default_decision`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L234)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L233)
 
 
 ```
@@ -119,7 +119,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `classically_valid_basic_step`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L270)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L269)
 
 
 ```
@@ -130,7 +130,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `classically_valid_inference_procedure`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L288)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L287)
 
 
 ```
@@ -141,7 +141,7 @@ Below you'll find all of the cases in pyetr.cases, and their associated views. Y
 ```
 
 ## `classically_valid_does_it_follow`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L318)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L319)
 
 
 ```

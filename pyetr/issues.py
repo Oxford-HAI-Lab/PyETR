@@ -128,7 +128,14 @@ class IssueStructure(frozenset[tuple[Term, OpenPredicateAtom]]):
 
     @property
     def detailed(self):
-        return "{" + ",".join([f"({t.detailed},{a.detailed})" for t, a in self]) + "}"
+        return (
+            "{"
+            + ",".join([f"({t.detailed},{a.detailed})" for t, a in self.sorted_iter()])
+            + "}"
+        )
 
     def __repr__(self) -> str:
-        return "{" + ",".join([f"({t},{a})" for t, a in self]) + "}"
+        return "{" + ",".join([f"({t},{a})" for t, a in self.sorted_iter()]) + "}"
+
+    def sorted_iter(self):
+        return sorted(self, key=str)

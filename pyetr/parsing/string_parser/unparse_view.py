@@ -50,11 +50,19 @@ def unparse_term(
     if isinstance(term, FunctionalTerm):
         # Insert term back in - if it matches, it's a term to pass
         new_subterms: list[parsing.Term | Variable] = []
-        for subterm in term.t:
+        if isinstance(term.t, Multiset):
+            sorted_terms = term.t.sorted_iter()
+        else:
+            sorted_terms = term.t
+        for subterm in sorted_terms:
             rel_open_terms: list[tuple[Term, OpenTerm]] = []
             for t, o in open_terms:
                 assert isinstance(o, OpenFunctionalTerm)
-                for o_subterm in o.t:
+                if isinstance(o.t, Multiset):
+                    sorted_sub_terms = o.t.sorted_iter()
+                else:
+                    sorted_sub_terms = o.t
+                for o_subterm in sorted_sub_terms:
                     if subterm == o_subterm(t):
                         rel_open_terms.append((t, o_subterm))
             new_subterms.append(unparse_term(subterm, rel_open_terms))
@@ -84,7 +92,7 @@ def unparse_multiset(multiset: Multiset[Term]) -> list[parsing.Term | Variable]:
     Returns:
         list[parsing.Term | Variable]: A list of parsing terms
     """
-    return [unparse_term(subterm, []) for subterm in multiset]
+    return [unparse_term(subterm, []) for subterm in multiset.sorted_iter()]
 
 
 def unparse_predicate_atom(
@@ -135,7 +143,7 @@ def unparse_do_atom(
         return False
 
     new_atoms: list[parsing.Atom] = []
-    for atom in do_atom.atoms:
+    for atom in do_atom.sorted_iter_atoms():
         # For each atom in the do atom
         assoc_open_atoms: list[tuple[Term, OpenPredicateAtom]] = []
         for t, o in open_atoms:
@@ -166,7 +174,7 @@ def unparse_atom(
     """
     open_atoms = [
         (term, open_atom)
-        for term, open_atom in issue_structure
+        for term, open_atom in issue_structure.sorted_iter()
         if (
             open_atom(term) == atom
             or (isinstance(atom, DoAtom) and (open_atom(term) in atom.atoms))
@@ -193,7 +201,9 @@ def unparse_state(state: State, issue_structure: IssueStructure) -> parsing.Stat
     Returns:
         parsing.State: The parsing form of the state.
     """
-    return parsing.State([unparse_atom(atom, issue_structure) for atom in state])
+    return parsing.State(
+        [unparse_atom(atom, issue_structure) for atom in state.sorted_iter()]
+    )
 
 
 def unparse_weighted_state(
@@ -236,7 +246,7 @@ def unparse_stage(weights: Weights, issue_structure: IssueStructure) -> parsing.
     return parsing.Stage(
         [
             unparse_weighted_state(state, weight, issue_structure)
-            for state, weight in weights.items()
+            for state, weight in weights.sorted_items()
         ]
     )
 
@@ -255,7 +265,10 @@ def unparse_supposition(
         parsing.Supposition: The supposition in parsing form.
     """
     return parsing.Supposition(
-        [unparse_state(state, issue_structure=issue_structure) for state in supposition]
+        [
+            unparse_state(state, issue_structure=issue_structure)
+            for state in supposition.sorted_iter()
+        ]
     )
 
 

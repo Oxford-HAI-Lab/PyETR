@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from copy import copy
 from typing import Any, Iterable, Optional
 
@@ -190,13 +191,13 @@ class QuantList:
 
 
 def order_quantifieds(
-    unordered_quantifieds: dict[str, Quantified], dependencies: frozenset[Dependency]
+    unordered_quantifieds: OrderedDict[str, Quantified], dependencies: list[Dependency]
 ) -> list[Quantified]:
     """
     Order the quantifieds based on the dependencies
 
     Args:
-        unordered_quantifieds (dict[str, Quantified]): a mapping from name to Quantified
+        unordered_quantifieds (OrderedDict[str, Quantified]): a mapping from name to Quantified
         dependencies (frozenset[Dependency]): The dependencies from the dependency relation
 
     Returns:
@@ -217,14 +218,14 @@ def order_quantifieds(
     for _, uni, exi_set in sorted_universals:
         # Fill list from the front
         new_exis: list[Quantified] = []
-        for exi in exi_set:
+        for exi in sorted(exi_set, key=str):
             if exi.name not in exis_used:
                 exis_used.append(exi.name)
                 new_exis.append(unordered_quantifieds[exi.name])
         univs_used.append(uni.name)
         final_out = [unordered_quantifieds[uni.name], *new_exis, *final_out]
 
-    for name, quantified in unordered_quantifieds.items():
+    for name, quantified in sorted(unordered_quantifieds.items()):
         if quantified.quantifier == "∃":
             if name not in exis_used:
                 final_out.insert(0, quantified)
@@ -234,7 +235,23 @@ def order_quantifieds(
         else:
             assert False
 
-    return final_out
+    # continued sections must be sorted
+    if len(final_out) > 0:
+        new_final_out: list[Quantified] = []
+        prev_quant = final_out[0].quantifier
+        current_section: list[Quantified] = [final_out[0]]
+        for quant in final_out[1:]:
+            current_quant = quant.quantifier
+            if prev_quant != current_quant:
+                new_final_out += sorted(current_section, key=str)
+                current_section = [quant]
+                prev_quant = current_quant
+            else:
+                current_section.append(quant)
+        new_final_out += sorted(current_section, key=str)
+        return new_final_out
+    else:
+        return final_out
 
 
 def get_quantifiers(dependency_relation: DependencyRelation) -> list[Quantified]:
@@ -247,19 +264,18 @@ def get_quantifiers(dependency_relation: DependencyRelation) -> list[Quantified]
     Returns:
         list[Quantified]: The ordered quantifiers.
     """
-    unordered_quantifieds: dict[str, Quantified] = {}
-    for exi in dependency_relation.existentials:
+    unordered_quantifieds: OrderedDict[str, Quantified] = OrderedDict()
+    for exi in dependency_relation.ordered_exis():
         if exi.name not in unordered_quantifieds:
             unordered_quantifieds[exi.name] = Quantified(
                 [QuantList([Variable([exi.name])], quantifier="∃")]
             )
-    for uni in dependency_relation.universals:
+    for uni in dependency_relation.ordered_unis():
         if uni.name not in unordered_quantifieds:
             unordered_quantifieds[uni.name] = Quantified(
                 [QuantList([Variable([uni.name])], quantifier="∀")]
             )
-
-    return order_quantifieds(unordered_quantifieds, dependency_relation.dependencies)
+    return order_quantifieds(unordered_quantifieds, dependency_relation.ordered_deps())
 
 
 def funcs_converter(f_iter: Iterable[Function | NumFunc]) -> list[Function]:

@@ -102,7 +102,7 @@ def convert_atom(
         LogicPredicate | BoolNot: The converted atom
     """
     open_atoms: list[tuple[Term, OpenPredicateAtom]] = []
-    for i, (term, open_atom) in enumerate(issue_structure):
+    for i, (term, open_atom) in enumerate(issue_structure.sorted_iter()):
         issue_atom = issue_atoms[i]
         if issue_atom == atom:
             assert isinstance(open_atom, OpenPredicateAtom)
@@ -136,7 +136,9 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
         return Truth([])
     else:
         assert len(s) > 0
-        issue_atoms = cast(list[PredicateAtom], [o(t) for t, o in issue_structure])
+        issue_atoms = cast(
+            list[PredicateAtom], [o(t) for t, o in issue_structure.sorted_iter()]
+        )
         if len(s) == 1:
             state = next(iter(s))
             assert len(state) > 0
@@ -153,12 +155,12 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
                 return BoolAnd([new_atoms])
         else:
             new_ands: list[LogicPredicate | BoolNot | BoolAnd | Truth] = []
-            for state in s:
+            for state in s.sorted_iter():
                 if len(state) == 0:
                     new_item = Truth([])
                 else:
                     new_atoms = []
-                    for atom in state:
+                    for atom in state.sorted_iter():
                         if not isinstance(atom, PredicateAtom):
                             raise FOLNotSupportedError(
                                 f"Non predicate atom: {atom}  found - FOL not supported"
