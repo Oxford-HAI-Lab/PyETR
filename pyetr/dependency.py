@@ -99,7 +99,7 @@ def dependencies_from_sets(
 
 
 def dependencies_to_sets(
-    dependencies: frozenset[Dependency],
+    dependencies: list[Dependency],
 ) -> list[tuple[Universal, set[Existential]]]:
     """
     Converts dependencies to collected by existential set form.
@@ -174,7 +174,7 @@ class DependencyRelation:
             ValueError: Raised if the dependencies fail the Matryoshka condition.
         """
         existentials: list[frozenset[ArbitraryObject]] = [
-            frozenset(e) for _, e in dependencies_to_sets(self.dependencies)
+            frozenset(e) for _, e in dependencies_to_sets(self.ordered_deps())
         ]
         stack = existentials.copy()
         while stack:
@@ -185,17 +185,28 @@ class DependencyRelation:
                         f"Existential sets do not meet Matryoshka condition. \nSet1: {set1}\nSet2: {set2}"
                     )
 
+    def ordered_exis(self):
+        return sorted(self.existentials, key=str)
+
+    def ordered_unis(self):
+        return sorted(self.universals, key=str)
+
+    def ordered_deps(self):
+        return sorted(self.dependencies, key=str)
+
     def __repr__(self) -> str:
-        universal_str = f"U=" + "{" + ",".join(repr(u) for u in self.universals) + "}"
+        universal_str = (
+            f"U=" + "{" + ",".join(repr(u) for u in self.ordered_unis()) + "}"
+        )
         existential_str = (
-            f" E=" + "{" + ",".join(repr(e) for e in self.existentials) + "}"
+            f" E=" + "{" + ",".join(repr(e) for e in self.ordered_exis()) + "}"
         )
         if len(self.dependencies) == 0:
             dep_string = ""
         else:
             dep_string = " deps=" + "".join(
-                f"{u}" + "{" + ",".join(repr(e) for e in exis) + "}"
-                for u, exis in dependencies_to_sets(self.dependencies)
+                f"{u}" + "{" + ",".join(repr(e) for e in sorted(exis, key=str)) + "}"
+                for u, exis in dependencies_to_sets(self.ordered_deps())
             )
         return universal_str + existential_str + dep_string
 

@@ -117,11 +117,11 @@ class State(frozenset[Atom]):
     def __repr__(self) -> str:
         if len(self) == 0:
             return "0"
-        return "".join([repr(i) for i in self])
+        return "".join([repr(i) for i in self.sorted_iter()])
 
     @property
     def detailed(self) -> str:
-        return "{" + ",".join(i.detailed for i in self) + "}"
+        return "{" + ",".join(i.detailed for i in self.sorted_iter()) + "}"
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "State":
         """
@@ -193,6 +193,9 @@ class State(frozenset[Atom]):
         for atom in self:
             a.add(atom)
         return a
+
+    def sorted_iter(self):
+        return sorted(self, key=str)
 
 
 class SetOfStates(frozenset[State]):
@@ -349,12 +352,12 @@ class SetOfStates(frozenset[State]):
         return FunctionalTerm(f=Summation, t=expr1)
 
     def __repr__(self) -> str:
-        terms = ",".join([repr(i) for i in self])
+        terms = ",".join([repr(i) for i in self.sorted_iter()])
         return "{" + terms + "}"
 
     @property
     def detailed(self) -> str:
-        return "{" + ",".join(i.detailed for i in self) + "}"
+        return "{" + ",".join(i.detailed for i in self.sorted_iter()) + "}"
 
     def replace(self, replacements: dict[ArbitraryObject, Term]) -> "SetOfStates":
         """
@@ -393,6 +396,9 @@ class SetOfStates(frozenset[State]):
                 assert isinstance(a, PredicateAtom)
                 p_atoms.add(a)
         return p_atoms
+
+    def sorted_iter(self):
+        return sorted(self, key=str)
 
 
 Stage = SetOfStates

@@ -17,7 +17,7 @@ class Multiset(Generic[T]):
         return iter(self._items)
 
     def __repr__(self) -> str:
-        return f"⟪{','.join([repr(i) for i in self._items])}⟫"
+        return f"⟪{','.join([repr(i) for i in self.sorted_iter()])}⟫"
 
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, Multiset):
@@ -37,3 +37,6 @@ class Multiset(Generic[T]):
 
     def __add__(self, other: "Multiset[T]") -> "Multiset[T]":
         return Multiset(self._items + other._items)
+
+    def sorted_iter(self):
+        return sorted(self, key=str)

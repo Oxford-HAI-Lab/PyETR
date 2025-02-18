@@ -104,7 +104,10 @@ def atom_to_model(a: AbstractAtom) -> models.Atom | models.DoAtom:
         )
     elif isinstance(a, DoAtom):
         return models.DoAtom(
-            atoms=cast(list[models.Atom], [atom_to_model(atom) for atom in a.atoms]),
+            atoms=cast(
+                list[models.Atom],
+                [atom_to_model(atom) for atom in a.sorted_iter_atoms()],
+            ),
             polarity=a.polarity,
         )
     else:
@@ -121,14 +124,14 @@ def dependency_rel_to_model(dep_rel: DependencyRelation) -> models.DependencyRel
     Returns:
         models.DependencyRelation: The pydantic model form of the dependency relation.
     """
-    universals = [term_to_model(i) for i in dep_rel.universals]
-    existentials = [term_to_model(i) for i in dep_rel.existentials]
+    universals = [term_to_model(i) for i in sorted(dep_rel.universals, key=str)]
+    existentials = [term_to_model(i) for i in sorted(dep_rel.existentials, key=str)]
     dependencies = [
         models.Dependency(
             existential=term_to_model(i.existential),
             universal=term_to_model(i.universal),
         )
-        for i in dep_rel.dependencies
+        for i in sorted(dep_rel.dependencies, key=str)
     ]
     return models.DependencyRelation(
         universals=universals, existentials=existentials, dependencies=dependencies
@@ -146,23 +149,29 @@ def view_to_model(v: View) -> models.View:
         models.View: Pydantic model view
     """
     return models.View(
-        stage=[[atom_to_model(atom) for atom in state] for state in v.stage],
+        stage=[
+            [atom_to_model(atom) for atom in state.sorted_iter()]
+            for state in v.stage.sorted_iter()
+        ],
         supposition=[
-            [atom_to_model(atom) for atom in state] for state in v.supposition
+            [atom_to_model(atom) for atom in state.sorted_iter()]
+            for state in v.supposition.sorted_iter()
         ],
         weights=[
             models.WeightPair(
-                state=[atom_to_model(atom) for atom in s],
+                state=[atom_to_model(atom) for atom in s.sorted_iter()],
                 weight=models.Weight(
-                    multiplicative=[term_to_model(i) for i in w.multiplicative],
-                    additive=[term_to_model(i) for i in w.additive],
+                    multiplicative=[
+                        term_to_model(i) for i in w.multiplicative.sorted_iter()
+                    ],
+                    additive=[term_to_model(i) for i in w.additive.sorted_iter()],
                 ),
             )
-            for s, w in v.weights.items()
+            for s, w in v.weights.sorted_items()
         ],
         issues=[
             (term_to_model(term), atom_to_model(atom))
-            for term, atom in v.issue_structure
+            for term, atom in v.issue_structure.sorted_iter()
         ],
         dependency_relation=dependency_rel_to_model(v.dependency_relation),
     )

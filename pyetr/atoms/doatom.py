@@ -22,7 +22,7 @@ class DoAtom(Atom):
 
     @property
     def detailed(self) -> str:
-        return f"<{type(self).__name__} polarity={self.polarity} atoms=({','.join(a.detailed for a in self.atoms)})>"
+        return f"<{type(self).__name__} polarity={self.polarity} atoms=({','.join(a.detailed for a in self.sorted_iter_atoms())})>"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
@@ -33,7 +33,7 @@ class DoAtom(Atom):
         return hash((type(self).__name__, frozenset(self.atoms), self.polarity))
 
     def __repr__(self) -> str:
-        terms = "".join([repr(i) for i in self.atoms])
+        terms = "".join([repr(i) for i in self.sorted_iter_atoms()])
         if self.polarity:
             tilde = ""
         else:
@@ -59,3 +59,6 @@ class DoAtom(Atom):
         new_term: Term,
     ) -> "DoAtom":
         return DoAtom({atom.replace_term(old_term, new_term) for atom in self.atoms})
+
+    def sorted_iter_atoms(self):
+        return sorted(self.atoms, key=str)
