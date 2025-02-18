@@ -1,0 +1,263 @@
+#+begin_src
+description:
+    Example 47, p129
+
+    P1: Some thermotogum stains gram-negative
+    P2: Maritima is a thermotogum
+
+    C: Maritima stains gram negative
+
+v (Views): (
+   ∃x {Thermotogum(x*)StainsGramNegative(x)},
+   {Thermotogum(Maritima()*)}
+)
+c (Conclusion): {StainsGramNegative(Maritima())}
+test(verbose=False): Method used to test the example
+#+end_src
+
+#+begin_src lisp
+(declare-sort U)
+(declare-const Maritima U)
+(declare-fun StainsGramNegative (U) Bool)
+(declare-fun Thermotogum (U) Bool)
+
+(assert (exists ((x U)) (and (Thermotogum x) (StainsGramNegative x))))
+(assert (Thermotogum Maritima))
+
+
+(assert (not (StainsGramNegative Maritima)))
+
+(check-sat)
+#+end_src
+
+Returns
+: sat
+so not a valid inference.
+
+#+begin_src
+description:
+    Example 51, p131
+
+    P1: Every archaeon has a nucleus
+    P2: Halobacterium is an archaeon
+
+    C: Halobacterium is an archaeon and has a nucleus
+
+v (Views): (
+   ∀x {HasNucleus(x)IsArchaeon(x*)}^{IsArchaeon(x*)},
+   {IsArchaeon(Halobacterium()*)}
+)
+c (Conclusion): {HasNucleus(Halobacterium())IsArchaeon(Halobacterium()*)}
+test(verbose=False): Method used to test the example
+#+end_src
+
+#+begin_src lisp
+(declare-sort U)
+(declare-const Halobacterium U)
+(declare-fun HasNucleus (U) Bool)
+(declare-fun IsArchaeon (U) Bool)
+
+(assert
+ (forall ((x U))
+         (=>
+          (IsArchaeon x)
+          (and (IsArchaeon x) (HasNucleus x)))))
+(assert
+ (IsArchaeon Halobacterium))
+
+(assert
+ (not
+  (and
+   (HasNucleus Halobacterium)
+   (IsArchaeon Halobacterium))))
+
+(check-sat)
+#+end_src
+
+Returns
+: unsat
+so it was a valid inference.
+
+
+#+begin_src
+description:
+    Example 88, p233
+
+    P1: There is a 90% chance Superman can fly
+    P2: Clark is superman
+
+    C: There is a 90% chance Clark can fly
+
+v (Views): (
+   {90.0=* CanFly(Superman())},
+   {==(Clark(),Superman())},
+   {==(Clark(),Superman()*)},
+   {==(Clark(),Clark())}
+)
+c (Conclusion): {90.0=* CanFly(Clark())}
+test(verbose=False): Method used to test the example
+#+end_src
+
+#+begin_src lisp
+(declare-sort U)
+(declare-const Clark U)
+(declare-fun Superman () U) ;; declare-const is just sugar
+(declare-fun CanFly (U) Bool)
+
+(assert (CanFly Superman))
+(assert (= Clark Superman))
+(assert (not (CanFly Clark)))
+
+(check-sat)
+#+end_src
+
+Returns
+: unsat
+so it was a valid inference.
+
+
+#+begin_src
+description:
+    Example 54, p133
+
+    P1 Sharks attack bathers.
+    P2 Whitey is a shark.
+    C Whitey attacks bathers.
+
+v (Views): (
+   ∀x {0,Attack(x)Shark(x*)}^{Shark(x*)},
+   {Shark(Whitey()*)}
+)
+c (Conclusion): {Shark(Whitey()*)Attack(Whitey())}
+test(verbose=False): Method used to test the example
+#+end_src
+
+
+#+begin_src lisp
+(declare-sort U)
+(declare-const Whitey U)
+(declare-fun Shark (U) Bool)
+(declare-fun Attack (U) Bool)
+
+(assert (forall ((x U)) (=> (Shark x) (or true (and (Attack x) (Shark x))))))
+(assert (Shark Whitey))
+
+(assert (not (and (Shark Whitey) (Attack Whitey))))
+
+(check-sat)
+;; (get-model)
+#+end_src
+
+Returns
+: sat
+so is not a valid inference. The model found is a universe U with one element, named Whitey, which is a Shark but does not Attack.
+
+
+#+begin_src
+description:
+    Example 56, p134
+
+    P1: Every professor teaches some student
+    P2: Every student reads some book
+
+    C: Every professor teaches some student who reads some book
+
+v (Views): (
+   ∀x ∃y {Teaches(x,y)Student(y*)Professor(x)}^{Professor(x)},
+   ∀z ∃w {Book(w)Reads(z,w)Student(z*)}^{Student(z*)}
+)
+c (Conclusion): ∃y ∃b {0,Book(b)Reads(y,b)}
+test(verbose=False): Method used to test the example
+#+end_src
+
+#+begin_src lisp
+(declare-sort U)
+(declare-fun Student (U) Bool)
+(declare-fun Professor (U) Bool)
+(declare-fun Book (U) Bool)
+(declare-fun Teaches (U U) Bool)
+(declare-fun Reads (U U) Bool)
+
+(assert
+ (forall
+  ((x U))
+  (exists
+   ((y U))
+   (=> (Professor x)
+       (and
+        (Teaches x y)
+        (Student y)
+        (Professor x))))))
+
+(assert
+ (forall
+  ((z U))
+  (exists
+   ((w U))
+   (=> (Student z)
+       (and
+        (Book w)
+        (Reads z w)
+        (Student z))))))
+
+(assert
+ (not
+  (exists
+   ((y U) (b U))
+   (or true
+       (and (Book b)
+            (Reads y b))))))
+
+(check-sat)
+#+end_src
+
+Returns
+: unsat
+(obviously)
+
+
+#+begin_src
+e63_modified
+
+Link to code
+
+description:
+    Example 63, p176
+
+v (Views): (
+   ∀x ∃y {S(j()*)D(n()*),T(j())~D(j()*)D(f(y,x)*)},
+   ∃a {D(a*)}
+)
+c (Conclusion): ∀x ∃y {D(n()*),D(f(y,x)*)}
+test(verbose=False): Method used to test the example
+#+end_src
+
+#+begin_src lisp
+(declare-sort U)
+(declare-const j U)
+(declare-const n U)
+(declare-fun f (U U) U)
+(declare-fun S (U) Bool)
+(declare-fun D (U) Bool)
+(declare-fun T (U) Bool)
+
+(assert
+ (forall ((x U)) (exists ((y U)) (or
+                                  (and (S j)
+                                       (D n))
+                                  (and (T j)
+                                       (not (D j))
+                                       (D (f y x)))))))
+
+(assert (exists ((a U)) (D a)))
+
+(assert (not (forall ((x U)) (exists ((y U)) (or
+                                              (D n)
+                                              (D (f y x)))))))
+
+(check-sat)
+#+end_src
+
+Returns
+: unsat
+so it was a valid inference.
