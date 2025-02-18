@@ -9,6 +9,7 @@ readme = "README.md"
 python = ">=3.11"
 pyparsing = "^3.1.0"
 pydantic = "^2.4.2"
+pysmt = "^0.9.6"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -26,6 +27,9 @@ mkdocs-material = "^9.5.28"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.pyright]
+venvPath="./"
+venv=".venv"
 
 [tool.poetry.scripts]
 case-index = "scripts.generate_case_index:main"
