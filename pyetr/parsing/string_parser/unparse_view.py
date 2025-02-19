@@ -77,7 +77,7 @@ def unparse_term(
             return parsing.Function([term.f.name, *new_subterms])
 
     elif isinstance(term, ArbitraryObject):
-        return Variable([term.name])
+        return Variable(term.name)
     else:
         raise ValueError(f"Invalid term {term} provided")
 

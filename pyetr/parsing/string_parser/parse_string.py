@@ -420,13 +420,15 @@ def get_expr() -> pp.Forward:
     variable = (
         pp.Word(init_chars=new_alphas + "_", body_chars=new_alphanums + "_")
         .setResultsName("variables", listAllMatches=True)
-        .setParseAction(Variable)
+        .setParseAction(Variable.from_pyparsing)
     )
 
     quantifier = pp.oneOf(
         "∃ ∀ E A",
     ).setResultsName("quantifier")
-    quantified_expr = pp.Group(quantifier + variable).setParseAction(Quantified)
+    quantified_expr = pp.Group(quantifier + variable).setParseAction(
+        Quantified.from_pyparsing
+    )
 
     predicate_word = pp.And(
         [

@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import cast
 
 from pysmt.fnode import FNode
@@ -24,12 +23,6 @@ class UnsupportedSMT(ValueError):
     pass
 
 
-@dataclass
-class Quant:
-    quantifier: str
-    variables: list[Variable]
-
-
 def fnode_to_view(fnode: FNode, quants_seen: list[str]) -> Item:
     if fnode.is_real_constant():
         pass
@@ -37,35 +30,35 @@ def fnode_to_view(fnode: FNode, quants_seen: list[str]) -> Item:
         raise NotImplementedError
     elif fnode.is_and():
         output_args = [fnode_to_view(arg, quants_seen) for arg in fnode.args()]
-        return BoolAnd([output_args])
+        return BoolAnd(output_args)
     elif fnode.is_or():
         output_args = [fnode_to_view(arg, quants_seen) for arg in fnode.args()]
-        return BoolOr([output_args])
+        return BoolOr(output_args)
     elif fnode.is_function_application():
         name: str = str(fnode.function_name())
         output_args = [fnode_to_view(arg, quants_seen) for arg in fnode.args()]
-        return LogicPredicate([name, *output_args])
+        return LogicPredicate(name, output_args)
     elif fnode.is_symbol():
         var_name = str(fnode.symbol_name())
         if var_name in quants_seen:
-            return Variable([str(fnode.symbol_name())])
+            return Variable(str(fnode.symbol_name()))
         else:
-            return LogicPredicate([var_name])
+            return LogicPredicate(var_name, [])
     elif fnode.is_implies():
         args = fnode.args()
         return Implies(
-            [[fnode_to_view(args[0], quants_seen), fnode_to_view(args[1], quants_seen)]]
+            fnode_to_view(args[0], quants_seen), fnode_to_view(args[1], quants_seen)
         )
     elif fnode.is_not():
-        return BoolNot([[fnode_to_view(fnode.args()[0], quants_seen)]])
+        return BoolNot(fnode_to_view(fnode.args()[0], quants_seen))
     elif fnode.is_equals():
         return LogicPredicate(
-            ["==", *[fnode_to_view(i, quants_seen) for i in fnode.args()]]
+            name="==", args=[fnode_to_view(i, quants_seen) for i in fnode.args()]
         )
     elif fnode.is_true():
         return Truth()
     elif fnode.is_false():
-        return Falsum([])
+        return Falsum()
     else:
         opts = dir(fnode)
         output = {}
@@ -95,8 +88,9 @@ def outer_fnode_to_view(fnode: FNode, quants_seen: list[str]) -> list[Item]:
             for q in quant_vars:
                 quants_seen.append(q.name)
             new = outer_fnode_to_view(arg, quants_seen)
-            quants = [Quant(quantifier=quant_name, variables=[i]) for i in quant_vars]
-            return [Quantified([i]) for i in quants] + new
+            return [
+                Quantified(variable=i, quantifier=quant_name) for i in quant_vars
+            ] + new
         else:
             raise UnsupportedSMT(fnode)
     else:
