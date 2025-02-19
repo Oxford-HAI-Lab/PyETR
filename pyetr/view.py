@@ -4,6 +4,9 @@ from functools import reduce
 from itertools import permutations
 from typing import Callable, Optional, Self, Unpack, cast
 
+from pysmt.environment import Environment
+from pysmt.fnode import FNode
+
 from pyetr.atoms.abstract import Atom
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
 from pyetr.atoms.terms.function import Function, NumFunc
@@ -12,6 +15,7 @@ from pyetr.exceptions import OperationUndefinedError
 from pyetr.parsing.common import get_quantifiers
 from pyetr.parsing.data_parser import json_to_view, view_to_json
 from pyetr.parsing.fol_parser import fol_to_view, view_to_fol
+from pyetr.parsing.smt_parser import smt_to_view, view_to_smt
 from pyetr.parsing.string_parser import StringConversion, string_to_view, view_to_string
 from pyetr.parsing.view_storage import ViewStorage
 
@@ -2153,3 +2157,12 @@ class View:
             str: The first order logic string form.
         """
         return view_to_fol(self)
+
+    @classmethod
+    def from_smt(
+        cls, fnode: FNode, custom_functions: list[NumFunc | Function] | None = None
+    ) -> Self:
+        return cls._from_view_storage(smt_to_view(fnode, custom_functions))
+
+    def to_smt(self, env: Optional[Environment] = None) -> FNode:
+        return view_to_smt(self, env)

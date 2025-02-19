@@ -1,8 +1,10 @@
-from typing import cast
+from typing import Optional, cast
 
 from pysmt.fnode import FNode
 
-from pyetr.parsing.common import Quantified
+from pyetr.atoms.terms import Function
+from pyetr.atoms.terms.function import NumFunc
+from pyetr.parsing.common import Quantified, funcs_converter
 from pyetr.parsing.fol_items.items import LogicReal
 from pyetr.parsing.view_storage import ViewStorage
 
@@ -36,6 +38,7 @@ def fnode_to_view(fnode: FNode, quants_seen: list[str]) -> Item:
     elif fnode.is_function_application():
         name: str = str(fnode.function_name())
         output_args = [fnode_to_view(arg, quants_seen) for arg in fnode.args()]
+
         return LogicPredicate(name, output_args)
     elif fnode.is_symbol():
         var_name = str(fnode.symbol_name())
@@ -96,5 +99,11 @@ def outer_fnode_to_view(fnode: FNode, quants_seen: list[str]) -> list[Item]:
         return [fnode_to_view(fnode, quants_seen)]
 
 
-def smt_to_view(smt: FNode) -> ViewStorage:
-    return items_to_view(outer_fnode_to_view(smt, []), [])
+def smt_to_view(
+    smt: FNode, custom_functions: Optional[list[NumFunc | Function]] = None
+) -> ViewStorage:
+    if custom_functions is None:
+        custom_functions = []
+    return items_to_view(
+        outer_fnode_to_view(smt, []), custom_functions=funcs_converter(custom_functions)
+    )
