@@ -12,10 +12,9 @@ from pyetr.parsing.view_storage import ViewStorage
 if typing.TYPE_CHECKING:
     from pyetr.view import View
 
-from .parse_item import parse_items
+from ..fol_items import items_to_view, view_to_items
 from .parse_string import parse_string
 from .unparse_item import unparse_items
-from .unparse_view import unparse_view
 
 
 def fol_to_view(
@@ -34,7 +33,7 @@ def fol_to_view(
     """
     if custom_functions is None:
         custom_functions = []
-    return parse_items(
+    return items_to_view(
         parse_string(s), custom_functions=funcs_converter(custom_functions)
     )
 
@@ -49,4 +48,4 @@ def view_to_fol(v: View) -> str:
     Returns:
         str: The first order logic string form.
     """
-    return unparse_items(unparse_view(v))
+    return unparse_items(view_to_items(v))

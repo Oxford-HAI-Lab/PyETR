@@ -5,17 +5,17 @@ from pysmt.fnode import FNode
 
 from pyetr.parsing.common import Quantified
 from pyetr.parsing.view_storage import ViewStorage
-from pyetr.stateset import State
 
-from ..fol_parser.parse_item import parse_items
+from ..fol_items import items_to_view
 from ..fol_parser.parse_string import (
     BoolAnd,
     BoolNot,
     BoolOr,
+    Falsum,
     Implies,
     Item,
-    LogicEmphasis,
     LogicPredicate,
+    Truth,
     Variable,
 )
 
@@ -32,6 +32,8 @@ class Quant:
 
 def fnode_to_view(fnode: FNode, quants_seen: list[str]) -> Item:
     if fnode.is_real_constant():
+        pass
+
         raise NotImplementedError
     elif fnode.is_and():
         output_args = [fnode_to_view(arg, quants_seen) for arg in fnode.args()]
@@ -56,6 +58,14 @@ def fnode_to_view(fnode: FNode, quants_seen: list[str]) -> Item:
         )
     elif fnode.is_not():
         return BoolNot([[fnode_to_view(fnode.args()[0], quants_seen)]])
+    elif fnode.is_equals():
+        return LogicPredicate(
+            ["==", *[fnode_to_view(i, quants_seen) for i in fnode.args()]]
+        )
+    elif fnode.is_true():
+        return Truth()
+    elif fnode.is_false():
+        return Falsum([])
     else:
         opts = dir(fnode)
         output = {}
@@ -78,14 +88,15 @@ def outer_fnode_to_view(fnode: FNode, quants_seen: list[str]) -> list[Item]:
         fnode_args = fnode.args()
         quant_vars: list[Variable] = cast(
             list[Variable],
-            [fnode_to_view(i, quants_seen) for i in fnode.quantifier_vars()],
+            [fnode_to_view(i, []) for i in fnode.quantifier_vars()],
         )
         if len(fnode_args) == 1:
             arg = fnode_args[0]
-            quants_seen.append(quant_vars[0].name)
+            for q in quant_vars:
+                quants_seen.append(q.name)
             new = outer_fnode_to_view(arg, quants_seen)
-            quant = Quant(quantifier=quant_name, variables=quant_vars)
-            return [Quantified([quant]), *new]
+            quants = [Quant(quantifier=quant_name, variables=[i]) for i in quant_vars]
+            return [Quantified([i]) for i in quants] + new
         else:
             raise UnsupportedSMT(fnode)
     else:
@@ -93,4 +104,4 @@ def outer_fnode_to_view(fnode: FNode, quants_seen: list[str]) -> list[Item]:
 
 
 def smt_to_view(smt: FNode) -> ViewStorage:
-    return parse_items(outer_fnode_to_view(smt, []), [])
+    return items_to_view(outer_fnode_to_view(smt, []), [])
