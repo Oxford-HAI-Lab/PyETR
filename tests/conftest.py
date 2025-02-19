@@ -10,7 +10,7 @@ from pyetr import ArbitraryObject, Function, FunctionalTerm
 from pyetr.cases import BaseExample
 from pyetr.exceptions import OperationUndefinedError
 from pyetr.parsing.common import ParsingError
-from pyetr.parsing.fol_parser.unparse_view import FOLNotSupportedError
+from pyetr.parsing.fol_items.view_to_items import FOLNotSupportedError
 from pyetr.view import View
 
 

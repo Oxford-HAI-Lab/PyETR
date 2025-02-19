@@ -1,4 +1,4 @@
-from .parse_string import Item
+from ..fol_items import Item
 
 
 def unparse_items(items: list[Item]) -> str:

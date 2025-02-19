@@ -25,7 +25,7 @@ from pyetr.stateset import SetOfStates, State
 if typing.TYPE_CHECKING:
     from pyetr.view import View
 
-from .parse_string import (
+from .items import (
     AtomicItem,
     BoolAnd,
     BoolNot,
@@ -376,7 +376,7 @@ def build_maps(
     return predicate_map, function_map, constant_map
 
 
-def parse_items(expr: list[Item], custom_functions: list[Function]) -> ViewStorage:
+def items_to_view(expr: list[Item], custom_functions: list[Function]) -> ViewStorage:
     """
     Converts the items parsed from the string to a view.
 

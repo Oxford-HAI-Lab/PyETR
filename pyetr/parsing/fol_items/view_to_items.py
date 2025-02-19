@@ -15,7 +15,9 @@ from pyetr.atoms.terms import (
 )
 from pyetr.issues import IssueStructure
 from pyetr.parsing.common import get_quantifiers
-from pyetr.parsing.fol_parser.parse_string import (
+from pyetr.stateset import SetOfStates
+
+from .items import (
     BoolAnd,
     BoolNot,
     BoolOr,
@@ -27,7 +29,6 @@ from pyetr.parsing.fol_parser.parse_string import (
     Truth,
     Variable,
 )
-from pyetr.stateset import SetOfStates
 
 if typing.TYPE_CHECKING:
     from pyetr.view import View
@@ -176,7 +177,7 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
             return BoolOr([new_ands])
 
 
-def unparse_view(v: View) -> list[Item]:
+def view_to_items(v: View) -> list[Item]:
     """
     Unparses a view back to a parser object representation
 
