@@ -19,6 +19,7 @@ from pyetr.parsing.fol_items import (
     LogicPredicate,
     Truth,
 )
+from pyetr.parsing.fol_items.items import LogicReal
 
 ParserElement.enablePackrat()
 
@@ -64,11 +65,17 @@ def get_expr() -> pp.Forward:
         + pp.Optional(pp.delimitedList(term))
         + pp.Suppress(")")
     ).setParseAction(LogicPredicate.from_pyparsing)
+    real_word = (
+        pp.Optional(pp.Literal("-"))
+        + pp.Word(pp.nums)
+        + pp.Optional(pp.Literal(".") + pp.Word(pp.nums))
+    )
+    reals = real_word.setResultsName("reals").setParseAction(LogicReal.from_pyparsing)
 
     truth = pp.Char("⊤").setParseAction(Truth)
     falsum = pp.Char("⊥").setParseAction(Falsum)
     nested_and = pp.infix_notation(
-        predicate | variable | truth | falsum,
+        predicate | reals | variable | truth | falsum,
         op_list=[
             (predicate_word, 1, pp_right, LogicPredicate.from_pyparsing),
             (emphasis, 1, pp_left, LogicEmphasis.from_pyparsing),

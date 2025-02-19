@@ -12,6 +12,7 @@ from pyetr.atoms.terms import (
     QuestionMark,
     Term,
 )
+from pyetr.atoms.terms.function import RealNumber
 from pyetr.dependency import DependencyRelation
 from pyetr.issues import IssueStructure
 from pyetr.parsing.common import (
@@ -35,6 +36,7 @@ from .items import (
     Item,
     LogicEmphasis,
     LogicPredicate,
+    LogicReal,
     Quantified,
     Truth,
     Variable,
@@ -372,7 +374,10 @@ def build_maps(
     constant_map: dict[str, Function] = {}
     for constant in constants:
         if constant.name not in constant_map:
-            constant_map[constant.name] = Function(name=constant.name, arity=0)
+            if isinstance(constant, LogicReal):
+                constant_map[constant.name] = RealNumber(num=constant.num)
+            else:
+                constant_map[constant.name] = Function(name=constant.name, arity=0)
     return predicate_map, function_map, constant_map
 
 

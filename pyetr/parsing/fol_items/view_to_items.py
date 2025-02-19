@@ -25,6 +25,7 @@ from .items import (
     Item,
     LogicEmphasis,
     LogicPredicate,
+    LogicReal,
     Truth,
     Variable,
 )
@@ -69,7 +70,7 @@ def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
                 rel_open_terms.append((t, o.t[i]))
             new_subterms.append(convert_term(subterm, rel_open_terms))
         if isinstance(term.f, RealNumber):
-            raise FOLNotSupportedError(f"Real Number {term.f} found")
+            return LogicReal(num=term.f.num)
         return LogicPredicate(name=term.f.name, args=new_subterms)
 
     elif isinstance(term, ArbitraryObject):

@@ -18,18 +18,24 @@ from pyetr import View
 from pyetr.parsing.smt_parser import smt_to_view
 
 DEMO_SMTLIB = """
-(declare-sort U 0)
-(declare-const Maritima U)
-(declare-fun StainsGramNegative (U) Bool)
-(declare-fun Thermotogum (U) Bool)
+(declare-sort A 0)
 
+(declare-const a Real)
+(declare-const b Real)
 
-(assert (Thermotogum Maritima))
+(declare-fun f (Real Real) Real)
 
+(assert (= (f 1.25 a) b))
 """
 parser = SmtLibParser()
 script = parser.get_script(StringIO(DEMO_SMTLIB))
 # ∃x {Thermotogum(x*)StainsGramNegative(x)}
 print(script.get_last_formula())
+formula = script.get_last_formula()
+if formula.is_and():
+    out = [View._from_view_storage(smt_to_view(arg)) for arg in formula.args()]
+else:
+    out = View._from_view_storage(smt_to_view(script.get_last_formula()))
+from pprint import pprint
 
-print(View._from_view_storage(smt_to_view(script.get_last_formula())))
+pprint(out)

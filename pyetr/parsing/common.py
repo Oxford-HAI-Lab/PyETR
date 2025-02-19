@@ -1,11 +1,8 @@
+import decimal
 from collections import OrderedDict
 from copy import copy
-from typing import Any, Iterable, Optional
+from typing import Any, Iterable, NotRequired, Optional, TypedDict
 
-import pyparsing
-
-from pyetr.atoms.open_predicate_atom import OpenPredicateAtom, get_open_atom_equivalent
-from pyetr.atoms.predicate_atom import PredicateAtom
 from pyetr.atoms.terms import ArbitraryObject, OpenTerm, Term, get_open_equivalent
 from pyetr.atoms.terms.function import Function, NumFunc
 from pyetr.dependency import (
@@ -282,3 +279,31 @@ def funcs_converter(f_iter: Iterable[Function | NumFunc]) -> list[Function]:
         else:
             output.append(Function.numeric(f))
     return output
+
+
+ctx = decimal.Context()
+ctx.prec = 20
+
+
+def convert_float_to_dec(f: float, round_ints: bool) -> str | int:
+    """
+    Converts a float to decimal form.
+
+    Args:
+        f (float): The float to convert
+        round_ints (bool): Whether to round integers or not
+
+    Returns:
+        str | int: The converted form
+    """
+    if round_ints:
+        if round(f) == f:
+            return round(f)
+        else:
+            return format(ctx.create_decimal(repr(f)), "f")
+    else:
+        return format(ctx.create_decimal(repr(f)), "f")
+
+
+class StringConversion(TypedDict):
+    round_ints: NotRequired[bool]

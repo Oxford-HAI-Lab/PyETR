@@ -1,6 +1,7 @@
 __all__ = [
     "Variable",
     "LogicPredicate",
+    "LogicReal",
     "LogicEmphasis",
     "Quantified",
     "BoolNot",
@@ -14,7 +15,7 @@ __all__ = [
 
 from typing import Any, ClassVar, Sequence
 
-from pyetr.parsing.common import Quantified, Variable
+from pyetr.parsing.common import Quantified, Variable, convert_float_to_dec
 
 
 class SingleOperand:
@@ -45,8 +46,8 @@ class BoolNot(SingleOperand):
 
     name = "BoolNot"
 
-    def to_string(self) -> str:
-        return "~" + self.arg.to_string()
+    def to_string(self, **kwargs: Any) -> str:
+        return "~" + self.arg.to_string(**kwargs)
 
 
 class LogicEmphasis(SingleOperand):
@@ -56,8 +57,8 @@ class LogicEmphasis(SingleOperand):
 
     name = "LogicEmphasis"
 
-    def to_string(self) -> str:
-        return self.arg.to_string() + "*"
+    def to_string(self, **kwargs: Any) -> str:
+        return self.arg.to_string(**kwargs) + "*"
 
 
 class MultiOperand:
@@ -74,8 +75,8 @@ class MultiOperand:
     def __repr__(self) -> str:
         return f"<{self.name} operands={self.operands}>"
 
-    def _operand_string(self, operand: str) -> str:
-        inner = operand.join([o.to_string() for o in self.operands])
+    def _operand_string(self, operand: str, **kwargs: Any) -> str:
+        inner = operand.join([o.to_string(**kwargs) for o in self.operands])
         return "(" + inner + ")"
 
     @classmethod
@@ -91,8 +92,8 @@ class BoolAnd(MultiOperand):
 
     name = "BoolAnd"
 
-    def to_string(self) -> str:
-        return self._operand_string(" ∧ ")
+    def to_string(self, **kwargs: Any) -> str:
+        return self._operand_string(" ∧ ", **kwargs)
 
 
 class BoolOr(MultiOperand):
@@ -102,8 +103,8 @@ class BoolOr(MultiOperand):
 
     name = "BoolOr"
 
-    def to_string(self) -> str:
-        return self._operand_string(" ∨ ")
+    def to_string(self, **kwargs: Any) -> str:
+        return self._operand_string(" ∨ ", **kwargs)
 
 
 class Implies:
@@ -121,8 +122,8 @@ class Implies:
     def __repr__(self) -> str:
         return f"<Implies left={self.left} right={self.right}>"
 
-    def to_string(self) -> str:
-        return self.left.to_string() + "→" + self.right.to_string()
+    def to_string(self, **kwargs: Any) -> str:
+        return self.left.to_string(**kwargs) + "→" + self.right.to_string(**kwargs)
 
     @classmethod
     def from_pyparsing(cls, t: Any):
@@ -144,7 +145,7 @@ class Truth:
     def __repr__(self) -> str:
         return f"<Truth>"
 
-    def to_string(self) -> str:
+    def to_string(self, **kwargs: Any) -> str:
         return "⊤"
 
     @classmethod
@@ -163,7 +164,7 @@ class Falsum:
     def __repr__(self) -> str:
         return f"<Falsum>"
 
-    def to_string(self) -> str:
+    def to_string(self, **kwargs: Any) -> str:
         return "⊥"
 
     @classmethod
@@ -186,8 +187,13 @@ class LogicPredicate:
     def __repr__(self) -> str:
         return f"<LogicPredicate args={self.args} name={self.name}>"
 
-    def to_string(self) -> str:
-        return self.name + "(" + ", ".join([a.to_string() for a in self.args]) + ")"
+    def to_string(self, **kwargs: Any) -> str:
+        return (
+            self.name
+            + "("
+            + ", ".join([a.to_string(**kwargs) for a in self.args])
+            + ")"
+        )
 
     @classmethod
     def from_pyparsing(cls, t: Any):
@@ -200,7 +206,20 @@ class LogicPredicate:
         return cls(name=name, args=args)
 
 
-AtomicItem = Variable | LogicEmphasis | LogicPredicate
+class LogicReal(LogicPredicate):
+    def __init__(self, num: float) -> None:
+        self.num = num
+        super().__init__(name=str(num), args=[])
+
+    def to_string(self, *, round_ints: bool = False, **kwargs: Any):
+        return f"{convert_float_to_dec(self.num, round_ints)}"
+
+    @classmethod
+    def from_pyparsing(cls, t: Any):
+        return cls(float("".join([str(i) for i in t])))
+
+
+AtomicItem = Variable | LogicEmphasis | LogicPredicate | LogicReal
 
 StatementItem = Quantified | BoolNot | BoolAnd | BoolOr | Implies | Truth | Falsum
 
