@@ -3,7 +3,7 @@ import typing
 from pysmt.environment import Environment
 from pysmt.fnode import FNode
 from pysmt.formula import FormulaManager
-from pysmt.typing import BOOL, INT, REAL, FunctionType
+from pysmt.typing import BOOL, INT, REAL, FunctionType, PySMTType, Type, TypeManager
 
 from pyetr.parsing.common import Quantified, Variable
 from pyetr.parsing.fol_items import (
@@ -20,7 +20,12 @@ if typing.TYPE_CHECKING:
     from pyetr.view import View
 
 
-def items_to_smt(items: list[Item], formula_manager: FormulaManager):
+def items_to_smt(
+    items: list[Item],
+    formula_manager: FormulaManager,
+    u_type: PySMTType,
+    type_manager: TypeManager,
+):
     def item_to_smt(item: Item) -> FNode:
         if isinstance(item, Implies):
             left = item_to_smt(item.left)
@@ -35,7 +40,7 @@ def items_to_smt(items: list[Item], formula_manager: FormulaManager):
                 if isinstance(arg, LogicReal):
                     arg_types.append(REAL)
                 else:
-                    arg_types.append(BOOL)
+                    arg_types.append(u_type)
             if name == "==":
                 assert len(item.args) == 2
                 return formula_manager.EqualsOrIff(
@@ -44,13 +49,15 @@ def items_to_smt(items: list[Item], formula_manager: FormulaManager):
             else:
                 vname = formula_manager.Symbol(
                     name=name,
-                    typename=FunctionType(return_type=BOOL, param_types=arg_types),
+                    typename=type_manager.FunctionType(
+                        return_type=BOOL, param_types=arg_types
+                    ),
                 )
                 return formula_manager.Function(
                     vname=vname, params=[item_to_smt(i) for i in item.args]
                 )
         elif isinstance(item, Variable):
-            return formula_manager.Symbol(item.name)
+            return formula_manager.Symbol(item.name, typename=u_type)
         elif isinstance(item, BoolAnd):
             return formula_manager.And(*[item_to_smt(i) for i in item.operands])
         elif isinstance(item, BoolOr):
@@ -99,4 +106,6 @@ def view_to_smt(v: "View", env: typing.Optional[Environment] = None) -> FNode:
     if env is None:
         env = Environment()
     formula_manager = env.formula_manager
-    return items_to_smt(view_to_items(v), formula_manager)
+    u_type: PySMTType = typing.cast(PySMTType, env.type_manager.Type(name="U"))
+    type_manager = env.type_manager
+    return items_to_smt(view_to_items(v), formula_manager, u_type, type_manager)
