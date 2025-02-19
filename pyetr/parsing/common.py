@@ -71,14 +71,18 @@ class Variable:
 
     name: str
 
-    def __init__(self, t: Any) -> None:
-        self.name = t[0]
+    def __init__(self, name: str) -> None:
+        self.name = name
 
     def __repr__(self) -> str:
         return f"<Variable name={self.name}>"
 
     def to_string(self, **kwargs: Any) -> str:
         return self.name
+
+    @classmethod
+    def from_pyparsing(cls, t: Any):
+        return cls(t[0])
 
 
 class Quantified:
@@ -89,23 +93,28 @@ class Quantified:
     variable: Variable
     quantifier: str
 
-    def __init__(self, t: Any) -> None:
-        variables = t[0].variables
-        assert len(variables) == 1
-        quantifier = t[0].quantifier
+    def __init__(self, variable: Variable, quantifier: str) -> None:
         if quantifier == "A":
             self.quantifier = "∀"
         elif quantifier == "E":
             self.quantifier = "∃"
         else:
             self.quantifier = quantifier
-        self.variable = variables[0]
+        self.variable = variable
 
     def __repr__(self) -> str:
         return f"<Quantified variable={self.variable} quantifier={self.quantifier}>"
 
     def to_string(self, **kwargs: Any) -> str:
         return self.quantifier + self.variable.to_string(**kwargs)
+
+    @classmethod
+    def from_pyparsing(cls, t: Any):
+        variables = t[0].variables
+        assert len(variables) == 1
+        quantifier = t[0].quantifier
+        variable = variables[0]
+        return cls(variable, quantifier)
 
 
 def get_variable_map_and_dependencies(
@@ -175,19 +184,6 @@ def merge_terms_with_opens(
                 fresh_terms[i] = open_term
                 new_terms_sets.append((t, fresh_terms))
     return new_terms_sets
-
-
-class QuantList:
-    """
-    Simulates needed interface for parser
-    """
-
-    variables: list[Variable]
-    quantifier: str
-
-    def __init__(self, variables: list[Variable], quantifier: str) -> None:
-        self.variables = variables
-        self.quantifier = quantifier
 
 
 def order_quantifieds(
@@ -268,12 +264,12 @@ def get_quantifiers(dependency_relation: DependencyRelation) -> list[Quantified]
     for exi in dependency_relation.ordered_exis():
         if exi.name not in unordered_quantifieds:
             unordered_quantifieds[exi.name] = Quantified(
-                [QuantList([Variable([exi.name])], quantifier="∃")]
+                variable=Variable(name=exi.name), quantifier="∃"
             )
     for uni in dependency_relation.ordered_unis():
         if uni.name not in unordered_quantifieds:
             unordered_quantifieds[uni.name] = Quantified(
-                [QuantList([Variable([uni.name])], quantifier="∀")]
+                variable=Variable(name=uni.name), quantifier="∀"
             )
     return order_quantifieds(unordered_quantifieds, dependency_relation.ordered_deps())
 

@@ -38,13 +38,15 @@ def get_expr() -> pp.Forward:
     variable = (
         pp.Word(pp.alphas + "_", pp.alphanums + "_")
         .setResultsName("variables", listAllMatches=True)
-        .setParseAction(Variable)
+        .setParseAction(Variable.from_pyparsing)
     )
 
     quantifier = pp.oneOf(
         "∃ ∀",
     ).setResultsName("quantifier")
-    quantified_expr = pp.Group(quantifier + variable).setParseAction(Quantified)
+    quantified_expr = pp.Group(quantifier + variable).setParseAction(
+        Quantified.from_pyparsing
+    )
     bool_not = pp.Suppress(pp.Char("~"))
     bool_or = pp.Suppress(pp.oneOf("∨ |"))
     bool_and = pp.Suppress(pp.oneOf("∧ &"))
@@ -61,19 +63,19 @@ def get_expr() -> pp.Forward:
         + pp.Suppress("(")
         + pp.Optional(pp.delimitedList(term))
         + pp.Suppress(")")
-    ).setParseAction(LogicPredicate)
+    ).setParseAction(LogicPredicate.from_pyparsing)
 
     truth = pp.Char("⊤").setParseAction(Truth)
     falsum = pp.Char("⊥").setParseAction(Falsum)
     nested_and = pp.infix_notation(
         predicate | variable | truth | falsum,
         op_list=[
-            (predicate_word, 1, pp_right, LogicPredicate),
-            (emphasis, 1, pp_left, LogicEmphasis),
-            (bool_not, 1, pp_right, BoolNot),
-            (bool_and, 2, pp_left, BoolAnd),
-            (bool_or, 2, pp_left, BoolOr),
-            (implies, 2, pp_left, Implies),
+            (predicate_word, 1, pp_right, LogicPredicate.from_pyparsing),
+            (emphasis, 1, pp_left, LogicEmphasis.from_pyparsing),
+            (bool_not, 1, pp_right, BoolNot.from_pyparsing),
+            (bool_and, 2, pp_left, BoolAnd.from_pyparsing),
+            (bool_or, 2, pp_left, BoolOr.from_pyparsing),
+            (implies, 2, pp_left, Implies.from_pyparsing),
         ],
         lpar=pp.Suppress("("),
         rpar=pp.Suppress(")"),

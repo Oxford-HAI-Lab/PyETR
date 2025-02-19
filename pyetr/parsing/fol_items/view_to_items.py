@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import typing
-from typing import cast
 
 from pyetr.atoms import OpenPredicateAtom, PredicateAtom
 from pyetr.atoms.terms import (
@@ -59,7 +58,7 @@ def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
         remaining_terms = [
             (t, o) for t, o in open_terms if not isinstance(o, QuestionMark)
         ]
-        return LogicEmphasis([[convert_term(term, remaining_terms)]])
+        return LogicEmphasis(arg=convert_term(term, remaining_terms))
     if isinstance(term, FunctionalTerm):
         new_subterms: list[Item] = []
         for i, subterm in enumerate(term.t):
@@ -71,17 +70,10 @@ def convert_term(term: Term, open_terms: list[tuple[Term, OpenTerm]]) -> Item:
             new_subterms.append(convert_term(subterm, rel_open_terms))
         if isinstance(term.f, RealNumber):
             raise FOLNotSupportedError(f"Real Number {term.f} found")
-        return LogicPredicate(
-            [
-                [
-                    term.f.name,
-                    *new_subterms,
-                ]
-            ]
-        )
+        return LogicPredicate(name=term.f.name, args=new_subterms)
 
     elif isinstance(term, ArbitraryObject):
-        return Variable([term.name])
+        return Variable(term.name)
     else:
         raise ValueError(f"Invalid term {term} provided")
 
@@ -113,11 +105,11 @@ def convert_atom(
     for i, term in enumerate(atom.terms):
         open_terms = [(t, o.terms[i]) for t, o in open_atoms]
         new_terms.append(convert_term(term, open_terms))
-    inner = LogicPredicate([[atom.predicate.name, *new_terms]])
+    inner = LogicPredicate(name=atom.predicate.name, args=new_terms)
     if atom.predicate.verifier:
         return inner
     else:
-        return BoolNot([[inner]])
+        return BoolNot(inner)
 
 
 def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> Item:
@@ -132,14 +124,12 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
         Item: The unparsed item.
     """
     if s.is_falsum:
-        return Falsum([])
+        return Falsum()
     elif s.is_verum:
-        return Truth([])
+        return Truth()
     else:
         assert len(s) > 0
-        issue_atoms = cast(
-            list[PredicateAtom], [o(t) for t, o in issue_structure.sorted_iter()]
-        )
+        issue_atoms = [o(t) for t, o in issue_structure.sorted_iter()]
         if len(s) == 1:
             state = next(iter(s))
             assert len(state) > 0
@@ -153,12 +143,12 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
             if len(new_atoms) == 1:
                 return new_atoms[0]
             else:
-                return BoolAnd([new_atoms])
+                return BoolAnd(new_atoms)
         else:
             new_ands: list[LogicPredicate | BoolNot | BoolAnd | Truth] = []
             for state in s.sorted_iter():
                 if len(state) == 0:
-                    new_item = Truth([])
+                    new_item = Truth()
                 else:
                     new_atoms = []
                     for atom in state.sorted_iter():
@@ -172,9 +162,9 @@ def unparse_set_of_states(s: SetOfStates, issue_structure: IssueStructure) -> It
                     if len(new_atoms) == 1:
                         new_item = new_atoms[0]
                     else:
-                        new_item = BoolAnd([new_atoms])
+                        new_item = BoolAnd(new_atoms)
                 new_ands.append(new_item)
-            return BoolOr([new_ands])
+            return BoolOr(new_ands)
 
 
 def view_to_items(v: View) -> list[Item]:
@@ -198,5 +188,5 @@ def view_to_items(v: View) -> list[Item]:
     else:
         stage = unparse_set_of_states(v.stage, v.issue_structure)
         supposition = unparse_set_of_states(v.supposition, v.issue_structure)
-        main_item = Implies([[supposition, stage]])
+        main_item = Implies(supposition, stage)
     return [*get_quantifiers(v.dependency_relation), main_item]
