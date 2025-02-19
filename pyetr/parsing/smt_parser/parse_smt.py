@@ -3,6 +3,7 @@ from typing import cast
 from pysmt.fnode import FNode
 
 from pyetr.parsing.common import Quantified
+from pyetr.parsing.fol_items.items import LogicReal
 from pyetr.parsing.view_storage import ViewStorage
 
 from ..fol_items import items_to_view
@@ -25,9 +26,7 @@ class UnsupportedSMT(ValueError):
 
 def fnode_to_view(fnode: FNode, quants_seen: list[str]) -> Item:
     if fnode.is_real_constant():
-        pass
-
-        raise NotImplementedError
+        return LogicReal(float(fnode.constant_value()))
     elif fnode.is_and():
         output_args = [fnode_to_view(arg, quants_seen) for arg in fnode.args()]
         return BoolAnd(output_args)
