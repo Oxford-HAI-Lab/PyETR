@@ -3,11 +3,11 @@ from __future__ import annotations
 __all__ = ["string_to_view", "view_to_string"]
 
 import typing
-from typing import NotRequired, Optional, TypedDict, Unpack
+from typing import Optional, Unpack
 
 from pyetr.atoms.terms import Function
 from pyetr.atoms.terms.function import NumFunc
-from pyetr.parsing.common import funcs_converter
+from pyetr.parsing.common import StringConversion, funcs_converter
 from pyetr.parsing.view_storage import ViewStorage
 
 if typing.TYPE_CHECKING:
@@ -36,10 +36,6 @@ def string_to_view(
     if custom_functions is None:
         custom_functions = []
     return parse_pv(ps(s), funcs_converter(custom_functions))
-
-
-class StringConversion(TypedDict):
-    round_ints: NotRequired[bool]
 
 
 def view_to_string(

@@ -1,4 +1,3 @@
-import decimal
 import sys
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -8,7 +7,13 @@ from typing import Any, Optional
 import pyparsing as pp
 from pyparsing import ParserElement
 
-from pyetr.parsing.common import ParsingError, Quantified, Variable, check_brackets
+from pyetr.parsing.common import (
+    ParsingError,
+    Quantified,
+    Variable,
+    check_brackets,
+    convert_float_to_dec,
+)
 
 sys.setrecursionlimit(10000)
 
@@ -206,30 +211,6 @@ class Xbar(Term):
 
     def to_string(self, **kwargs: Any):
         return f"{self.left.to_string(**kwargs)}**{self.right.to_string(**kwargs)}"
-
-
-ctx = decimal.Context()
-ctx.prec = 20
-
-
-def convert_float_to_dec(f: float, round_ints: bool) -> str | int:
-    """
-    Converts a float to decimal form.
-
-    Args:
-        f (float): The float to convert
-        round_ints (bool): Whether to round integers or not
-
-    Returns:
-        str | int: The converted form
-    """
-    if round_ints:
-        if round(f) == f:
-            return round(f)
-        else:
-            return format(ctx.create_decimal(repr(f)), "f")
-    else:
-        return format(ctx.create_decimal(repr(f)), "f")
 
 
 class Real(Term):

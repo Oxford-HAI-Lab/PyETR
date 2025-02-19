@@ -3,10 +3,10 @@ from __future__ import annotations
 __all__ = ["fol_to_view", "view_to_fol"]
 
 import typing
-from typing import Optional
+from typing import Optional, Unpack
 
 from pyetr.atoms.terms.function import Function, NumFunc
-from pyetr.parsing.common import funcs_converter
+from pyetr.parsing.common import StringConversion, funcs_converter
 from pyetr.parsing.view_storage import ViewStorage
 
 if typing.TYPE_CHECKING:
@@ -38,7 +38,7 @@ def fol_to_view(
     )
 
 
-def view_to_fol(v: View) -> str:
+def view_to_fol(v: View, **string_conversion_kwargs: Unpack[StringConversion]) -> str:
     """
     Parses from View form to first order logic string form.
 
@@ -48,4 +48,4 @@ def view_to_fol(v: View) -> str:
     Returns:
         str: The first order logic string form.
     """
-    return unparse_items(view_to_items(v))
+    return unparse_items(view_to_items(v), **string_conversion_kwargs)
