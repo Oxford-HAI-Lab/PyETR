@@ -53,7 +53,7 @@ def fnode_to_view(fnode: FNode, quants_seen: list[str]) -> Item:
         )
     elif fnode.is_not():
         return BoolNot(fnode_to_view(fnode.args()[0], quants_seen))
-    elif fnode.is_equals():
+    elif fnode.is_equals() or fnode.is_iff():
         return LogicPredicate(
             name="==", args=[fnode_to_view(i, quants_seen) for i in fnode.args()]
         )
@@ -99,9 +99,29 @@ def outer_fnode_to_view(fnode: FNode, quants_seen: list[str]) -> list[Item]:
         return [fnode_to_view(fnode, quants_seen)]
 
 
+def check_for_multiple(fnode: FNode):
+    def _check_sub(sub: FNode):
+        if sub.is_quantifier():
+            return True
+        elif sub.is_implies():
+            return True
+        else:
+            return False
+
+    if fnode.is_and():
+        for arg in fnode.args():
+            if _check_sub(arg):
+                raise UnsupportedSMT(
+                    str(fnode)
+                    + "\n\n"
+                    + "Did you mean to parse multiple views? Please use associated function"
+                )
+
+
 def smt_to_view(
     smt: FNode, custom_functions: Optional[list[NumFunc | Function]] = None
 ) -> ViewStorage:
+    check_for_multiple(smt)
     if custom_functions is None:
         custom_functions = []
     return items_to_view(

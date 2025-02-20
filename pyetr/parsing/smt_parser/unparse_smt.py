@@ -14,7 +14,13 @@ from pyetr.parsing.fol_items import (
     LogicPredicate,
     view_to_items,
 )
-from pyetr.parsing.fol_items.items import Falsum, LogicReal, Truth
+from pyetr.parsing.fol_items.items import (
+    BoolNot,
+    Falsum,
+    LogicEmphasis,
+    LogicReal,
+    Truth,
+)
 
 if typing.TYPE_CHECKING:
     from pyetr.view import View
@@ -35,37 +41,35 @@ def items_to_smt(
             return formula_manager.Real(item.num)
         elif isinstance(item, LogicPredicate):
             name = item.name
-            arg_types = []
-            for arg in item.args:
-                if isinstance(arg, LogicReal):
-                    arg_types.append(REAL)
-                else:
-                    arg_types.append(u_type)
             if name == "==":
                 assert len(item.args) == 2
                 return formula_manager.EqualsOrIff(
                     item_to_smt(item.args[0]), item_to_smt(item.args[1])
                 )
             else:
+                params = [item_to_smt(i) for i in item.args]
+                param_types = [param.get_type() for param in params]
                 vname = formula_manager.Symbol(
                     name=name,
                     typename=type_manager.FunctionType(
-                        return_type=BOOL, param_types=arg_types
+                        return_type=BOOL, param_types=param_types
                     ),
                 )
-                return formula_manager.Function(
-                    vname=vname, params=[item_to_smt(i) for i in item.args]
-                )
+                return formula_manager.Function(vname=vname, params=params)
         elif isinstance(item, Variable):
-            return formula_manager.Symbol(item.name, typename=u_type)
+            return formula_manager.Symbol(item.name, typename=BOOL)
         elif isinstance(item, BoolAnd):
             return formula_manager.And(*[item_to_smt(i) for i in item.operands])
         elif isinstance(item, BoolOr):
             return formula_manager.Or(*[item_to_smt(i) for i in item.operands])
+        elif isinstance(item, BoolNot):
+            return formula_manager.Not(item_to_smt(item.arg))
         elif isinstance(item, Truth):
             return formula_manager.TRUE()
         elif isinstance(item, Falsum):
             return formula_manager.FALSE()
+        elif isinstance(item, LogicEmphasis):
+            return item_to_smt(item.arg)
         else:
             raise NotImplementedError(f"{item}, {item.__class__}")
 
