@@ -68,8 +68,7 @@ def get_main_string(formula):
     return res
 
 
-def smt_to_smt_lib(smt: FNode, env: Environment) -> str:
-    main_string = get_main_string(smt)
+def _with_setup(statements: list[str], env: Environment):
     ret = []
     for x in env.type_manager._custom_types_decl.values():
         out = convert_type(x)
@@ -80,11 +79,28 @@ def smt_to_smt_lib(smt: FNode, env: Environment) -> str:
         out = convert_symbol(x)
         if out is not None:
             ret.append(out)
-    ret.append(f"(assert {format_brackets(main_string)} )")
+    for statement in statements:
+        ret.append(f"(assert {format_brackets(statement)} )")
     return "\n".join(ret)
+
+
+def smt_to_smt_lib(smt: FNode, env: Environment) -> str:
+    main_string = get_main_string(smt)
+    return _with_setup([main_string], env)
+
+
+def smts_to_smt_lib(smts: list[FNode], env: Environment) -> str:
+    statements = [get_main_string(smt) for smt in smts]
+    return _with_setup(statements, env)
 
 
 def view_to_smt_lib(v: "View", env: typing.Optional[Environment] = None):
     if env is None:
         env = Environment()
     return smt_to_smt_lib(v.to_smt(env), env)
+
+
+def views_to_smt_lib(views: list["View"], env: typing.Optional[Environment] = None):
+    if env is None:
+        env = Environment()
+    return smts_to_smt_lib([v.to_smt(env) for v in views], env)
