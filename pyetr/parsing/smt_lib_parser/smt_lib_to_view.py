@@ -23,10 +23,17 @@ def smt_lib_to_view(
     return smt_to_view(formula, custom_functions=custom_functions)
 
 
-def smt_lib_to_views(
-    smt_lib: str, custom_functions: Optional[list[NumFunc | Function]] = None
+def smt_lib_to_view_stores(
+    smt_lib: str,
+    custom_functions: Optional[list[NumFunc | Function]] = None,
+    env: typing.Optional[Environment] = None,
 ) -> list[ViewStorage]:
+    if env is None:
+        env = Environment()
     parser = SmtLibParser(Environment())
     script = parser.get_script(StringIO(smt_lib))
-    script.get_last_formula()
-    raise NotImplementedError
+    current = script.get_last_formula()
+    if current.is_and():
+        return [smt_to_view(i, custom_functions) for i in current.args()]
+    else:
+        return [smt_to_view(current, custom_functions)]
