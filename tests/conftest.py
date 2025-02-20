@@ -9,6 +9,7 @@ import pyetr.cases
 from pyetr import ArbitraryObject, Function, FunctionalTerm
 from pyetr.cases import BaseExample
 from pyetr.exceptions import OperationUndefinedError
+from pyetr.issues import IssueStructure
 from pyetr.parsing.common import ParsingError
 from pyetr.parsing.fol_items.view_to_items import FOLNotSupportedError
 from pyetr.view import View
@@ -134,6 +135,27 @@ class ParseCompareViaFOL(BaseParseItem):
             pass
 
 
+class ParseCompareViaSMT(BaseParseItem):
+    def runtest(self):
+        parsed_view = View.from_str(self.view_string)
+
+        try:
+            out_view = View.from_smt(parsed_view.to_smt())
+            compare_view = View.with_defaults(
+                stage=parsed_view.stage,
+                supposition=parsed_view.supposition,
+                dependency_relation=parsed_view.dependency_relation,
+                issue_structure=IssueStructure(),
+                weights=parsed_view.weights,
+            )
+            if compare_view != out_view:
+                raise ValueError(
+                    f"View lost in yoyo SMT conversion, start: {compare_view}, end: {out_view}"
+                )
+        except FOLNotSupportedError:
+            pass
+
+
 class ParseFailure(BaseParseItem):
     def runtest(self):
         with pytest.raises(ParsingError):
@@ -191,6 +213,7 @@ parse_test_set: list[type[BaseParseItem]] = [
     ParseCompareViaJson,
     ParseCompareViaString,
     ParseCompareViaFOL,
+    ParseCompareViaSMT,
 ]
 
 

@@ -15,6 +15,7 @@ from pyetr.exceptions import OperationUndefinedError
 from pyetr.parsing.common import get_quantifiers
 from pyetr.parsing.data_parser import json_to_view, view_to_json
 from pyetr.parsing.fol_parser import fol_to_view, view_to_fol
+from pyetr.parsing.smt_lib_parser import smt_lib_to_view, view_to_smt_lib
 from pyetr.parsing.smt_parser import smt_to_view, view_to_smt
 from pyetr.parsing.string_parser import StringConversion, string_to_view, view_to_string
 from pyetr.parsing.view_storage import ViewStorage
@@ -2166,3 +2167,15 @@ class View:
 
     def to_smt(self, env: Optional[Environment] = None) -> FNode:
         return view_to_smt(self, env)
+
+    @classmethod
+    def from_smt_lib(
+        cls,
+        smt_lib: str,
+        custom_functions: list[NumFunc | Function] | None = None,
+        env: Optional[Environment] = None,
+    ):
+        return cls._from_view_storage(smt_lib_to_view(smt_lib, custom_functions, env))
+
+    def to_smt_lib(self, env: Optional[Environment] = None) -> str:
+        return view_to_smt_lib(self, env)
