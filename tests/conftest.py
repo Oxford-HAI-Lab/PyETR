@@ -156,6 +156,27 @@ class ParseCompareViaSMT(BaseParseItem):
             pass
 
 
+class ParseCompareViaSMTLib(BaseParseItem):
+    def runtest(self):
+        parsed_view = View.from_str(self.view_string)
+
+        try:
+            out_view = View.from_smt_lib(parsed_view.to_smt_lib())
+            compare_view = View.with_defaults(
+                stage=parsed_view.stage,
+                supposition=parsed_view.supposition,
+                dependency_relation=parsed_view.dependency_relation,
+                issue_structure=IssueStructure(),
+                weights=parsed_view.weights,
+            )
+            if compare_view != out_view:
+                raise ValueError(
+                    f"View lost in yoyo SMT Lib conversion, start: {compare_view}, end: {out_view}"
+                )
+        except FOLNotSupportedError:
+            pass
+
+
 class ParseFailure(BaseParseItem):
     def runtest(self):
         with pytest.raises(ParsingError):
@@ -214,6 +235,7 @@ parse_test_set: list[type[BaseParseItem]] = [
     ParseCompareViaString,
     ParseCompareViaFOL,
     ParseCompareViaSMT,
+    ParseCompareViaSMTLib,
 ]
 
 

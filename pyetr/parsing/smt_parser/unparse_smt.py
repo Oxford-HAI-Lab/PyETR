@@ -15,6 +15,7 @@ from pyetr.parsing.fol_items import (
     view_to_items,
 )
 from pyetr.parsing.fol_items.items import (
+    AtomicItem,
     BoolNot,
     Falsum,
     LogicEmphasis,
@@ -32,22 +33,57 @@ def items_to_smt(
     u_type: PySMTType,
     type_manager: TypeManager,
 ):
+    def atomic_item_to_smt(item: Item) -> FNode:
+        if isinstance(item, Variable):
+            return formula_manager.Symbol(item.name, typename=u_type)
+        elif isinstance(item, LogicEmphasis):
+            return atomic_item_to_smt(item.arg)
+        elif isinstance(item, LogicReal):
+            return formula_manager.Real(item.num)
+        elif isinstance(item, LogicPredicate):
+            name = item.name
+            assert name != "=="
+            params = [atomic_item_to_smt(i) for i in item.args]
+            param_types = [param.get_type() for param in params]
+            vname = formula_manager.Symbol(
+                name=name,
+                typename=type_manager.FunctionType(
+                    return_type=u_type, param_types=param_types
+                ),
+            )
+            return formula_manager.Function(vname=vname, params=params)
+        else:
+            raise NotImplementedError(f"{item}, {item.__class__}")
+
     def item_to_smt(item: Item) -> FNode:
         if isinstance(item, Implies):
             left = item_to_smt(item.left)
             right = item_to_smt(item.right)
             return formula_manager.Implies(left=left, right=right)
-        elif isinstance(item, LogicReal):
-            return formula_manager.Real(item.num)
+
         elif isinstance(item, LogicPredicate):
             name = item.name
             if name == "==":
                 assert len(item.args) == 2
-                return formula_manager.EqualsOrIff(
-                    item_to_smt(item.args[0]), item_to_smt(item.args[1])
+                is_real = [isinstance(i, LogicReal) for i in item.args]
+                if any(is_real) and not all(is_real):
+                    if isinstance(item.args[0], LogicReal):
+                        new_args = [
+                            LogicPredicate("real2const", [item.args[0]]),
+                            item.args[1],
+                        ]
+                    else:
+                        new_args = [
+                            item.args[0],
+                            LogicPredicate("real2const", [item.args[1]]),
+                        ]
+                else:
+                    new_args = item.args
+                return formula_manager.Equals(
+                    atomic_item_to_smt(new_args[0]), atomic_item_to_smt(new_args[1])
                 )
             else:
-                params = [item_to_smt(i) for i in item.args]
+                params = [atomic_item_to_smt(i) for i in item.args]
                 param_types = [param.get_type() for param in params]
                 vname = formula_manager.Symbol(
                     name=name,
@@ -56,8 +92,7 @@ def items_to_smt(
                     ),
                 )
                 return formula_manager.Function(vname=vname, params=params)
-        elif isinstance(item, Variable):
-            return formula_manager.Symbol(item.name, typename=BOOL)
+
         elif isinstance(item, BoolAnd):
             return formula_manager.And(*[item_to_smt(i) for i in item.operands])
         elif isinstance(item, BoolOr):
@@ -68,8 +103,7 @@ def items_to_smt(
             return formula_manager.TRUE()
         elif isinstance(item, Falsum):
             return formula_manager.FALSE()
-        elif isinstance(item, LogicEmphasis):
-            return item_to_smt(item.arg)
+
         else:
             raise NotImplementedError(f"{item}, {item.__class__}")
 
@@ -96,7 +130,7 @@ def items_to_smt(
             else:
                 out = formula_manager.Exists(current_quants, out)
             current_quants = []
-        current_quants.insert(0, item_to_smt(quant.variable))
+        current_quants.insert(0, atomic_item_to_smt(quant.variable))
         last_quantifier = quant.quantifier
     if current_quants:
         if last_quantifier == "∀":

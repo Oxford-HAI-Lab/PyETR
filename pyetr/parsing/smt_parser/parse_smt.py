@@ -37,9 +37,12 @@ def fnode_to_view(fnode: FNode, quants_seen: list[str]) -> Item:
         return BoolOr(output_args)
     elif fnode.is_function_application():
         name: str = str(fnode.function_name())
-        output_args = [fnode_to_view(arg, quants_seen) for arg in fnode.args()]
+        if name == "real2const":
+            return fnode_to_view(fnode.args()[0], quants_seen)
+        else:
+            output_args = [fnode_to_view(arg, quants_seen) for arg in fnode.args()]
 
-        return LogicPredicate(name, output_args)
+            return LogicPredicate(name, output_args)
     elif fnode.is_symbol():
         var_name = str(fnode.symbol_name())
         if var_name in quants_seen:
