@@ -1,9 +1,14 @@
 from abc import abstractmethod
+from typing import TYPE_CHECKING
 
 from pyetr.atoms.terms import Multiset
+from pyetr.atoms.terms.function import Function
 
 from .abstract_term import AbstractArbitraryObject, AbstractFunctionalTerm, AbstractTerm
 from .term import ArbitraryObject, FunctionalTerm, Term
+
+if TYPE_CHECKING:  # pragma: not covered
+    from pyetr.types import MatchCallback, MatchItem
 
 
 def multiset_context_equals(
@@ -32,7 +37,7 @@ class OpenTerm(AbstractTerm):
         ...
 
     @abstractmethod
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenTerm":
+    def _replace_arbs(self, replacements: dict[ArbitraryObject, Term]) -> "OpenTerm":
         ...
 
     @abstractmethod
@@ -51,7 +56,7 @@ class OpenArbitraryObject(AbstractArbitraryObject, OpenTerm):
     def question_count(self) -> int:
         return 0
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> OpenTerm:
+    def _replace_arbs(self, replacements: dict[ArbitraryObject, Term]) -> OpenTerm:
         for arb_obj in replacements:
             if arb_obj.name == self.name:
                 return get_open_equivalent(replacements[arb_obj])
@@ -73,10 +78,10 @@ class OpenFunctionalTerm(AbstractFunctionalTerm[OpenTerm], OpenTerm):
             c += i.question_count()
         return c
 
-    def replace(
+    def _replace_arbs(
         self, replacements: dict[ArbitraryObject, Term]
     ) -> "OpenFunctionalTerm":
-        new_terms = tuple([term.replace(replacements) for term in self.t])
+        new_terms = tuple([term._replace_arbs(replacements) for term in self.t])
         return OpenFunctionalTerm(f=self.f, t=new_terms)
 
     def context_equals(self, term: "Term", question_term: "Term") -> bool:
@@ -115,11 +120,16 @@ class QuestionMark(OpenTerm):
     def question_count(self) -> int:
         return 1
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "QuestionMark":
+    def _replace_arbs(
+        self, replacements: dict[ArbitraryObject, Term]
+    ) -> "QuestionMark":
         return self
 
     def context_equals(self, term: "Term", question_term: "Term") -> bool:
         return term == question_term
+
+    def match(self, old_item: "MatchItem", callback: "MatchCallback") -> "QuestionMark":
+        return self
 
 
 def get_open_equivalent(term: Term) -> OpenTerm:

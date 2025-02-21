@@ -2,15 +2,17 @@ __all__ = ["View"]
 
 from functools import reduce
 from itertools import permutations
-from typing import Callable, Optional, Self, Unpack, cast
+from typing import TYPE_CHECKING, Callable, Optional, Self, Unpack, cast, overload
 
 from pysmt.environment import Environment
 from pysmt.fnode import FNode
 
 from pyetr.atoms.abstract import Atom
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
+from pyetr.atoms.predicate import Predicate
+from pyetr.atoms.terms.abstract_term import AbstractArbitraryObject
 from pyetr.atoms.terms.function import Function, NumFunc
-from pyetr.atoms.terms.open_term import QuestionMark
+from pyetr.atoms.terms.open_term import OpenArbitraryObject, QuestionMark
 from pyetr.exceptions import OperationUndefinedError
 from pyetr.parsing.common import get_quantifiers
 from pyetr.parsing.data_parser import json_to_view, view_to_json
@@ -27,6 +29,9 @@ from .issues import IssueStructure
 from .stateset import SetOfStates, Stage, State, Supposition
 from .tools import ArbitraryObjectGenerator, powerset
 from .weight import Weight, Weights
+
+if TYPE_CHECKING:  # pragma: not covered
+    from .types import MatchCallback, MatchItem
 
 
 def get_subset(big_gamma: SetOfStates, big_psi: SetOfStates) -> SetOfStates:
@@ -143,29 +148,29 @@ def substitution(
 
     # T' = T ⋊ ([T]_Z(T,a)[t/a])
     T_prime = dep_relation.chain(
-        dep_relation.replace(subs).restriction(set(subs.values()))
+        dep_relation._replace_arbs(subs).restriction(set(subs.values()))
     )
 
     new_weights = Weights()
     for state in stage:
         # Γ[ν₁]_Z(T,a) [t/a]
-        new_state = state.replace(cast(dict[ArbitraryObject, Term], subs)).replace(
-            {arb_obj: term}
-        )
+        new_state = state._replace_arbs(
+            cast(dict[ArbitraryObject, Term], subs)
+        )._replace_arbs({arb_obj: term})
         # f[ν₁]_Z(T,a) [t/a]
         new_weight = (
             weights[state]
-            .replace(cast(dict[ArbitraryObject, Term], subs))
-            .replace({arb_obj: term})
+            ._replace_arbs(cast(dict[ArbitraryObject, Term], subs))
+            ._replace_arbs({arb_obj: term})
         )
         new_weights.adding(new_state, new_weight)
 
     new_stage = SetOfStates(new_weights.keys())
 
     # I[ν₁]_Z(T,a) [t/a]
-    new_issue_structure = issue_structure.replace(
+    new_issue_structure = issue_structure._replace_arbs(
         cast(dict[ArbitraryObject, Term], subs)
-    ).replace({arb_obj: term})
+    )._replace_arbs({arb_obj: term})
 
     # The following restriction is in the book but should not have been
     # T_prime = T_prime.restriction(new_stage.arb_objects | supposition.arb_objects)
@@ -295,7 +300,7 @@ def phi(
             # [t₁/e₁,...,tₙ/eₙ]
             replacements: dict[ArbitraryObject, Term] = {e: t for t, e in m_prime_set}
             # δ[t₁/e₁,...,tₙ/eₙ]
-            delta_new = delta.replace(replacements)
+            delta_new = delta._replace_arbs(replacements)
             # ψ∪δ[t₁/e₁,...,tₙ/eₙ]
             x = psi | delta_new
             # (ψ∪δ[t₁/e₁,...,tₙ/eₙ] ⊆ γ)
@@ -304,7 +309,7 @@ def phi(
             # (f(γ) = g(δ)[t₁/e₁,...] ∨ g(δ) =《》)
             third_cond = (
                 delta_weight.is_null
-                or delta_weight.replace(replacements) == gamma_weight
+                or delta_weight._replace_arbs(replacements) == gamma_weight
             )
 
             if first_cond and second_cond and third_cond:
@@ -608,7 +613,7 @@ class View:
     def stage_supp_arb_objects(self) -> set[ArbitraryObject]:
         return self.stage.arb_objects | self.supposition.arb_objects
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "View":
+    def _replace_arbs(self, replacements: dict[ArbitraryObject, Term]) -> "View":
         """
         Replaces arbitrary objects found in the view with another term from a mapping.
 
@@ -621,20 +626,20 @@ class View:
         new_stage_set: set[State] = set()
         new_weights: Weights = Weights()
         for state in self.stage:
-            new_state = state.replace(replacements)
+            new_state = state._replace_arbs(replacements)
             new_stage_set.add(new_state)
             current_weight = self.weights[state]
-            new_weight = current_weight.replace(replacements)
+            new_weight = current_weight._replace_arbs(replacements)
             new_weights.adding(new_state, new_weight)
 
         new_stage = SetOfStates(new_stage_set)
 
-        new_supposition = self.supposition.replace(replacements)
-        new_issue_structure = self.issue_structure.replace(replacements)
+        new_supposition = self.supposition._replace_arbs(replacements)
+        new_issue_structure = self.issue_structure._replace_arbs(replacements)
         filtered_replacements = {
             e: n for e, n in replacements.items() if isinstance(n, ArbitraryObject)
         }
-        new_dep_relation = self.dependency_relation.replace(filtered_replacements)
+        new_dep_relation = self.dependency_relation._replace_arbs(filtered_replacements)
 
         return View(
             stage=new_stage,
@@ -645,6 +650,104 @@ class View:
             issue_structure=new_issue_structure,
             weights=new_weights,
         )
+
+    def match(self, old_item: "MatchItem", callback: "MatchCallback") -> "View":
+        new_stage_set: set[State] = set()
+        new_weights: Weights = Weights()
+        for state in self.stage:
+            new_state = state.match(old_item, callback)
+            new_stage_set.add(new_state)
+            current_weight = self.weights[state]
+            new_weight = current_weight.match(old_item, callback)
+            new_weights.adding(new_state, new_weight)
+
+        new_stage = SetOfStates(new_stage_set)
+
+        new_supposition = self.supposition.match(old_item, callback)
+        new_issue_structure = self.issue_structure.match(old_item, callback)
+        new_dep_relation = self.dependency_relation.match(old_item, callback)
+
+        return View(
+            stage=new_stage,
+            supposition=new_supposition,
+            dependency_relation=new_dep_relation.restriction(
+                new_stage.arb_objects | new_supposition.arb_objects
+            ),
+            issue_structure=new_issue_structure,
+            weights=new_weights,
+        )
+
+    @overload
+    def replace(self, old_item: str, new_item: str) -> "View":
+        ...
+
+    @overload
+    def replace(
+        self, old_item: str | OpenArbitraryObject, new_item: OpenArbitraryObject
+    ) -> "View":
+        ...
+
+    @overload
+    def replace(
+        self, old_item: str | ArbitraryObject, new_item: ArbitraryObject
+    ) -> "View":
+        ...
+
+    @overload
+    def replace(self, old_item: str | Function, new_item: Function) -> "View":
+        ...
+
+    @overload
+    def replace(self, old_item: str | Predicate, new_item: Predicate) -> "View":
+        ...
+
+    def replace(
+        self,
+        old_item: str | OpenArbitraryObject | ArbitraryObject | Function | Predicate,
+        new_item: str | OpenArbitraryObject | ArbitraryObject | Function | Predicate,
+    ):
+        # Get matches for str in stage or supposition
+        output = set()
+
+        def return_found(
+            match: AbstractArbitraryObject | Function | Predicate,
+        ) -> AbstractArbitraryObject | Function | Predicate:
+            output.add(match)
+            return match
+
+        self.match(old_item, return_found)
+
+        if len(output) > 1 and not new_item == str:
+            raise ValueError(
+                f"For multiple matches {output} you must replace with strings"
+            )
+
+        def replace_item(
+            match: AbstractArbitraryObject | Function | Predicate,
+        ) -> AbstractArbitraryObject | Function | Predicate:
+            if isinstance(new_item, str):
+                if isinstance(match, ArbitraryObject):
+                    return ArbitraryObject(name=new_item)
+                elif isinstance(match, OpenArbitraryObject):
+                    return OpenArbitraryObject(name=new_item)
+                elif isinstance(match, Function):
+                    return Function(
+                        name=new_item, arity=match.arity, func_caller=match.func_caller
+                    )
+                elif isinstance(match, Predicate):
+                    return Predicate(
+                        name=new_item, arity=match.arity, _verifier=match.verifier
+                    )
+                else:
+                    assert False
+            else:
+                return new_item
+
+        new_v = self
+        for i in output:
+            new_v = self.match(i, replace_item)
+
+        return new_v
 
     def is_equivalent_under_arb_sub(self, other: "View") -> bool:
         """
@@ -688,7 +791,7 @@ class View:
                     **dict(zip(uni_perm, self_uni)),
                 }
 
-                new_view = other.replace(
+                new_view = other._replace_arbs(
                     cast(
                         dict[ArbitraryObject, Term],
                         replacements,
@@ -992,9 +1095,9 @@ class View:
                     psi_exists = False
                     for psi in view.supposition:
                         # (ψ[t/u] ⊆ γ ∧ ψ⊈γ)
-                        if psi.replace({u: t}).issubset(gamma) and not psi.issubset(
+                        if psi._replace_arbs({u: t}).issubset(
                             gamma
-                        ):
+                        ) and not psi.issubset(gamma):
                             psi_exists = True
                             break
                     if psi_exists:
@@ -1437,8 +1540,8 @@ class View:
                         state_division(
                             state=state,
                             self_stage=self.stage,
-                            other_stage=other.stage.replace({a: t}),  # Δ[t/a]
-                            other_supposition=other.supposition.replace(
+                            other_stage=other.stage._replace_arbs({a: t}),  # Δ[t/a]
+                            other_supposition=other.supposition._replace_arbs(
                                 {a: t}
                             ),  # Ψ[t/a]
                         )
@@ -2033,9 +2136,9 @@ class View:
                     if len({e_n for _, e_n in m_prime_set}) == len(m_prime_set):
                         for p in other.supposition:
                             for delta in other.stage:
-                                xi = delta.replace(replacements)
+                                xi = delta._replace_arbs(replacements)
                                 if (xi | p).issubset(gamma):
-                                    w = other.weights[delta].replace(replacements)
+                                    w = other.weights[delta]._replace_arbs(replacements)
                                     # NOTE: This is not exactly what's in the book, because here we count
                                     # each w.xi possibly multiple times, whereas the book (a little ambiguously,
                                     # but interpreted strictly) collapses the multiplicities to 1.

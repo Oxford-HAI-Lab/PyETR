@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
 from pyetr.atoms.doatom import DoAtom
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
+from pyetr.atoms.predicate import Predicate
+from pyetr.atoms.terms.function import Function
 from pyetr.atoms.terms.open_term import (
     OpenFunctionalTerm,
     OpenTerm,
@@ -19,6 +21,8 @@ from .atoms.terms import ArbitraryObject, FunctionalTerm, Multiset, Summation, T
 
 if TYPE_CHECKING:  # pragma: not covered
     from pyetr.weight import Weights
+
+    from .types import MatchCallback, MatchItem
 
 
 def _get_open_terms(term: Term, search_term: Term) -> list[OpenTerm]:
@@ -123,7 +127,7 @@ class State(frozenset[Atom]):
     def detailed(self) -> str:
         return "{" + ",".join(i.detailed for i in self.sorted_iter()) + "}"
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "State":
+    def _replace_arbs(self, replacements: dict[ArbitraryObject, Term]) -> "State":
         """
         Replaces a series of arbitrary objects with terms and makes a new states.
 
@@ -134,7 +138,7 @@ class State(frozenset[Atom]):
         Returns:
             State: The new states.
         """
-        return State([s.replace(replacements) for s in self])
+        return State([s._replace_arbs(replacements) for s in self])
 
     def replace_term(self, old_term: Term, new_term: Term) -> "State":
         return State(
@@ -196,6 +200,11 @@ class State(frozenset[Atom]):
 
     def sorted_iter(self):
         return sorted(self, key=str)
+
+    def match(self, old_item: "MatchItem", callback: "MatchCallback") -> "State":
+        return State(
+            {atom.match(old_item=old_item, callback=callback) for atom in self}
+        )
 
 
 class SetOfStates(frozenset[State]):
@@ -359,7 +368,7 @@ class SetOfStates(frozenset[State]):
     def detailed(self) -> str:
         return "{" + ",".join(i.detailed for i in self.sorted_iter()) + "}"
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "SetOfStates":
+    def _replace_arbs(self, replacements: dict[ArbitraryObject, Term]) -> "SetOfStates":
         """
         Replaces a series of arbitrary objects with terms and makes a new set of states.
 
@@ -370,7 +379,7 @@ class SetOfStates(frozenset[State]):
         Returns:
             SetOfStates: The new set of states.
         """
-        return SetOfStates([s.replace(replacements) for s in self])
+        return SetOfStates([s._replace_arbs(replacements) for s in self])
 
     @property
     def atoms(self) -> set[Atom]:
@@ -399,6 +408,11 @@ class SetOfStates(frozenset[State]):
 
     def sorted_iter(self):
         return sorted(self, key=str)
+
+    def match(self, old_item: "MatchItem", callback: "MatchCallback") -> "SetOfStates":
+        return SetOfStates(
+            {state.match(old_item=old_item, callback=callback) for state in self}
+        )
 
 
 Stage = SetOfStates

@@ -1,10 +1,13 @@
-from typing import AbstractSet, Iterable, Optional
+from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
 from pyetr.atoms.doatom import DoAtom
 
 from .atoms import Atom, OpenPredicateAtom
 from .atoms.terms import ArbitraryObject, Term
 from .stateset import SetOfStates
+
+if TYPE_CHECKING:  # pragma: not covered
+    from .types import MatchCallback, MatchItem
 
 
 class IssueStructure(frozenset[tuple[Term, OpenPredicateAtom]]):
@@ -99,7 +102,9 @@ class IssueStructure(frozenset[tuple[Term, OpenPredicateAtom]]):
                     f"Issue atom {(t, a)} is not a subset of atoms in stage/supposition: {states.atoms}"
                 )
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "IssueStructure":
+    def _replace_arbs(
+        self, replacements: dict[ArbitraryObject, Term]
+    ) -> "IssueStructure":
         """
         Replaces one arbitrary object found in the dependency with another term from a mapping.
 
@@ -110,7 +115,20 @@ class IssueStructure(frozenset[tuple[Term, OpenPredicateAtom]]):
             IssueStructure: The issue structure with replacements made.
         """
         return IssueStructure(
-            {(t.replace(replacements), a.replace(replacements)) for t, a in self}
+            {
+                (t._replace_arbs(replacements), a._replace_arbs(replacements))
+                for t, a in self
+            }
+        )
+
+    def match(
+        self, old_item: "MatchItem", callback: "MatchCallback"
+    ) -> "IssueStructure":
+        return IssueStructure(
+            {
+                (t.match(old_item, callback), a.match(old_item, callback))
+                for t, a in self
+            }
         )
 
     def negation(self) -> "IssueStructure":

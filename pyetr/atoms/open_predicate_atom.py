@@ -18,8 +18,10 @@ class OpenPredicateAtom(PredicateAtomLike[OpenTerm], AbstractAtom):
             question_count += term.question_count()
         return question_count
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "OpenPredicateAtom":
-        new_terms = tuple([term.replace(replacements) for term in self.terms])
+    def _replace_arbs(
+        self, replacements: dict[ArbitraryObject, Term]
+    ) -> "OpenPredicateAtom":
+        new_terms = tuple([term._replace_arbs(replacements) for term in self.terms])
         return OpenPredicateAtom(predicate=self.predicate, terms=new_terms)
 
     def __invert__(self) -> "OpenPredicateAtom":

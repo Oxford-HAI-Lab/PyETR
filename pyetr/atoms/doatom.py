@@ -1,10 +1,13 @@
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 from pyetr.atoms.terms.multiset import Multiset
 
 from .abstract import Atom
 from .predicate_atom import PredicateAtom
 from .terms import ArbitraryObject, Term
+
+if TYPE_CHECKING:  # pragma: not covered
+    from pyetr.types import MatchCallback, MatchItem
 
 
 class DoAtom(Atom):
@@ -50,8 +53,8 @@ class DoAtom(Atom):
             output_objs |= atom.arb_objects
         return output_objs
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "DoAtom":
-        return DoAtom({atom.replace(replacements) for atom in self.atoms})
+    def _replace_arbs(self, replacements: dict[ArbitraryObject, Term]) -> "DoAtom":
+        return DoAtom({atom._replace_arbs(replacements) for atom in self.atoms})
 
     def replace_term(
         self,
@@ -59,6 +62,13 @@ class DoAtom(Atom):
         new_term: Term,
     ) -> "DoAtom":
         return DoAtom({atom.replace_term(old_term, new_term) for atom in self.atoms})
+
+    def match(
+        self,
+        old_item: "MatchItem",
+        callback: "MatchCallback",
+    ) -> "DoAtom":
+        return DoAtom({atom.match(old_item, callback) for atom in self.atoms})
 
     def sorted_iter_atoms(self):
         return sorted(self.atoms, key=str)

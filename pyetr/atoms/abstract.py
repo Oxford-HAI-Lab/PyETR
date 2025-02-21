@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 from .terms import ArbitraryObject, Term
+
+if TYPE_CHECKING:  # pragma: not covered
+    from pyetr.types import MatchCallback, MatchItem
 
 
 class AbstractAtom(ABC):
@@ -15,7 +18,7 @@ class AbstractAtom(ABC):
         ...
 
     @abstractmethod
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> Self:
+    def _replace_arbs(self, replacements: dict[ArbitraryObject, Term]) -> Self:
         """
         Replaces one arbitrary object found in the atom with another term from a mapping.
 
@@ -67,4 +70,12 @@ class Atom(AbstractAtom):
         Returns:
             Self: The new instance of the atom
         """
+        ...
+
+    @abstractmethod
+    def match(
+        self,
+        old_item: "MatchItem",
+        callback: "MatchCallback",
+    ) -> Self:
         ...
