@@ -127,16 +127,5 @@ class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
             ]
             return FunctionalTerm(f=self.f, t=tuple(new_terms))
 
-    def match(
-        self, old_item: "MatchItem", callback: "MatchCallback"
-    ) -> "FunctionalTerm":
-        if self.f == old_item or self.f.name == old_item:
-            new_f = callback(self.f)
-            assert isinstance(new_f, Function)
-        new_terms = [
-            term.match(old_item=old_item, callback=callback) for term in self.t
-        ]
-        return FunctionalTerm(f=self.f, t=tuple(new_terms))
-
 
 # Changed if clause in 4.2 to separate Arbitrary Objects from FunctionalTerm
