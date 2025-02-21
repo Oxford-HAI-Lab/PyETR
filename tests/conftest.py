@@ -39,38 +39,6 @@ class ExampleItem(pytest.Item):
         return self.fspath, None, f"custom test: {self.test_class.__name__}"
 
 
-def replace_emphasis(input_string):
-    return re.sub(
-        r"(\w+\*|\([^()]*\))",
-        lambda match: match.group(1).replace("*", ""),
-        input_string,
-    )
-
-
-def replace_letters(s: str) -> str:
-    return s.replace(" ", "").replace("++", "σ").replace("∃", "E").replace("∀", "A")
-
-
-def length_identity_test(start: str, end: str) -> bool:
-    start = replace_letters(start)
-    end = replace_letters(end)
-    if len(start) == len(end) and sorted(start, key=hash) == sorted(end, key=hash):
-        return True
-
-    # Then remove emphasis
-    start = replace_emphasis(start)
-    end = replace_emphasis(end)
-
-    if len(start) == len(end) and sorted(start, key=hash) == sorted(end, key=hash):
-        return True
-    return False
-
-
-parse_test_exemptions = [
-    "{0.85**0.1=* E(j()*)D(j())H(j()), 0.85**0.9=* E(j())D(j())~H(j()), 0.15**0.1=* E(j())~D(j())H(j()), 0.15**0.9=* E(j())~D(j())~H(j())}"
-]
-
-
 class BaseParseItem(pytest.Item):
     def __init__(self, *args, view_string: str, **kwargs):
         super().__init__(*args, **kwargs)
@@ -87,9 +55,8 @@ class ParseTestItem(BaseParseItem):
         string_recovered = parsed_view.to_str(round_ints=False)
         alt_string = parsed_view.to_str(round_ints=True)
         if (
-            not length_identity_test(self.view_string, string_recovered)
-            and not length_identity_test(self.view_string, alt_string)
-            and self.view_string not in parse_test_exemptions
+            not self.view_string == string_recovered
+            and not self.view_string == alt_string
         ):
             raise ValueError(
                 f"String recovered: {string_recovered} or alt {alt_string}, compared to {self.view_string}"
