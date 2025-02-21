@@ -20,7 +20,7 @@ def main():
             except ParsingError:
                 new_view = None
             if new_view is not None and match not in output_list:
-                output_list.append(match)
+                output_list.append(new_view.to_str())
 
     extras: list[str] = json.load(open("./tests/case_list_extra.json"))
     output_list += extras

@@ -28,9 +28,11 @@ class OpenPredicateAtom(PredicateAtomLike[OpenTerm], AbstractAtom):
         return OpenPredicateAtom(~self.predicate, self.terms)
 
     def context_equals(self, atom: "Atom", question_term: "Term") -> bool:
-        if not isinstance(atom, PredicateAtom):
-            return False
-        if self.predicate != atom.predicate or len(self.terms) != len(atom.terms):
+        if (
+            not isinstance(atom, PredicateAtom)
+            or self.predicate != atom.predicate
+            or len(self.terms) != len(atom.terms)
+        ):
             return False
 
         return all(

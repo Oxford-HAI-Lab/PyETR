@@ -6,7 +6,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `product`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L701)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L811)
 
 ```
 
@@ -30,7 +30,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `sum`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L741)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L851)
 
 ```
 
@@ -53,7 +53,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `update`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1055)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1165)
 
 ```
 
@@ -73,7 +73,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `answer`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L906)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1016)
 
 ```
 
@@ -93,7 +93,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `negation`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L929)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1039)
 
 ```
 
@@ -112,7 +112,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `merge`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L957)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1067)
 
 ```
 
@@ -132,7 +132,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `division`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1342)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1452)
 
 ```
 
@@ -154,7 +154,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `factor`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1390)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1500)
 
 ```
 
@@ -179,7 +179,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `depose`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1574)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1684)
 
 ```
 
@@ -197,7 +197,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `inquire`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1605)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1715)
 
 ```
 
@@ -224,7 +224,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `suppose`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1698)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1808)
 
 ```
 
@@ -253,7 +253,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `query`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1817)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1927)
 
 ```
 
@@ -267,7 +267,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `which`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1992)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2102)
 
 ```
 
@@ -289,7 +289,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `universal_product`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1102)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1212)
 
 ```
 
@@ -301,7 +301,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `atomic_answer`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L789)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L899)
 
 ```
 
@@ -321,7 +321,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `equilibrium_answer`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L844)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L954)
 
 ```
 
@@ -341,7 +341,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `existential_sum`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1176)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1286)
 
 ```
 
@@ -358,7 +358,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `from_str`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2104)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2214)
 
 ```
 
@@ -377,7 +377,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `to_str`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2122)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2232)
 
 ```
 
@@ -393,7 +393,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `from_fol`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2134)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2244)
 
 ```
 
@@ -410,7 +410,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `to_fol`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2150)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2260)
 
 ```
 
@@ -426,7 +426,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `from_json`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2079)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2189)
 
 ```
 
@@ -442,7 +442,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `to_json`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2092)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2202)
 
 ```
 
