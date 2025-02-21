@@ -1,6 +1,7 @@
 import pytest
 
 from pyetr import ArbitraryObject, Function, View
+from pyetr.atoms.predicate import Predicate
 
 
 class TestReplace:
@@ -45,5 +46,23 @@ class TestReplace:
         with pytest.raises(
             ValueError,
             match=r"Original Function\(Buy, 1\) and replacement Function\(Sell, 0\) must match arity",
+        ):
+            v.replace(search, replacement)
+
+    def test_predicate_multiple(self):
+        v = View.from_str("ABuy {Buy(Buy*)=* do(Buy(Buy(Buy*)))}")
+        search = Predicate("Buy", 1)
+        replacement = Predicate("Sell", 1)
+        replaced_view = v.replace(search, replacement)
+        sample_view = View.from_str("ABuy {Buy(Buy*)=* do(Sell(Buy(Buy*)))}")
+        assert sample_view == replaced_view
+
+    def test_predicate_non_match_arity(self):
+        v = View.from_str("ABuy {Buy(Buy*)=* do(Buy(Buy(Buy*)))}")
+        search = Predicate("Buy", 1)
+        replacement = Predicate("Sell", 0)
+        with pytest.raises(
+            ValueError,
+            match=r"Original <Predicate name=Buy arity=1> and replacement <Predicate name=Sell arity=0> must match arity",
         ):
             v.replace(search, replacement)
