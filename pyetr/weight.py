@@ -1,10 +1,13 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from pyetr.atoms.terms.special_funcs import multiset_product
 
 from .atoms.terms import ArbitraryObject, Multiset, Term
 from .dependency import DependencyRelation
 from .stateset import SetOfStates, State
+
+if TYPE_CHECKING:  # pragma: not covered
+    from pyetr.types import MatchCallback, MatchItem
 
 
 class Weight:
@@ -100,7 +103,7 @@ class Weight:
         """
         return len(self.multiplicative) == 0 and len(self.additive) == 0
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "Weight":
+    def _replace_arbs(self, replacements: dict[ArbitraryObject, Term]) -> "Weight":
         """
         Replaces a series of arbitrary objects with terms and makes a new weight.
         Args:
@@ -112,9 +115,9 @@ class Weight:
         """
         return Weight(
             multiplicative=Multiset(
-                [i.replace(replacements) for i in self.multiplicative]
+                [i._replace_arbs(replacements) for i in self.multiplicative]
             ),
-            additive=Multiset([i.replace(replacements) for i in self.additive]),
+            additive=Multiset([i._replace_arbs(replacements) for i in self.additive]),
         )
 
     def replace_term(
@@ -128,6 +131,16 @@ class Weight:
             ),
             additive=Multiset[Term](
                 [i.replace_term(old_term, new_term) for i in self.additive]
+            ),
+        )
+
+    def match(self, old_item: "MatchItem", callback: "MatchCallback"):
+        return Weight(
+            multiplicative=Multiset[Term](
+                [i.match(old_item, callback) for i in self.multiplicative]
+            ),
+            additive=Multiset[Term](
+                [i.match(old_item, callback) for i in self.additive]
             ),
         )
 

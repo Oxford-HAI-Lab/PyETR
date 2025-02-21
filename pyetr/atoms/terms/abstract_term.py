@@ -1,8 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Generic, Iterable, TypeVar
+from typing import TYPE_CHECKING, Generic, Iterable, Self, TypeVar
 
 from .function import Function
 from .multiset import Multiset
+
+if TYPE_CHECKING:  # pragma: not covered
+    from pyetr.types import MatchCallback, MatchItem
 
 
 class AbstractTerm(ABC):
@@ -25,6 +28,14 @@ class AbstractTerm(ABC):
     @property
     @abstractmethod
     def detailed(self) -> str:
+        ...
+
+    @abstractmethod
+    def match(
+        self,
+        old_item: "MatchItem",
+        callback: "MatchCallback",
+    ) -> Self:
         ...
 
 
@@ -59,6 +70,18 @@ class AbstractArbitraryObject(AbstractTerm):
     @property
     def detailed(self) -> str:
         return f"<{type(self).__name__} name={self.name}>"
+
+    def match(
+        self, old_item: "MatchItem", callback: "MatchCallback"
+    ) -> "AbstractArbitraryObject":
+        if (
+            isinstance(old_item, AbstractArbitraryObject) and self.name == old_item.name
+        ) or self.name == old_item:
+            new_self = callback(self)
+            assert isinstance(new_self, AbstractArbitraryObject)
+        else:
+            new_self = self
+        return new_self
 
 
 class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
@@ -122,3 +145,12 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
             return f"<{type(self).__name__} f={self.f.detailed} t={self.t.detailed}>"
         else:
             return f"<{type(self).__name__} f={self.f.detailed} t=({','.join(t.detailed for t in self.t)})>"
+
+    def match(self, old_item: "MatchItem", callback: "MatchCallback") -> Self:
+        if self.f == old_item or self.f.name == old_item:
+            new_f = callback(self.f)
+            assert isinstance(new_f, Function)
+        new_terms = [
+            term.match(old_item=old_item, callback=callback) for term in self.t
+        ]
+        return self.__class__(f=self.f, t=tuple(new_terms))

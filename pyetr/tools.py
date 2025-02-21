@@ -3,7 +3,10 @@ __all__ = ["ArbitraryObjectGenerator"]
 import typing
 from abc import ABCMeta, abstractmethod
 from enum import Enum
-from typing import TYPE_CHECKING, Iterable, TypeVar
+from typing import TYPE_CHECKING, Callable, Iterable, TypeVar
+
+from pyetr.atoms.predicate import Predicate
+from pyetr.atoms.terms.function import Function
 
 if TYPE_CHECKING:  # pragma: not covered
     from .view import View
@@ -128,7 +131,7 @@ class ArbitraryObjectGenerator:
         Returns:
             View: The new view with arbitrary objects replaced.
         """
-        return view.replace(
+        return view._replace_arbs(
             typing.cast(dict[ArbitraryObject, Term], self.redraw(arb_objects))
         )
 
@@ -163,3 +166,9 @@ def powerset(iterable: Iterable[IterType]) -> list[set[IterType]]:
         set(i)
         for i in (chain.from_iterable(combinations(s, r) for r in range(len(s) + 1)))
     ]
+
+
+MatchCallback = Callable[
+    [ArbitraryObject | Predicate | Function], ArbitraryObject | Predicate | Function
+]
+MatchItem = str | ArbitraryObject | Function | Predicate

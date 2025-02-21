@@ -1,9 +1,13 @@
 __all__ = ["Dependency", "DependencyRelation"]
 
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
+
+from pyetr.atoms.terms.open_term import OpenArbitraryObject
 
 from .atoms.terms import ArbitraryObject
 
+if TYPE_CHECKING:  # pragma: not covered
+    from .types import MatchCallback, MatchItem
 Universal = ArbitraryObject
 Existential = ArbitraryObject
 
@@ -40,7 +44,7 @@ class Dependency:
     def __hash__(self) -> int:
         return hash((self.existential, self.universal))
 
-    def replace(
+    def _replace_arbs(
         self, replacements: dict[ArbitraryObject, ArbitraryObject]
     ) -> "Dependency":
         """
@@ -60,6 +64,19 @@ class Dependency:
             new_uni = replacements[self.universal]
         else:
             new_uni = self.universal
+        return Dependency(universal=new_uni, existential=new_exi)
+
+    def match(self, old_item: "MatchItem", callback: "MatchCallback") -> "Dependency":
+        if self.existential == old_item or self.existential.name == old_item:
+            new_exi = callback(self.existential)
+        else:
+            new_exi = self.existential
+        if self.universal == old_item or self.universal.name == old_item:
+            new_uni = callback(self.universal)
+        else:
+            new_uni = self.universal
+        assert isinstance(new_exi, ArbitraryObject)
+        assert isinstance(new_uni, ArbitraryObject)
         return Dependency(universal=new_uni, existential=new_exi)
 
 
@@ -226,7 +243,7 @@ class DependencyRelation:
     def __hash__(self) -> int:
         return hash((self.universals, self.existentials, self.dependencies))
 
-    def replace(
+    def _replace_arbs(
         self, replacements: dict[ArbitraryObject, ArbitraryObject]
     ) -> "DependencyRelation":
         """
@@ -248,7 +265,30 @@ class DependencyRelation:
 
         new_unis = {replace_arb_object(x) for x in self.universals}
         new_exis = {replace_arb_object(x) for x in self.existentials}
-        new_deps = {d.replace(replacements) for d in self.dependencies}
+        new_deps = {d._replace_arbs(replacements) for d in self.dependencies}
+        return DependencyRelation(new_unis, new_exis, frozenset(new_deps))
+
+    def match(self, old_item: "MatchItem", callback: "MatchCallback"):
+        if isinstance(old_item, ArbitraryObject):
+            search_arb = old_item
+        elif isinstance(old_item, OpenArbitraryObject):
+            search_arb = ArbitraryObject(name=old_item.name)
+        elif isinstance(old_item, str):
+            search_arb = ArbitraryObject(name=old_item)
+        else:
+            return self
+
+        def match_arb_object(x: ArbitraryObject) -> ArbitraryObject:
+            if x == search_arb:
+                out = callback(x)
+                assert isinstance(out, ArbitraryObject)
+                return out
+            else:
+                return x
+
+        new_unis = {match_arb_object(x) for x in self.universals}
+        new_exis = {match_arb_object(x) for x in self.existentials}
+        new_deps = {d.match(old_item, callback) for d in self.dependencies}
         return DependencyRelation(new_unis, new_exis, frozenset(new_deps))
 
     def is_existential(self, arb_object: ArbitraryObject) -> bool:

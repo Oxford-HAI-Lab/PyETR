@@ -1,6 +1,5 @@
 __all__ = ["PredicateAtom"]
 
-
 from .abstract import Atom
 from .atom_likes import PredicateAtomLike
 from .terms import ArbitraryObject, FunctionalTerm, Term
@@ -22,7 +21,9 @@ class PredicateAtom(PredicateAtomLike[Term], Atom):
     def __invert__(self):
         return PredicateAtom(~self.predicate, self.terms)
 
-    def replace(self, replacements: dict[ArbitraryObject, Term]) -> "PredicateAtom":
+    def _replace_arbs(
+        self, replacements: dict[ArbitraryObject, Term]
+    ) -> "PredicateAtom":
         new_terms: list[Term] = []
         for term in self.terms:
             if term in replacements:
@@ -30,7 +31,7 @@ class PredicateAtom(PredicateAtomLike[Term], Atom):
                 replacement = replacements[term]
             else:
                 if isinstance(term, FunctionalTerm):
-                    replacement = term.replace(replacements)
+                    replacement = term._replace_arbs(replacements)
                 elif isinstance(term, ArbitraryObject):
                     replacement = term
                 else:

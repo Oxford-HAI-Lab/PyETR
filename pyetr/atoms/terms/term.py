@@ -1,8 +1,14 @@
 __all__ = ["Term", "ArbitraryObject", "FunctionalTerm"]
 
 from abc import abstractmethod
+from typing import TYPE_CHECKING
+
+from pyetr.atoms.terms.function import Function
 
 from .abstract_term import AbstractArbitraryObject, AbstractFunctionalTerm, AbstractTerm
+
+if TYPE_CHECKING:  # pragma: not covered
+    from pyetr.types import MatchCallback, MatchItem
 
 
 class Term(AbstractTerm):
@@ -18,7 +24,7 @@ class Term(AbstractTerm):
         ...
 
     @abstractmethod
-    def replace(
+    def _replace_arbs(
         self,
         replacements: dict["ArbitraryObject", "Term"],
     ) -> "Term":
@@ -57,7 +63,7 @@ class ArbitraryObject(AbstractArbitraryObject, Term):
     def arb_objects(self) -> set["ArbitraryObject"]:
         return {self}
 
-    def replace(
+    def _replace_arbs(
         self,
         replacements: dict["ArbitraryObject", Term],
     ) -> Term:
@@ -89,7 +95,7 @@ class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
                 assert False
         return output_set
 
-    def replace(
+    def _replace_arbs(
         self,
         replacements: dict[ArbitraryObject, Term],
     ) -> "FunctionalTerm":
@@ -99,7 +105,7 @@ class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
                 replacement = replacements[term]
             else:
                 if isinstance(term, FunctionalTerm):
-                    replacement = term.replace(replacements)
+                    replacement = term._replace_arbs(replacements)
                 elif isinstance(term, ArbitraryObject):
                     replacement = term
                 else:
@@ -120,6 +126,17 @@ class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
                 for term in self.t
             ]
             return FunctionalTerm(f=self.f, t=tuple(new_terms))
+
+    def match(
+        self, old_item: "MatchItem", callback: "MatchCallback"
+    ) -> "FunctionalTerm":
+        if self.f == old_item or self.f.name == old_item:
+            new_f = callback(self.f)
+            assert isinstance(new_f, Function)
+        new_terms = [
+            term.match(old_item=old_item, callback=callback) for term in self.t
+        ]
+        return FunctionalTerm(f=self.f, t=tuple(new_terms))
 
 
 # Changed if clause in 4.2 to separate Arbitrary Objects from FunctionalTerm

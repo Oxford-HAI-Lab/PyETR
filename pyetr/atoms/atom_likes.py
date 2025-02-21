@@ -7,6 +7,10 @@ from .predicate import Predicate
 from .terms.abstract_term import TermType
 
 AtomType = TypeVar("AtomType", bound=AbstractAtom)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: not covered
+    from pyetr.types import MatchCallback, MatchItem
 
 
 class PredicateAtomLike(Generic[TermType]):
@@ -49,3 +53,18 @@ class PredicateAtomLike(Generic[TermType]):
         else:
             tilde = "~"
         return f"{tilde}{self.predicate.name}({terms})"
+
+    def match(
+        self,
+        old_item: "MatchItem",
+        callback: "MatchCallback",
+    ):
+        new_terms = [
+            term.match(old_item=old_item, callback=callback) for term in self.terms
+        ]
+        if self.predicate == old_item or self.predicate.name == old_item:
+            new_predicate = callback(self.predicate)
+            assert isinstance(new_predicate, Predicate)
+        else:
+            new_predicate = self.predicate
+        return self.__class__(predicate=new_predicate, terms=tuple(new_terms))
