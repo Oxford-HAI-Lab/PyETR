@@ -150,7 +150,9 @@ class AbstractFunctionalTerm(Generic[TermType], AbstractTerm):
         if self.f == old_item or self.f.name == old_item:
             new_f = callback(self.f)
             assert isinstance(new_f, Function)
+        else:
+            new_f = self.f
         new_terms = [
             term.match(old_item=old_item, callback=callback) for term in self.t
         ]
-        return self.__class__(f=self.f, t=tuple(new_terms))
+        return self.__class__(f=new_f, t=tuple(new_terms))

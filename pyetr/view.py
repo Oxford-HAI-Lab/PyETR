@@ -715,9 +715,10 @@ class View:
             output.add(match)
             return match
 
-        self.match(old_item, return_found)
+        self.stage.match(old_item, return_found)
+        self.supposition.match(old_item, return_found)
 
-        if len(output) > 1 and not new_item == str:
+        if len(output) > 1 and not isinstance(new_item, str):
             raise ValueError(
                 f"For multiple matches {output} you must replace with strings"
             )
@@ -745,8 +746,14 @@ class View:
 
         new_v = self
         for i in output:
-            new_v = self.match(i, replace_item)
-
+            if (isinstance(i, Function) and isinstance(new_item, Function)) or (
+                isinstance(i, Predicate) and isinstance(new_item, Predicate)
+            ):
+                if i.arity != new_item.arity:
+                    raise ValueError(
+                        f"Original {i} and replacement {new_item} must match arity"
+                    )
+            new_v = new_v.match(i, replace_item)
         return new_v
 
     def is_equivalent_under_arb_sub(self, other: "View") -> bool:
