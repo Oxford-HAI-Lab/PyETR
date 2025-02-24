@@ -144,47 +144,50 @@ def _parse_item_with_issue(
     """
 
     def _parse_item(
-        item: Item, maps: Maps, open_atoms: list[tuple[Term, OpenPredicateAtom]]
-    ) -> SetOfStates:
+        item: Item, maps: Maps
+    ) -> tuple[SetOfStates, list[tuple[Term, OpenPredicateAtom]]]:
         # Based on definition 4.16
         if isinstance(item, BoolOr):
             # based on (i)
             new_set = SetOfStates(set())
+            new_opens = []
             for operand in item.operands:
-                parsed_item: SetOfStates = _parse_item(operand, maps, open_atoms)
+                parsed_item, new_rels = _parse_item(operand, maps)
                 new_set |= parsed_item
-            return new_set
+                new_opens += new_rels
+            return new_set, new_opens
 
         elif isinstance(item, BoolAnd):
             # based on (ii)
             new_set = SetOfStates({State(set())})
+            new_opens = []
             for operand in item.operands:
-                parsed_item: SetOfStates = _parse_item(operand, maps, open_atoms)
+                parsed_item, new_rels = _parse_item(operand, maps)
                 new_set *= parsed_item
-            return new_set
+                new_opens += new_rels
+            return new_set, new_opens
 
         elif isinstance(item, BoolNot):
             # based on (iii)
-            new_arg = _parse_item(item.arg, maps, open_atoms)
-            for i, (t, o) in enumerate(open_atoms):
+            new_arg, rel_opens = _parse_item(item.arg, maps)
+            new_rels = []
+            for t, o in rel_opens:
                 new_atom = o(t)
                 if new_atom in new_arg.atoms:
-                    open_atoms[i] = (t, ~o)
-            return new_arg.negation()
+                    new_rels.append((t, ~o))
+            return new_arg.negation(), new_rels
         elif isinstance(item, Truth):
             # based on (iv)
-            return SetOfStates({State({})})
+            return SetOfStates({State({})}), []
 
         elif isinstance(item, Falsum):
             # based on (v)
-            return SetOfStates({})
+            return SetOfStates({}), []
 
         elif isinstance(item, LogicPredicate):
             # based on (vi)
             atom, o_atoms = _parse_predicate(item, maps)
-            for o_atom in o_atoms:
-                open_atoms.append(o_atom)
-            return SetOfStates({State({atom})})
+            return SetOfStates({State({atom})}), o_atoms
 
         elif isinstance(item, LogicEmphasis):  # pragma: not covered
             raise ParsingError(
@@ -203,8 +206,7 @@ def _parse_item_with_issue(
             assert isinstance(item, Quantified)
             raise ParsingError(f"Quantified {item} found at lower level than top")
 
-    open_atoms: list[tuple[Term, OpenPredicateAtom]] = []
-    return _parse_item(item, maps, open_atoms), open_atoms
+    return _parse_item(item, maps)
 
 
 def _parse_view(
@@ -232,13 +234,7 @@ def _parse_view(
     parsed_supposition, open_atoms_supp = _parse_item_with_issue(supposition, maps)
     parsed_stage, open_atoms_stage = _parse_item_with_issue(stage, maps)
     issue_structure = IssueStructure(open_atoms_supp + open_atoms_stage)
-    # if (
-    #     parsed_stage.emphasis_count + parsed_supposition.emphasis_count == 0
-    #     and add_emphasis
-    # ):
-    #     parsed_stage, parsed_supposition = add_new_emphasis(
-    #         parsed_stage, parsed_supposition, dependency_relation
-    #     )
+
     return ViewStorage(
         stage=parsed_stage,
         supposition=parsed_supposition,

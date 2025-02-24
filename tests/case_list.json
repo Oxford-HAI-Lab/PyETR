@@ -385,5 +385,6 @@
   "{~do()}",
   "\u2200c_v {f_a(a_b(c_v))}",
   "{A(12)}",
-  "{==(3,f())}"
+  "{==(3,f())}",
+  "{Thermotogum(Maritima()*),~Thermotogum(Maritima())}"
 ]
