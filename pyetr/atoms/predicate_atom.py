@@ -1,5 +1,7 @@
 __all__ = ["PredicateAtom"]
 
+from typing import cast
+
 from .abstract import Atom
 from .atom_likes import PredicateAtomLike
 from .terms import ArbitraryObject, FunctionalTerm, Term
@@ -27,8 +29,7 @@ class PredicateAtom(PredicateAtomLike[Term], Atom):
         new_terms: list[Term] = []
         for term in self.terms:
             if term in replacements:
-                assert not isinstance(term, FunctionalTerm)
-                replacement = replacements[term]
+                replacement = replacements[cast(ArbitraryObject, term)]
             else:
                 if isinstance(term, FunctionalTerm):
                     replacement = term._replace_arbs(replacements)

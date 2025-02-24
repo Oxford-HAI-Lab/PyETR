@@ -1,7 +1,7 @@
 __all__ = ["Term", "ArbitraryObject", "FunctionalTerm"]
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from pyetr.atoms.terms.function import Function
 
@@ -102,7 +102,7 @@ class FunctionalTerm(AbstractFunctionalTerm[Term], Term):
         new_terms: list[Term] = []
         for term in self.t:
             if term in replacements:
-                replacement = replacements[term]
+                replacement = replacements[cast(ArbitraryObject, term)]
             else:
                 if isinstance(term, FunctionalTerm):
                     replacement = term._replace_arbs(replacements)
