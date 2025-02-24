@@ -81,6 +81,12 @@ class Variable:
     def from_pyparsing(cls, t: Any):
         return cls(t[0])
 
+    def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
+        if self.name in name_mappings:
+            return name_mappings[self.name]
+        else:
+            return self.name
+
 
 class Quantified:
     """
@@ -104,6 +110,9 @@ class Quantified:
 
     def to_string(self, **kwargs: Any) -> str:
         return self.quantifier + self.variable.to_string(**kwargs)
+
+    def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
+        raise ValueError("Cannot call directly")
 
     @classmethod
     def from_pyparsing(cls, t: Any):

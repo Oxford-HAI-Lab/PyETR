@@ -16,6 +16,7 @@ from pyetr.atoms.terms.open_term import OpenArbitraryObject, QuestionMark
 from pyetr.exceptions import OperationUndefinedError
 from pyetr.parsing.common import get_quantifiers
 from pyetr.parsing.data_parser import json_to_view, view_to_json
+from pyetr.parsing.english_parser import view_to_english
 from pyetr.parsing.fol_parser import fol_to_view, view_to_fol
 from pyetr.parsing.smt_lib_parser import smt_lib_to_view, view_to_smt_lib
 from pyetr.parsing.smt_parser import smt_to_view, view_to_smt
@@ -2287,3 +2288,19 @@ class View:
 
     def to_smt_lib(self, env: Optional[Environment] = None) -> str:
         return view_to_smt_lib(self, env)
+
+    def to_english(self, name_mappings: Optional[dict[str, str]] = None) -> str:
+        """
+        Parses from View form to english string form.
+
+        Args:
+            v (View): The View object
+            name_mappings (Optional[dict[str,str]]): Maps strings in variables, predicates etc to
+                replacements strings
+
+        Returns:
+            str: The english string form.
+        """
+        if name_mappings is None:
+            name_mappings = {}
+        return view_to_english(self, name_mappings)

@@ -49,6 +49,9 @@ class BoolNot(SingleOperand):
     def to_string(self, **kwargs: Any) -> str:
         return "~" + self.arg.to_string(**kwargs)
 
+    def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
+        return self.arg.to_english(name_mappings, **kwargs).replace(" is ", " is not ")
+
 
 class LogicEmphasis(SingleOperand):
     """
@@ -59,6 +62,9 @@ class LogicEmphasis(SingleOperand):
 
     def to_string(self, **kwargs: Any) -> str:
         return self.arg.to_string(**kwargs) + "*"
+
+    def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
+        return self.arg.to_english(name_mappings, **kwargs) + " (at emphasis)"
 
 
 class MultiOperand:
@@ -95,6 +101,11 @@ class BoolAnd(MultiOperand):
     def to_string(self, **kwargs: Any) -> str:
         return self._operand_string(" ∧ ", **kwargs)
 
+    def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
+        return " and ".join(
+            [i.to_english(name_mappings, **kwargs) for i in self.operands]
+        )
+
 
 class BoolOr(MultiOperand):
     """
@@ -105,6 +116,11 @@ class BoolOr(MultiOperand):
 
     def to_string(self, **kwargs: Any) -> str:
         return self._operand_string(" ∨ ", **kwargs)
+
+    def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
+        return " or ".join(
+            [i.to_english(name_mappings, **kwargs) for i in self.operands]
+        )
 
 
 class Implies:
@@ -124,6 +140,11 @@ class Implies:
 
     def to_string(self, **kwargs: Any) -> str:
         return self.left.to_string(**kwargs) + "→" + self.right.to_string(**kwargs)
+
+    def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
+        left = self.left.to_english(name_mappings, **kwargs)
+        right = self.right.to_english(name_mappings, **kwargs)
+        return f"if {left}, then {right}"
 
     @classmethod
     def from_pyparsing(cls, t: Any):
@@ -148,6 +169,9 @@ class Truth:
     def to_string(self, **kwargs: Any) -> str:
         return "⊤"
 
+    def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
+        return "true"
+
     @classmethod
     def from_pyparsing(cls, t: Any):
         return cls()
@@ -166,6 +190,9 @@ class Falsum:
 
     def to_string(self, **kwargs: Any) -> str:
         return "⊥"
+
+    def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
+        return "false"
 
     @classmethod
     def from_pyparsing(cls, t: Any):
@@ -195,6 +222,28 @@ class LogicPredicate:
             + ")"
         )
 
+    def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
+        if self.name == "==":
+            assert len(self.args) == 2
+            return f"{self.args[0].to_english(name_mappings, **kwargs)} if and only if {self.args[1].to_english(name_mappings, **kwargs)}"
+        else:
+            if self.name in name_mappings:
+                new_name = name_mappings[self.name]
+            else:
+                new_name = self.name
+            if len(self.args) == 0:
+                return new_name
+            elif len(self.args) == 1:
+                return (
+                    f"{self.args[0].to_english(name_mappings, **kwargs)} is {new_name}"
+                )
+            elif len(self.args) == 2:
+                return f"{self.args[0].to_english(name_mappings, **kwargs)} {self.name} {self.args[1].to_english(name_mappings, **kwargs)}"
+            else:
+                raise ValueError(
+                    "Predicates of more than 3 args cannot be made into english"
+                )
+
     @classmethod
     def from_pyparsing(cls, t: Any):
         if isinstance(t[0], str):
@@ -213,6 +262,9 @@ class LogicReal(LogicPredicate):
 
     def to_string(self, *, round_ints: bool = False, **kwargs: Any):
         return f"{convert_float_to_dec(self.num, round_ints)}"
+
+    def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
+        return self.to_string()
 
     @classmethod
     def from_pyparsing(cls, t: Any):

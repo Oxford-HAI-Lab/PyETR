@@ -88,6 +88,15 @@ class ParseCompareViaString(BaseParseItem):
             )
 
 
+class ParseToEnglish(BaseParseItem):
+    def runtest(self):
+        parsed_view = View.from_str(self.view_string)
+        try:
+            parsed_view.to_english()
+        except FOLNotSupportedError:
+            pass
+
+
 class ParseCompareViaFOL(BaseParseItem):
     def runtest(self):
         parsed_view = View.from_str(self.view_string)
@@ -203,6 +212,7 @@ parse_test_set: list[type[BaseParseItem]] = [
     ParseCompareViaFOL,
     ParseCompareViaSMT,
     ParseCompareViaSMTLib,
+    ParseToEnglish,
 ]
 
 
