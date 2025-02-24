@@ -6,7 +6,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `product`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L809)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L844)
 
 ```
 
@@ -30,7 +30,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `sum`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L849)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L884)
 
 ```
 
@@ -53,7 +53,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `update`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1163)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1198)
 
 ```
 
@@ -73,7 +73,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `answer`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1014)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1049)
 
 ```
 
@@ -93,7 +93,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `negation`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1037)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1072)
 
 ```
 
@@ -112,7 +112,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `merge`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1065)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1100)
 
 ```
 
@@ -132,7 +132,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `division`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1450)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1485)
 
 ```
 
@@ -154,7 +154,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `factor`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1498)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1533)
 
 ```
 
@@ -179,7 +179,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `depose`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1682)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1717)
 
 ```
 
@@ -197,7 +197,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `inquire`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1713)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1748)
 
 ```
 
@@ -224,7 +224,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `suppose`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1806)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1841)
 
 ```
 
@@ -253,7 +253,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `query`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1925)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1960)
 
 ```
 
@@ -267,7 +267,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `which`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2100)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2135)
 
 ```
 
@@ -289,7 +289,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `universal_product`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1210)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1245)
 
 ```
 
@@ -301,7 +301,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `atomic_answer`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L897)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L932)
 
 ```
 
@@ -321,7 +321,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `equilibrium_answer`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L952)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L987)
 
 ```
 
@@ -341,7 +341,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `existential_sum`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1284)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1319)
 
 ```
 
@@ -358,7 +358,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `from_str`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2212)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2247)
 
 ```
 
@@ -377,7 +377,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `to_str`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2230)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2265)
 
 ```
 
@@ -393,11 +393,12 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `from_fol`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2242)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2277)
 
 ```
 
         Parses from first order logic string form to View form.
+
         Args:
             s (str): A first order logic string
             custom_functions (list[NumFunc | Function] | None, optional): Custom functions used in the
@@ -410,7 +411,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `to_fol`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2258)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2294)
 
 ```
 
@@ -426,7 +427,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `from_json`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2187)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2222)
 
 ```
 
@@ -442,7 +443,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `to_json`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2200)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2235)
 
 ```
 
@@ -453,5 +454,171 @@ Below you'll find all of the methods of View, including associated operations an
 
         Returns:
             str: The output json
+        
+```
+
+### `from_smt`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2306)
+
+```
+
+        Parses from first order logic pysmt form to View form.
+
+        Args:
+            fnode (FNode): The pysmt object
+            custom_functions (list[NumFunc | Function] | None, optional): Custom functions used in the
+                string. It assumes the name of the function is that used in the string. Useful
+                for using func callers. Defaults to None.
+        Returns:
+            Self: The parsed view
+        
+```
+
+### `to_smt`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2323)
+
+```
+
+        Parses from View form to first order logic pysmt form.
+
+        Args:
+            env (Optional[Environment], optional): The pysmt environment to embed
+                parsed variables. If None will use a fresh environment to avoid clashes.
+                Defaults to None.
+
+        Returns:
+            FNode: The parsed pysmt object
+        
+```
+
+### `from_smt_lib`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2337)
+
+```
+
+        Parses from SMT Lib form to View form.
+
+        Args:
+            smt_lib (str): The input string in SMT Lib structure
+            custom_functions (list[NumFunc  |  Function] | None, optional): Custom functions used in the
+                string. It assumes the name of the function is that used in the string. Useful
+                for using func callers. Defaults to None.
+            env (Optional[Environment], optional): The pysmt environment to embed
+                parsed variables. If None will use a fresh environment to avoid clashes.
+                Defaults to None.
+
+        Returns:
+            Self: The parsed view
+        
+```
+
+### `to_smt_lib`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2361)
+
+```
+
+        Parses from View form to SMT Lib form.
+
+
+        Args:
+            env (Optional[Environment], optional):  The pysmt environment to embed
+                parsed variables. If None will use a fresh environment to avoid clashes.
+                Defaults to None.
+
+        Returns:
+            str: The view string in SMT Lib structure
+        
+```
+
+### `to_english`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2376)
+
+```
+
+        Parses from View form to english string form.
+
+        Args:
+            v (View): The View object
+            name_mappings (Optional[dict[str,str]]): Maps strings in variables, predicates etc to
+                replacements strings
+
+        Returns:
+            str: The english string form.
+        
+```
+
+## Other
+
+
+### `replace (overload1)`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L681)
+
+```
+
+        Searches for the string name of old item and replaces all instances with new item.
+
+        Args:
+            old_item (str): The search string
+            new_item (str): The replacement string
+
+        Returns:
+            View: The new view with the replacements made
+        
+```
+
+### `replace (overload2)`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L695)
+
+```
+
+        Searches for the arbitrary object and replaces all instances with new item.
+
+        Args:
+            old_item (ArbitraryObject): The search object
+            new_item (ArbitraryObject): The replacement object
+
+        Returns:
+            View: The new view with the replacements made
+        
+```
+
+### `replace (overload3)`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L709)
+
+```
+
+        Searches for the function and replaces all instances with new item.
+
+        Args:
+            old_item (Function): The function to search for
+            new_item (Function): The function to replace with
+
+        Returns:
+            View: The new view with the replacements made
+        
+```
+
+### `replace (overload4)`
+
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L723)
+
+```
+
+        Searches for the predicate and replaces all instances with new item.
+
+        Args:
+            old_item (Predicate): The predicate to search for
+            new_item (Predicate): The predicate to replace with
+
+        Returns:
+            View: The new view with the replacements made
         
 ```

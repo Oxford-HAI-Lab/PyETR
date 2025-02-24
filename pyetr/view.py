@@ -680,30 +680,64 @@ class View:
 
     @overload
     def replace(self, old_item: str, new_item: str) -> "View":
-        ...
+        """
+        Searches for the string name of old item and replaces all instances with new item.
 
-    @overload
-    def replace(
-        self, old_item: OpenArbitraryObject, new_item: OpenArbitraryObject
-    ) -> "View":
+        Args:
+            old_item (str): The search string
+            new_item (str): The replacement string
+
+        Returns:
+            View: The new view with the replacements made
+        """
         ...
 
     @overload
     def replace(self, old_item: ArbitraryObject, new_item: ArbitraryObject) -> "View":
+        """
+        Searches for the arbitrary object and replaces all instances with new item.
+
+        Args:
+            old_item (ArbitraryObject): The search object
+            new_item (ArbitraryObject): The replacement object
+
+        Returns:
+            View: The new view with the replacements made
+        """
         ...
 
     @overload
     def replace(self, old_item: Function, new_item: Function) -> "View":
+        """
+        Searches for the function and replaces all instances with new item.
+
+        Args:
+            old_item (Function): The function to search for
+            new_item (Function): The function to replace with
+
+        Returns:
+            View: The new view with the replacements made
+        """
         ...
 
     @overload
     def replace(self, old_item: Predicate, new_item: Predicate) -> "View":
+        """
+        Searches for the predicate and replaces all instances with new item.
+
+        Args:
+            old_item (Predicate): The predicate to search for
+            new_item (Predicate): The predicate to replace with
+
+        Returns:
+            View: The new view with the replacements made
+        """
         ...
 
     def replace(
         self,
-        old_item: str | OpenArbitraryObject | ArbitraryObject | Function | Predicate,
-        new_item: str | OpenArbitraryObject | ArbitraryObject | Function | Predicate,
+        old_item: str | ArbitraryObject | Function | Predicate,
+        new_item: str | ArbitraryObject | Function | Predicate,
     ):
         # Get matches for str in stage or supposition
         output = set()
@@ -2246,6 +2280,7 @@ class View:
     ) -> Self:
         """
         Parses from first order logic string form to View form.
+
         Args:
             s (str): A first order logic string
             custom_functions (list[NumFunc | Function] | None, optional): Custom functions used in the
@@ -2272,9 +2307,31 @@ class View:
     def from_smt(
         cls, fnode: FNode, custom_functions: list[NumFunc | Function] | None = None
     ) -> Self:
+        """
+        Parses from first order logic pysmt form to View form.
+
+        Args:
+            fnode (FNode): The pysmt object
+            custom_functions (list[NumFunc | Function] | None, optional): Custom functions used in the
+                string. It assumes the name of the function is that used in the string. Useful
+                for using func callers. Defaults to None.
+        Returns:
+            Self: The parsed view
+        """
         return cls._from_view_storage(smt_to_view(fnode, custom_functions))
 
     def to_smt(self, env: Optional[Environment] = None) -> FNode:
+        """
+        Parses from View form to first order logic pysmt form.
+
+        Args:
+            env (Optional[Environment], optional): The pysmt environment to embed
+                parsed variables. If None will use a fresh environment to avoid clashes.
+                Defaults to None.
+
+        Returns:
+            FNode: The parsed pysmt object
+        """
         return view_to_smt(self, env)
 
     @classmethod
@@ -2283,10 +2340,37 @@ class View:
         smt_lib: str,
         custom_functions: list[NumFunc | Function] | None = None,
         env: Optional[Environment] = None,
-    ):
+    ) -> Self:
+        """
+        Parses from SMT Lib form to View form.
+
+        Args:
+            smt_lib (str): The input string in SMT Lib structure
+            custom_functions (list[NumFunc  |  Function] | None, optional): Custom functions used in the
+                string. It assumes the name of the function is that used in the string. Useful
+                for using func callers. Defaults to None.
+            env (Optional[Environment], optional): The pysmt environment to embed
+                parsed variables. If None will use a fresh environment to avoid clashes.
+                Defaults to None.
+
+        Returns:
+            Self: The parsed view
+        """
         return cls._from_view_storage(smt_lib_to_view(smt_lib, custom_functions, env))
 
     def to_smt_lib(self, env: Optional[Environment] = None) -> str:
+        """
+        Parses from View form to SMT Lib form.
+
+
+        Args:
+            env (Optional[Environment], optional):  The pysmt environment to embed
+                parsed variables. If None will use a fresh environment to avoid clashes.
+                Defaults to None.
+
+        Returns:
+            str: The view string in SMT Lib structure
+        """
         return view_to_smt_lib(self, env)
 
     def to_english(self, name_mappings: Optional[dict[str, str]] = None) -> str:

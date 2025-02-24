@@ -1,4 +1,5 @@
 import inspect
+from typing import get_overloads
 
 from pyetr.view import View
 
@@ -22,7 +23,20 @@ relevant_methods: dict[str, list[str]] = {
         "equilibrium_answer",
         "existential_sum",
     ],
-    "## Parsing": ["from_str", "to_str", "from_fol", "to_fol", "from_json", "to_json"],
+    "## Parsing": [
+        "from_str",
+        "to_str",
+        "from_fol",
+        "to_fol",
+        "from_json",
+        "to_json",
+        "from_smt",
+        "to_smt",
+        "from_smt_lib",
+        "to_smt_lib",
+        "to_english",
+    ],
+    "## Other": ["replace"],
 }
 
 
@@ -45,18 +59,33 @@ def main():
         for name in section_items:
             assert name in dir(View)
             method = getattr(View, name)
-
-            main_str = (
-                "### `"
-                + name
-                + "`\n"
-                + get_line_no(method)
-                + "```\n"
-                + method.__doc__
-                + "\n```"
-            )
-
-            out.append(main_str)
+            overloads = get_overloads(method)
+            if overloads:
+                for i, overload in enumerate(overloads):
+                    if overload.__doc__ is not None:
+                        main_str = (
+                            "### `"
+                            + name
+                            + f" (overload{str(i+1)})"
+                            + "`\n"
+                            + get_line_no(overload)
+                            + "```\n"
+                            + overload.__doc__
+                            + "\n```"
+                        )
+                        out.append(main_str)
+            else:
+                if method.__doc__ is not None:
+                    main_str = (
+                        "### `"
+                        + name
+                        + "`\n"
+                        + get_line_no(method)
+                        + "```\n"
+                        + method.__doc__
+                        + "\n```"
+                    )
+                    out.append(main_str)
 
     with open("./docs/reference/view_methods.md", "w+") as f:
         intro = "# View Methods Index\n\nBelow you'll find all of the methods of View, including associated operations and ways of creating them.\n"
