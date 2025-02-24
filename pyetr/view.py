@@ -683,22 +683,20 @@ class View:
 
     @overload
     def replace(
-        self, old_item: str | OpenArbitraryObject, new_item: OpenArbitraryObject
+        self, old_item: OpenArbitraryObject, new_item: OpenArbitraryObject
     ) -> "View":
         ...
 
     @overload
-    def replace(
-        self, old_item: str | ArbitraryObject, new_item: ArbitraryObject
-    ) -> "View":
+    def replace(self, old_item: ArbitraryObject, new_item: ArbitraryObject) -> "View":
         ...
 
     @overload
-    def replace(self, old_item: str | Function, new_item: Function) -> "View":
+    def replace(self, old_item: Function, new_item: Function) -> "View":
         ...
 
     @overload
-    def replace(self, old_item: str | Predicate, new_item: Predicate) -> "View":
+    def replace(self, old_item: Predicate, new_item: Predicate) -> "View":
         ...
 
     def replace(
