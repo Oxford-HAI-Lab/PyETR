@@ -2,6 +2,11 @@ repos:
   - repo: local
     hooks:
       - id: system
+        name: generate docs
+        entry: poetry run gen-all
+        pass_filenames: false
+        language: system
+      - id: system
         name: isort
         args: ["--profile", "black"]
         entry: poetry run isort .
@@ -20,10 +25,5 @@ repos:
       - id: system
         name: pytest
         entry: poetry run pytest -n auto
-        pass_filenames: false
-        language: system
-      - id: system
-        name: generate docs
-        entry: poetry run gen-all
         pass_filenames: false
         language: system
