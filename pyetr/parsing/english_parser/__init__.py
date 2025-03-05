@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
     from pyetr.view import View
 
 
-def unparse_items_to_eng(
+def unparse_items_to_english(
     items: list[Item],
     name_mappings: dict[str, str],
     **string_conversion_kwargs: Unpack[StringConversion],
@@ -76,6 +76,6 @@ def view_to_english(
     Returns:
         str: The english form.
     """
-    return unparse_items_to_eng(
+    return unparse_items_to_english(
         view_to_items(v), name_mappings, **string_conversion_kwargs
     )

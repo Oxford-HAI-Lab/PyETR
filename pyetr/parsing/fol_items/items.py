@@ -118,7 +118,7 @@ class BoolOr(MultiOperand):
         return self._operand_string(" ∨ ", **kwargs)
 
     def to_english(self, name_mappings: dict[str, str], **kwargs: Any) -> str:
-        return " or ".join(
+        return "either " + ", or ".join(
             [i.to_english(name_mappings, **kwargs) for i in self.operands]
         )
 
