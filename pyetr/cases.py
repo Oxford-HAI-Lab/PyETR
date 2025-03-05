@@ -2445,6 +2445,7 @@ class e92_deny(DefaultDecision, e92_base, BaseExample):
     v = (ps("{do(Deny(ParentA()*)), do(Deny(ParentB()*))}"),)
     c = ps("{do(Deny(ParentB()*))}")
 
+
 class e92_incorrect(DefaultDecision, e92_base, BaseExample):
     """
     To which parent would you deny sole custody of the child?
