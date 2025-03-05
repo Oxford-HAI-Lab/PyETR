@@ -2445,6 +2445,15 @@ class e92_deny(DefaultDecision, e92_base, BaseExample):
     v = (ps("{do(Deny(ParentA()*)), do(Deny(ParentB()*))}"),)
     c = ps("{do(Deny(ParentB()*))}")
 
+class e92_incorrect(DefaultDecision, e92_base, BaseExample):
+    """
+    To which parent would you deny sole custody of the child?
+    """
+
+    __doc__ = cast(str, e92_base.__doc__) + cast(str, __doc__)
+    v = (ps("{do(Deny(ParentA()*)), do(Deny(ParentB()*))}"),)
+    c = ps("{do(Deny(ParentC()*))}")
+
 
 class e93_grp1(DefaultDecision, BaseExample):
     """
