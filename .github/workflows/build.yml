@@ -24,7 +24,9 @@ jobs:
         poetry config virtualenvs.in-project true
         poetry install
     - name: Check docs
-      run: poetry run gen-all
+      run: |
+        poetry run gen-all
+        ./check.sh
     - name: Typecheck
       run: poetry run pyright
     - name: Check formatting
