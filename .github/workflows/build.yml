@@ -23,6 +23,8 @@ jobs:
         pip install poetry
         poetry config virtualenvs.in-project true
         poetry install
+    - name: Check docs
+      run: poetry run gen-all
     - name: Typecheck
       run: poetry run pyright
     - name: Check formatting
