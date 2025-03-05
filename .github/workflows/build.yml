@@ -55,4 +55,4 @@ jobs:
       run: |
         poetry build
         pip install dist/pyetr-*.whl
-        python test_build.py
+        python build_runner.py
