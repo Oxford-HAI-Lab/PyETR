@@ -272,7 +272,7 @@ class DependencyRelation:
         if isinstance(old_item, ArbitraryObject):
             search_arb = old_item
         elif isinstance(old_item, OpenArbitraryObject):
-            search_arb = ArbitraryObject(name=old_item.name)
+            search_arb = ArbitraryObject(name=old_item.name)sdfsd
         elif isinstance(old_item, str):
             search_arb = ArbitraryObject(name=old_item)
         else:
