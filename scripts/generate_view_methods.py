@@ -62,7 +62,8 @@ def main():
             overloads = get_overloads(method)
             if overloads:
                 for i, overload in enumerate(overloads):
-                    if overload.__doc__ is not None:
+                    doc = inspect.getdoc(overload)
+                    if doc is not None:
                         main_str = (
                             "### `"
                             + name
@@ -70,19 +71,20 @@ def main():
                             + "`\n"
                             + get_line_no(overload)
                             + "```\n"
-                            + overload.__doc__
+                            + doc
                             + "\n```"
                         )
                         out.append(main_str)
             else:
-                if method.__doc__ is not None:
+                doc = inspect.getdoc(method)
+                if doc is not None:
                     main_str = (
                         "### `"
                         + name
                         + "`\n"
                         + get_line_no(method)
                         + "```\n"
-                        + method.__doc__
+                        + doc
                         + "\n```"
                     )
                     out.append(main_str)

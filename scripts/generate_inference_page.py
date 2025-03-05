@@ -19,8 +19,9 @@ def main():
     out = []
     for name, func in vars(pyetr.inference).items():
         if name in pyetr.inference.__all__:
-            if func.__doc__ is not None:
-                new_doc = func.__doc__
+            doc = inspect.getdoc(func)
+            if doc is not None:
+                new_doc = doc
             else:
                 new_doc = ""
             out.append(
