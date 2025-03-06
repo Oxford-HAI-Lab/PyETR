@@ -138,6 +138,7 @@ __all__ = [
     "ClassicIllusoryBlocked",
 ]
 
+import inspect
 from abc import ABCMeta, abstractmethod
 from pyclbr import Function
 from typing import cast
@@ -176,12 +177,12 @@ name_mapping = {
 class BaseMeta(ABCMeta):
     @property
     def description(self):
-        return self.__doc__
+        return inspect.getdoc(self)
 
     def __repr__(self):
         final_str = ""
         if self.description is not None:
-            final_str += "\ndescription:"
+            final_str += "\ndescription:\n"
             final_str += self.description
 
         for attr, mapped_name in name_mapping.items():

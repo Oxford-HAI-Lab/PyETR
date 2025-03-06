@@ -3,18 +3,17 @@
 Below you'll find all of the cases in pyetr.cases, and their associated views. You can use this page as an index of the current cases.
 
 ## e1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L433)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L434)
 
 
 ```
 description:
-    Example 1, p61:
+Example 1, p61:
 
-    P1 Either Jane is kneeling by the fire and she is looking at the TV or else
-    Mark is standing at the window and he is peering into the garden.
-    P2 Jane is kneeling by the fire.
-    C Jane is looking at the TV.
-    
+P1 Either Jane is kneeling by the fire and she is looking at the TV or else
+Mark is standing at the window and he is peering into the garden.
+P2 Jane is kneeling by the fire.
+C Jane is looking at the TV.
 v[0]: {KneelingByTheFire(Jane())LookingAtTV(Jane()),PeeringIntoTheGarden(Mark())StandingAtTheWindow(Mark())}
 v[1]: {KneelingByTheFire(Jane())}
 
@@ -23,17 +22,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L452)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L453)
 
 
 ```
 description:
-    Example 2, p62:
+Example 2, p62:
 
-    P1 There is at least an ace and a queen, or else at least a king and a ten.
-    P2 There is a king.
-    C There is a ten.
-    
+P1 There is at least an ace and a queen, or else at least a king and a ten.
+P2 There is a king.
+C There is a ten.
 v[0]: {A()Q(),K()T()}
 v[1]: {K()}
 
@@ -42,18 +40,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e3
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L468)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L469)
 
 
 ```
 description:
-    Example 3, p63:
+Example 3, p63:
 
-    P1 There is at least an ace and a king or else there is at least a queen and
-    a jack.
-    P2 There isn't an ace.
-    C There is a queen and a jack.
-    
+P1 There is at least an ace and a king or else there is at least a queen and
+a jack.
+P2 There isn't an ace.
+C There is a queen and a jack.
 v[0]: {Ace()King(),Jack()Queen()}
 v[1]: {~Ace()}
 
@@ -62,13 +59,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e5ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L495)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L496)
 
 
 ```
 description:
-    Example 5, p72, part ii
-    
+Example 5, p72, part ii
 v[0]: {p1()q1(),r1()s1()}
 v[1]: {p2()q2(),r2()s2()}
 
@@ -77,13 +73,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e5iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L509)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L510)
 
 
 ```
 description:
-    Example 5, p72, part iii
-    
+Example 5, p72, part iii
 v[0]: {p1()q1(),r1()s1()}
 v[1]: {}
 
@@ -92,13 +87,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e5iv
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L521)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L522)
 
 
 ```
 description:
-    Example 5, p72, part iv
-    
+Example 5, p72, part iv
 v[0]: {p1()q1(),r1()s1()}
 v[1]: {0}
 
@@ -107,13 +101,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e5v
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L533)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L534)
 
 
 ```
 description:
-    Example 5, p72, part v
-    
+Example 5, p72, part v
 v[0]: {0}
 v[1]: {p1()q1(),r1()s1()}
 
@@ -122,15 +115,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e6
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L545)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L546)
 
 
 ```
 description:
-    Example 6, p72
+Example 6, p72
 
-    There is an Ace and a King = (There is an Ace) x (There is a king)
-    
+There is an Ace and a King = (There is an Ace) x (There is a king)
 v[0]: {a()}
 v[1]: {k()}
 
@@ -139,15 +131,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e7
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L556)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L557)
 
 
 ```
 description:
-    Example 7, p73
+Example 7, p73
 
-    There is an Ace or there is a king = (There is an Ace) + (There is a king)
-    
+There is an Ace or there is a king = (There is an Ace) + (There is a king)
 v[0]: {a()}
 v[1]: {k()}
 
@@ -156,18 +147,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e8
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L567)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L568)
 
 
 ```
 description:
-    Example 8, p74
+Example 8, p74
 
-    P1 There is an ace and a queen, or else there is a king and a ten
-    P2 There is a king
+P1 There is an ace and a queen, or else there is a king and a ten
+P2 There is a king
 
-    C There is a ten (and a king)
-    
+C There is a ten (and a king)
 v[0]: {a()q(),k()t()}
 v[1]: {k()}
 
@@ -176,17 +166,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e10
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L581)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L582)
 
 
 ```
 description:
-    Example 10, p76
+Example 10, p76
 
-    P1 There is a king.
-    P2 There is at least an ace and a queen, or else at least a king and a ten.
-    C There is a king (reversed premises blocking illusory inference).
-    
+P1 There is a king.
+P2 There is at least an ace and a queen, or else at least a king and a ten.
+C There is a king (reversed premises blocking illusory inference).
 v[0]: {K()}
 v[1]: {A()Q(),K()T()}
 
@@ -195,18 +184,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e11
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L597)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L598)
 
 
 ```
 description:
-    Example 11, p77
+Example 11, p77
 
-    P1 Either John smokes or Mary smokes.
-    P2 Supposing John smokes, John drinks.
-    P3 Supposing Mary smokes, Mary eats.
-    C Either John smokes and drinks or Mary smokes and drinks.
-    
+P1 Either John smokes or Mary smokes.
+P2 Supposing John smokes, John drinks.
+P3 Supposing Mary smokes, Mary eats.
+C Either John smokes and drinks or Mary smokes and drinks.
 v[0]: {Smokes(j()),Smokes(m())}
 v[1]: {Drinks(j())}^{Smokes(j())}
 v[2]: {Eats(m())}^{Smokes(m())}
@@ -216,15 +204,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e12i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L615)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L616)
 
 
 ```
 description:
-    Example 12i, p78
+Example 12i, p78
 
-    ItisnotthecasethatPorQorR
-    
+ItisnotthecasethatPorQorR
 v[0]: {P(),Q(),R()}
 
 c (Conclusion): {~P()~Q()~R()}
@@ -232,15 +219,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e12ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L626)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L627)
 
 
 ```
 description:
-    Example 12ii, p78
+Example 12ii, p78
 
-    ItisnotthecasethatPandQandR
-    
+ItisnotthecasethatPandQandR
 v[0]: {P()Q()R()}
 
 c (Conclusion): {~P(),~Q(),~R()}
@@ -248,15 +234,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e12iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L637)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L638)
 
 
 ```
 description:
-    Example 12iii, p79
+Example 12iii, p79
 
-    It is not the case that, supposing S, ((P and Q) or R)
-    
+It is not the case that, supposing S, ((P and Q) or R)
 v[0]: {P()Q(),R()}^{S()}
 
 c (Conclusion): {S()~P()~R(),S()~Q()~R()}
@@ -264,17 +249,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e13
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L648)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L649)
 
 
 ```
 description:
-    Example 13, p80
+Example 13, p80
 
-    P1 There is an ace and a king or a queen and a jack.
-    P2 There isn't an ace.
-    C There is a queen and a jack.
-    
+P1 There is an ace and a king or a queen and a jack.
+P2 There isn't an ace.
+C There is a queen and a jack.
 v[0]: {IsAce()IsKing(),IsJack()IsQueen()}
 v[1]: {~IsAce()}
 
@@ -283,15 +267,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L664)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L665)
 
 
 ```
 description:
-    Example 14-1, p81
+Example 14-1, p81
 
-    Factor examples
-    
+Factor examples
 v[0]: {P()Q(),P()R()}
 v[1]: {P()}
 
@@ -300,15 +283,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L678)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L679)
 
 
 ```
 description:
-    Example 14-2, p81
+Example 14-2, p81
 
-    Factor examples
-    
+Factor examples
 v[0]: {P()Q()S(),P()R(),P()R()S()}
 v[1]: {P()}^{S()}
 
@@ -317,15 +299,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_3
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L692)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L693)
 
 
 ```
 description:
-    Example 14-3, p81
+Example 14-3, p81
 
-    Factor examples
-    
+Factor examples
 v[0]: {P()R(),P()S(),Q()R(),Q()S()}
 v[1]: {P(),Q()}
 
@@ -334,15 +315,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_6
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L706)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L707)
 
 
 ```
 description:
-    Example 14-6, p81
+Example 14-6, p81
 
-    Factor examples
-    
+Factor examples
 v[0]: {P()R(),Q()S()}
 v[1]: {P(),Q(),T()}
 
@@ -351,15 +331,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_7
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L720)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L721)
 
 
 ```
 description:
-    Example 14-7, p81
+Example 14-7, p81
 
-    Factor examples
-    
+Factor examples
 v[0]: {P(),P()R(),Q()S()}
 v[1]: {P(),Q()}
 
@@ -368,18 +347,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e15
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L734)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L735)
 
 
 ```
 description:
-    Example 15, p82
+Example 15, p82
 
-    P1 There is an ace and a jack and a queen, or else there is an eight and a ten and a four, or else there is an ace.
-    P2 There is an ace and a jack, and there is an eight and a ten.
-    P3 There is not a queen.
-    C There is a four
-    
+P1 There is an ace and a jack and a queen, or else there is an eight and a ten and a four, or else there is an ace.
+P2 There is an ace and a jack, and there is an eight and a ten.
+P3 There is not a queen.
+C There is a four
 v[0]: {Ace(),Ace()Jack()Queen(),Eight()Four()Ten()}
 v[1]: {Ace()Eight()Jack()Ten()}
 v[2]: {~Queen()}
@@ -389,17 +367,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e16
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L752)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L753)
 
 
 ```
 description:
-    Example 16, p83
+Example 16, p83
 
-    P1 There is a ten and an eight and a four, or else there is a jack and a king and a queen, or else there is an ace.
-    P2 There isn't a four.
-    P3 There isn't an ace.
-    
+P1 There is a ten and an eight and a four, or else there is a jack and a king and a queen, or else there is an ace.
+P2 There isn't a four.
+P3 There isn't an ace.
 v[0]: {Ace(),Eight()Four()Ten(),Jack()King()Queen()}
 v[1]: {~Four()}
 v[2]: {~Ace()}
@@ -409,17 +386,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e17
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L769)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L770)
 
 
 ```
 description:
-    Example 17, p83
+Example 17, p83
 
-    P1 There is a king in the hand and there is not an ace in the hand, or else there is an ace in the hand and there is not a king in the hand.
-    P2 There is a king in the hand.
-    C There isn't an ace in the hand.
-    
+P1 There is a king in the hand and there is not an ace in the hand, or else there is an ace in the hand and there is not a king in the hand.
+P2 There is a king in the hand.
+C There isn't an ace in the hand.
 v[0]: {Ace()~King(),King()~Ace()}
 v[1]: {King()}
 
@@ -428,15 +404,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e19
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L785)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L786)
 
 
 ```
 description:
-    Example 19, p84
+Example 19, p84
 
-    Suppose test
-    
+Suppose test
 v[0]: {0}
 v[1]: {~N()}
 
@@ -445,18 +420,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e20
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L799)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L800)
 
 
 ```
 description:
-    Example 20, p85
+Example 20, p85
 
-    P1 Either there is a king in the hand or a queen in the hand.
-    P2 On the supposition that there is a king, Mary wins.
-    P3 On the supposition that there is a queen, Bill wins.
-    C Either Mary wins or Bill wins.
-    
+P1 Either there is a king in the hand or a queen in the hand.
+P2 On the supposition that there is a king, Mary wins.
+P3 On the supposition that there is a queen, Bill wins.
+C Either Mary wins or Bill wins.
 v[0]: {King(),Queen()}
 v[1]: {Win(mary())}^{King()}
 v[2]: {Win(bill())}^{Queen()}
@@ -466,15 +440,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e21
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L817)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L818)
 
 
 ```
 description:
-    Example 21, p86
+Example 21, p86
 
-    Any view Δ^{0} = [Δ^{0}]ᶰ can be derived from the absurd view
-    
+Any view Δ^{0} = [Δ^{0}]ᶰ can be derived from the absurd view
 v[0]: {r1()s1()}
 
 c (Conclusion): {~r1(),~s1()}
@@ -482,15 +455,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e22
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L835)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L836)
 
 
 ```
 description:
-    Example 22, p87
+Example 22, p87
 
-    It is not the case that A and B and C
-    
+It is not the case that A and B and C
 v[0]: {a()b()c()}
 v[1]: {a()}
 v[2]: {b()}
@@ -503,19 +475,18 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e23_with_inquire
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L874)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L875)
 
 
 ```
 description:
-    Example 23, p88, with inquire step
+Example 23, p88, with inquire step
 
-    P1 Either Jane is kneeling by the fire and she is looking at the TV or else Mark is
-    standing at the window and he is peering into the garden.
-    P2 Jane is kneeling by the fire
+P1 Either Jane is kneeling by the fire and she is looking at the TV or else Mark is
+standing at the window and he is peering into the garden.
+P2 Jane is kneeling by the fire
 
-    C Jane is looking at the TV
-    
+C Jane is looking at the TV
 v[0]: {K()L(),P()S()}
 v[1]: {K()}
 
@@ -526,19 +497,18 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e23_without_inquire
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L910)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L911)
 
 
 ```
 description:
-    Example 23, p88, without inquire step
+Example 23, p88, without inquire step
 
-    P1 Either Jane is kneeling by the fire and she is looking at the TV or else Mark is
-    standing at the window and he is peering into the garden.
-    P2 Jane is kneeling by the fire
+P1 Either Jane is kneeling by the fire and she is looking at the TV or else Mark is
+standing at the window and he is peering into the garden.
+P2 Jane is kneeling by the fire
 
-    C Jane is looking at the TV
-    
+C Jane is looking at the TV
 v[0]: {K()L(),P()S()}
 v[1]: {K()}
 
@@ -549,16 +519,15 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e24
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L942)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L943)
 
 
 ```
 description:
-    Example 24, p89
+Example 24, p89
 
-    P1 There is an ace
-    C There is an ace or a queen
-    
+P1 There is an ace
+C There is an ace or a queen
 v[0]: {a()}
 v[1]: {q()}
 v[2]: {~q()}
@@ -571,13 +540,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L975)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L976)
 
 
 ```
 description:
-    Example 25i, p89
-    
+Example 25i, p89
 v[0]: {p()q(),p()r()}
 v[1]: {p()}
 
@@ -586,13 +554,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L984)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L985)
 
 
 ```
 description:
-    Example 25ii, p89
-    
+Example 25ii, p89
 v[0]: {p()q(),p()r()}
 v[1]: {q()}
 
@@ -601,13 +568,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L993)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L994)
 
 
 ```
 description:
-    Example 25iii, p89
-    
+Example 25iii, p89
 v[0]: {p()q(),p()r(),s(),t()}
 v[1]: {p(),s()}
 
@@ -616,13 +582,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25iv
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1005)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1006)
 
 
 ```
 description:
-    Example 25iv, p89
-    
+Example 25iv, p89
 v[0]: {p()q(),p()r(),s(),t()}
 v[1]: {p(),s(),t()}
 
@@ -631,13 +596,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25v
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1017)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1018)
 
 
 ```
 description:
-    Example 25v, p89
-    
+Example 25v, p89
 v[0]: {p()q()s(),p()r()s()}
 v[1]: {p()}^{s()}
 
@@ -646,13 +610,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25vi
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1029)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1030)
 
 
 ```
 description:
-    Example 25vi, p89
-    
+Example 25vi, p89
 v[0]: {p()q()s(),p()r()s()}
 v[1]: {p()}^{t()}
 
@@ -661,16 +624,15 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e26
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1041)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1042)
 
 
 ```
 description:
-    Example 26, p90
+Example 26, p90
 
-    P1 Either John plays and wins, or Mary plays, or Bill plays
-    C Supposing John plays, John wins
-    
+P1 Either John plays and wins, or Mary plays, or Bill plays
+C Supposing John plays, John wins
 v[0]: {Play(B()),Play(J())Win(J()),Play(M())}
 v[1]: {Play(J())}
 v[2]: {Win(J())}^{Play(J())}
@@ -682,10 +644,15 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e26_does_it_follow
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1074)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1075)
 
 
 ```
+description:
+Example 26, p90
+
+P1 Either John plays and wins, or Mary plays, or Bill plays
+C Supposing John plays, John wins
 v[0]: {Play(B()),Play(J())Win(J()),Play(M())}
 v[1]: {Play(J())}
 v[2]: {Win(J())}^{Play(J())}
@@ -697,18 +664,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e28
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1085)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1086)
 
 
 ```
 description:
-    Example 28, p96
+Example 28, p96
 
-    P1 Is there a tiger?
-    P2 Supposing there is a tiger, there is orange fur.
-    P3 There is orange fur.
-    C There is a tiger.
-    
+P1 Is there a tiger?
+P2 Supposing there is a tiger, there is orange fur.
+P3 There is orange fur.
+C There is a tiger.
 v[0]: {Tiger(),~Tiger()}
 v[1]: {Orange()Tiger()}^{Tiger()}
 v[2]: {Orange()}
@@ -718,17 +684,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e32_1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1103)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1104)
 
 
 ```
 description:
-    Example 32-1, p107
+Example 32-1, p107
 
-    P1 If P then Q.
-    P2 P
-    C Q
-    
+P1 If P then Q.
+P2 P
+C Q
 v[0]: {P()Q()}^{P()}
 v[1]: {P()}
 
@@ -737,17 +702,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e32_2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1119)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1120)
 
 
 ```
 description:
-    Example 32-2, p107
+Example 32-2, p107
 
-    P1 P
-    P2 If P then Q.
-    C Q
-    
+P1 P
+P2 If P then Q.
+C Q
 v[0]: {P()}
 v[1]: {P()Q()}^{P()}
 
@@ -756,17 +720,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e33
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1135)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1136)
 
 
 ```
 description:
-    Example 33, p108
+Example 33, p108
 
-    P1 If the card is red then the number is even.
-    P2 The number is even.
-    C The card is red
-    
+P1 If the card is red then the number is even.
+P2 The number is even.
+C The card is red
 v[0]: {E()R()}^{R()}
 v[1]: {E()}
 
@@ -775,19 +738,18 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e40i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1151)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1152)
 
 
 ```
 description:
-    Example 40, p119
+Example 40, p119
 
-    (P0 Shapes at the bottom of the card are mutually exclusive)
-    P1 If there is a circle at the top of the card, then there is a
-    square on the bottom.
-    P2 There is a triangle on the bottom
-    C Falsum
-    
+(P0 Shapes at the bottom of the card are mutually exclusive)
+P1 If there is a circle at the top of the card, then there is a
+square on the bottom.
+P2 There is a triangle on the bottom
+C Falsum
 v[0]: {CircleB()~SquareB()~TriangleB(),SquareB()~CircleB()~TriangleB(),TriangleB()~CircleB()~SquareB()}
 v[1]: {CircleT()SquareB()}^{CircleT()}
 v[2]: {TriangleB()}
@@ -797,23 +759,22 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e40ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1184)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1185)
 
 
 ```
 description:
-    Example 40, p119-p120
+Example 40, p119-p120
 
-    (P0 Shapes at the bottom of the card are mutually exclusive)
-    P1 If there is a circle at the top of the card, then there is a
-    square on the bottom.
-    P2 There is a triangle on the bottom
-    C Falsum
+(P0 Shapes at the bottom of the card are mutually exclusive)
+P1 If there is a circle at the top of the card, then there is a
+square on the bottom.
+P2 There is a triangle on the bottom
+C Falsum
 
-    The reader diverges from the default procedure,
-    and deposes the conditional premise, and switches the premise
-    order.
-    
+The reader diverges from the default procedure,
+and deposes the conditional premise, and switches the premise
+order.
 v[0]: {CircleB()~SquareB()~TriangleB(),SquareB()~CircleB()~TriangleB(),TriangleB()~CircleB()~SquareB()}
 v[1]: {TriangleB()}
 v[2]: {CircleT()SquareB()}^{CircleT()}
@@ -823,17 +784,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e41
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1221)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1222)
 
 
 ```
 description:
-    Example 41, p121
+Example 41, p121
 
-    P1 P only if Q.
-    P2 Not Q.
-    C Not P.
-    
+P1 P only if Q.
+P2 Not Q.
+C Not P.
 v[0]: {~P()~Q()}^{~Q()}
 v[1]: {~Q()}
 
@@ -842,18 +802,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e42
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1237)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1238)
 
 
 ```
 description:
-    Example 42, p122
+Example 42, p122
 
-    P1 There is a circle at the top of the card only if there is a square
-    at the bottom.
-    P2 There is not a square at the bottom
-    C There is not a circle at the top
-    
+P1 There is a circle at the top of the card only if there is a square
+at the bottom.
+P2 There is not a square at the bottom
+C There is not a circle at the top
 v[0]: {~CircleT()~SquareB()}^{~SquareB()}
 v[1]: {~SquareB()}
 
@@ -862,18 +821,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e44_1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1257)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1258)
 
 
 ```
 description:
-    Example 44-1, p123
+Example 44-1, p123
 
-    P1 The chair is saleable if and only if it is inelegant.
-    P2 The chair is elegant if and only if it is stable.
-    P3 The chair is saleable or it is stable, or both.
-    C The chair is saleable elegant and stable.
-    
+P1 The chair is saleable if and only if it is inelegant.
+P2 The chair is elegant if and only if it is stable.
+P3 The chair is saleable or it is stable, or both.
+C The chair is saleable elegant and stable.
 v[0]: {Elegant(c())Saleable(c()),~Elegant(c())~Saleable(c())}
 v[1]: {Elegant(c())Stable(c()),~Elegant(c())~Stable(c())}
 v[2]: {Elegant(c())Saleable(c()),Saleable(c()),Stable(c())}
@@ -883,17 +841,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e45
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1275)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1276)
 
 
 ```
 description:
-    Example 45, p125
+Example 45, p125
 
-    It is possible that Steven is in Madrid and it is possible that Emma is in
-    Berlin.
-    Therefore it is possible that Steven is in Madrid and that Emma is in Berlin.
-    
+It is possible that Steven is in Madrid and it is possible that Emma is in
+Berlin.
+Therefore it is possible that Steven is in Madrid and that Emma is in Berlin.
 v[0]: {0,M()}
 v[1]: {0,B()}
 v[2]: {0,B()M()}
@@ -905,18 +862,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e46i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1302)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1303)
 
 
 ```
 description:
-    Example 46, p126
+Example 46, p126
 
-    P1 Pat is here then Viv is here
-    P2 Mo is here or else Pat is here, but not both
+P1 Pat is here then Viv is here
+P2 Mo is here or else Pat is here, but not both
 
-    C No
-    
+C No
 v[0]: {P()V()}^{P()}
 v[1]: {M()~P(),P()~M()}
 v[2]: {0,M()V()}
@@ -928,15 +884,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e46ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1339)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1340)
 
 
 ```
 description:
-    Example 46, part ii, p126
+Example 46, part ii, p126
 
-    If we had a view{VMR,VMS, T} and applied [{vm, 0}]Q we would get [{vm, 0}]
-    
+If we had a view{VMR,VMS, T} and applied [{vm, 0}]Q we would get [{vm, 0}]
 v[0]: {M()R()V(),M()S()V(),T()}
 v[1]: {0,M()V()}
 
@@ -945,18 +900,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e47
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1353)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1354)
 
 
 ```
 description:
-    Example 47, p129
+Example 47, p129
 
-    P1: Some thermotogum stains gram-negative
-    P2: Maritima is a thermotogum
+P1: Some thermotogum stains gram-negative
+P2: Maritima is a thermotogum
 
-    C: Maritima stains gram negative
-    
+C: Maritima stains gram negative
 v[0]: ∃x {StainsGramNegative(x)Thermotogum(x*)}
 v[1]: {Thermotogum(Maritima()*)}
 
@@ -965,17 +919,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e48
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1370)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1371)
 
 
 ```
 description:
-    Example 48, p130
+Example 48, p130
 
-    P1 Some dictyoglomus is thermophobic.
-    P2 Turgidum is not a dictyoglomus.
-    C Truth
-    
+P1 Some dictyoglomus is thermophobic.
+P2 Turgidum is not a dictyoglomus.
+C Truth
 v[0]: ∃x {D(x*)T(x)}
 v[1]: {~D(Turgidum()*)}
 
@@ -984,18 +937,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e49
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1386)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1387)
 
 
 ```
 description:
-    Example 49, p130
+Example 49, p130
 
-    P1 Either there is an ace in Mary's hand and some other player has a king,
-    or else there is a queen in John's hand and some other player has a jack.
-    P2 Sally has a king
-    C Truth
-    
+P1 Either there is an ace in Mary's hand and some other player has a king,
+or else there is a queen in John's hand and some other player has a jack.
+P2 Sally has a king
+C Truth
 v[0]: ∃x ∃y {Ace(Mary())King(x),Jack(y)Queen(John())}
 v[1]: {King(Sally())}
 
@@ -1004,20 +956,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e50_part1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1403)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1404)
 
 
 ```
 description:
-    Example 50, part1, p131
+Example 50, part1, p131
 
-    Jack is looking at Sally, but Sally is looking at George. Jack is married, but George is
-    not. Is the married person looking at an unmarried person?
+Jack is looking at Sally, but Sally is looking at George. Jack is married, but George is
+not. Is the married person looking at an unmarried person?
 
-    (A) Yes
-    (B) No
-    (C) Cannot be determined
-    
+(A) Yes
+(B) No
+(C) Cannot be determined
 v[0]: {L(j(),s())L(s(),g())}
 v[1]: {M(j()*)~M(g()*)}
 v[2]: {}
@@ -1030,20 +981,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e50_part2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1440)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1441)
 
 
 ```
 description:
-    Example 50, part2, p131
+Example 50, part2, p131
 
-    Jack is looking at Sally, but Sally is looking at George. Jack is married, but George is
-    not. Is the married person looking at an unmarried person?
+Jack is looking at Sally, but Sally is looking at George. Jack is married, but George is
+not. Is the married person looking at an unmarried person?
 
-    (A) Yes
-    (B) No
-    (C) Cannot be determined
-    
+(A) Yes
+(B) No
+(C) Cannot be determined
 v[0]: {L(j(),s())L(s(),g())}
 v[1]: {M(j())~M(g())}
 v[2]: {M(s())}
@@ -1056,13 +1006,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e50_part2_arbs
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1485)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1486)
 
 
 ```
 description:
-    Duplicate of e50, uses arb objects, some changes
-    
+Duplicate of e50, uses arb objects, some changes
 v[0]: ∃g ∃j ∃s {L(j,s)L(s,g)M(j)~M(g)}
 v[1]: ∃s {M(s)}
 v[2]: ∃a ∃b {L(a,b)M(a*)~M(b*)}
@@ -1074,18 +1023,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e51
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1516)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1517)
 
 
 ```
 description:
-    Example 51, p131
+Example 51, p131
 
-    P1: Every archaeon has a nucleus
-    P2: Halobacterium is an archaeon
+P1: Every archaeon has a nucleus
+P2: Halobacterium is an archaeon
 
-    C: Halobacterium is an archaeon and has a nucleus
-    
+C: Halobacterium is an archaeon and has a nucleus
 v[0]: ∀x {HasNucleus(x)IsArchaeon(x*)}^{IsArchaeon(x*)}
 v[1]: {IsArchaeon(Halobacterium()*)}
 
@@ -1094,17 +1042,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e52
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1533)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1534)
 
 
 ```
 description:
-    Example 52, p132
+Example 52, p132
 
-    P1 All Fs G.
-    P2 John Gs.
-    C John Fs and Gs.
-    
+P1 All Fs G.
+P2 John Gs.
+C John Fs and Gs.
 v[0]: ∀x {F(x)G(x*)}^{F(x)}
 v[1]: {G(John()*)}
 
@@ -1113,16 +1060,15 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e53
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1549)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1550)
 
 
 ```
 description:
-    Example 53, p132 & p175
+Example 53, p132 & p175
 
-    P All A are B.
-    C All B are A.
-    
+P All A are B.
+C All B are A.
 v[0]: ∀x {A(x)B(x)}^{A(x)}
 v[1]: ∀x {B(x)}
 v[2]: ∀x {A(x)B(x)}^{B(x)}
@@ -1132,10 +1078,15 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e53_does_it_follow
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1576)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1577)
 
 
 ```
+description:
+Example 53, p132 & p175
+
+P All A are B.
+C All B are A.
 v[0]: ∀x {A(x)B(x)}^{A(x)}
 v[1]: ∀x {B(x)}
 v[2]: ∀x {A(x)B(x)}^{B(x)}
@@ -1145,17 +1096,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e54
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1587)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1588)
 
 
 ```
 description:
-    Example 54, p133
+Example 54, p133
 
-    P1 Sharks attack bathers.
-    P2 Whitey is a shark.
-    C Whitey attacks bathers.
-    
+P1 Sharks attack bathers.
+P2 Whitey is a shark.
+C Whitey attacks bathers.
 v[0]: ∀x {0,Attack(x)Shark(x*)}^{Shark(x*)}
 v[1]: {Shark(Whitey()*)}
 
@@ -1164,18 +1114,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e56_default_inference
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1620)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1621)
 
 
 ```
 description:
-    Example 56, p134
+Example 56, p134
 
-    P1: Every professor teaches some student
-    P2: Every student reads some book
+P1: Every professor teaches some student
+P2: Every student reads some book
 
-    C: Every professor teaches some student who reads some book
-    
+C: Every professor teaches some student who reads some book
 v[0]: ∀x ∃y {Professor(x)Student(y*)Teaches(x,y)}^{Professor(x)}
 v[1]: ∀z ∃w {Book(w)Reads(z,w)Student(z*)}^{Student(z*)}
 
@@ -1184,10 +1133,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e56_basic_step
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1637)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1638)
 
 
 ```
+description:
+Example 56, p134
+
+P1: Every professor teaches some student
+P2: Every student reads some book
+
+C: Every professor teaches some student who reads some book
 v[0]: ∀x ∃y {Professor(x)Student(y*)Teaches(x,y)}^{Professor(x)}
 v[1]: ∀z ∃w {Book(w)Reads(z,w)Student(z*)}^{Student(z*)}
 
@@ -1196,17 +1152,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e57
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1643)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1644)
 
 
 ```
 description:
-    Example 57, p134
+Example 57, p134
 
-    P1 All B are A.
-    P2 Some C are B.
-    C Some C are A.
-    
+P1 All B are A.
+P2 Some C are B.
+C Some C are A.
 v[0]: ∀x {A(x)B(x*)}^{B(x*)}
 v[1]: ∃x {B(x*)C(x)}
 
@@ -1215,17 +1170,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e58_reversed
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1659)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1660)
 
 
 ```
 description:
-    Example 58 reversed, based on p135
+Example 58 reversed, based on p135
 
-    P1 All C are B.
-    P2 Some B are A.
-    C Some C are A.
-    
+P1 All C are B.
+P2 Some B are A.
+C Some C are A.
 v[0]: ∀y {B(y*)C(y)}^{C(y)}
 v[1]: ∃x {A(x)B(x*)}
 
@@ -1234,17 +1188,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e61
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1675)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1676)
 
 
 ```
 description:
-    Example 61, p166
-    P1 All dogs bite some man
-    P2 John is a man
+Example 61, p166
+P1 All dogs bite some man
+P2 John is a man
 
-    C All dogs bite John
-    
+C All dogs bite John
 v[0]: ∀x ∃a {B(x,a)D(x)M(a*),~D(x)}
 v[1]: {M(j()*)}
 
@@ -1253,13 +1206,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e62
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1688)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1689)
 
 
 ```
 description:
-    Example 62, p176
-    
+Example 62, p176
 v[0]: {D(b())~S(n()*),D(m())S(j()*)T(n()),L(n(),m())S(m()*)}
 v[1]: ∃a {S(a*)}
 
@@ -1268,13 +1220,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e63
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1700)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1701)
 
 
 ```
 description:
-    Example 63, p176
-    
+Example 63, p176
 v[0]: {D(n()*)S(j()*),D(n()*)T(j())~D(j()*)}
 v[1]: ∃a {D(a*)}
 
@@ -1283,13 +1234,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e63_modified
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1712)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1713)
 
 
 ```
 description:
-    Example 63, p176
-    
+Example 63, p176
 v[0]: ∀x ∃y {D(f(y,x)*)T(j())~D(j()*),D(n()*)S(j()*)}
 v[1]: ∃a {D(a*)}
 
@@ -1298,22 +1248,21 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e64i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1724)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1725)
 
 
 ```
 description:
-    Example 64, p189, p223
+Example 64, p189, p223
 
-    A device has been invented for screening a population for a disease known as psylicrapitis.
-    The device is a very good one, but not perfect. If someone is a sufferer, there is a 90% chance
-    that he will recorded positively. If he is not a sufferer, there is still a 1% chance that he will
-    be recorded positively.
+A device has been invented for screening a population for a disease known as psylicrapitis.
+The device is a very good one, but not perfect. If someone is a sufferer, there is a 90% chance
+that he will recorded positively. If he is not a sufferer, there is still a 1% chance that he will
+be recorded positively.
 
-    Roughly 1% of the population has the disease. Mr Smith has been tested, and the result is positive.
+Roughly 1% of the population has the disease. Mr Smith has been tested, and the result is positive.
 
-    What is the chance that he is in fact a sufferer?
-    
+What is the chance that he is in fact a sufferer?
 v[0]: ∀x {90.0=* S(x*)T(x*),S(x*)~T(x)}^{S(x*)}
 v[1]: ∀x {1.0=* T(x)~S(x*),~S(x*)~T(x)}^{~S(x*)}
 v[2]: {T(Smith()*)}
@@ -1324,10 +1273,21 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e64ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1756)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1757)
 
 
 ```
+description:
+Example 64, p189, p223
+
+A device has been invented for screening a population for a disease known as psylicrapitis.
+The device is a very good one, but not perfect. If someone is a sufferer, there is a 90% chance
+that he will recorded positively. If he is not a sufferer, there is still a 1% chance that he will
+be recorded positively.
+
+Roughly 1% of the population has the disease. Mr Smith has been tested, and the result is positive.
+
+What is the chance that he is in fact a sufferer?
 v[0]: ∀x {90.0=* P(x)S(x*)T(x*),P(x)S(x*)~T(x)}^{P(x)S(x*)}
 v[1]: ∀x {1.0=* P(x)T(x)~S(x*),P(x)~S(x*)~T(x)}^{P(x)~S(x*)}
 v[2]: ∀x {1.0=* P(x)S(x*),P(x)~S(x)}^{P(x)}
@@ -1339,24 +1299,23 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e65
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1776)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1777)
 
 
 ```
 description:
-    Example 65, p190, p224
+Example 65, p190, p224
 
-    (Base-rate neglect with doctors and realistic disease) Imagine you conduct
-    a screening using the Hemoccult test in a certain region. For symptom-free
-    people over 50 years old who participate in screening using the Hemoccult test,
-    the following information is available for this region.
+(Base-rate neglect with doctors and realistic disease) Imagine you conduct
+a screening using the Hemoccult test in a certain region. For symptom-free
+people over 50 years old who participate in screening using the Hemoccult test,
+the following information is available for this region.
 
-    The probability that one of these people has colorectal cancer is 0.3%. If a
-    person has colorectal cancer, the probability is 50 that he will have a positive
-    Hemoccult test. If a person does not have a colorectal cancer, the probability is
-    3% that he will still have a positive Hemoccult test in your screening. What is
-    the probability that this person actually has colorectal cancer?
-    
+The probability that one of these people has colorectal cancer is 0.3%. If a
+person has colorectal cancer, the probability is 50 that he will have a positive
+Hemoccult test. If a person does not have a colorectal cancer, the probability is
+3% that he will still have a positive Hemoccult test in your screening. What is
+the probability that this person actually has colorectal cancer?
 v[0]: ∀x {0.3=* C(x)P(x*),P(x*)~C(x)}^{P(x*)}
 v[1]: ∀x {50.0=* C(x)P(x*)T(x),C(x)P(x*)~T(x)}^{C(x)P(x*)}
 v[2]: ∀x {3.0=* P(x*)T(x)~C(x),P(x*)~C(x)~T(x)}^{P(x*)~C(x)}
@@ -1368,20 +1327,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e66i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1810)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1811)
 
 
 ```
 description:
-    Example 66, p191, p225
+Example 66, p191, p225
 
-    Think of 100 people.
+Think of 100 people.
 
-    1. One of the disease psylicrapitis, and he is likely to be positive.
-    2. Of those who do not have the disease, 1 will also test positive.
+1. One of the disease psylicrapitis, and he is likely to be positive.
+2. Of those who do not have the disease, 1 will also test positive.
 
-    How many of those who test positive do have the disease? Out of ?
-    
+How many of those who test positive do have the disease? Out of ?
 v[0]: {1.0=* D()T(),1.0=* T()~D(),98.0=* ~D()}
 v[1]: {D()T()}
 
@@ -1390,10 +1348,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e66ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1838)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1839)
 
 
 ```
+description:
+Example 66, p191, p225
+
+Think of 100 people.
+
+1. One of the disease psylicrapitis, and he is likely to be positive.
+2. Of those who do not have the disease, 1 will also test positive.
+
+How many of those who test positive do have the disease? Out of ?
 v[0]: {1.0=* D()T(),1.0=* T()~D(),98.0=* ~D()}
 v[1]: {T()}
 
@@ -1402,18 +1369,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e67
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1855)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1856)
 
 
 ```
 description:
-    Example 67, p191, p220
+Example 67, p191, p220
 
-    Results of a recent survey of seventy-four chief executive officers indicate there
-    may be a link between childhood pet ownership and future career success. Fully 94%
-    of the CEOs, all of them employed within Fortune 500 companies, had possessed a dog,
-    a cat, or both, as youngsters.
-    
+Results of a recent survey of seventy-four chief executive officers indicate there
+may be a link between childhood pet ownership and future career success. Fully 94%
+of the CEOs, all of them employed within Fortune 500 companies, had possessed a dog,
+a cat, or both, as youngsters.
 v[0]: {94.0=* HadPet()IsCEO(),~IsCEO()}
 v[1]: {HadPet()}
 v[2]: {IsCEO()}
@@ -1423,20 +1389,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e69_part1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1884)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1885)
 
 
 ```
 description:
-    Example 69, p192, p218
+Example 69, p192, p218
 
-    The suspect's DNA matches the crime sample.
+The suspect's DNA matches the crime sample.
 
-    If the suspect is not guilty, then the probability of such a DNA match is 1 in
-    a million
+If the suspect is not guilty, then the probability of such a DNA match is 1 in
+a million
 
-    Is the suspect likely to be guilty?
-    
+Is the suspect likely to be guilty?
 v[0]: {Match(Suspect())}
 v[1]: {0.000001=* Match(Suspect())~Guilty(Suspect()),~Guilty(Suspect())~Match(Suspect())}^{~Guilty(Suspect())}
 
@@ -1445,10 +1410,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e69_part2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1918)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1919)
 
 
 ```
+description:
+The base class for all examples. It contains a series of views (v)
+for operations and a conclusion (c).
 v[0]: {Guilty(Suspect())Match(Suspect()),0.000001=* Match(Suspect())~Guilty(Suspect())}
 v[1]: {999999.999999=* 0}^{Guilty(Suspect())Match(Suspect())}
 v[2]: {Guilty(Suspect())}
@@ -1460,17 +1428,16 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e70
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1945)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1946)
 
 
 ```
 description:
-    Example 70, p194, p221
+Example 70, p194, p221
 
-    P1 Pat has either the disease or a benign condition
-    P2 If she has the disease, then she will have a certain symptom.
-    P3 In fact, she has the symptom
-    
+P1 Pat has either the disease or a benign condition
+P2 If she has the disease, then she will have a certain symptom.
+P3 In fact, she has the symptom
 v[0]: {Benign(),Disease()}
 v[1]: {Disease()Symptom()}^{Disease()}
 v[2]: {Symptom()}
@@ -1480,19 +1447,18 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e71
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1970)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1971)
 
 
 ```
 description:
-    Examples 71 & 78, p209, p212
+Examples 71 & 78, p209, p212
 
-    There is a box in which there is a yellow card or a brown card, but not both.
+There is a box in which there is a yellow card or a brown card, but not both.
 
-    Given the preceding assertion, according to you, what is the probability of the following situation?
+Given the preceding assertion, according to you, what is the probability of the following situation?
 
-    In the box there is a yellow card and there is not a brown card
-    
+In the box there is a yellow card and there is not a brown card
 v[0]: {B(brown())~B(yellow()),B(yellow())~B(brown())}
 v[1]: {50.0=* 0}^{B(yellow())~B(brown())}
 v[2]: {50.0=* 0}^{B(brown())~B(yellow())}
@@ -1505,20 +1471,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e72
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2007)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2008)
 
 
 ```
 description:
-    Example 72 & 80, p196, p213
+Example 72 & 80, p196, p213
 
-    There is a box in which there is at least a red marble or else there is a green
-    marble and there is a blue marble, but not all three marbles.
+There is a box in which there is at least a red marble or else there is a green
+marble and there is a blue marble, but not all three marbles.
 
-    What is the probability of the following situation:
+What is the probability of the following situation:
 
-    There is a red marble and a blue marble in the box?
-    
+There is a red marble and a blue marble in the box?
 v[0]: {B(b())B(g())~B(r()),B(r())~B(b()),B(r())~B(g())}
 v[1]: {33.333333=* 0}^{B(b())B(g())~B(r())}
 v[2]: {33.333333=* 0}^{B(r())~B(g())}
@@ -1532,15 +1497,14 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e74
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2051)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2052)
 
 
 ```
 description:
-    Example 74, p197, p231
+Example 74, p197, p231
 
-    (includes two background commitments)
-    
+(includes two background commitments)
 v[0]: {D(j())H(j()),H(j()),P(j())}
 v[1]: {E(j()*)}
 v[2]: ∀x {0.85=* D(x)E(x*),0.15=* E(x*)~D(x)}^{E(x*)}
@@ -1553,18 +1517,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e76
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2087)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2088)
 
 
 ```
 description:
-    Example 76 (guns and guitars), p199, p226,  p229
+Example 76 (guns and guitars), p199, p226,  p229
 
-    (P1) The gun fired and the guitar was out of tune, or else someone was in the attic
-    (P1.5, see p228) Guns who triggers are pulled fire
-    (P2) The trigger (of the gun) was pulled. Does it follow that the guitar was out of
-    tune?
-    
+(P1) The gun fired and the guitar was out of tune, or else someone was in the attic
+(P1.5, see p228) Guns who triggers are pulled fire
+(P2) The trigger (of the gun) was pulled. Does it follow that the guitar was out of
+tune?
 v[0]: {Attic(a()),Fired(i()*)Guitar(j())Gun(i())Outoftune(j())}
 v[1]: ∀x {0,Fired(x*)Gun(x)Trigger(x)}^{Fired(x*)Gun(x)}
 v[2]: {Trigger(i())}
@@ -1574,19 +1537,18 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e81i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2129)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2130)
 
 
 ```
 description:
-    Example 81, p213
+Example 81, p213
 
-    There is a box in which there is a yellow card, or a brown card, but not both
+There is a box in which there is a yellow card, or a brown card, but not both
 
-    Given the preceding assertion, according to you, what is the probability of the following situation?
-    
-    In the box there is a yellow card
-    
+Given the preceding assertion, according to you, what is the probability of the following situation?
+
+In the box there is a yellow card
 v[0]: {Box(Brown())~Box(Yellow()),Box(Yellow())~Box(Brown())}
 
 c (Conclusion): {0,50.0=* Box(Yellow())}
@@ -1595,19 +1557,18 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e81ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2139)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2140)
 
 
 ```
 description:
-    Example 81, p213
+Example 81, p213
 
-    There is a box in which there is a yellow card, or a brown card, but not both
+There is a box in which there is a yellow card, or a brown card, but not both
 
-    Given the preceding assertion, according to you, what is the probability of the following situation?
-    
-    In the box there is a yellow card and a brown card
-    
+Given the preceding assertion, according to you, what is the probability of the following situation?
+
+In the box there is a yellow card and a brown card
 v[0]: {Box(Brown())~Box(Yellow()),Box(Yellow())~Box(Brown())}
 
 c (Conclusion): {0}
@@ -1616,19 +1577,18 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e81iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2149)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2150)
 
 
 ```
 description:
-    Example 81, p213
+Example 81, p213
 
-    There is a box in which there is a yellow card, or a brown card, but not both
+There is a box in which there is a yellow card, or a brown card, but not both
 
-    Given the preceding assertion, according to you, what is the probability of the following situation?
-    
-    In the box there is neither a yellow card nor a brown card
-    
+Given the preceding assertion, according to you, what is the probability of the following situation?
+
+In the box there is neither a yellow card nor a brown card
 v[0]: {Box(Brown())~Box(Yellow()),Box(Yellow())~Box(Brown())}
 
 c (Conclusion): {0}
@@ -1637,20 +1597,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e82i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2172)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2173)
 
 
 ```
 description:
-    Example 82, p213
+Example 82, p213
 
-    There is a box in which if there is a yellow card then there is a brown card.
+There is a box in which if there is a yellow card then there is a brown card.
 
-    Given the preceding assertion, according to you, what is the probability of the
-    following situation?
-    
-    In the box there is a yellow card.
-    
+Given the preceding assertion, according to you, what is the probability of the
+following situation?
+
+In the box there is a yellow card.
 v[0]: {Box(Brown())Box(Yellow())}^{Box(Yellow())}
 
 c (Conclusion): {0,50.0=* Box(Yellow())}
@@ -1659,20 +1618,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e82ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2182)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2183)
 
 
 ```
 description:
-    Example 82, p213
+Example 82, p213
 
-    There is a box in which if there is a yellow card then there is a brown card.
+There is a box in which if there is a yellow card then there is a brown card.
 
-    Given the preceding assertion, according to you, what is the probability of the
-    following situation?
-    
-    In the box there is a yellow card and a brown card.
-    
+Given the preceding assertion, according to you, what is the probability of the
+following situation?
+
+In the box there is a yellow card and a brown card.
 v[0]: {Box(Brown())Box(Yellow())}^{Box(Yellow())}
 
 c (Conclusion): {0,50.0=* Box(Brown())Box(Yellow())}
@@ -1681,20 +1639,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e82iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2192)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2193)
 
 
 ```
 description:
-    Example 82, p213
+Example 82, p213
 
-    There is a box in which if there is a yellow card then there is a brown card.
+There is a box in which if there is a yellow card then there is a brown card.
 
-    Given the preceding assertion, according to you, what is the probability of the
-    following situation?
-    
-    In the box there is a yellow card and there is not a brown card.
-    
+Given the preceding assertion, according to you, what is the probability of the
+following situation?
+
+In the box there is a yellow card and there is not a brown card.
 v[0]: {Box(Brown())Box(Yellow())}^{Box(Yellow())}
 
 c (Conclusion): {0}
@@ -1703,20 +1660,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e82iv
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2202)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2203)
 
 
 ```
 description:
-    Example 82, p213
+Example 82, p213
 
-    There is a box in which if there is a yellow card then there is a brown card.
+There is a box in which if there is a yellow card then there is a brown card.
 
-    Given the preceding assertion, according to you, what is the probability of the
-    following situation?
-    
-    In the box there is neither a yellow card nor a brown card.
-    
+Given the preceding assertion, according to you, what is the probability of the
+following situation?
+
+In the box there is neither a yellow card nor a brown card.
 v[0]: {Box(Brown())Box(Yellow())}^{Box(Yellow())}
 
 c (Conclusion): {0}
@@ -1725,21 +1681,20 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e83i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2231)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2232)
 
 
 ```
 description:
-    Example 83, p214
+Example 83, p214
 
-    There is a box in which there is a red marble, or else there is a green
-    marble and there is a blue marble, but not all three marbles.
+There is a box in which there is a red marble, or else there is a green
+marble and there is a blue marble, but not all three marbles.
 
-    Given the preceding assertion, according to you, what is the probability of the
-    following situation?
-    
-    There is a red marble and blue in marble in the box.
-    
+Given the preceding assertion, according to you, what is the probability of the
+following situation?
+
+There is a red marble and blue in marble in the box.
 v[0]: {33.333333333333336=* Box(Blue())Box(Green()),33.333333333333336=* Box(Red()),33.333333333333336=* ~Box(Blue())~Box(Green())~Box(Red())}
 
 c (Conclusion): {0}
@@ -1748,21 +1703,20 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e83ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2241)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2242)
 
 
 ```
 description:
-    Example 83, p214
+Example 83, p214
 
-    There is a box in which there is a red marble, or else there is a green
-    marble and there is a blue marble, but not all three marbles.
+There is a box in which there is a red marble, or else there is a green
+marble and there is a blue marble, but not all three marbles.
 
-    Given the preceding assertion, according to you, what is the probability of the
-    following situation?
-    
-    There is a green marble and there is a blue marble.
-    
+Given the preceding assertion, according to you, what is the probability of the
+following situation?
+
+There is a green marble and there is a blue marble.
 v[0]: {33.333333333333336=* Box(Blue())Box(Green()),33.333333333333336=* Box(Red()),33.333333333333336=* ~Box(Blue())~Box(Green())~Box(Red())}
 
 c (Conclusion): {0,33.333333333333336=* Box(Blue())Box(Green())}
@@ -1771,21 +1725,20 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e84i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2254)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2255)
 
 
 ```
 description:
-    Example 84, p215
+Example 84, p215
 
-    There is a box in which there is a grey marble and either a white marble or
-    else a mauve marble but not all three marbles are in the box.
+There is a box in which there is a grey marble and either a white marble or
+else a mauve marble but not all three marbles are in the box.
 
-    Given the preceding assertion, what is the probability of the following
-    situation?
+Given the preceding assertion, what is the probability of the following
+situation?
 
-    In the box there is a grey marble and there is a mauve marble.
-    
+In the box there is a grey marble and there is a mauve marble.
 v[0]: {Box(Grey())Box(Mauve())~Box(White()),Box(Grey())Box(White())~Box(Mauve())}
 
 c (Conclusion): {0,50.0=* Box(Grey())Box(Mauve())}
@@ -1794,21 +1747,20 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e84ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2276)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2277)
 
 
 ```
 description:
-    Example 84, p215
+Example 84, p215
 
-    There is a box in which there is a grey marble, or else a white marble, or else a mauve marble,
-    but no more than one marble.
+There is a box in which there is a grey marble, or else a white marble, or else a mauve marble,
+but no more than one marble.
 
-    Given the preceding assertion, what is the probability of the following
-    situation?
+Given the preceding assertion, what is the probability of the following
+situation?
 
-    In the box there is a grey marble and there is a mauve marble.
-    
+In the box there is a grey marble and there is a mauve marble.
 v[0]: {Box(Grey())~Box(Mauve())~Box(White()),Box(Mauve())~Box(Grey())~Box(White()),Box(White())~Box(Grey())~Box(Mauve())}
 
 c (Conclusion): {0}
@@ -1817,22 +1769,21 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e85
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2299)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2300)
 
 
 ```
 description:
-    Example 85, p216
+Example 85, p216
 
-    Easy partial probability inference
+Easy partial probability inference
 
-    There is a box in which there is one and only one of these marbles: a
-    green marble, a blue marble, or a red marble. The probability that a green
-    marble is in the box is 0.6, and the probability that a blue marble is in
-    the box is 0.2.
+There is a box in which there is one and only one of these marbles: a
+green marble, a blue marble, or a red marble. The probability that a green
+marble is in the box is 0.6, and the probability that a blue marble is in
+the box is 0.2.
 
-    What is the probability that a red marble is in the box?
-    
+What is the probability that a red marble is in the box?
 v[0]: {Box(Blue()),Box(Green()),Box(Red())}
 v[1]: {60.0=* Box(Green())}^{Box(Green())}
 v[2]: {20.0=* Box(Blue())}^{Box(Blue())}
@@ -1843,21 +1794,20 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e86
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2322)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2323)
 
 
 ```
 description:
-    Example 86, p217
+Example 86, p217
 
-    You have a hand of several cards with only limited information about it.
+You have a hand of several cards with only limited information about it.
 
-    There is an ace and a queen or a king and a jack or a ten.
-    The probability that there is an ace and a queen is 0.6
-    The probability that there is a king and a jack is 0.2
+There is an ace and a queen or a king and a jack or a ten.
+The probability that there is an ace and a queen is 0.6
+The probability that there is a king and a jack is 0.2
 
-    What is the probability that there is a ten?
-    
+What is the probability that there is a ten?
 v[0]: {A()Q(),J()K(),X()}
 v[1]: {60.0=* A()Q()}^{A()Q()}
 v[2]: {20.0=* J()K()}^{J()K()}
@@ -1868,18 +1818,17 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e88
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2344)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2345)
 
 
 ```
 description:
-    Example 88, p233
+Example 88, p233
 
-    P1: There is a 90% chance Superman can fly
-    P2: Clark is superman
+P1: There is a 90% chance Superman can fly
+P2: Clark is superman
 
-    C: There is a 90% chance Clark can fly
-    
+C: There is a 90% chance Clark can fly
 v[0]: {90.0=* CanFly(Superman())}
 v[1]: {==(Clark(),Superman())}
 v[2]: {==(Clark(),Superman()*)}
@@ -1890,20 +1839,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e90_condA
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2374)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2375)
 
 
 ```
 description:
-    Example 90, p249, p273
+Example 90, p249, p273
 
-    Imagine that you have been saving some extra money on the side to make some purchases,
-    and on your most recent visit to the video store you come across a special sale of a new
-    video. This video is one with your favourite actor or actress, and your favourite type of
-    movie (such as a comedy, drama, thriller etc.). This particular video that you are considering
-    is one you have been thinking about buying a long time. It is a available at a special sale price
-    of $14.99. What would you do in this situation?
-    
+Imagine that you have been saving some extra money on the side to make some purchases,
+and on your most recent visit to the video store you come across a special sale of a new
+video. This video is one with your favourite actor or actress, and your favourite type of
+movie (such as a comedy, drama, thriller etc.). This particular video that you are considering
+is one you have been thinking about buying a long time. It is a available at a special sale price
+of $14.99. What would you do in this situation?
 v[0]: {do(Buy(Video()*)),~do(Buy(Video()*))}
 
 c (Conclusion): {do(Buy(Video()*))}
@@ -1915,10 +1863,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e90_condB
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2392)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2393)
 
 
 ```
+description:
+Example 90, p249, p273
+
+Imagine that you have been saving some extra money on the side to make some purchases,
+and on your most recent visit to the video store you come across a special sale of a new
+video. This video is one with your favourite actor or actress, and your favourite type of
+movie (such as a comedy, drama, thriller etc.). This particular video that you are considering
+is one you have been thinking about buying a long time. It is a available at a special sale price
+of $14.99. What would you do in this situation?
 v[0]: ∃a {do(Buy(Video()*)),do(Buy(a*))}
 
 c (Conclusion): ∃a {do(Buy(Video()*)),do(Buy(a*))}
@@ -1930,25 +1887,24 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e92_award
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2428)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2429)
 
 
 ```
 description:
-    Example 92, p253, p274
-    Imagine that you serve on the jury of an only-child sole-custody case following a relatively
-    messy divorce. The facts of the case are complicated by ambiguous economic, social, and
-    emotional considerations, and you decide to base your decision entirely on the following
-    few observations.
+Example 92, p253, p274
+Imagine that you serve on the jury of an only-child sole-custody case following a relatively
+messy divorce. The facts of the case are complicated by ambiguous economic, social, and
+emotional considerations, and you decide to base your decision entirely on the following
+few observations.
 
-    ParentA: average income, average health, average working hours, reasonable rapport with the
-    child, relatively social life.
+ParentA: average income, average health, average working hours, reasonable rapport with the
+child, relatively social life.
 
-    ParentB: above-average income, very close relationship with the child, extremely active
-    social life, lots of work-related travel, minor health problems.
-    
-    To which parent would you award sole custody of the child?
-    
+ParentB: above-average income, very close relationship with the child, extremely active
+social life, lots of work-related travel, minor health problems.
+
+To which parent would you award sole custody of the child?
 v[0]: {do(Award(ParentA()*)),do(Award(ParentB()*))}
 
 c (Conclusion): {do(Award(ParentB()*))}
@@ -1966,25 +1922,24 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e92_deny
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2439)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2440)
 
 
 ```
 description:
-    Example 92, p253, p274
-    Imagine that you serve on the jury of an only-child sole-custody case following a relatively
-    messy divorce. The facts of the case are complicated by ambiguous economic, social, and
-    emotional considerations, and you decide to base your decision entirely on the following
-    few observations.
+Example 92, p253, p274
+Imagine that you serve on the jury of an only-child sole-custody case following a relatively
+messy divorce. The facts of the case are complicated by ambiguous economic, social, and
+emotional considerations, and you decide to base your decision entirely on the following
+few observations.
 
-    ParentA: average income, average health, average working hours, reasonable rapport with the
-    child, relatively social life.
+ParentA: average income, average health, average working hours, reasonable rapport with the
+child, relatively social life.
 
-    ParentB: above-average income, very close relationship with the child, extremely active
-    social life, lots of work-related travel, minor health problems.
-    
-    To which parent would you deny sole custody of the child?
-    
+ParentB: above-average income, very close relationship with the child, extremely active
+social life, lots of work-related travel, minor health problems.
+
+To which parent would you deny sole custody of the child?
 v[0]: {do(Deny(ParentA()*)),do(Deny(ParentB()*))}
 
 c (Conclusion): {do(Deny(ParentB()*))}
@@ -2002,20 +1957,19 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e93_grp1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2449)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2450)
 
 
 ```
 description:
-    Example 93, p255, p276
+Example 93, p255, p276
 
-    The US is preparing for the outbreak of an unusual Asian disease, which
-    is expected to kill 600 people. There are two possible treatments (A) and (B)
-    with the following results:
+The US is preparing for the outbreak of an unusual Asian disease, which
+is expected to kill 600 people. There are two possible treatments (A) and (B)
+with the following results:
 
-    (Group 1) (A) 400 people die. (B) Nobody dies with 1/3 chance, 600 people die with 2/3 chance.
-    Which treatment would you choose?
-    
+(Group 1) (A) 400 people die. (B) Nobody dies with 1/3 chance, 600 people die with 2/3 chance.
+Which treatment would you choose?
 v[0]: {do(A()),do(B())}
 
 c (Conclusion): {do(B())}
@@ -2030,10 +1984,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2491)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2492)
 
 
 ```
+description:
+The base class for all examples. It contains a series of views (v)
+for operations and a conclusion (c).
 v[0]: ∀x ∃a ∀y {P(x,a)Q(a,y)}
 v[1]: ∃b ∀z {P(b,z)}
 
@@ -2042,10 +1999,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2502)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2503)
 
 
 ```
+description:
+The base class for all examples. It contains a series of views (v)
+for operations and a conclusion (c).
 v[0]: ∃a ∀x {P(a)Q(x*)}
 v[1]: ∀x ∃b {Q(x*)R(b)}^{Q(x*)}
 
@@ -2054,10 +2014,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_inquire
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2520)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2521)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃a ∀x {P(a)Q(x*)}
 v[1]: ∀x ∃b {Q(x*)R(b)}^{Q(x*)}
 
@@ -2066,10 +2029,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_merge
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2524)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2525)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃a ∀x {P(a)Q(x*)}
 v[1]: ∀x ∃b {Q(x*)R(b)}^{Q(x*)}
 
@@ -2078,10 +2044,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_suppose
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2528)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2529)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃a ∀x {P(a)Q(x*)}
 v[1]: ∀x ∃b {Q(x*)R(b)}^{Q(x*)}
 
@@ -2090,10 +2059,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_uni_prod
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2532)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2533)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃a ∀x {P(a)Q(x*)}
 v[1]: ∀x ∃b {Q(x*)R(b)}^{Q(x*)}
 
@@ -2102,10 +2074,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_query
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2541)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2542)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃a ∀x {P(a)Q(x*)}
 v[1]: ∀y ∃a {Q(y*)R(a)}^{Q(y*)}
 
@@ -2114,10 +2089,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_which
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2545)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2546)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃a ∀x {P(a)Q(x*)}
 v[1]: ∀y ∃a {Q(y*)R(a)}^{Q(y*)}
 
@@ -2126,10 +2104,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e5
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2549)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2550)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∀x ∀y ∃a ∃b ∀z ∃c {P(a*)P(b)P(c)P(y)P(z)Q(x*)}
 v[1]: ∃d ∃e ∃f {P(d*)Q(e*)Q(f*)}
 
@@ -2138,10 +2119,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e6_leibniz
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2557)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2558)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃a ∃b {==(a,b)P(f(a),a)~P(f(b),a)}
 v[1]: {}
 
@@ -2150,10 +2134,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e7_aristotle
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2562)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2563)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃a {~==(a,a)}
 v[1]: {}
 
@@ -2162,10 +2149,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e8
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2567)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2568)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: {t()=+ A()}
 v[1]: {u()=* A()}
 
@@ -2174,10 +2164,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e9
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2572)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2573)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∀x {P(x*)}
 v[1]: {P(j()*)}
 
@@ -2186,10 +2179,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e10
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2577)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2578)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∀x {f(x)=* A(x*)}
 v[1]: ∃e {f(e)=* A(e*)}
 
@@ -2198,10 +2194,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e11
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2582)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2583)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: {f(12.0)=* A(12.0*)}
 v[1]: ∃e {f(e)=* A(e*)}
 
@@ -2210,10 +2209,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e12
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2587)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2588)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: {A()}
 v[1]: {}
 
@@ -2222,10 +2224,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e13
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2592)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2593)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: {f(12.0)=* A(12.0*),B()}
 
 c (Conclusion): {}
@@ -2234,10 +2239,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e14
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2598)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2599)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∀x ∃y {A(f(x*))B(g(x*,y))}
 v[1]: {A(f(j()*))}
 
@@ -2246,10 +2254,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e15
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2603)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2604)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃k {==(Clark(),Superman())Defeats(k,Superman())}
 v[1]: {==(Clark()*,Superman())}
 
@@ -2258,10 +2269,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e16
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2611)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2612)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃k ∃x {==(Clark(),x)Defeats(k,x)}
 v[1]: ∃x {==(Clark()*,x)}
 
@@ -2270,10 +2284,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e17
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2616)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2617)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃k ∃x {==(Clark(),x)do(Defeats(k,x))}
 v[1]: ∃x {==(Clark()*,x)}
 
@@ -2282,10 +2299,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e18
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2621)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2622)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: {m()=* A()}
 v[1]: {n()=* B()}
 
@@ -2294,10 +2314,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e19_first_atom_do_atom
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2626)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2627)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃k {==(Clark(),Superman())Defeats(k,Superman())}
 v[1]: {do(A())}
 
@@ -2306,10 +2329,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e20_nested_issue_in_pred
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2631)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2632)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃k {==(Clark(),Superman())Defeats(k,Superman())}
 v[1]: {==(Clark(),f(Superman()*))}
 
@@ -2318,10 +2344,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e21_supp_is_something
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2639)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2640)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃k {==(Clark(),Superman())Defeats(k,Superman())}
 v[1]: {==(Clark()*,Superman())}^{}
 
@@ -2330,10 +2359,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e22_restrict_dep_rel_is_not_other
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2647)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2648)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∃k ∃x {==(Clark(),x)do(Defeats(k,x))}
 v[1]: ∃y {==(Clark()*,y)}
 
@@ -2342,10 +2374,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## AnswerPotential
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2652)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2653)
 
 
 ```
+description:
+The base class for all examples. It contains a series of views (v)
+for operations and a conclusion (c).
 v[0]: {1.0=* 2.0=+ A()B(),A()C(),0.4=* B()C()}
 v[1]: {A()}
 v[2]: {B()}
@@ -2358,10 +2393,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## UniProduct
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2694)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2695)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: ∀x ∃a {E(x,a)P(x),~P(x*)}
 v[1]: {P(j()*)}
 
@@ -2370,13 +2408,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## QueryTest
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2699)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2700)
 
 
 ```
 description:
-    From page 173
-    
+From page 173
 v[0]: ∀x {S(j()*)S(m()*)T(x,j()),S(j()*)S(m()*)T(x,m())}
 v[1]: ∀x ∃a {S(a*)T(x,a)}
 
@@ -2385,13 +2422,12 @@ test(verbose=False): Method used to test the example
 ```
 
 ## QueryTest2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2711)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2712)
 
 
 ```
 description:
-    From page 173
-    
+From page 173
 v[0]: ∀x {S(j()*)S(m()*)T(x,j()),S(j()*)S(m()*)T(x,m())}
 v[1]: ∃a ∀x {S(a*)T(x,a)}
 
@@ -2400,10 +2436,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## ClassicInfer
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2723)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2724)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: {p()}
 v[1]: {q()}^{p()}
 
@@ -2412,10 +2451,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## ClassicInferBlocked
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2728)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2729)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: {a()b(),c()d()}
 v[1]: {a()}
 
@@ -2424,10 +2466,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## ClassicInferVerum
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2733)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2734)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: {0}
 v[1]: {p()}
 
@@ -2436,10 +2481,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## ClassicSimpleMP
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2738)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2739)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: {p()}
 v[1]: {q()}^{p()}
 
@@ -2448,10 +2496,13 @@ test(verbose=False): Method used to test the example
 ```
 
 ## ClassicIllusoryBlocked
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2747)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2748)
 
 
 ```
+description:
+The base class for all test types. Test types are mixins the define a test
+type, but not the associated views.
 v[0]: {a()b(),c()d()}
 v[1]: {a()}
 
