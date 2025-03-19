@@ -3,7 +3,7 @@
 Below you'll find all of the cases in pyetr.cases, and their associated views. You can use this page as an index of the current cases.
 
 ## e1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L434)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L402)
 
 
 ```
@@ -22,7 +22,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L453)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L421)
 
 
 ```
@@ -40,7 +40,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e3
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L469)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L437)
 
 
 ```
@@ -59,7 +59,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e5ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L496)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L464)
 
 
 ```
@@ -73,7 +73,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e5iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L510)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L478)
 
 
 ```
@@ -87,7 +87,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e5iv
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L522)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L490)
 
 
 ```
@@ -101,7 +101,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e5v
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L534)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L502)
 
 
 ```
@@ -115,7 +115,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e6
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L546)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L514)
 
 
 ```
@@ -131,7 +131,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e7
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L557)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L525)
 
 
 ```
@@ -147,7 +147,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e8
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L568)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L536)
 
 
 ```
@@ -166,7 +166,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e10
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L582)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L550)
 
 
 ```
@@ -184,7 +184,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e11
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L598)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L566)
 
 
 ```
@@ -204,7 +204,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e12i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L616)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L584)
 
 
 ```
@@ -219,7 +219,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e12ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L627)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L595)
 
 
 ```
@@ -234,7 +234,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e12iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L638)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L606)
 
 
 ```
@@ -249,7 +249,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e13
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L649)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L617)
 
 
 ```
@@ -267,7 +267,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L665)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L633)
 
 
 ```
@@ -283,7 +283,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L679)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L647)
 
 
 ```
@@ -299,7 +299,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_3
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L693)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L661)
 
 
 ```
@@ -315,7 +315,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_6
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L707)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L675)
 
 
 ```
@@ -331,7 +331,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e14_7
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L721)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L689)
 
 
 ```
@@ -347,7 +347,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e15
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L735)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L703)
 
 
 ```
@@ -367,7 +367,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e16
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L753)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L721)
 
 
 ```
@@ -386,7 +386,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e17
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L770)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L738)
 
 
 ```
@@ -404,7 +404,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e19
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L786)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L754)
 
 
 ```
@@ -420,7 +420,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e20
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L800)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L768)
 
 
 ```
@@ -440,7 +440,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e21
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L818)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L786)
 
 
 ```
@@ -455,7 +455,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e22
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L836)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L804)
 
 
 ```
@@ -475,7 +475,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e23_with_inquire
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L875)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L843)
 
 
 ```
@@ -497,7 +497,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e23_without_inquire
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L911)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L879)
 
 
 ```
@@ -519,7 +519,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e24
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L943)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L911)
 
 
 ```
@@ -540,7 +540,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L976)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L944)
 
 
 ```
@@ -554,7 +554,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L985)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L953)
 
 
 ```
@@ -568,7 +568,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L994)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L962)
 
 
 ```
@@ -582,7 +582,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25iv
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1006)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L974)
 
 
 ```
@@ -596,7 +596,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25v
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1018)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L986)
 
 
 ```
@@ -610,7 +610,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e25vi
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1030)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L998)
 
 
 ```
@@ -624,7 +624,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e26
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1042)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1010)
 
 
 ```
@@ -644,7 +644,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e26_does_it_follow
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1075)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1043)
 
 
 ```
@@ -664,7 +664,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e28
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1086)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1054)
 
 
 ```
@@ -684,7 +684,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e32_1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1104)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1072)
 
 
 ```
@@ -702,7 +702,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e32_2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1120)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1088)
 
 
 ```
@@ -720,7 +720,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e33
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1136)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1104)
 
 
 ```
@@ -738,7 +738,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e40i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1152)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1120)
 
 
 ```
@@ -759,7 +759,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e40ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1185)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1153)
 
 
 ```
@@ -784,7 +784,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e41
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1222)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1190)
 
 
 ```
@@ -802,7 +802,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e42
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1238)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1206)
 
 
 ```
@@ -821,7 +821,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e44_1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1258)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1226)
 
 
 ```
@@ -841,7 +841,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e45
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1276)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1244)
 
 
 ```
@@ -862,7 +862,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e46i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1303)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1271)
 
 
 ```
@@ -884,7 +884,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e46ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1340)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1308)
 
 
 ```
@@ -900,7 +900,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e47
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1354)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1322)
 
 
 ```
@@ -919,7 +919,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e48
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1371)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1339)
 
 
 ```
@@ -937,7 +937,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e49
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1387)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1355)
 
 
 ```
@@ -956,7 +956,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e50_part1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1404)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1372)
 
 
 ```
@@ -981,7 +981,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e50_part2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1441)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1409)
 
 
 ```
@@ -1006,7 +1006,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e50_part2_arbs
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1486)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1454)
 
 
 ```
@@ -1023,7 +1023,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e51
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1517)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1485)
 
 
 ```
@@ -1042,7 +1042,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e52
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1534)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1502)
 
 
 ```
@@ -1060,7 +1060,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e53
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1550)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1518)
 
 
 ```
@@ -1078,7 +1078,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e53_does_it_follow
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1577)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1545)
 
 
 ```
@@ -1096,7 +1096,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e54
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1588)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1556)
 
 
 ```
@@ -1114,7 +1114,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e56_default_inference
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1621)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1589)
 
 
 ```
@@ -1133,7 +1133,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e56_basic_step
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1638)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1606)
 
 
 ```
@@ -1152,7 +1152,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e57
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1644)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1612)
 
 
 ```
@@ -1170,7 +1170,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e58_reversed
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1660)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1628)
 
 
 ```
@@ -1188,7 +1188,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e61
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1676)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1644)
 
 
 ```
@@ -1206,7 +1206,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e62
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1689)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1657)
 
 
 ```
@@ -1220,7 +1220,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e63
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1701)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1669)
 
 
 ```
@@ -1234,7 +1234,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e63_modified
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1713)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1681)
 
 
 ```
@@ -1248,7 +1248,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e64i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1725)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1693)
 
 
 ```
@@ -1273,7 +1273,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e64ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1757)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1725)
 
 
 ```
@@ -1299,7 +1299,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e65
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1777)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1745)
 
 
 ```
@@ -1327,7 +1327,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e66i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1811)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1779)
 
 
 ```
@@ -1348,7 +1348,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e66ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1839)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1807)
 
 
 ```
@@ -1369,7 +1369,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e67
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1856)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1824)
 
 
 ```
@@ -1389,7 +1389,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e69_part1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1885)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1853)
 
 
 ```
@@ -1410,7 +1410,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e69_part2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1919)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1887)
 
 
 ```
@@ -1428,7 +1428,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e70
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1946)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1914)
 
 
 ```
@@ -1447,7 +1447,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e71
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1971)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1939)
 
 
 ```
@@ -1471,7 +1471,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e72
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2008)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L1976)
 
 
 ```
@@ -1497,7 +1497,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e74
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2052)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2020)
 
 
 ```
@@ -1517,7 +1517,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e76
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2088)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2056)
 
 
 ```
@@ -1537,7 +1537,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e81i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2130)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2098)
 
 
 ```
@@ -1557,7 +1557,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e81ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2140)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2108)
 
 
 ```
@@ -1577,7 +1577,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e81iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2150)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2118)
 
 
 ```
@@ -1597,7 +1597,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e82i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2173)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2141)
 
 
 ```
@@ -1618,7 +1618,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e82ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2183)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2151)
 
 
 ```
@@ -1639,7 +1639,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e82iii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2193)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2161)
 
 
 ```
@@ -1660,7 +1660,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e82iv
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2203)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2171)
 
 
 ```
@@ -1681,7 +1681,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e83i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2232)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2200)
 
 
 ```
@@ -1703,7 +1703,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e83ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2242)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2210)
 
 
 ```
@@ -1725,7 +1725,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e84i
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2255)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2223)
 
 
 ```
@@ -1747,7 +1747,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e84ii
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2277)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2245)
 
 
 ```
@@ -1769,7 +1769,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e85
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2300)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2268)
 
 
 ```
@@ -1794,7 +1794,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e86
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2323)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2291)
 
 
 ```
@@ -1818,7 +1818,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e88
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2345)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2313)
 
 
 ```
@@ -1839,7 +1839,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e90_condA
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2375)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2343)
 
 
 ```
@@ -1863,7 +1863,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e90_condB
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2393)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2361)
 
 
 ```
@@ -1887,7 +1887,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e92_award
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2429)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2397)
 
 
 ```
@@ -1922,7 +1922,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e92_deny
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2440)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2408)
 
 
 ```
@@ -1957,7 +1957,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## e93_grp1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2450)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2418)
 
 
 ```
@@ -1984,7 +1984,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e1
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2492)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2460)
 
 
 ```
@@ -1999,7 +1999,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2503)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2471)
 
 
 ```
@@ -2014,7 +2014,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_inquire
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2521)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2489)
 
 
 ```
@@ -2029,7 +2029,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_merge
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2525)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2493)
 
 
 ```
@@ -2044,7 +2044,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_suppose
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2529)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2497)
 
 
 ```
@@ -2059,7 +2059,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_uni_prod
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2533)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2501)
 
 
 ```
@@ -2074,7 +2074,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_query
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2542)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2510)
 
 
 ```
@@ -2089,7 +2089,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## else_which
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2546)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2514)
 
 
 ```
@@ -2104,7 +2104,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e5
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2550)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2518)
 
 
 ```
@@ -2119,7 +2119,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e6_leibniz
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2558)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2526)
 
 
 ```
@@ -2134,7 +2134,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e7_aristotle
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2563)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2531)
 
 
 ```
@@ -2149,7 +2149,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e8
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2568)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2536)
 
 
 ```
@@ -2164,7 +2164,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e9
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2573)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2541)
 
 
 ```
@@ -2179,7 +2179,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e10
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2578)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2546)
 
 
 ```
@@ -2194,7 +2194,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e11
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2583)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2551)
 
 
 ```
@@ -2209,7 +2209,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e12
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2588)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2556)
 
 
 ```
@@ -2224,7 +2224,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e13
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2593)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2561)
 
 
 ```
@@ -2239,7 +2239,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e14
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2599)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2567)
 
 
 ```
@@ -2254,7 +2254,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e15
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2604)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2572)
 
 
 ```
@@ -2269,7 +2269,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e16
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2612)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2580)
 
 
 ```
@@ -2284,7 +2284,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e17
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2617)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2585)
 
 
 ```
@@ -2299,7 +2299,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e18
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2622)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2590)
 
 
 ```
@@ -2314,7 +2314,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e19_first_atom_do_atom
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2627)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2595)
 
 
 ```
@@ -2329,7 +2329,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e20_nested_issue_in_pred
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2632)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2600)
 
 
 ```
@@ -2344,7 +2344,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e21_supp_is_something
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2640)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2608)
 
 
 ```
@@ -2359,7 +2359,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## new_e22_restrict_dep_rel_is_not_other
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2648)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2616)
 
 
 ```
@@ -2374,7 +2374,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## AnswerPotential
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2653)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2621)
 
 
 ```
@@ -2393,7 +2393,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## UniProduct
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2695)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2663)
 
 
 ```
@@ -2408,7 +2408,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## QueryTest
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2700)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2668)
 
 
 ```
@@ -2422,7 +2422,7 @@ test(verbose=False): Method used to test the example
 ```
 
 ## QueryTest2
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2712)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2680)
 
 
 ```
@@ -2432,80 +2432,5 @@ v[0]: ∀x {S(j()*)S(m()*)T(x,j()),S(j()*)S(m()*)T(x,m())}
 v[1]: ∃a ∀x {S(a*)T(x,a)}
 
 c (Conclusion): ∀x ∃a {S(a*)T(x,a)}
-test(verbose=False): Method used to test the example
-```
-
-## ClassicInfer
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2724)
-
-
-```
-description:
-The base class for all test types. Test types are mixins the define a test
-type, but not the associated views.
-v[0]: {p()}
-v[1]: {q()}^{p()}
-
-c (Conclusion): {q()}
-test(verbose=False): Method used to test the example
-```
-
-## ClassicInferBlocked
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2729)
-
-
-```
-description:
-The base class for all test types. Test types are mixins the define a test
-type, but not the associated views.
-v[0]: {a()b(),c()d()}
-v[1]: {a()}
-
-c (Conclusion): {b()c()d(),b()c()~d(),b()d()~c(),b()~c()~d(),c()d()~b()}
-test(verbose=False): Method used to test the example
-```
-
-## ClassicInferVerum
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2734)
-
-
-```
-description:
-The base class for all test types. Test types are mixins the define a test
-type, but not the associated views.
-v[0]: {0}
-v[1]: {p()}
-
-c (Conclusion): {0}
-test(verbose=False): Method used to test the example
-```
-
-## ClassicSimpleMP
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2739)
-
-
-```
-description:
-The base class for all test types. Test types are mixins the define a test
-type, but not the associated views.
-v[0]: {p()}
-v[1]: {q()}^{p()}
-
-c (Conclusion): {}
-test(verbose=False): Method used to test the example
-```
-
-## ClassicIllusoryBlocked
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/cases.py#L2748)
-
-
-```
-description:
-The base class for all test types. Test types are mixins the define a test
-type, but not the associated views.
-v[0]: {a()b(),c()d()}
-v[1]: {a()}
-
-c (Conclusion): {}
 test(verbose=False): Method used to test the example
 ```

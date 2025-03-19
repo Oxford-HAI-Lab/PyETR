@@ -3,7 +3,7 @@
 Below you'll find all of the cases in pyetr.cases, and their associated views. You can use this page as an index of the current cases.
 
 ## `basic_step`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L34)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L31)
 
 
 ```
@@ -20,7 +20,7 @@ Returns:
 ```
 
 ## `default_inference_procedure`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L56)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L53)
 
 
 ```
@@ -38,7 +38,7 @@ Returns:
 ```
 
 ## `default_procedure_does_it_follow`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L95)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L92)
 
 
 ```
@@ -58,7 +58,7 @@ Returns:
 ```
 
 ## `default_procedure_what_is_prob`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L139)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L136)
 
 
 ```
@@ -89,7 +89,7 @@ Returns:
 ```
 
 ## `default_decision`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L233)
+[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L230)
 
 
 ```
@@ -106,31 +106,4 @@ Args:
 
 Returns:
     View: The resultant view.
-```
-
-## `classically_valid_basic_step`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L269)
-
-
-```
-Same as basic_step, except we inquire on all atoms in the original view to preserve alternatives
-in a classically valid way.
-```
-
-## `classically_valid_inference_procedure`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L287)
-
-
-```
-Same as default_inference_procedure, except we inquire on all atoms in the original view to preserve
-alternatives in a classically valid way.
-```
-
-## `classically_valid_does_it_follow`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L319)
-
-
-```
-Same as default_procedure_does_it_follow, except we inquire on all atoms in the original view to preserve
-alternatives in a classically valid way.
 ```
