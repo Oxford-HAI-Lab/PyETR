@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional
 
 from pyetr.atoms.doatom import DoAtom
 from pyetr.atoms.open_predicate_atom import OpenPredicateAtom
-from pyetr.atoms.predicate import Predicate
-from pyetr.atoms.terms.function import Function
 from pyetr.atoms.terms.open_term import (
     OpenFunctionalTerm,
     OpenTerm,

@@ -2,7 +2,6 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING
 
 from pyetr.atoms.terms import Multiset
-from pyetr.atoms.terms.function import Function
 
 from .abstract_term import AbstractArbitraryObject, AbstractFunctionalTerm, AbstractTerm
 from .term import ArbitraryObject, FunctionalTerm, Term

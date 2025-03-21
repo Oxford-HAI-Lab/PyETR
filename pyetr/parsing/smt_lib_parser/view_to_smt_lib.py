@@ -100,7 +100,21 @@ def view_to_smt_lib(v: "View", env: typing.Optional[Environment] = None):
     return smt_to_smt_lib(v.to_smt(env), env)
 
 
-def views_to_smt_lib(views: list["View"], env: typing.Optional[Environment] = None):
+def views_to_smt_lib(
+    views: list["View"], env: typing.Optional[Environment] = None
+) -> str:
+    """
+    Convert multiple views into a single smt lib string.
+
+    Args:
+        views (list[View]): A list of views to convert.
+        env (typing.Optional[Environment], optional): The pysmt environment to embed
+            parsed variables. If None will use a fresh environment to avoid clashes.
+            Defaults to None.
+
+    Returns:
+        str: The smt lib string containing multiple views.
+    """
     if env is None:
         env = Environment()
     return smts_to_smt_lib([v.to_smt(env) for v in views], env)

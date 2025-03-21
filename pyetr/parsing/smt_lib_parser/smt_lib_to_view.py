@@ -24,12 +24,8 @@ def smt_lib_to_view(
 
 
 def smt_lib_to_view_stores(
-    smt_lib: str,
-    custom_functions: Optional[list[NumFunc | Function]] = None,
-    env: typing.Optional[Environment] = None,
+    smt_lib: str, custom_functions: Optional[list[NumFunc | Function]] = None
 ) -> list[ViewStorage]:
-    if env is None:
-        env = Environment()
     parser = SmtLibParser(Environment())
     script = parser.get_script(StringIO(smt_lib))
     current = script.get_last_formula()

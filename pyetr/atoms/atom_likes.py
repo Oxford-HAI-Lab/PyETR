@@ -1,7 +1,5 @@
 from typing import Generic, TypeVar
 
-from pyetr.atoms.terms.multiset import Multiset
-
 from .abstract import AbstractAtom
 from .predicate import Predicate
 from .terms.abstract_term import TermType

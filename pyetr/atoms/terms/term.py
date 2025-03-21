@@ -1,14 +1,9 @@
 __all__ = ["Term", "ArbitraryObject", "FunctionalTerm"]
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, cast
-
-from pyetr.atoms.terms.function import Function
+from typing import cast
 
 from .abstract_term import AbstractArbitraryObject, AbstractFunctionalTerm, AbstractTerm
-
-if TYPE_CHECKING:  # pragma: not covered
-    from pyetr.types import MatchCallback, MatchItem
 
 
 class Term(AbstractTerm):

@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING, Iterable
 
-from pyetr.atoms.terms.multiset import Multiset
-
 from .abstract import Atom
 from .predicate_atom import PredicateAtom
 from .terms import ArbitraryObject, Term

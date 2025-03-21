@@ -19,8 +19,8 @@ sys.setrecursionlimit(10000)
 
 ParserElement.enable_packrat(force=True)
 
-pp_left = pp.opAssoc.LEFT  # type:ignore
-pp_right = pp.opAssoc.RIGHT  # type:ignore
+pp_left = pp.opAssoc.LEFT
+pp_right = pp.opAssoc.RIGHT
 
 
 class Atom:

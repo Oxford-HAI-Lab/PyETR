@@ -3,7 +3,7 @@ import typing
 from pysmt.environment import Environment
 from pysmt.fnode import FNode
 from pysmt.formula import FormulaManager
-from pysmt.typing import BOOL, INT, REAL, FunctionType, PySMTType, Type, TypeManager
+from pysmt.typing import BOOL, PySMTType, TypeManager
 
 from pyetr.parsing.common import Quantified, Variable
 from pyetr.parsing.fol_items import (
@@ -15,7 +15,6 @@ from pyetr.parsing.fol_items import (
     view_to_items,
 )
 from pyetr.parsing.fol_items.items import (
-    AtomicItem,
     BoolNot,
     Falsum,
     LogicEmphasis,
