@@ -1,0 +1,2311 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../case_index/">
+      
+      
+        <link rel="next" href="../inference_index/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
+    
+    
+      
+        <title>View Methods - PyETR</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2afb09e1.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#view-methods-index" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="PyETR" class="md-header__button md-logo" aria-label="PyETR" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M184 0c30.9 0 56 25.1 56 56v400c0 30.9-25.1 56-56 56-28.9 0-52.7-21.9-55.7-50.1-5.2 1.4-10.7 2.1-16.3 2.1-35.3 0-64-28.7-64-64 0-7.4 1.3-14.6 3.6-21.2C21.4 367.4 0 338.2 0 304c0-31.9 18.7-59.5 45.8-72.3C37.1 220.8 32 207 32 192c0-30.7 21.6-56.3 50.4-62.6C80.8 123.9 80 118 80 112c0-29.9 20.6-55.1 48.3-62.1 3-28 26.8-49.9 55.7-49.9m144 0c28.9 0 52.6 21.9 55.7 49.9C411.5 56.9 432 82 432 112c0 6-.8 11.9-2.4 17.4 28.8 6.2 50.4 31.9 50.4 62.6 0 15-5.1 28.8-13.8 39.7 27.1 12.8 45.8 40.4 45.8 72.3 0 34.2-21.4 63.4-51.6 74.8 2.3 6.6 3.6 13.8 3.6 21.2 0 35.3-28.7 64-64 64-5.6 0-11.1-.7-16.3-2.1-3 28.2-26.8 50.1-55.7 50.1-30.9 0-56-25.1-56-56V56c0-30.9 25.1-56 56-56"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            PyETR
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              View Methods
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="yellow" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Oxford-HAI-Lab/PyETR" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Oxford-HAI-Lab/PyETR
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="PyETR" class="md-nav__button md-logo" aria-label="PyETR" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M184 0c30.9 0 56 25.1 56 56v400c0 30.9-25.1 56-56 56-28.9 0-52.7-21.9-55.7-50.1-5.2 1.4-10.7 2.1-16.3 2.1-35.3 0-64-28.7-64-64 0-7.4 1.3-14.6 3.6-21.2C21.4 367.4 0 338.2 0 304c0-31.9 18.7-59.5 45.8-72.3C37.1 220.8 32 207 32 192c0-30.7 21.6-56.3 50.4-62.6C80.8 123.9 80 118 80 112c0-29.9 20.6-55.1 48.3-62.1 3-28 26.8-49.9 55.7-49.9m144 0c28.9 0 52.6 21.9 55.7 49.9C411.5 56.9 432 82 432 112c0 6-.8 11.9-2.4 17.4 28.8 6.2 50.4 31.9 50.4 62.6 0 15-5.1 28.8-13.8 39.7 27.1 12.8 45.8 40.4 45.8 72.3 0 34.2-21.4 63.4-51.6 74.8 2.3 6.6 3.6 13.8 3.6 21.2 0 35.3-28.7 64-64 64-5.6 0-11.1-.7-16.3-2.1-3 28.2-26.8 50.1-55.7 50.1-30.9 0-56-25.1-56-56V56c0-30.9 25.1-56 56-56"/></svg>
+
+    </a>
+    PyETR
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Oxford-HAI-Lab/PyETR" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Oxford-HAI-Lab/PyETR
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Getting started
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/python/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Python
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/first_steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    First Steps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/pre_defined_cases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Pre-defined Cases
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/view_construction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    View Construction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/view_methods_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    View Methods Example
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/direct_decision_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Direct Decision Example
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Advanced Usage
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced_usage/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced_usage/defining_inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Defining Inference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced_usage/func_callers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Func Callers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced_usage/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced_usage/view_equality_and_equivalence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Equality
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Theory
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Theory
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Systems from R&I
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/differences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Differences with R&I
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../case_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Case Index
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    View Methods
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    View Methods
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#view-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      View Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="View Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#product" class="md-nav__link">
+    <span class="md-ellipsis">
+      product
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sum" class="md-nav__link">
+    <span class="md-ellipsis">
+      sum
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update" class="md-nav__link">
+    <span class="md-ellipsis">
+      update
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      answer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#negation" class="md-nav__link">
+    <span class="md-ellipsis">
+      negation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#merge" class="md-nav__link">
+    <span class="md-ellipsis">
+      merge
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#division" class="md-nav__link">
+    <span class="md-ellipsis">
+      division
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#factor" class="md-nav__link">
+    <span class="md-ellipsis">
+      factor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#depose" class="md-nav__link">
+    <span class="md-ellipsis">
+      depose
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inquire" class="md-nav__link">
+    <span class="md-ellipsis">
+      inquire
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#suppose" class="md-nav__link">
+    <span class="md-ellipsis">
+      suppose
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query" class="md-nav__link">
+    <span class="md-ellipsis">
+      query
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#which" class="md-nav__link">
+    <span class="md-ellipsis">
+      which
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#universal_product" class="md-nav__link">
+    <span class="md-ellipsis">
+      universal_product
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#atomic_answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      atomic_answer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#equilibrium_answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      equilibrium_answer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#existential_sum" class="md-nav__link">
+    <span class="md-ellipsis">
+      existential_sum
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parsing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parsing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parsing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from_str" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_str
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_str" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_str
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from_fol" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_fol
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_fol" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_fol
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from_json" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_json
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_json" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_json
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from_smt" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_smt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_smt" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_smt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from_smt_lib" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_smt_lib
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_smt_lib" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_smt_lib
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_english" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_english
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other" class="md-nav__link">
+    <span class="md-ellipsis">
+      Other
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Other">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#replace-overload1" class="md-nav__link">
+    <span class="md-ellipsis">
+      replace (overload1)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replace-overload2" class="md-nav__link">
+    <span class="md-ellipsis">
+      replace (overload2)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replace-overload3" class="md-nav__link">
+    <span class="md-ellipsis">
+      replace (overload3)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replace-overload4" class="md-nav__link">
+    <span class="md-ellipsis">
+      replace (overload4)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inference_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Inference Index
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Utilities Index
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Glossary
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    For Developers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../credits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Credits and Copyright
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#view-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      View Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="View Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#product" class="md-nav__link">
+    <span class="md-ellipsis">
+      product
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sum" class="md-nav__link">
+    <span class="md-ellipsis">
+      sum
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update" class="md-nav__link">
+    <span class="md-ellipsis">
+      update
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      answer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#negation" class="md-nav__link">
+    <span class="md-ellipsis">
+      negation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#merge" class="md-nav__link">
+    <span class="md-ellipsis">
+      merge
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#division" class="md-nav__link">
+    <span class="md-ellipsis">
+      division
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#factor" class="md-nav__link">
+    <span class="md-ellipsis">
+      factor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#depose" class="md-nav__link">
+    <span class="md-ellipsis">
+      depose
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inquire" class="md-nav__link">
+    <span class="md-ellipsis">
+      inquire
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#suppose" class="md-nav__link">
+    <span class="md-ellipsis">
+      suppose
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query" class="md-nav__link">
+    <span class="md-ellipsis">
+      query
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#which" class="md-nav__link">
+    <span class="md-ellipsis">
+      which
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#universal_product" class="md-nav__link">
+    <span class="md-ellipsis">
+      universal_product
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#atomic_answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      atomic_answer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#equilibrium_answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      equilibrium_answer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#existential_sum" class="md-nav__link">
+    <span class="md-ellipsis">
+      existential_sum
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parsing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parsing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parsing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from_str" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_str
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_str" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_str
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from_fol" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_fol
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_fol" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_fol
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from_json" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_json
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_json" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_json
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from_smt" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_smt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_smt" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_smt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from_smt_lib" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_smt_lib
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_smt_lib" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_smt_lib
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_english" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_english
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other" class="md-nav__link">
+    <span class="md-ellipsis">
+      Other
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Other">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#replace-overload1" class="md-nav__link">
+    <span class="md-ellipsis">
+      replace (overload1)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replace-overload2" class="md-nav__link">
+    <span class="md-ellipsis">
+      replace (overload2)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replace-overload3" class="md-nav__link">
+    <span class="md-ellipsis">
+      replace (overload3)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replace-overload4" class="md-nav__link">
+    <span class="md-ellipsis">
+      replace (overload4)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="view-methods-index">View Methods Index<a class="headerlink" href="#view-methods-index" title="Permanent link">&para;</a></h1>
+<p>Below you'll find all of the methods of View, including associated operations and ways of creating them.</p>
+<h2 id="view-operations">View Operations<a class="headerlink" href="#view-operations" title="Permanent link">&para;</a></h2>
+<h3 id="product"><code>product</code><a class="headerlink" href="#product" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L854">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.15, p208
+
+Γ^θ_fRI ⨂ᵀ Δ^{Ψ}_gSJ = (Γ_f ⨂ Δ^{Ψ}_g)^θ_(T⋈R)⋈(T⋈S),I∪J
+
+where Γ_f ⨂ Δ^{Ψ}_g = P + Σ_γ∈(Γ＼P) Σ_δ∈Δ {f(γ) x g(δ)).(γ∪δ)}
+and P = {f(γ).γ∈Γ |¬∃ψ ∈ Ψ.ψ⊆γ}
+
+Args:
+    self (View): Γ^θ_fRI
+    view (View): Δ^{Ψ}_gSJ
+    inherited_dependencies (Optional[DependencyRelation], optional): T. Defaults to an empty
+        dependency relation.
+
+Returns:
+    View: The result of the product calculation.
+</code></pre></div>
+<h3 id="sum"><code>sum</code><a class="headerlink" href="#sum" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L894">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.14, p208
+
+Γ^θ_fRI ⊕ᵀ Δ^{0}_gSJ = (Γ_f + Δ_g)^θ_(T⋈R)⋈(T⋈S),I∪J
+
+where (Γ_f + Δ_g) = (Γ ∪ Δ)_h, where h(γ) = f(γ) + g(γ)
+
+Args:
+    self (View): Γ^θ_fRI
+    view (View): Δ^{0}_gSJ
+    inherited_dependencies (Optional[DependencyRelation], optional): T. Defaults to an empty
+        dependency relation.
+
+Returns:
+    View: The result of the sum calculation
+</code></pre></div>
+<h3 id="update"><code>update</code><a class="headerlink" href="#update" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1208">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on Definition 4.34, p163
+
+Γ^Θ_fRI[D]^↻ = Γ^Θ_fRI[D]ᵁ[D]ᴱ[D]ᴬ[D]ᴹ
+
+Args:
+    self (View): Γ^Θ_fRI
+    view (View): D
+    verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+Returns:
+    View: The updated view.
+</code></pre></div>
+<h3 id="answer"><code>answer</code><a class="headerlink" href="#answer" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1059">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.13, p206
+
+Γ^θ_fRI[Δ^{0}_gSJ]^A = Γ^θ_fRI[Δ^{0}_gSJ]^𝔼A[Δ^{0}_gSJ]^𝓐A
+
+Args:
+    self (View): Γ^θ_fRI
+    other (View): Δ^{0}_gSJ
+    verbose (bool, optional): enables verbose mode
+
+Returns:
+    View: The result of the answer calculation
+</code></pre></div>
+<h3 id="negation"><code>negation</code><a class="headerlink" href="#negation" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1082">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.16, p210
+
+[Γ^Θ_fRI]ᶰ = (Θ ⨂ [Γ]ᶰ)^{0}_[R]ᶰ[I]ᶰ
+
+Args:
+    self (View): Γ^Θ_fRI
+    verbose (bool, optional): enable verbose mode. Defaults to False.
+
+Returns:
+    View: The negated view.
+</code></pre></div>
+<h3 id="merge"><code>merge</code><a class="headerlink" href="#merge" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1110">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on Definition 5.26, p221
+
+Γ^Θ_fRI[Δ^Ψ_gSJ]ᴹ = ⊕^R⋈S_γ∈Γ {f(γ).γ}|^Θ_RI ⨂^R⋈S Δ^Ψ_gSJ ⨂^R⋈S (⭙^R⋈S_&lt;t,u&gt;∈M&#39;ij(γ) Sub^R⋈S_&lt;t,u&gt;(Δ^{0}_gSJ))
+
+Args:
+    self (View): Γ^Θ_fRI
+    view (View): Δ^Ψ_gSJ
+    verbose (bool, optional): enable verbose mode. Defaults to False.
+
+Returns:
+    View: Returns the merged view.
+</code></pre></div>
+<h3 id="division"><code>division</code><a class="headerlink" href="#division" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1495">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 4.38, p168
+
+If ∀δ_∈Δ ∃ψ_∈Ψ ∃γ∈Γ (δ ⊆ γ ∧ ψ ⊆ γ):
+
+Γ^Θ_RI ⊘ Δ^Ψ_SJ = {γ ⊘_Γ Δ^Ψ : γ∈Γ}^Θ_[R][I]
+
+Args:
+    self (View): Γ^Θ_fRI
+    view (View): Δ^Ψ_SJ
+    verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+Returns:
+    View: The divided view.
+</code></pre></div>
+<h3 id="factor"><code>factor</code><a class="headerlink" href="#factor" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1543">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.17 p210 (contradiction)
+Based on definition 5.35 p233 (identity)
+Based on definition 5.32 p232 (central case)
+
+Contradiction: Γ^Θ_fRI[⊥]ꟳ = {γ∈Γ : ¬∃κ ∈ 𝕂.κ ⊆ γ}^Θ_fRI
+Identity: Γ^Θ_fRI[{w.t₁==t₂}^{0}_gSJ]ꟳ = {γ ∈ Γ : t₁==t₂ ∉ γ}_f + Σ_γ∈Γ s.t.t₁==t₂∈γ {(f(γ)[t₁/t₂]).(γ[t₁/t₂])}^Θ_RI
+Central: Γ^Θ_fRI[Δ^Ψ_gSJ]ꟳ = Σ_γ∈Γ {f(γ).γ[Δ^Ψ]ꟳ}
+
+Args:
+    self (View): Γ^Θ_fRI
+    other (View): ⊥ | {w.t₁==t₂}^{0}_gSJ | Δ^Ψ_gSJ
+    verbose (bool, optional): Enables verbose mode. Defaults to False.
+    absurd_states (Optional[list[State]], optional): Manual input of primitive absurd states. Defaults to None.
+
+Returns:
+    View: The factored view.
+</code></pre></div>
+<h3 id="depose"><code>depose</code><a class="headerlink" href="#depose" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1727">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.23
+
+Γ^Θ_fRI[]ᴰ = (Γ_f + [Θ]ᶰ)^{0}_R[I]ᶰ
+
+Args:
+    verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+Returns:
+    View: The deposed view.
+</code></pre></div>
+<h3 id="inquire"><code>inquire</code><a class="headerlink" href="#inquire" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1758">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.18, p210
+
+
+If A(Γ∪Θ) ∩ A(Δ∪Ψ) = ∅ and A(Δ) ∩ A(Ψ) = ∅
+    O Case: Γ^Θ_fRI[Δ^Ψ_gSJ]ᴵ = (Γ^Θ_fRI ⨂ (Δ^Ψ_gSJ ⊕ˢ({0}^Ψ_SJ ⨂ ([Δ^{0}_gSJ]ᶰ)^nov(A(Δ)))))[⊥]ꟳ
+
+Else if A(Δ∪Ψ) ⊆ A(Γ∪Θ) and S = [R]_Γ∪Θ
+    I Case: Γ^Θ_fRI[Δ^Ψ_gSJ]ᴵ = (Γ^Θ_fRI ⨂ᴿ (Δ^Ψ_gSJ ⊕ᴿ ([Δ_g]ᶰ|^Ψ_SJ)))[⊥]ꟳ
+
+Else:
+    Γ^Θ_fRI[Δ^Ψ_gSJ]ᴵ = Γ^Θ_fRI
+Args:
+    self (View): Γ^Θ_fRI
+    other (View): Δ^Ψ_gSJ
+    verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+Returns:
+    View: The resultant inquired view.
+</code></pre></div>
+<h3 id="suppose"><code>suppose</code><a class="headerlink" href="#suppose" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1851">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.22, p219
+
+If A(Γ∪Θ) ∩ A(Δ∪Ψ) = ∅ ∧ Δ^Ψ_gSJ = Δ^Ψ_SJ
+    O Case: Γ^Θ_fRI[Δ^Ψ_gSJ]ˢ = Γ^Θ&#39;_[R⋈R&#39;][I∪I&#39;] [Δ^Ψ_gSJ]ᵁ[Δ^Ψ_gSJ]ᴱ[Δ^Ψ_gSJ]ᴬ[Δ^Ψ_gSJ]ᴹ
+
+    where: Θ&#39;^{0}_R&#39;I&#39; = Θ^{0}_RI ⨂ Nov(Δ^Ψ_[S]ᶰJ []ᴰ)
+
+Else if A(Δ) ⊆ A(Γ∪Θ), [R]_Δ = S, and Δ^Ψ_gSJ = Δ^Ψ_SJ and Ψ = {0}
+    I Case: Γ^Θ_fRI[Δ^{0}_gSJ]ˢ = Γ^(Θ⨂Δ)_fRI[Δ^{0}_gSJ]ᵁ[Δ^{0}_gSJ]ᴱ[Δ^{0}_gSJ]ᴬ[Δ^{0}_gSJ]ᴹ
+
+Else:
+    Γ^Θ_fRI[Δ^Ψ_gSJ]ˢ = Γ^Θ_fRI
+
+Args:
+    self: (View): Γ^Θ_fRI
+    other (View): Δ^Ψ_gSJ
+    verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+Returns:
+    View: The resultant view.
+</code></pre></div>
+<h3 id="query"><code>query</code><a class="headerlink" href="#query" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1970">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.19, p210
+If U_S ⊆ U_R:
+    Γ^Θ_fRI[Δ^Ψ_gSJ]ꟴ = H + Σ_γ∈Γ Σ_δ∈Δ_s.t.Φ(γ, δ) {w_(γ,δ).δ}^Θ_R⋈&lt;U_R,E_S＼E_R,D_S&#39;&gt;,I∪J
+Else:
+    Γ^Θ_fRI[Δ^Ψ_gSJ]ꟴ = Γ^Θ_fRI
+</code></pre></div>
+<h3 id="which"><code>which</code><a class="headerlink" href="#which" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2145">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.33, p232
+
+Γ^Θ_fRI[Δ^Ψ_gSJ]ᵂ = H + Σ_γ∈Γ《ω.ξ : Ξ(γ,ω.ξ)》|^Θ_RI
+
+Ξ(γ,ω.ξ) = ∃ψ_∈Ψ ∃δ_∈Δ ∃n≥0 ∃&lt;t₁,e₁&gt;,...,&lt;tₙ,eₙ&gt;∈M&#39;ij (∀i,j.(e_i=e_j -&gt; i=j)) ∧ (ξ∪ψ ⊆ γ ∧ ω.ξ = (g(δ).δ)[t₁/e₁,...,tₙ/eₙ])
+
+Args:
+    self (View): Γ^Θ_fRI
+    other (View): Δ^Ψ_gSJ
+    verbose (bool, optional): Enables verbose mode. Defaults to False.
+
+Returns:
+    View: The resultant view.
+</code></pre></div>
+<h3 id="universal_product"><code>universal_product</code><a class="headerlink" href="#universal_product" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1255">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on Definition 5.28, p223
+
+Γ^Θ_fRI[D]ᵁ = {0}^Θ_RI ⨂^R⋈S (⨂^R⋈S_&lt;u,t&gt;∈M&#39;ij Sub^R⋈S_&lt;t,u&gt; (Γ^{0}_fRI))
+</code></pre></div>
+<h3 id="atomic_answer"><code>atomic_answer</code><a class="headerlink" href="#atomic_answer" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L942">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.12, p206
+
+Γ^θ_fRI[Δ^{0}_gSJ]^𝓐A = argmax_γ∈Γ(Δ[{{p} : p ∈ γ}]^𝓐P)_f |^θ_RI
+
+Args:
+    self (View): Γ^θ_fRI
+    other (View): Δ^{0}_gSJ
+    verbose (bool, optional): enables verbose mode
+
+Returns:
+    View: The result of the atomic answer calculation
+</code></pre></div>
+<h3 id="equilibrium_answer"><code>equilibrium_answer</code><a class="headerlink" href="#equilibrium_answer" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L997">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on definition 5.10, p205
+
+Γ^θ_fRI[Δ^{0}_gSJ]^𝔼A
+
+Args:
+    self (View): Γ^θ_fRI
+    other (View): Δ^{0}_gSJ
+    verbose (bool, optional): enables verbose mode
+
+Returns:
+    View: The result of the equilibrium answer calculation
+</code></pre></div>
+<h3 id="existential_sum"><code>existential_sum</code><a class="headerlink" href="#existential_sum" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1329">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Based on Definition 5.34, p233
+
+Γ^Θ_fRI[Δ^{0}_gSJ]ᴱ = Γ^Θ_fRI ⊕^R⋈S (
+    ⊕^R⋈S_&lt;e,t&gt;∈M&#39;ij Sub^R⋈S_&lt;t,e&gt; (BIG_UNION(e)^Θ_SJ)
+)
+</code></pre></div>
+<h2 id="parsing">Parsing<a class="headerlink" href="#parsing" title="Permanent link">&para;</a></h2>
+<h3 id="from_str"><code>from_str</code><a class="headerlink" href="#from_str" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2257">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Parses from view string form to view form.
+
+Args:
+    s (str): view string
+    custom_functions (list[NumFunc | Function] | None, optional): Custom functions used in the
+        string. It assumes the name of the function is that used in the string. Useful
+        for using func callers. Defaults to None.
+
+Returns:
+    View: The output view
+</code></pre></div>
+<h3 id="to_str"><code>to_str</code><a class="headerlink" href="#to_str" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2275">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Parses from View form to view string form
+
+Args:
+    v (View): The view to convert to string
+
+Returns:
+    str: The view string
+</code></pre></div>
+<h3 id="from_fol"><code>from_fol</code><a class="headerlink" href="#from_fol" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2287">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Parses from first order logic string form to View form.
+
+Args:
+    s (str): A first order logic string
+    custom_functions (list[NumFunc | Function] | None, optional): Custom functions used in the
+        string. It assumes the name of the function is that used in the string. Useful
+        for using func callers. Defaults to None.
+Returns:
+    View: The parsed view
+</code></pre></div>
+<h3 id="to_fol"><code>to_fol</code><a class="headerlink" href="#to_fol" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2304">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Parses from View form to first order logic string form.
+
+Args:
+    v (View): The View object
+
+Returns:
+    str: The first order logic string form.
+</code></pre></div>
+<h3 id="from_json"><code>from_json</code><a class="headerlink" href="#from_json" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2232">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Parses from json form to View form
+
+Args:
+    s (str): The json string
+
+Returns:
+    View: The parsed view
+</code></pre></div>
+<h3 id="to_json"><code>to_json</code><a class="headerlink" href="#to_json" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2245">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Parses from View form to json form
+
+Args:
+    v (View): The input view
+
+Returns:
+    str: The output json
+</code></pre></div>
+<h3 id="from_smt"><code>from_smt</code><a class="headerlink" href="#from_smt" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2316">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Parses from first order logic pysmt form to View form.
+
+Args:
+    fnode (FNode): The pysmt object
+    custom_functions (list[NumFunc | Function] | None, optional): Custom functions used in the
+        string. It assumes the name of the function is that used in the string. Useful
+        for using func callers. Defaults to None.
+Returns:
+    Self: The parsed view
+</code></pre></div>
+<h3 id="to_smt"><code>to_smt</code><a class="headerlink" href="#to_smt" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2333">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Parses from View form to first order logic pysmt form.
+
+Args:
+    env (Optional[Environment], optional): The pysmt environment to embed
+        parsed variables. If None will use a fresh environment to avoid clashes.
+        Defaults to None.
+
+Returns:
+    FNode: The parsed pysmt object
+</code></pre></div>
+<h3 id="from_smt_lib"><code>from_smt_lib</code><a class="headerlink" href="#from_smt_lib" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2347">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Parses from SMT Lib form to View form.
+
+Args:
+    smt_lib (str): The input string in SMT Lib structure
+    custom_functions (list[NumFunc  |  Function] | None, optional): Custom functions used in the
+        string. It assumes the name of the function is that used in the string. Useful
+        for using func callers. Defaults to None.
+    env (Optional[Environment], optional): The pysmt environment to embed
+        parsed variables. If None will use a fresh environment to avoid clashes.
+        Defaults to None.
+
+Returns:
+    Self: The parsed view
+</code></pre></div>
+<h3 id="to_smt_lib"><code>to_smt_lib</code><a class="headerlink" href="#to_smt_lib" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2371">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Parses from View form to SMT Lib form.
+
+
+Args:
+    env (Optional[Environment], optional):  The pysmt environment to embed
+        parsed variables. If None will use a fresh environment to avoid clashes.
+        Defaults to None.
+
+Returns:
+    str: The view string in SMT Lib structure
+</code></pre></div>
+<h3 id="to_english"><code>to_english</code><a class="headerlink" href="#to_english" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2386">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Parses from View form to english string form.
+
+Args:
+    v (View): The View object
+    name_mappings (Optional[dict[str,str]]): Maps strings in variables, predicates etc to
+        replacements strings
+
+Returns:
+    str: The english string form.
+</code></pre></div>
+<h2 id="other">Other<a class="headerlink" href="#other" title="Permanent link">&para;</a></h2>
+<h3 id="replace-overload1"><code>replace (overload1)</code><a class="headerlink" href="#replace-overload1" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L691">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Searches for the string name of old item and replaces all instances with new item.
+
+Args:
+    old_item (str): The search string
+    new_item (str): The replacement string
+
+Returns:
+    View: The new view with the replacements made
+</code></pre></div>
+<h3 id="replace-overload2"><code>replace (overload2)</code><a class="headerlink" href="#replace-overload2" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L705">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Searches for the arbitrary object and replaces all instances with new item.
+
+Args:
+    old_item (ArbitraryObject): The search object
+    new_item (ArbitraryObject): The replacement object
+
+Returns:
+    View: The new view with the replacements made
+</code></pre></div>
+<h3 id="replace-overload3"><code>replace (overload3)</code><a class="headerlink" href="#replace-overload3" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L719">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Searches for the function and replaces all instances with new item.
+
+Args:
+    old_item (Function): The function to search for
+    new_item (Function): The function to replace with
+
+Returns:
+    View: The new view with the replacements made
+</code></pre></div>
+<h3 id="replace-overload4"><code>replace (overload4)</code><a class="headerlink" href="#replace-overload4" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L733">Link to code</a></p>
+<div class="highlight"><pre><span></span><code>Searches for the predicate and replaces all instances with new item.
+
+Args:
+    old_item (Predicate): The predicate to search for
+    new_item (Predicate): The predicate to replace with
+
+Returns:
+    View: The new view with the replacements made
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../case_index/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Case Index">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Case Index
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../inference_index/" class="md-footer__link md-footer__link--next" aria-label="Next: Inference Index">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Inference Index
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy", "navigation.footer", "navigation.top"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
