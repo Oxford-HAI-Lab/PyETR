@@ -14,8 +14,7 @@ class AbstractAtom(ABC):
 
     @property
     @abstractmethod
-    def detailed(self) -> str:
-        ...
+    def detailed(self) -> str: ...
 
     @abstractmethod
     def _replace_arbs(self, replacements: dict[ArbitraryObject, Term]) -> Self:
@@ -77,5 +76,4 @@ class Atom(AbstractAtom):
         self,
         old_item: "MatchItem",
         callback: "MatchCallback",
-    ) -> Self:
-        ...
+    ) -> Self: ...

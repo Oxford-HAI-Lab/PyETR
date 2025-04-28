@@ -222,8 +222,7 @@ class BaseExample(metaclass=BaseMeta):
 
     @classmethod
     @abstractmethod
-    def test(cls, verbose: bool = True):
-        ...
+    def test(cls, verbose: bool = True): ...
 
 
 class BaseTest:

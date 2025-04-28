@@ -32,20 +32,18 @@ def multiset_context_equals(
 
 class OpenTerm(AbstractTerm):
     @abstractmethod
-    def question_count(self) -> int:
-        ...
+    def question_count(self) -> int: ...
 
     @abstractmethod
-    def _replace_arbs(self, replacements: dict[ArbitraryObject, Term]) -> "OpenTerm":
-        ...
+    def _replace_arbs(
+        self, replacements: dict[ArbitraryObject, Term]
+    ) -> "OpenTerm": ...
 
     @abstractmethod
-    def __call__(self, term: Term) -> Term:
-        ...
+    def __call__(self, term: Term) -> Term: ...
 
     @abstractmethod
-    def context_equals(self, term: "Term", question_term: "Term") -> bool:
-        ...
+    def context_equals(self, term: "Term", question_term: "Term") -> bool: ...
 
 
 class OpenArbitraryObject(AbstractArbitraryObject, OpenTerm):

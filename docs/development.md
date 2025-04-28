@@ -75,6 +75,6 @@ poetry build
 
 ## Step 6: Make the release
 
-You can make a new release [here](https://github.com/dreamingspires/PyETR/releases/new)
+You can make a new release [here](https://github.com/Oxford-HAI-Lab/PyETR/releases/new)
 
 Be sure to upload the `*.tar.gz` and `*.whl` files found in the ./dist directory.

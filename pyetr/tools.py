@@ -35,8 +35,7 @@ class _BaseNameGen(metaclass=ABCMeta):
         super().__init__()
 
     @abstractmethod
-    def __next__(self) -> str:
-        ...
+    def __next__(self) -> str: ...
 
 
 class _AlphabetGenerator(_BaseNameGen):

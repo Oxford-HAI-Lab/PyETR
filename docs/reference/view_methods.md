@@ -6,7 +6,7 @@ Below you'll find all of the methods of View, including associated operations an
 
 ### `product`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L854)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L854)
 
 ```
 Based on definition 5.15, p208
@@ -28,7 +28,7 @@ Returns:
 
 ### `sum`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L894)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L894)
 
 ```
 Based on definition 5.14, p208
@@ -49,7 +49,7 @@ Returns:
 
 ### `update`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1208)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1208)
 
 ```
 Based on Definition 4.34, p163
@@ -67,7 +67,7 @@ Returns:
 
 ### `answer`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1059)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1059)
 
 ```
 Based on definition 5.13, p206
@@ -85,7 +85,7 @@ Returns:
 
 ### `negation`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1082)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1082)
 
 ```
 Based on definition 5.16, p210
@@ -102,7 +102,7 @@ Returns:
 
 ### `merge`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1110)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1110)
 
 ```
 Based on Definition 5.26, p221
@@ -120,7 +120,7 @@ Returns:
 
 ### `division`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1495)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1495)
 
 ```
 Based on definition 4.38, p168
@@ -140,7 +140,7 @@ Returns:
 
 ### `factor`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1543)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1543)
 
 ```
 Based on definition 5.17 p210 (contradiction)
@@ -163,7 +163,7 @@ Returns:
 
 ### `depose`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1727)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1727)
 
 ```
 Based on definition 5.23
@@ -179,7 +179,7 @@ Returns:
 
 ### `inquire`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1758)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1758)
 
 ```
 Based on definition 5.18, p210
@@ -204,7 +204,7 @@ Returns:
 
 ### `suppose`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1851)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1851)
 
 ```
 Based on definition 5.22, p219
@@ -231,7 +231,7 @@ Returns:
 
 ### `query`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1970)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1970)
 
 ```
 Based on definition 5.19, p210
@@ -243,7 +243,7 @@ Else:
 
 ### `which`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2145)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2145)
 
 ```
 Based on definition 5.33, p232
@@ -263,7 +263,7 @@ Returns:
 
 ### `universal_product`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1255)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1255)
 
 ```
 Based on Definition 5.28, p223
@@ -273,7 +273,7 @@ Based on Definition 5.28, p223
 
 ### `atomic_answer`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L942)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L942)
 
 ```
 Based on definition 5.12, p206
@@ -291,7 +291,7 @@ Returns:
 
 ### `equilibrium_answer`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L997)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L997)
 
 ```
 Based on definition 5.10, p205
@@ -309,7 +309,7 @@ Returns:
 
 ### `existential_sum`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L1329)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L1329)
 
 ```
 Based on Definition 5.34, p233
@@ -324,7 +324,7 @@ Based on Definition 5.34, p233
 
 ### `from_str`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2257)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2257)
 
 ```
 Parses from view string form to view form.
@@ -341,7 +341,7 @@ Returns:
 
 ### `to_str`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2275)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2275)
 
 ```
 Parses from View form to view string form
@@ -355,7 +355,7 @@ Returns:
 
 ### `from_fol`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2287)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2287)
 
 ```
 Parses from first order logic string form to View form.
@@ -371,7 +371,7 @@ Returns:
 
 ### `to_fol`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2304)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2304)
 
 ```
 Parses from View form to first order logic string form.
@@ -385,7 +385,7 @@ Returns:
 
 ### `from_json`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2232)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2232)
 
 ```
 Parses from json form to View form
@@ -399,7 +399,7 @@ Returns:
 
 ### `to_json`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2245)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2245)
 
 ```
 Parses from View form to json form
@@ -413,7 +413,7 @@ Returns:
 
 ### `from_smt`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2316)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2316)
 
 ```
 Parses from first order logic pysmt form to View form.
@@ -429,7 +429,7 @@ Returns:
 
 ### `to_smt`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2333)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2333)
 
 ```
 Parses from View form to first order logic pysmt form.
@@ -445,7 +445,7 @@ Returns:
 
 ### `from_smt_lib`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2347)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2347)
 
 ```
 Parses from SMT Lib form to View form.
@@ -465,7 +465,7 @@ Returns:
 
 ### `to_smt_lib`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2371)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2371)
 
 ```
 Parses from View form to SMT Lib form.
@@ -482,7 +482,7 @@ Returns:
 
 ### `to_english`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L2386)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L2386)
 
 ```
 Parses from View form to english string form.
@@ -501,7 +501,7 @@ Returns:
 
 ### `replace (overload1)`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L691)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L691)
 
 ```
 Searches for the string name of old item and replaces all instances with new item.
@@ -516,7 +516,7 @@ Returns:
 
 ### `replace (overload2)`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L705)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L705)
 
 ```
 Searches for the arbitrary object and replaces all instances with new item.
@@ -531,7 +531,7 @@ Returns:
 
 ### `replace (overload3)`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L719)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L719)
 
 ```
 Searches for the function and replaces all instances with new item.
@@ -546,7 +546,7 @@ Returns:
 
 ### `replace (overload4)`
 
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/view.py#L733)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/view.py#L733)
 
 ```
 Searches for the predicate and replaces all instances with new item.

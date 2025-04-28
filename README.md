@@ -2,7 +2,7 @@
 
 ## Documentation
 
-Please see the documentation page [here](https://client.dreamingspires.dev/pyetr/)
+Please see the documentation page [here](https://oxford-hai-lab.github.io/PyETR/)
 
 ## Installation
 

@@ -14,29 +14,24 @@ class AbstractTerm(ABC):
     """
 
     @abstractmethod
-    def __eq__(self, other: object) -> bool:
-        ...
+    def __eq__(self, other: object) -> bool: ...
 
     @abstractmethod
-    def __hash__(self) -> int:
-        ...
+    def __hash__(self) -> int: ...
 
     @abstractmethod
-    def __repr__(self) -> str:
-        ...
+    def __repr__(self) -> str: ...
 
     @property
     @abstractmethod
-    def detailed(self) -> str:
-        ...
+    def detailed(self) -> str: ...
 
     @abstractmethod
     def match(
         self,
         old_item: "MatchItem",
         callback: "MatchCallback",
-    ) -> Self:
-        ...
+    ) -> Self: ...
 
 
 TermType = TypeVar("TermType", bound=AbstractTerm)

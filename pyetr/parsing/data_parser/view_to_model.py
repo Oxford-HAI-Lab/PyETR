@@ -23,25 +23,21 @@ if typing.TYPE_CHECKING:
 
 
 @overload
-def term_to_model(t: AbstractFunctionalTerm[TermType]) -> models.FunctionalTerm:
-    ...
+def term_to_model(t: AbstractFunctionalTerm[TermType]) -> models.FunctionalTerm: ...
 
 
 @overload
-def term_to_model(t: AbstractArbitraryObject) -> models.ArbitraryObject:
-    ...
+def term_to_model(t: AbstractArbitraryObject) -> models.ArbitraryObject: ...
 
 
 @overload
-def term_to_model(t: QuestionMark) -> models.QuestionMark:
-    ...
+def term_to_model(t: QuestionMark) -> models.QuestionMark: ...
 
 
 @overload
 def term_to_model(
     t: AbstractTerm,
-) -> models.ArbitraryObject | models.FunctionalTerm | models.QuestionMark:
-    ...
+) -> models.ArbitraryObject | models.FunctionalTerm | models.QuestionMark: ...
 
 
 def term_to_model(

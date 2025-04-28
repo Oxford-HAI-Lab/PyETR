@@ -3,7 +3,7 @@
 Below you'll find all of the inference functions in pyetr.inference. You can use this page as an index of the inference methods.
 
 ## `basic_step`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L20)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/inference.py#L20)
 
 
 ```
@@ -20,7 +20,7 @@ Returns:
 ```
 
 ## `default_inference_procedure`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L42)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/inference.py#L42)
 
 
 ```
@@ -38,7 +38,7 @@ Returns:
 ```
 
 ## `default_procedure_does_it_follow`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L81)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/inference.py#L81)
 
 
 ```
@@ -58,7 +58,7 @@ Returns:
 ```
 
 ## `default_procedure_what_is_prob`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L125)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/inference.py#L125)
 
 
 ```
@@ -89,7 +89,7 @@ Returns:
 ```
 
 ## `default_decision`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/inference.py#L219)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/inference.py#L219)
 
 
 ```

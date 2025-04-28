@@ -33,20 +33,17 @@ def model_to_function(f: models.Function | models.RealNumber) -> Function:
 
 
 @overload
-def model_to_term(t: models.FunctionalTerm) -> FunctionalTerm:
-    ...
+def model_to_term(t: models.FunctionalTerm) -> FunctionalTerm: ...
 
 
 @overload
-def model_to_term(t: models.ArbitraryObject) -> ArbitraryObject:
-    ...
+def model_to_term(t: models.ArbitraryObject) -> ArbitraryObject: ...
 
 
 @overload
 def model_to_term(
     t: models.ArbitraryObject | models.FunctionalTerm,
-) -> FunctionalTerm | ArbitraryObject:
-    ...
+) -> FunctionalTerm | ArbitraryObject: ...
 
 
 def model_to_term(
@@ -65,25 +62,21 @@ def model_to_term(
 
 
 @overload
-def model_to_open_term(t: models.FunctionalTerm) -> OpenFunctionalTerm:
-    ...
+def model_to_open_term(t: models.FunctionalTerm) -> OpenFunctionalTerm: ...
 
 
 @overload
-def model_to_open_term(t: models.ArbitraryObject) -> OpenArbitraryObject:
-    ...
+def model_to_open_term(t: models.ArbitraryObject) -> OpenArbitraryObject: ...
 
 
 @overload
-def model_to_open_term(t: models.QuestionMark) -> QuestionMark:
-    ...
+def model_to_open_term(t: models.QuestionMark) -> QuestionMark: ...
 
 
 @overload
 def model_to_open_term(
     t: models.ArbitraryObject | models.FunctionalTerm | models.QuestionMark,
-) -> OpenFunctionalTerm | OpenArbitraryObject | QuestionMark:
-    ...
+) -> OpenFunctionalTerm | OpenArbitraryObject | QuestionMark: ...
 
 
 def model_to_open_term(
@@ -101,20 +94,17 @@ def model_to_open_term(
 
 
 @overload
-def model_to_open_atom(a: models.DoAtom) -> list[OpenPredicateAtom]:
-    ...
+def model_to_open_atom(a: models.DoAtom) -> list[OpenPredicateAtom]: ...
 
 
 @overload
-def model_to_open_atom(a: models.Atom) -> OpenPredicateAtom:
-    ...
+def model_to_open_atom(a: models.Atom) -> OpenPredicateAtom: ...
 
 
 @overload
 def model_to_open_atom(
     a: models.Atom | models.DoAtom,
-) -> OpenPredicateAtom | list[OpenPredicateAtom]:
-    ...
+) -> OpenPredicateAtom | list[OpenPredicateAtom]: ...
 
 
 def model_to_open_atom(
@@ -147,18 +137,15 @@ def model_to_open_atom(
 
 
 @overload
-def model_to_atom(a: models.DoAtom) -> DoAtom:
-    ...
+def model_to_atom(a: models.DoAtom) -> DoAtom: ...
 
 
 @overload
-def model_to_atom(a: models.Atom) -> PredicateAtom:
-    ...
+def model_to_atom(a: models.Atom) -> PredicateAtom: ...
 
 
 @overload
-def model_to_atom(a: models.Atom | models.DoAtom) -> Atom:
-    ...
+def model_to_atom(a: models.Atom | models.DoAtom) -> Atom: ...
 
 
 def model_to_atom(a: models.Atom | models.DoAtom) -> Atom:

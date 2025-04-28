@@ -3,7 +3,7 @@
 Below you'll find all of the utilities in pyetr.utils. You can use this page as an index of the available utilities.
 
 ## `views_to_smt_lib`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/utils.py#L103)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/utils.py#L103)
 
 
 ```
@@ -20,7 +20,7 @@ Returns:
 ```
 
 ## `smt_lib_to_views`
-[Link to code](https://github.com/dreamingspires/PyETR/blob/master/pyetr/utils.py#L12)
+[Link to code](https://github.com/Oxford-HAI-Lab/PyETR/blob/master/pyetr/utils.py#L12)
 
 
 ```

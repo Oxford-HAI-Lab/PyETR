@@ -10,7 +10,7 @@ Make sure you first have installed:
 
 You can download the latest version of the PyETR package on the below link. Go to the Assets section and download the file of the structure: `pyetr-*.*.*.tar.gz`
 
-[Latest Release](https://github.com/dreamingspires/PyETR/releases/latest)
+[Latest Release](https://github.com/Oxford-HAI-Lab/PyETR/releases/latest)
 
 ## Step 3: Install the package
 

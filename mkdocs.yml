@@ -29,8 +29,7 @@ nav:
     - 'Utilities Index': 'reference/utils_index.md'
   - 'Glossary' : 'glossary.md'
   - 'For Developers': 'development.md'
-  - 'Credits': 'credits.md'
-  - 'License': 'license.md'
+  - 'Credits and Copyright': 'credits.md'
 theme:
   name: 'material'
   features:
